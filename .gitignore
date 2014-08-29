@@ -101,7 +101,6 @@ build/
 /npm-debug.log
 
 /Server/App/file_times.js
-/Client/App/js/okdoki.js
 /logs/
 /nginx.conf.compiled
 /.rocks/
