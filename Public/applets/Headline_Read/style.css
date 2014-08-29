@@ -1,0 +1,59 @@
+#Write div.content {
+  padding-top: 0;
+}
+#Write div.to_room,
+#Write div.as_this_life {
+  float: left;
+  padding-right: 6px;
+}
+#Write div.menu {
+  display: inline-block;
+  padding-left: 5px;
+}
+#Write div.buttons {
+  text-align: center;
+}
+#Headlines {
+  padding-bottom: 150px;
+}
+#Headlines div.msg {
+  background: #fff;
+  border-radius: 0 5px 5px 0;
+  margin: 0 0 15px 0;
+  padding: 2px 5px 6px 5px;
+}
+#Headlines div.msg div.meta span.name {
+  color: #0051af;
+  font-weight: bold;
+}
+#Headlines div.msg div.meta span.room_name {
+  color: #00a0bd;
+  font-weight: bold;
+}
+#Headlines div.msg div.meta span.said,
+#Headlines div.msg div.meta span.by {
+  color: #545454;
+}
+#Headlines div.msg div.body {
+  font-size: 120%;
+}
+#Headlines div.official,
+#Headlines div.error {
+  background: #ffea74;
+  padding: 4px 4px 4px 5px;
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+}
+#Headlines div.error {
+  background: #fff;
+  color: #f00919;
+  font-family: 'Ubuntu', 'Ubuntu Beta', UbuntuBeta, Ubuntu, 'Bitstream Vera Sans', 'DejaVu Sans', Tahoma, proxima-nova, 'Helvetica Neue', Arial, sans-serif;
+  padding-bottom: 6px;
+}
+#Headlines div.error div.body {
+  font-size: 110%;
+}
+#Headlines div.me {
+  background: rgba(255,255,255,0.35);
+  border: 1px solid #fff;
+  border-width: 1px 1px 1px 0;
+}

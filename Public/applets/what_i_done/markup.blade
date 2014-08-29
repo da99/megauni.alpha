@@ -1,0 +1,32 @@
+
+append Interact
+  div.box#New_Task
+    h3 Create Task:
+    div.content
+      form#Create_Task(method="POST", action="/what_i_done")
+        div.fields
+          div.field.title
+            label Title:
+            input(name="title", type="text", maxlength="80")
+          div.field.due_at
+            label Due at:
+            select
+              option Yesterday
+              option(selected="selected") Today
+              option Tomorrow
+            select(name="hour")
+              - var i = 0
+              - while(++i < 13)
+                option(value="#{i}") #{i}
+            select(name="minute")
+              - var i = -5
+              - while((i+=5) < 60)
+                - if (i < 10)
+                  option(value="0#{i}") 0#{i}
+                - else
+                  option(value="#{i}") #{i}
+            select(name="am_pm")
+              option(value="am") am
+              option(value="pm") pm
+        div.buttons
+          button.submit Create

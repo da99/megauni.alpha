@@ -1,0 +1,10 @@
+div.box#Create_Website
+  h3 Create a new website:
+  div.content
+    form(action="/me/#{screen_name}/create/website", method="POST")
+      div.fields
+        div.field.title
+          span.label Title:
+          input(type="text", value="", name="title", maxlength="100")
+      div.buttons
+        button.submit Create

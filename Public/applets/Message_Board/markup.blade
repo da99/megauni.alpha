@@ -1,0 +1,21 @@
+div.box#Message_Board
+  h3
+    | Message Board:
+
+  div.content
+
+    - if (is_customer)
+      //- div.show.show_write
+      //- a(href="#Write_Message") Write A New Message.
+      form#Write_Message(action="/me/#{screen_name}/message_board/msg", method="post")
+        div.fields
+          div.field
+            span.label Message:
+            textarea(name="body")
+        call applet("as_this_life")
+        div.buttons
+          button.submit Publish
+
+    div.msgs
+      div.loading Retrieving messages...
+

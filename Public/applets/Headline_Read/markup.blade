@@ -1,0 +1,11 @@
+
+append templates
+  div.headline.msg(id="{dom_id}")
+    div.meta
+      span.name {author}
+      span.said &nbsp;said&nbsp;
+      input(type="hidden", name="author", value="{author}")
+    div.body
+      | {body}
+
+

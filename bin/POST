@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+set -u -e -o pipefail
+curl -k -X POST --header "Content-Type:application/json" -d "$1" https://localhost$2
+echo ""
+
+
+

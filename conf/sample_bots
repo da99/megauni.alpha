@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+# -*- js   -*-
+#
+
+var imok = {"life":["box",["#Sidebar"],"create box at top",["#quotes"],"list",["The computer world is like a great big toy store. ","Microsoft Word is a computer game.","a","b","c","D","e","ted","doug","alan","wal"],"random item",[],"is text of",["#quotes"],"box",["#quotes"],"padding",["30px 0"],"font-size",["x-large"]]}
+
+

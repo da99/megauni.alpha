@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#!/usr/bin/env node
+# -*- js   -*-
+#
+set -u -e -o pipefail
+
+
+
+bin/migrate down
+bin/migrate
+bin/set_admin

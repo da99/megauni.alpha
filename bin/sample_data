@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# -*- ruby -*-
+#
+#
+
+
+if !ENV['IS_DEV']
+  puts "Not a dev machine."
+  exit 1
+end
+
+
+require "./Server/Customer/model"
+require "./Server/Screen_Name/model"
+require "./Server/Bot/model"
+require "./Server/Consume/model"
+
+
+begin
+  c = Customer.new(Customer::TABLE.first)
+  puts "=== Customer found."
+rescue Customer::Not_Found
+  c = Customer.create :screen_name => "ted1"
+  puts "=== Created first customer."
+end
+
+['Egg-Timer', 'Hearts-Club', 'Nippon-Style', 'Lit-Rom'].each { |n|
+  begin
+    sn = Screen_Name.create :screen_name=>n, :customer=>c
+    sn.create :bot
+    puts "=== Created: #{n}"
+  rescue Object => e
+    puts "=== Skipping #{n}: #{e.message}"
+  end
+}
+

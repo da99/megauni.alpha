@@ -7,4 +7,3 @@ set -u -e -o pipefail
 bin/server start
 
 
-

@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+#
+#
+
+name = ARGV[0]
+if !name
+  puts "No name."
+  exit 1
+end
+
+action = ARGV[1]
+if !action
+  puts "No action."
+  exit 1
+end
+
+action_sub = ARGV[2]
+
+`mkdir -p Server/#{name}/migrates`
+
+files = Dir.glob("Server/#{name}/migrates/*.sql").sort
+
+if files.empty?
+  ver=1
+else
+  last=files.last.split('/').last || "/0"
+  ver=last.split('/').last.split('-').first.to_i + 1
+end
+
+
+if ver < 10
+  ver_str = "00#{ver}"
+elsif ver < 100
+  ver_str = "0#{ver}"
+else
+  ver_str = "#{ver}"
+end
+
+sub_str=[name, action, action_sub].compact
+if sub_str.size > 2
+  sub_str.shift
+end
+
+new_file = "Server/#{name}/migrates/#{ver_str}-#{sub_str.join('-')}.sql"
+File.open(new_file, 'a') do |f|
+  f.puts "\n\n\n\n-- DOWN\n\n\n\n"
+end
+
+exec "gvim #{new_file}"

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+set -u -e -o pipefail
+
+git push
+git push github master
+
+
+

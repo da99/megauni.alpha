@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+set -u -e -o pipefail
+npm_link ensure_none
+git_ensure_clean_repo
+
+folder="node_modules"
+git add -f $folder
+git stash
+git checkout mu_mind
+
+git merge master
+git stash pop
+
+
+git add -f node_modules/ > /dev/null
+
+if ! is_git_repo_clean
+then
+  git_update > /dev/null
+  git commit -m "npm update"
+fi
+
+git push -f heroku mu_mind:master
+
+git push origin mu_mind
+git push origin master
+
+git checkout master
+
+bin/regenerate_deploy_cache
+git checkout mu_mind -- $folder
+
+git reset HEAD $folder
+
+

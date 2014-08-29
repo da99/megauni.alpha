@@ -1,0 +1,494 @@
+
+html {
+  background: #000 url("/img/montreal_bikes/bikes_small.jpg?1") no-repeat top left fixed;
+  -moz-background-size: cover;
+  -webkit-background-size: cover;
+  -o-background-size: cover;
+  -ms-background-size: cover;
+  background-size: cover;
+}
+html.max_900_plus {
+  background-image: url("/img/montreal_bikes/bikes_huge.jpg?1");
+}
+body {
+  background-color: transparent;
+  padding: 0;
+}
+a:link,
+a:visited {
+  border: 0;
+  text-decoration: underline;
+}
+a:hover {
+  text-decoration: none;
+}
+#intro {
+  background: #000;
+  color: #e1eeff;
+  padding: 0;
+}
+div.intro {
+  background: #000;
+  color: #e1eeff;
+  padding: 0;
+}
+h1.title {
+  text-shadow: #000 0.1em 0.1em 0.1em;
+  font-family: 'Libertinage';
+  font-weight: 400;
+  font-size: 24pt;
+  text-align: center;
+  margin: 0 0 0 0;
+  line-height: 1.5;
+  padding: 10px 0 7px 0;
+}
+h1.title span.main {
+  color: #e5e5e2;
+  text-transform: lowercase;
+}
+h1.title span.sub {
+  font-weight: bold;
+  color: #f85d95;
+  color: #de5787;
+  text-transform: uppercase;
+}
+span.about {
+  color: #ff8f00;
+  font-weight: normal;
+  font-size: 110%;
+  font-style: italic;
+}
+span ul.nav_bar {
+  text-align: left;
+  padding-top: 100px;
+}
+span input {
+  width: 90%;
+}
+div.form {
+  margin: 0 10px;
+}
+div.form div.form h2 {
+  color: #185dad;
+}
+div.form div.form a.cancel {
+  margin-left: 10px;
+}
+#show_sign_in {
+  padding: 0;
+  margin: 0;
+}
+#header,
+#footer {
+  background: #000;
+  background: rgba(0,0,0,0.65);
+  text-align: center;
+  text-align: center;
+}
+#header p,
+#footer p {
+  max-width: 400px;
+  margin: 0 auto;
+}
+#header strong,
+#footer strong {
+  background: #185dad;
+  color: #fff;
+}
+#header {
+  padding: 10px 0 10px 0;
+  margin: 0px 0 0 0;
+  border-radius: 0;
+  color: #e1eeff;
+}
+#header h2 {
+  font-family: serif;
+  font-size: 250%;
+  font-style: italic;
+  font-weight: normal;
+  color: #ff721a;
+  padding: 0;
+  margin: 0;
+  line-height: 1.3em;
+}
+#header strong {
+  background: #185dad;
+  color: #fff;
+}
+#header p {
+  margin: 0;
+  padding: 0 30px;
+}
+#footer {
+  margin: 10px 0 0 0;
+  border-radius: 0 0 5px 0;
+  padding: 8px 0 10px 0;
+  font-size: 80%;
+  color: #a8adb0;
+}
+#footer p {
+  margin: 0;
+  padding: 0;
+  line-height: 16px;
+}
+#keyword {
+  margin-top: 0;
+  padding-top: 20px;
+  padding-bottom: 30px;
+button
+}
+#keyword div.label {
+  background: transparent;
+  color: #b7d850;
+  font-weight: bold;
+  padding: 0;
+  display: block;
+  padding-right: 25px;
+  padding-bottom: 4px;
+}
+#keyword input {
+  font-family: monospace;
+  font-weight: bold;
+  margin: 0px;
+}
+#blocks {
+  overflow: auto;
+  padding: 0;
+  float: left;
+}
+#blocks div.box {
+  float: left;
+  width: 300px;
+  margin: 5px 5px 10px 5px;
+}
+#blocks div.box #latest div.body {
+  padding-top: 0;
+}
+#blocks div.box #create_screen_name input[type='text'] {
+  width: 250px;
+}
+#trash_e div.buttons {
+  text-align: center;
+}
+#contacts div.contact {
+  padding: 0 0 5px 0;
+}
+#contacts span.value {
+  font-size: 90%;
+}
+div.item {
+  padding: 9px 0 4px 0;
+  border: 1px dashed #f00;
+  border-width: 0 0 1px 0;
+}
+div.item span.time {
+  font-size: 70%;
+  font-style: italic;
+  color: #5f7483;
+  line-height: 15px;
+}
+div.item span.value {
+  display: block;
+}
+div.item span.label {
+  text-transform: lowercase;
+  font-size: 70%;
+  font-weight: normal;
+}
+div.item span.by {
+  font-size: 70%;
+  font-style: italic;
+  color: #5f7483;
+  line-height: 15px;
+}
+a.author,
+a.read_more {
+  font-size: 80%;
+}
+a.author {
+  text-transform: none;
+}
+form div.success {
+  border: 0;
+  color: #ffdf2c;
+}
+input[type="text"],
+input[type="password"],
+textarea {
+  background: #ececec;
+}
+#forms {
+  margin: 10px 0 0 0;
+  text-align: center;
+  background: rgba(0,0,0,0.65);
+}
+#forms div.tabs {
+  padding: 7px 0;
+}
+#forms div.tabs a.selected {
+  text-decoration: none;
+  background: #e1eeff;
+  border-radius: 2px 2px 0 0;
+  color: #000;
+  padding-bottom: 9px;
+}
+#forms div.tabs a.selected:hover {
+  background: #e1eeff;
+  color: #000;
+}
+#forms div.tabs span.or {
+  font-size: 90%;
+  font-style: italic;
+  color: #92999c;
+  display: inline-block;
+  padding: 0 8px;
+}
+#forms form {
+  display: none;
+  padding: 10px 0 20px 0;
+  border-top: 1px solid #e1eeff;
+  color: #92999c;
+}
+#forms form h2 {
+  color: #ff721a;
+}
+#forms form span {
+  display: block;
+  margin: 0;
+  padding: 0 10px;
+}
+#forms form div.field {
+  padding: 0 0 15px 0;
+}
+#forms form div.field span.value {
+  display: block;
+  color: #ff8f00;
+  font-style: normal;
+  font-size: 90%;
+}
+#forms form div.buttons {
+  padding: 20px 0 0 0;
+}
+#sidebar {
+  float: left;
+  width: 300px;
+  margin-right: 10px;
+}
+#sidebar div.intro {
+  background: transparent;
+}
+#sidebar div.box {
+  margin-top: 10px;
+}
+#sidebar div.box h3 {
+  margin: 0;
+}
+#sidebar div.box div.content {
+  border-radius: 0 0 4px 0;
+  margin: 0;
+}
+#content {
+  padding: 0;
+  overflow: auto;
+}
+#Write div.box div.content {
+  text-align: center;
+  padding: 10px 0;
+}
+#Write div.box div.content textarea {
+  width: 270px;
+  min-height: 180px;
+}
+#IMs {
+  width: 380px;
+  background: #fff;
+  float: left;
+  border-radius: 5px;
+  margin: 10px 0 0 0;
+}
+#IMs div.box {
+  border-bottom: 1px dashed #185dad;
+  margin: 0;
+  padding: 3px 7px;
+  border-radius: 5px 5px 0 0;
+}
+#IMs div.box div.content {
+  border-radius: 0;
+  background: transparent;
+  padding: 5px;
+  margin: 0;
+}
+#IMs div.box:last-child {
+  border: 0;
+}
+#IMs div.highlight_up {
+  background: #fff06a;
+  -moz-transition: background-color 0.9s linear;
+  -webkit-transition: background-color 0.9s linear;
+  -o-transition: background-color 0.9s linear;
+  -ms-transition: background-color 0.9s linear;
+  transition: background-color 0.9s linear;
+}
+#IMs div.highlight_down {
+  background: transparent;
+}
+#Why {
+  float: left;
+  width: 300px;
+  background: rgba(0,0,0,0.8);
+  color: #e1e4e7;
+  padding: 20px 0 10px 0;
+  border-radius: 0 0 4px 4px;
+}
+#Why h3 {
+  text-align: center;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  color: #ff8f00;
+  font-weight: bold;
+  font-style: normal;
+  text-transform: none;
+}
+#Why div.content {
+  margin: 0 15px;
+  padding-bottom: 20px;
+  color: #e1eeff;
+}
+#Follows {
+  float: left;
+  color: #353535;
+  min-width: 300px;
+}
+#Follows h3.follows {
+  margin: 0 0 10px 0;
+  background: rgba(0,0,0,0.65);
+  font-family: 'Ubuntu', 'Ubuntu Beta', UbuntuBeta, Ubuntu, 'Bitstream Vera Sans', 'DejaVu Sans', Tahoma, proxima-nova, 'Helvetica Neue', Arial, sans-serif;
+  text-align: center;
+  padding: 4px;
+  text-transform: none;
+  font-size: 100%;
+  color: #ff8f00;
+}
+#Follows div.box {
+  background: rgba(255,255,255,0.95);
+  border-radius: 0 0 3px 3px;
+  padding-bottom: 0;
+  margin-bottom: 10px;
+}
+#Follows div.box h3 {
+  background: transparent;
+  color: #185dad;
+  font-size: 120%;
+  text-align: center;
+  padding: 6px 0 0 0;
+}
+#Follows div.box div.content {
+  background: transparent;
+  color: #353535;
+  padding-bottom: 0;
+}
+#Follows div.box div.content div.msg {
+  padding: 5px 0;
+  border-bottom: 1px dashed #f00919;
+}
+#Follows div.box div.content div.msg div.title {
+  color: #185dad;
+}
+#Follows div.box div.content div.msg div.body {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 120%;
+}
+#Follows div.box div.content div.nav {
+  text-align: center;
+}
+#Follows div.box div.content div.nav a:link,
+#Follows div.box div.content div.nav a:visited {
+  display: block;
+}
+div.box {
+  padding: 0 0 10px 0;
+}
+div.box h3 {
+  text-align: right;
+  background: rgba(0,0,0,0.65);
+  color: #e1eeff;
+  padding: 2px 10px 4px 20px;
+  font-size: 90%;
+  font-family: 'Ubuntu', 'Ubuntu Beta', UbuntuBeta, Ubuntu, 'Bitstream Vera Sans', 'DejaVu Sans', Tahoma, proxima-nova, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: normal;
+  font-style: italic;
+  margin: 0;
+}
+div.box div.content {
+  background: rgba(0,0,0,0.65);
+  padding: 10px;
+  border: 0;
+  border-radius: 0 0 3px 0;
+  text-align: left;
+  color: #fff;
+}
+div.box div.content div.field {
+  padding-bottom: 10px;
+}
+div.box div.content label {
+  color: #ff8f00;
+  text-transform: none;
+  font-size: 100%;
+  padding: 0 0 3px 0;
+  display: block;
+}
+div.box div.content label span.sub {
+  font-weight: normal;
+  color: #e1eeff;
+  font-size: 90%;
+}
+div.box div.content span.value {
+  color: #e1eeff;
+  font-weight: normal;
+  text-transform: none;
+  line-height: 1.1em;
+  padding: 0 0 4px 0;
+}
+div.box div.content input[type="text"],
+div.box div.content input[type="password"] {
+  width: 99%;
+  font-size: 150%;
+}
+div.box div.content form div.errors {
+  border: 1px dashed #802f00;
+  border-width: 1px 0;
+  background: transparent;
+  color: #f00919;
+}
+#Session_Nav {
+  background: rgba(255,255,255,0.85);
+  text-align: center;
+  float: none;
+}
+div.box#New_Session,
+div.box#New_Customer {
+  text-align: center;
+  background: rgba(0,0,0,0.65);
+  border-radius: 0 0 3px 0;
+  padding: 0 0 10px 0;
+}
+div.box#New_Session h3,
+div.box#New_Customer h3 {
+  background: transparent;
+}
+div.box#New_Session div.content,
+div.box#New_Customer div.content {
+  width: 270px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  margin: 0 auto 0 auto;
+}
+div.box#New_Session div.fieldset,
+div.box#New_Customer div.fieldset {
+  text-align: right;
+}
+div.box#New_Session button,
+div.box#New_Customer button {
+  margin-top: 5px;
+}

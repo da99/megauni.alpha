@@ -1,0 +1,39 @@
+
+source 'https://rubygems.org'
+
+
+# --- Sanity --------------------
+# 0
+gem 'htmlentities'
+# 1
+gem 'sanitize'
+# 2
+gem 'content-security-policy'
+# 3
+gem 'escape_utils'
+# 4
+gem 'rack_csrf'
+# --------------------------------
+
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'rack-contrib'
+gem 'multi_json'
+gem 'yajl-ruby'
+gem 'unicorn'
+gem 'sequel'
+gem 'pg'
+gem 'addressable'
+gem 'i_dig_sql'
+gem 'www_applet'
+
+group :development do
+  gem 'dot_why'
+  gem 'mustache'
+  gem 'bacon'
+  gem 'Bacon_Colored'
+  gem 'mechanize'
+  gem 'RedCloth'
+  gem 'pry'
+end
+

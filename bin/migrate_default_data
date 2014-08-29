@@ -1,0 +1,44 @@
+#!/usr/bin/env ruby
+#
+#
+
+ADMIN_PSWD = if ENV['IS_DEV']
+               "i hate this"
+             else
+               puts "Enter a password: "
+               STDIN.readline
+             end
+
+require './Server/Okdoki/model'
+
+%w{ Customer Screen_Name Computer }.each { |m|
+  require "./Server/#{m}/model"
+}
+
+c = Customer.create(
+  :ip                =>'127.0.0.1',
+  :pass_word         =>ADMIN_PSWD,
+  :confirm_pass_word =>ADMIN_PSWD,
+  :screen_name       =>"okdoki"
+)
+
+c = Customer.create(
+  :ip                =>'127.0.0.1',
+  :pass_word         =>ADMIN_PSWD,
+  :confirm_pass_word =>ADMIN_PSWD,
+  :screen_name       =>"megauni"
+)
+
+sn = Screen_Name.create c, 'machine_publisher'
+
+Computer.create sn, 'read-screen-name', %~
+  ["success_msg", ["Welcome!"]]
+~
+
+puts %~
+=== Created: ===
+#{Screen_Name.read(c).map(&:screen_name).join "\n"}
+================
+~
+
+

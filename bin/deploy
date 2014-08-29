@@ -7,5 +7,3 @@ set -u -e -o pipefail
 git push
 git push heroku master
 
-
-

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+set -u -e -o pipefail
+
+bin/bundle exec pry \
+  -r ./Server/Okdoki/model                    \
+  -r ./Server/Customer/model                  \
+  -r ./Server/Screen_Name/model               \
+  -r ./Server/Consume/model                   \
+  -r ./Server/Okdoki/console
+
+

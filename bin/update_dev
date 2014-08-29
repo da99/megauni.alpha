@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+set -u -e -o pipefail
+
+if [[ -z "$(command -v pandoc)" ]]
+then
+  $yellow "=== Installing pandoc..."
+  sudo apt-get install pandoc
+fi
+
+sudo apt-get install libxslt1-dev libxml2-dev
+bin/bundle install
+bin/bundle update
+
+

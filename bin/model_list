@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+
+mods=(
+Customer
+Screen_Name
+File_Name
+Label
+Consume
+Computer
+)
+
+# === Create a reverse of the list.
+rev_mods=()
+
+for (( idx=${#mods[@]}-1 ; idx >= 0 ; idx-- ))
+do
+  rev_mods+=( "${mods[idx]}" )
+done

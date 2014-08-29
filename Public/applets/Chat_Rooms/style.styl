@@ -1,0 +1,91 @@
+$orange             = #FF7800
+$orange             = #FF721A
+$pink               = #F85D95
+$black              = #000
+$white              = #fff
+$light_blue         = #E1EEFF
+$dark_blue          = #185DAD
+$downlight_on_black = #D6D6D6
+$downlight_on_black = #92999C
+$sidebar_width      = 300px
+
+$yellow             = #FFEA74
+$yellow_med         = #FFDF2C
+$light_yellow       = #FFFDD2
+
+$samar_red          = #F00919
+$avacado            =#b0c460
+
+#Rooms
+  overflow: auto
+  div.room
+    padding: 5px 0 5px 5px
+    border-bottom: 1px dashed #ccc
+    &.loading
+      background-position: 13px 7px
+      color: #888
+      a:link
+        visibility: hidden
+    a:link
+      text-transform: uppercase
+      font-size: 85%
+    div.chatters
+      text-align: center
+    ul
+      text-align: left
+      padding: 0 0 0 20px
+      margin:  0
+      li
+        padding: 0
+        margin:  0
+        color: #545454
+      li.out
+        text-decoration: line-through
+        color: #999
+        font-style: italic
+  div.room:last-child
+    border: 0
+
+  #In_Rooms, #Out_Rooms
+    width: 49%
+    float: left
+    padding: 0
+    margin: 0
+
+  #In_Rooms
+    a.show_chatters:link
+      display: block
+    div.room
+      &.loading
+        background-position: 8px 7px
+        color: #888
+        padding-left: 45px
+        a:link
+          display: none
+
+  #Out_Rooms
+    border-left: 1px dashed #ccc
+    margin: 0
+    a:link
+      background: $yellow
+      text-transform: uppercase
+      font-size: 85%
+      font-weight: bold
+    a:hover
+      background: $pink
+    a.enter:link
+      margin: 0 5px 0 0
+      display: inline
+    div.enter_room_as
+      text-align: left
+      padding: 8px 0 4px 0
+      span.as
+        text-transform: lowercase
+        color: #7e7e7e
+        font-style: italic
+        font-family: $serif
+
+#Enter_Room
+  background-image: none
+  background-repeat: no-repeat
+  background-position: left top

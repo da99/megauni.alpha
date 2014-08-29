@@ -1,0 +1,34 @@
+
+body {
+  background: #fafafa url('/errors/bg2.png');
+  color: #EB57A3;
+  font-family: Ubuntu, Helvetica, Segoe, serif;
+  text-align: center;
+}
+
+h1 { color: #EB57A3; padding: 0; margin: 0; }
+h2 { color: #5a5a5a; padding: 0; margin: 0 0 1em 0; }
+
+div { color: #616161; }
+div.intro {
+  color: #6b6b6b;
+  background: #fff;
+  border-radius: 5px;
+  max-width: 400px;
+  padding: 1em 0.5em 1.5em 0.5em;
+  margin: 0 auto;
+}
+
+a:link { padding: 2px 5px; }
+a:hover {
+  background: #EB57A3;
+  color: #fff;
+}
+
+#Main {
+  background: #fff;
+  border-radius: 0.5em;
+  padding: 1.5em;
+  max-width: 400px;
+  margin: 2em auto 0 auto;
+}

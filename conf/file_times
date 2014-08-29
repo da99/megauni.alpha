@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+// # -*- js   -*-
+// #
+
+// #!/usr/bin/env bash
+// # -*- bash -*-
+// #
+// #set -u -e -o pipefail
+
+var exec = require("child_process").exec;
+var fs   = require("fs");
+var map  = {};
+
+exec('bin/client_files', function (err, raw_o, raw_e) {
+  if (err)
+    throw err;
+  var files = (raw_o.toString()).trim().split("\n");
+  var e = (raw_e.toString()).trim();
+  if (e.length) {
+    console.log(e);
+    console.log(files);
+    console.log("EXITING...");
+    process.exit(1);
+  }
+
+  files.sort();
+  for( var i = 0; i < files.length; i++ ) {
+    var data = files[i].split(' ');
+    var path = data[0];
+    var key = (path.match('.styl')) ?
+      path :
+      path.replace('Public', '');
+    map[key] = parseInt(data[1]);
+  }
+
+  var data_file = "Server/Main/file_times.js";
+  fs.writeFile(data_file, "exports.data = " + JSON.stringify(map, null, " "), function (err) {
+    if (err)
+      throw err;
+    console.log("Generated: ", data_file);
+  });
+
+});
+
+
+

@@ -1,0 +1,15 @@
+
+append Message_Create
+  div.box#New_Message
+    h3 Write to your message board:
+    div.content
+      form#Headline_Create(action="/Headline", method="post")
+        div.fields
+          div.field.body
+            span.label Type your message:
+            textarea(name="body")
+        div.buttons
+          call span_as()
+          button.submit Send.
+
+

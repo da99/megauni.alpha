@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+set -u -e -o pipefail
+
+nginx_conf="/etc/nginx/sites-enabled/okdoki.conf"
+if [[ ! -f "$nginx_conf" ]]; then
+  sudo ln -s /apps/okdoki/conf/nginx/nginx.ruby.conf "$nginx_conf"
+fi
+
+
+

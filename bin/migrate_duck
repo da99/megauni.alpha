@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+cmd="$1"
+full_cmd="$@"
+set -u -e -o pipefail
+
+# mods=( Chat Website Folder Page Follow Feature_Pack RSS_Reader );
+mods=( Customer Screen_Name Headline Bot );
+
+export DUCK_TEMPLATE=$(pwd)/Server/Okdoki/duck_template.js
+bin="$(pwd)/node_modules/duck_duck_duck/bin/duck_duck_duck"
+
+
+if [[ "$cmd" == "" ]]
+then
+  cmd="up"
+  full_cmd="up"
+fi
+
+
+function run_all {
+
+  for m in ${mods[@]}
+  do
+    cd "Server/$m"
+    echo "$m"
+    $bin $full_cmd
+    cd ../..
+  done
+
+}
+
+case "$cmd" in
+  create)
+    if [[ ! "${mods[@]}" == *"$2"* ]]
+    then
+      echo "$2 not in list."
+      exit 1
+    fi
+
+    cd "Server/$2"
+    $bin create $3
+    cd ../..
+    echo "created: $2 $3"
+    ;;
+
+  list)
+    $bin $full_cmd
+    ;;
+
+  down)
+
+    # === Reverse mods to delete tables in reverse.
+    new_mods=()
+    for (( idx=${#mods[@]}-1 ; idx >= 0 ; idx-- ))
+    do
+      new_mods+=( "${mods[idx]}" )
+    done
+
+    mods=("${new_mods[@]}")
+
+    # === Ensure dev machine.
+    if [ ! -n "${IS_DEV+x}" ]
+    then
+      echo "This is not a dev machine."
+      exit 1
+    fi
+
+    # === Run.
+    if [[ "$cmd" == "$full_cmd" ]]
+    then
+      run_all
+    else
+      cd "Server/$2"
+      echo "$2"
+      $bin down
+      cd ../..
+    fi
+    ;;
+
+  up)
+    run_all
+    ;;
+
+  reset)
+    bin/migrate down "$2"
+    bin/migrate up
+    ;;
+
+  *)
+    echo "Unknown command: $cmd"
+    exit 1
+    ;;
+
+esac
+

@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+# -*- bash -*-
+#
+#
+
+require "sequel"
+
+DB = Sequel.connect(ENV['DATABASE_URL'])
+
+DB << %!
+CREATE TABLE IF NOT EXISTS _schema (
+  name      varchar(255) NOT NULL PRIMARY KEY ,
+  version   smallint     NOT NULL DEFAULT 0
+)
+!
+
+NAME = ARGV[0]
+if !NAME
+  puts "Name required."
+  exit 1
+end
+
+def file_to_ver str
+  str.split('/').pop.split('-').first.to_i
+end
+
+FILES = Dir.glob("Server/#{NAME}/migrates/*.sql")

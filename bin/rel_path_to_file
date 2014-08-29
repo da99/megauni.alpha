@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#!/usr/bin/env node
+# -*- js   -*-
+#
+set -u -e -o pipefail
+
+python -c "import os.path; print os.path.relpath('$1', '$2')"
+
+

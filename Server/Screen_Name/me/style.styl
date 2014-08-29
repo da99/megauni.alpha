@@ -1,0 +1,397 @@
+@import "../../../Public/css/_common"
+
+column_count(num)
+  -moz-column-count: num
+  -webkit-column-count: num
+  -o-column-count: num
+  -ms-column-count: num
+  column-count: num
+column_gap(num)
+  -moz-column-gap: num
+  -webkit-column-gap: num
+  -o-column-gap: num
+  -ms-column-gap: num
+  column-gap: num
+column_rule(num)
+  -moz-column-rule: num
+  -webkit-column-rule: num
+  -o-column-rule: num
+  -ms-column-rule: num
+  column-rule: num
+
+
+html, body
+  height: 100%
+
+
+body
+  padding: 0 0 100px 0
+  background: #f1f1f1 url("/img/patterns/escheresque/escheresque.png")
+
+h4
+  color: $grey_on_light
+
+form
+
+  div.field
+    span.label, label
+      font-weight: normal
+      color: $grey_on_light
+    input[type="text"]
+      font-size: 190%
+
+  textarea
+    min-width: 97%
+    max-width: 97%
+    max-height: 250px
+    min-height: 100px
+    width: 97%
+
+  label
+    display: block
+
+  input[type="text"]
+    width: 99%
+
+select, option
+  font-size: 120%
+
+
+
+
+div.col
+  width: 50%
+  float: left
+
+#Session_Nav
+  background: #fff
+
+#Message_Board
+  div.please_wait
+    text-align: left
+    padding-left: 40px
+
+div.box
+  padding: 0
+  background: #fff
+  h3
+    padding: 0 5px
+    font-size: 80%
+    font-weight: bold
+    font-style: normal
+    color: #F1684E
+    color: $pink
+    text-align: right
+    span.sub
+      color: #909090
+      padding-left: 5px
+  div.content
+    padding: 0 5px 0 10px
+
+#Me
+  width: 51%
+  float: left
+  padding-top: 10px
+  // background: #D4EBF1 url("/img/busynoise/blue_sky_bg.jpg") repeat-x
+  div.box
+    margin: 0 0 10px 10px
+    border-radius: 4px
+    padding-bottom: 10px
+
+#Sidebar
+  float: left
+  width: 45%
+  padding : 0 0 10px 0
+  margin: 10px 0 0 10px
+  min-width : 250px
+  border-radius: 4px
+  div.box
+    text-align: center
+    h3
+      padding-top: 5px
+      text-align: left
+      padding-left: 10px
+    div.content
+      padding: 0 10px 5px 10px
+      border-bottom: 1px dashed #ccc
+      width: 90%
+      margin: 0 auto
+      text-align: left
+  div.box:last-child
+    div.content
+      border: 0
+  div.spacer
+    padding: 10px
+    border-radius: 0 0 4px 4px
+
+#Options
+  margin-top: 10px
+
+
+#Me_Intro
+  text-align: center
+  padding    : 15px 0 15px 0
+  border-radius: 4px 4px 0 0
+  background: #000 url("/img/patterns/escheresque_ste/escheresque_ste.png") repeat -10px 0
+  background: $yellow url("/img/busynoise/orange_yellow.gif") repeat -10px 0
+  border-bottom: 7px solid #B0C460
+  margin:  0
+  div.the_life_of, div.what_am_i
+    font-family : 'Libertinage', $serif
+    font-size   : 140%
+    color : $samar_red
+    font-weight: bold
+  h3
+    text-align     : center
+    font-family    : 'Libertinage', $serif
+    font-size      : 200%
+    font-style     : normal
+    font-weight: normal
+    text-transform : none
+    text-shadow    : 1px 1px 1px darken($avacado, 60%)
+    padding        : 0
+    line-height    : 1.0em
+    color: #fff
+    font-weight: bold
+  div.content
+    padding: 3px 0 4px 0
+    color: #000
+    width: 90%
+    margin: 0 auto
+    border-bottom: 1px dotted darken(#fff, 60%)
+
+#Control_Panel
+  overflow: auto
+  #Other_Screen_Names
+    background: $light_yellow
+    padding: 10px
+    div.screen_names
+      ul
+        margin: 0
+        padding: 0
+        display: inline
+      li
+        list-style: none
+        margin: 0
+        display: inline
+      li:after
+        content: ", "
+      li:last-child:after
+        content: ""
+
+#Other_Screen_Names
+  display: none
+  padding:  0 0 10px 0
+
+#Stage
+  width: 49%
+
+#Interact
+  width: 49%
+
+#New_Life
+  div.content
+    span.label
+      padding: 0 10px 0 0
+    input[type="text"]
+      font-size: 190%
+      margin-right: 10px
+    div.fields, div.screen_name, div.buttons
+      display: inline-block
+
+#Create
+  background: rgba(0,0,0,0.6)
+  div.link
+    padding: 0 2px $padding_create 0
+  a:link
+    padding: 1px $padding_create 5px $padding_create
+  div.loading
+    background-color: #fff
+    padding-top: 3px
+    padding-bottom: 3px
+  div.success
+    background: #fff
+    padding: 3px $padding_create
+  div.errors
+    color: lighten(#F50000, 50%)
+    padding: 3px $padding_create
+
+
+#Create_Boxs
+  display: none
+  padding: 10px 0 0 0
+  overflow: auto
+  div.box
+    margin: 0 0 0 10px
+    h3
+      border-radius: 0
+      display: block
+      text-align: left
+      padding-left: 10px
+      color: $yellow_med
+      background: rgba(0,0,0,0.8)
+    div.content
+      color: $yellow_med
+      background: rgba(0,0,0,0.8)
+      label, span.label
+        color: $yellow_med
+      div.field
+        span
+          display: block
+          text-transform: none
+        input
+          width: 98%
+      div.buttons
+        text-align: right
+
+#Follow
+  #Delete_Follow
+    display: none
+  #Create_Follow
+    display: block
+  padding: 0
+  div.content
+    form
+      text-align: center
+    #Delete_Follow
+      border: 1px dashed $samar_red
+      border-width: 1px 0
+      padding: 6px 0 10px 0
+      border: 0
+      div.intro
+        border: 0
+        padding: 0 4px 10px 4px
+        font-family: $serif
+        font-style: italic
+        color: lighten(#000, 40%)
+
+  &.is_following
+    #Delete_Follow
+      display: block
+    #Create_Follow
+      display: none
+    h3
+      display: none
+    div.content
+      form
+        text-align: center
+
+#Enter_Chat_Room
+  border-radius: 4px
+  background: $glass_black
+  color: $yellow
+  div.content
+    padding: 15px 0 10px 0
+    text-align: center
+    font-size: 110%
+    a:link
+      color: lighten($avacado, 30%)
+      padding: 3px 5px
+      border-radius: 5px
+      border-width: 0
+      font-weight: bold
+      text-transform: uppercase
+      text-decoration: underline
+      &:after
+        content: ": "
+    a:visited
+      color: lighten($avacado, 30%)
+    a:hover
+      background: darken($avacado, 30%)
+      color: #fff
+    div.errors
+      display: none
+      background: $light_yellow
+      color: $red
+      padding: 5px
+#Create_Website
+  display: none
+
+#Write_Message
+  span.label
+    display: block
+  div.buttons
+    text-align: right
+    button
+      margin: 0 15px 0 0
+
+#Message_Board
+  div.msgs
+    div.msg
+      border-radius: 3px 0 0 3px
+      background: #fff
+      padding: 4px 2px 4px 5px
+      margin: 0 0 10px 0
+      span.author
+        color: $dark_blue
+        font-weight: bold
+        font-size: 90%
+        font-style: italic
+      span.said
+        color: $grey_on_light
+        font-style: italic
+      div.content
+        font-size: 120%
+        font-family: $serif
+    div.official
+      background: $light_yellow
+      font-style: italic
+    div.me_chat_msg, div.me_msg
+      background: $light_yellow
+    div.errors
+      color: $red
+
+
+
+#Folders
+  div.content
+    ul.folders
+      list-style: none
+      margin: 0
+      padding: 0
+      li
+        margin: 0
+        padding: 0
+    div.folders
+      div.folder
+        padding: 3px 15px 5px 8px
+        font-size: 140%
+        font-weight: bold
+        a.open
+          font-size: 90%
+        span.title
+          padding: 0 0 0 3px
+    form
+      span.label
+        display: block
+      input[type="text"]
+        font-size: 190%
+        width: 95%
+
+
+body.w600_minus
+  #Session_Nav
+    position: static
+    float: none
+  #Me
+    margin: 0
+    width: auto
+    height: auto
+    float: none
+    padding-bottom: 10px
+    border-radius: 0
+    div.box
+      margin: 0 10px 10px 10px
+  #Sidebar
+    float: none
+    width: auto
+    position: static
+    margin-right: 10px
+
+
+
+
+
+
+
+

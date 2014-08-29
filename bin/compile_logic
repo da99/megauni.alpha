@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+set -u -e -o pipefail
+echo ""
+
+PUBLIC="Public/temp"
+
+if [[ ! "$@" == "" ]]; then
+  echo " !!! Not ready to handle individual files." 1>&2
+  exit 1
+fi
+
+function insert_into_public {
+  partial="Server/$1/$2/$3/$4"
+  full="$PUBLIC/${1}__${2}__${4}"
+  if [[ -f "$partial" ]]; then
+    mkdir -p "$(dirname $full)"
+    cat "$partial" >> "$full"
+    echo "  |-- processed: $partial"
+  fi
+}
+
+function process_the_css {
+  stylus="Server/$1/$2/$3/style.styl"
+  css="${stylus/.styl/.css}"
+  all_css="$PUBLIC/${1}__${2}__style.css"
+
+  if [[ -f "$stylus" ]]; then
+    # --- compile into .css
+    stylus "$stylus"
+
+    # --- insert
+    # --- remove .css
+    cat "$css" >> "$all_css"
+    rm "$css"
+    echo "  -- removed: $css"
+  fi
+}
+
+# ==== Clear all Public/temp files
+echo -e "=== Removing files in $PUBLIC\n"
+for f in $PUBLIC/*
+do
+  if [[ "$f" == *__* ]]; then
+    rm "$f"
+  fi
+done
+
+# ==== Find all logics using order.txt file:
+files=$( $UP/util/files_with_ext Server/ /order.txt )
+for f in $files
+do
+
+  group="$( basename "$(dirname "$(dirname $f)")" )"
+  name="$( basename "$(dirname $f)" )"
+  logics="$(cat $f)"
+
+  echo "|-- in $group/$name"
+
+  # === Reset dir in $PUBLIC/
+  echo "" > "$PUBLIC/${group}__${name}__script.js"
+  echo "" > "$PUBLIC/${group}__${name}__style.css"
+
+  # ==== Now for main Server/ files:
+  markup="Server/$group/$name/markup.rb"
+  if [[ -f "$markup" ]]; then
+    html="$PUBLIC/${group}__${name}__markup.html"
+    bin/bundle exec dot_why ./Public/layout.rb $markup > $html
+    echo "  |-- wrote: $html"
+  fi
+
+  insert_into_public "$group" "$name" "." "script.js"
+  process_the_css    "$group" "$name" "."
+
+  # ==== Now for sub-logic files:
+  for l in $logics
+  do
+    insert_into_public "$group" "$name" "$l" "script.js"
+    process_the_css    "$group" "$name" "$l"
+  done # === each $logics
+
+done # === each $files
+
+
+
+

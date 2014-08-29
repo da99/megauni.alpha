@@ -1,0 +1,10 @@
+- if (typeof(as_check_box_menu) === 'undefined')
+  - var as_check_box_menu = {}
+- if (logged_in)
+  - if (aud.data.screen_name_rows.length === 1)
+    input.field(type='hidden', name="as[]", value="#{aud.data.screen_name_rows[0].screen_name}")
+  - else
+    - for (var x in aud.data.screen_name_rows)
+      input.field(type='checkbox', name="as[]", checked=as_check_box_menu[x.screen_name], value='#{x.screen_name}') 
+      span.value #{x.screen_name}
+- as_check_box_menu = {}

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#!/usr/bin/env node
+# -*- js   -*-
+#
+set -u -e -o pipefail
+
+
+bin/upgrade skip_npm skip_os skip_download
+bin/file_times
+

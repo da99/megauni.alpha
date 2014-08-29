@@ -1,0 +1,79 @@
+
+function Chat_Room_room_out(chr_sn, o_sn)
+  div.room.out
+    a.enter(href="#enter-#{chr_sn}") Enter
+    span.chat_room.name #{chr_sn}
+    input(type="hidden", name="chat_room", value="#{chr_sn}")
+    input(type="hidden", name="owner", value="#{o_sn}")
+
+function Chat_Room_room_in(chr_sn, o_sn)
+  div.room.in
+    //- a.leave(href="#leave") X
+      //- span.name The Digital Word
+    a.leave(href="#leave-#{chr_sn}") X
+    span.chat_room.name #{chr_sn}
+    input(type="hidden", name="chat_room", value="#{chr_sn}")
+    input(type="hidden", name="owner", value="#{o_sn}")
+
+append templates
+  div#Chat_Rooms
+    call Chat_Room_room_in("{chat_room}", "{owner}")
+    call Chat_Room_room_out("{chat_room}", "{owner}")
+
+
+append Chat_Rooms_List
+  div.box#Rooms
+    div#In_Rooms
+      h3 Rooms You're In:
+      div.rooms
+        //- - for (var i in chat_room_ins)
+          //- call Chat_Room_room_in(chat_room_ins[i].chat_room, chat_room_ins[i].owner)
+        //- div.chatters
+          //- a.show(href="#list") Show Chatters
+        //- div.room
+          //- a.leave(href="#leave") X
+          //- span.name The Digital Word
+          //- div.chatters
+            //- ul.list
+              //- li Tom
+              //- li.out Dick
+              //- li Harry
+            //- a.hide(href="#hide_list") Hide Chatters
+        //- div.room
+          //- a.leave(href="#leave") X
+          //- span.name Super Nerds
+          //- div.chatters
+            //- ul.list
+              //- li Tom
+              //- li.out Dick
+              //- li Harry
+            //- a.hide(href="#hide_list") Hide Chatters
+
+    div#Out_Rooms
+      h3 You're out of:
+      div.rooms
+        - for (var i in chat_room_seats)
+          call Chat_Room_room_out(chat_room_seats[i].chat_room, chat_room_seats[i].owner)
+
+append Chat_Rooms_Enter
+  div.box#Enter_Room
+    h3 Enter A Room By Screen Name:
+    div.content
+      form#Create_Chat_Room_Seat(action="/chat_room/seat", method="POST")
+        div.fields
+          div.field.screen_name
+            input(type="text", value="", name="chat_room", maxlength="50")
+        div.buttons
+          call span_as()
+          button.submit Enter
+
+
+
+
+
+
+
+
+
+
+

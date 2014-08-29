@@ -1,0 +1,49 @@
+
+Security:
+=============================
+1 moonrocks nginx conf: 
+https://github.com/leafo/moonrocks-site/blob/master/nginx.conf
+
+2 Put CSRF in different compression context:
+http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
+
+3 Fix remember me: 1 week instead of current value
+
+4 Review mozilla web app guidelines.
+
+5 Security headers: http://blog.liftsecurity.io/post/37388272578/writing-secure-express-js-apps
+
+6 Server tokens: http://arstechnica.com/gadgets/2012/11/how-to-set-up-a-safe-and-secure-web-server/4/
+
+7 run rootkit finders
+
+8 Repeatable check of SSL/TLS ciphers.
+ http://blog.cloudflare.com/staying-on-top-of-tls-attacks 
+
+
+9 Limit traffic to https/ssh
+
+
+10 Gemfile.lock - scan for vulnerabilities.
+
+11 Remove RC4 from ssl setup
+
+12 file uploads: http://blog.detectify.com/post/86298380233/the-pitfalls-of-allowing-file-uploads-on-your-website
+
+13
+  // === from:http://blog.liftsecurity.io/post/37388272578/writing-secure-express-js-apps 
+  app.use(helmet.xframe());
+  app.use(helmet.iexss());
+  app.use(helmet.contentTypeOptions());
+  app.use(helmet.cacheControl());
+   
+
+14: Sinatra, cookies, secured apps:
+   http://blog.fil.vasilak.is/blog/2014/02/08/securing-sinatra-micro-framework/?utm_source=rubyweekly&utm_medium=email
+
+15: Securerandom + rack protection:
+   https://github.com/patriciomacadden/hobbit
+
+
+

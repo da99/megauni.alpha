@@ -2,14 +2,22 @@
 # -*- bash -*-
 #
 #
+
+set +u
+
+export RACK_ENV="production"
+
 if [[ -n "$IS_DEV" ]]; then
   export JAR="tmp/cookies.txt"
   export PORT=4567
   export PID="tmp/thin.pid"
   export LOG="tmp/log.txt"
+  export DATABASE_NAME="okdoki_db"
+  export DATABASE_URL="postgres://okdoki_user:pswd-dev4pg@localhost:5432/${DATABASE_NAME}"
 else
   # set a default value for IS_DEV
   export IS_DEV=""
 fi
 
-export RACK_ENV="production"
+set -u
+

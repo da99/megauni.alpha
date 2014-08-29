@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+#
+#
+#
+
+FIRST_RUN="$FIRST_RUN"
+CMD="$CMD"
+set -u -e -o pipefail
+
+if [[ -z "$IS_DEV" ]]
+then
+  echo "Not a dev machine." 1>&2
+  exit 1000
+fi
+
+unicorn_pid () {
+ pgrep -f "unicorn master" || echo ""
+}
+
+restart_server () {
+
+  unicorn=/tmp/unicorn.dev.restart
+  force_start="true"
+  if [[ -f "$unicorn" ]]
+  then
+    force_start="false"
+  fi
+
+  since=0
+
+  if [[ -f $unicorn ]]
+  then
+    since="$(expr "$(date +%s)" - "$(stat $unicorn -c %Y)" )"
+  fi
+
+  touch $unicorn
+
+  if [[ "$since" -gt "3" || "$force_start" == "true" ]]
+  then
+    echo "=== $since seconds: Restarting the server..."
+    pkill -f "unicorn master" || true
+    bin/start &
+  else
+    echo "=== No restart: $since secs"
+  fi
+
+}
+
+if [[ ! -z "$FIRST_RUN" ]]
+then
+
+
+  if [[ -z "$@" ]]
+  then
+    restart_server
+  else
+    bin/test "$@"
+  fi
+
+  exit 0
+fi # === done first run
+
+is_done=""
+
+# if [[ ( ! "$FILE" =~ "vendor" ) && ( "$FILE" =~ ".js"  || "$FILE" == "bin/upgrade" ) ]]
+# then
+  # is_done="true"
+  # bin/upgrade skip_npm skip_os skip_download
+# fi
+
+if [[ "$FILE" =~ ".styl" ]]
+then
+  is_done="true"
+  bin/compile_stylus "$FILE"
+fi
+
+if [[ "$FILE" =~ "Server/" && ( ! "$FILE" =~ "layout" ) && ( "$FILE" =~ "script.js"  || "$FILE" =~ "style.css" || "$FILE" =~ "markup.rb" ) ]]
+then
+  is_done="true"
+  $yellow "=== Please wait... compiling..."
+  if [[ "$FILE" =~ "applets" ]]
+  then
+    $green "$(bin/compile_logic)"
+  else
+    $green "$(bin/compile_logic $FILE)"
+  fi
+  restart_server
+fi
+
+if [[ "$FILE" =~ "layout.rb" ]]
+then
+  is_done="true"
+  bin/compile_logic
+  restart_server
+fi
+
+if [[ "$FILE" =~ "Server/" ]]
+then
+  is_done="true"
+
+  if [[ ! -z "$@" ]]
+  then
+    bin/test "$@"
+  else
+    restart_server
+  fi
+
+fi # === Server/ files
+
+if [[ "$FILE" =~ ".css"  || "$FILE" =~ "$0" || "$FILE" =~ "mustache.rb" ]]
+then
+  is_done="true"
+fi
+
+if [[ -z "$is_done" ]]
+then
+  echo "=== ignoring: $FILE"
+fi
+
+
+
+

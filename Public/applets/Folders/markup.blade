@@ -1,0 +1,39 @@
+div.box#OLD_Create_Folder
+  h3 Create a new folder:
+  div.content
+    form(action="/me/#{screen_name}/create/folder", method="POST")
+      div.fields
+        div.field.title
+          span.label Title:
+          input(type="text", value="", name="title", maxlength="100")
+        div.field.acts_like
+          span.label This new folder will act like a:
+          select
+            option folder (ie I DON'T CARE).
+            option book.
+            option journal (eg blog).
+            option scrap book (aka pin board).
+            option play activity w/friends.
+            option something serious for co-workers/class mates.
+      div.buttons
+        button.submit Create
+
+//- ===========================================================
+div.box#Folders
+h3 Folders:
+div.content
+  ul.folders
+    - for (var f in folders)
+      call folder(folders[f].data)
+  - if (is_customer)
+    h3 Create a new folder:
+    form#Create_Folder(action="/me/#{screen_name}/folder", method="POST")
+      div.fields
+        div.field.title
+          span.label Title:
+          input(type="text", name="title", value="", maxlength="100")
+        call applet("as_this_life")
+        div.buttons
+          button.submit Create
+
+

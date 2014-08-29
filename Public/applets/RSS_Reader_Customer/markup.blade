@@ -1,0 +1,34 @@
+
+
+append Creates
+  div.box
+    div.setting
+      a.on(href="#show") Show
+      a.off(href="#hide") Hide
+    h3 Subscribe to a RSS Feed
+    div.content
+      form#Create_RSS_Sub(action="/rss/sub", method="POST")
+        div.fields
+          div.field.url
+            label(for="NEW_RSS_SUB_URL") URL:
+            input#NEW_RSS_SUB_URL(type="text", value="")
+        div.buttons
+          button.submit Subscribe
+
+append RSS_Reader
+  div.box#New_RSS_Sub
+    h3 RSS Feeds
+    div.content
+      div.intro
+        | Subscribe to an RSS Feed.
+        | News items will be streamed to
+        | your chat window (ie left)
+        | as they arrive.
+      form#Create_RSS_Sub(action="/rss/sub", method="action")
+        div.fields
+          div.field.link
+            label Feed Address:
+            input(type="text", name="link", value="")
+        div.buttons
+          call span_as()
+          button.submit Subscribe

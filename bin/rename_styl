@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#!/usr/bin/env node
+# -*- js   -*-
+#
+set -u -e -o pipefail
+
+
+
+files=$(find ./Public -type f -name \*.stylus)
+
+
+for i in $files
+do
+  new_file="$(echo $i | sed 's/.stylus/.styl/g')"
+  mv $i $new_file
+done

@@ -1,0 +1,180 @@
+
+// /* [> background: #fff url("http://megauni.s3.amazonaws.com/bg.gif") repeat -125px 0; <] */
+// /* background: #fff url('http://megauni.s3.amazonaws.com/bg_overlay.gif') repeat -37px 0 */
+
+@import "../../../Public/css/_common"
+
+$sidebar_width   = 300px
+
+$write_col_width = 300px
+$box_margin      = 10px
+
+h2
+  margin: 0 10px 10px 0
+
+body
+  background: #fafafa url("/img/patterns/wood_pattern.png")
+
+div.APP_ERROR
+  background: $samar_red
+  color: #fff
+  padding: 10px
+  font-size: 140%
+  font-weight: bold
+
+
+form
+  div.field
+    span.label, label
+      display: block
+    input[type="text"]
+      width: 100%
+  div.buttons
+    text-align: left
+    button
+      margin: 0
+
+div.box
+  margin: 0 0 10px 10px
+  background: #fff
+  border-radius: 4px
+  div.screen_name
+    padding: 0 0 10px 0
+    span.screen_name
+      font-family: $serif
+  h3
+    padding: 0 0 0 10px
+    text-align: left
+    color: $pink
+    font-size: 95%
+  div.content
+    padding: 10px
+
+
+h1
+  margin: 10px 0 20px 0
+
+div.col
+  float: left
+
+ul.screen_names
+  list-style: none
+  margin: 0
+  padding: 0
+  li
+    margin: 0
+    padding: 0
+    list-style: none
+    display: inline
+    padding: 0 10px 0 0
+  li:after
+    content: ", "
+  li:last-child:after
+    content: ""
+
+#Logo
+  padding-top: 4px
+
+// COL ================================
+#Chat
+  float: left
+  width: 55%
+  #Enter_Chat_Room
+    padding: 15px 10px 25px 10px
+
+// COL ================================
+#Interact
+  width: 44%
+  max-width: 700px;
+  padding-bottom: 100px
+
+  #Screen_Names
+    h3, div.content, ul, li
+      display: inline
+      padding: 0
+      margin: 0
+    h3
+      padding: 0 10px 0 10px
+    ul
+      li
+        padding: 0 10px 0 0
+      li:after
+        content: ", "
+      li:last-child:after
+        content: ""
+
+  #Create_Life
+    // background-image: url("/img/human.gif")
+    // background-repeat: no-repeat
+    // background-position: right top
+    div.sn_type
+     label
+       text-transform: none
+       font-size: 95%
+     input
+       margin: 0 3px 0 0
+    div.my_life
+      div.content
+        text-align: center
+        padding-top: 0
+        padding-bottom: 10px
+        margin: 0 30px 5px 30px
+        border-bottom: 1px dashed #ccc
+    div.create_life
+      div.content
+        padding-top: 0
+
+
+#Create_Screen_Name
+  div.sn_type
+    label
+      display: inline
+
+#Msgs
+  float: left
+  min-width: 300px
+  width: 54%
+
+
+html.w600_minus
+  div.col
+    float: none
+    width: auto
+  #Interact, #Chat
+    width: auto
+  div.box
+    width: auto
+    float: none
+    border-radius: 0
+    margin: 0 0 10px 0
+  div.buttons
+    text-align: center
+
+h4
+  color: $pink
+
+#Prices
+  div.item
+    margin: 0 10px 3px 10px
+    padding: 3px 0
+    border-bottom: 1px dashed #ccc
+  span.money
+    font-weight: bold
+    color: $pink
+  span.sub
+    font-size: 90%
+    color: #888
+
+
+
+
+
+
+
+
+
+
+
+
+
+

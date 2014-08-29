@@ -1,0 +1,12 @@
+- if (is_customer)
+  - if (customer_has_one_life)
+    input(type="hidden", name="as_this_life", value="#{customer_screen_names[0]}")
+  - else if (is_owner && screen_name)
+    input(type="hidden", name="as_this_life", value="#{screen_name}")
+  - else
+    div.field.as_this_life
+      span.label As:
+      select
+        - for (var x in customer_screen_names)
+          option(value="#{customer_screen_names[sn]}") #{customer_screen_names[sn]}
+

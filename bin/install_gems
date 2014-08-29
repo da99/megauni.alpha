@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+set -u -e -o pipefail
+
+
+. bin/env
+
+
+set -x
+sudo apt-get install libxslt-dev libxml2-dev
+bin/bundle config build.nokogiri --use-system-libraries
+bin/bundle update
+bin/bundle install

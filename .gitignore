@@ -97,3 +97,18 @@ build/
 /shoes-and-a-shotgun.rb
 
 
+/node_modules/
+/npm-debug.log
+
+/Server/App/file_times.js
+/Client/App/js/okdoki.js
+/logs/
+/nginx.conf.compiled
+/.rocks/
+/.bundle
+/conf/.vendor
+/openresty/
+/current
+/nginx.root.conf
+/conf/.bundle/
+/conf/vendor/

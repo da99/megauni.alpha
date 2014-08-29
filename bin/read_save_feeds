@@ -1,0 +1,111 @@
+#!/usr/bin/env node
+// # -*- js   -*-
+// #
+// #!/usr/bin/env bash
+// # -*- bash -*-
+// #
+
+
+var _       = require("underscore");
+var cheerio = require("cheerio");
+var Topogo = require("topogo").Topogo;
+var River  = require("da_river").River;
+
+var Feed   = require("../Server/RSS_Reader/Feed").Feed;
+var Post   = require("../Server/RSS_Reader/Post").Post;
+
+var is_dev = process.env.IS_DEV;
+
+var items = [];
+var refresh = (is_dev) ? 0.05 : 10;
+var shutdown = false;
+
+
+// =========== When process ends.
+var shut_it = function () {
+  shutdown = true;
+  Topogo.close();
+};
+
+process.on('SIGTERM', shut_it);
+process.on('SIGINT',  shut_it);
+
+
+var orig_run = Topogo.run;
+Topogo.run = function () {
+  if (shutdown) {
+    console.log("\n\n=== Skipping query because of shutdown.");
+    if (is_dev)
+      console.log(arguments[1], "\n==========================");
+    return false;
+  }
+  return orig_run.apply(this, arguments);
+};
+
+// =========== Get init values from DB.
+function calc_refresh() {
+  if (shutdown)
+    return false;
+
+  River.new()
+
+  .job('get count', function (j) {
+    Feed.count(j);
+  })
+
+  .job('calc refresh time', function (j, count) {
+    if (count <= 72)
+      refresh = refresh;
+    else if (count <= 150)
+      refresh = 5;
+    else if (count <= 500)
+      refresh = 2;
+    else
+      refresh = 1;
+    if(is_dev)
+      console.log("Refresh in mins: " + refresh);
+  })
+
+  .run();
+}
+
+// =========== The Main Loop
+
+function loop_it() {
+  if (shutdown)
+    return false;
+
+  setTimeout(function () {
+
+    River.new()
+
+    .job(function (j) {
+      Feed.update_next(j);
+    })
+
+    .job(function (j, vals) {
+      if (is_dev) {
+        console.log(vals.feed_id);
+        if (vals.posts.length)
+          console.log(vals.posts[0].data);
+      }
+
+      if (vals && vals.posts && !vals.posts.length)
+        calc_refresh();
+
+      j.finish(vals);
+    })
+
+    .run(loop_it);
+
+  }, 1000 * 60 * refresh);
+
+} // === loop_it
+
+
+calc_refresh();
+loop_it();
+
+
+
+

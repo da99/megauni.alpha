@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+set -u -e -o pipefail
+
+
+cp -r  /gems/www_applet/lib      Public/js/vendor/www_applet
+cp -r  /gems/okdoki_applet/lib   Public/js/vendor/okdoki_applet
+

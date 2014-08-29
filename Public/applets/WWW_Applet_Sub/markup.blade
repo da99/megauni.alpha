@@ -1,0 +1,13 @@
+
+append WWW_Applet_Sub
+
+  div.box
+    h3 Subscribe to a WWW applet:
+    div.content
+      form#Create_WWW_Applet_Sub(action="/applet", method="POST")
+        div.fields
+          div.field.url
+            label(for="NEW_APPLET_SUB") Screen Name of Applet:
+            input#NEW_APPLET_SUB(type="text", value="", maxlength="40")
+        div.buttons
+          button.submit Create

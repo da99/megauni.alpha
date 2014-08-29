@@ -1,0 +1,31 @@
+
+
+
+
+append WwW_Applet_Create
+
+  div.box
+    div.setting
+      a.on(href="#show") Show
+      a.off(href="#off") Hide
+    h3 Publish a WWW applet
+    div.content
+      form#Create_WWW_Applet(action="/applet", method="POST")
+        div.fields
+          div.field.url
+            label(for="NEW_APPLET_URL") URL:
+            input#NEW_APPLET_URL(type="text", value="")
+          div.field.screen_name
+            label(for="NEW_APPLET_SN") Screen Name:
+            input#NEW_APPLET_SN(type="text", value="", maxlength="25")
+          div.field.title
+            label(for="NEW_APPLET_TITLE") TITLE:
+            input#NEW_APPLET_TITLE(type="text", value="", maxlength="80")
+          div.field.desc
+            label(for="NEW_APPLET_DESC") Brief Description:
+            textarea#NEW_APPLET_DESC
+        div.buttons
+          call span_as()
+          button.submit Create
+
+

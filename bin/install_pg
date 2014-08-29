@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+set -u -e -o pipefail
+new_app="okdoki"
+
+# === dev password
+# pswd-dev4pg
+sudo -u postgres createuser --no-createdb --encrypted --pwprompt --no-inherit ${new_app}_user
+sudo -u postgres createdb  --encoding=UTF8 --locale=en_US.UTF-8  --owner=${new_app}_user ${new_app}_db
+
+
+
+

@@ -1,0 +1,295 @@
+
+block vars
+  - var body_css = ''
+  - var form_css = ''
+
+  if screen_name_info.is_trashed
+    - form_css += ' trashed'
+
+  if screen_name_info.read_able == 'W'
+    - body_css += " world_read"
+
+  if screen_name_info.read_able == 'N'
+    - body_css += ' no_one_read'
+
+  if screen_name_info.read_able == 'S'
+    - body_css += ' specify_read'
+
+extends ./layout
+
+block footer
+  script(src='/App/js/underscore-min.js')
+  script(src='/App/js/jquery-1.8.2.min.js')
+  script(src='/App/js/jquery-ui-1.9.1.custom.min.js')
+  script(src='/App/js/_base.js')
+  script(src='/App/js/Forms.js')
+  script(src='/App/js/Edit_able_s.js')
+  script(src='/App/js/info.js')
+
+block content
+
+  include _log_out
+
+  if logged_in
+    div(id='sidebar')
+      if homepage_belongs_to_viewer
+
+        div.intro
+          span.label Delete Screen-name
+        div.options
+          form(class='#{form_css}', id="form_trash_screen_name", method="POST", action="/trash/screen_name/#{screen_name}")
+            if screen_name_info.is_trashed
+              div.success #{screen_name_info.trash_msg}
+            div.undo.trash
+              button.undo Undo
+            div.fields
+              div.field.buttons
+                input.field(type='hidden', name="_csrf", value="#{token}")
+                button.submit Delete
+
+        div.intro
+          span.label Edit Your Homepage
+        div.options
+          div.opt.privacy
+            span.value Who can see it?
+            form(id="form_homepage_priv", method="POST", action="/screen_names/#{screen_name}")
+              div.fields
+                div.field
+                  select.menu_priv(id='control_priv', name="read_able")
+                    option(value='W', selected='W'==screen_name_info.read_able) The World
+                    option(value='N', selected='N'==screen_name_info.read_able) No one, but me.
+                div.field.specify
+                  textarea(name="read_able_list", rows='3')
+                div.field.buttons
+                  input.field(type='hidden', name="_csrf", value="#{token}")
+                  input.field(type='hidden', name="_method", value="put")
+                  button.submit Update
+
+
+      else
+        div.intro
+          span.label Allowed to chat w/ you?
+        div.options
+          form(id='form_update_contact', action="/contacts/#{screen_name}", method="POST", class="#{ (aud.data.screen_name_rows.length === 1) ? 'single_screen_name' : ''}")
+            div.fields.show_after_success
+              - var as_check_box_menu = aud.data.contact_menu
+              if aud.data.screen_name_rows.length === 1
+                div.field.as.select
+                  select(name="as[]")
+                    option(selected=as_check_box_menu[aud.data.screen_names[0]], value="#{aud.data.screen_names[0]}") Yes
+                    option(selected=!as_check_box_menu[aud.data.screen_names[0]], value="null") No
+              else
+                div.field.as.check_boxs
+                  include _as_check_boxs.jade
+              div.buttons
+                input.field(type='hidden', name="_csrf", value="#{token}")
+                input.field(type='hidden', name="_method", value="put")
+                button.submit Update
+        if false
+          - for x in aud.data.screen_name_rows
+            div.screen_name
+              div.name
+                span.label As:
+                span.value &nbsp;#{x.screen_name}
+              div.options
+                div.opt.add_to_address_book
+                  input(type='checkbox', value='add_to_address_book')
+                  span Add To Address Book
+                div.opt.sub_e
+                  input(type='checkbox', value='sub_e')
+                  span Subscribe (Everything)
+                div.opt.sub_i
+                  input(type='checkbox', value='sub_i')
+                  span  Subscribe (Important News Only)
+                div.opt.hate
+                  input(type='checkbox', value='hate')
+                  span Block!
+                div.opt.keywords
+                  span.value Keywords:
+                  span.value  (optional. Ex: friend family classmate)
+                  textarea(rows='3')
+                  div.buttons
+                    button Save
+
+  div(id='intro')
+    h2 #{life_name}
+    div
+      span.label Name:&nbsp;
+      span Go 99
+
+    div
+      span.label OKdoki screen-name:&nbsp;
+      span #{life_name}
+
+
+  div.block(id='about')
+    h2 About Me:
+    div.body
+      if logged_in && homepage_belongs_to_viewer
+        form.hidden_fields(id="form_update_about", method="POST", action="/screen_names/#{screen_name}")
+          div.show
+            div.msg
+              | You can write your "about" section that will introduce
+              | you to other people.
+            button.show Start editing "about" section.
+          div.show_again
+            button.show_again Edit again.
+          div.fields
+            div.field.about
+              textarea(rows=4, name='about') #{screen_name_info.about}
+            div.buttons
+              input.field(type='hidden', name="_csrf", value="#{token}")
+              input.field(type='hidden', name="_method", value="PUT")
+              button.submit Update
+      else
+        if screen_name_info.about
+          #{screen_name_info.about}
+        else
+          | Nothing yet.
+
+  div.block(id='qa')
+    h2 Q&A:
+    div.body
+      div.loading.loading_rows
+        | Fetching Q&As....
+      if logged_in
+        if homepage_belongs_to_viewer
+          div.instruct
+            | Post questions that people frequently ask you.
+        else
+          div.instruct
+            | Ask a question about this person:
+        form(id='form_create_question', method='POST', action='/post/#{screen_name}')
+          div.show_again
+            button.show_again Write another.
+          div.fields
+            div.field.post_body
+              textarea.blurred(name='post_body',rows='3') Type your question here.
+            include _as
+            div.buttons
+              input.field(type='hidden', name="_csrf", value="#{token}")
+              input.field(type='hidden', name="section_name", value="question")
+              button.submit Post Question
+
+  div.block(id='boos')
+    h2 Cheers & BOOs:
+    div.body
+      div.loading.loading_rows
+        | Fetching cheers & boos....
+      if logged_in && !homepage_belongs_to_viewer
+        form(id='form_create_cheer_or_jeer', method='POST', action='/post/#{screen_name}')
+          div.show_again
+            button.show_again Write another.
+          div.fields
+            div.field
+              select(name="section_name")
+                option(value='cheer') Cheer this person:
+                option(value='jeer') Boo this person:
+            div.field
+              textarea.blurred(name='post_body', rows='3') Type your reason here.
+            include _as
+            div.buttons
+              input.field(type='hidden', name="_csrf", value="#{token}")
+              button.submit Save
+
+  div.block(id='latest')
+    h2 News Feed:
+    div.body
+      div.loading.loading_rows
+        | Fetching latest posts....
+
+      if logged_in && homepage_belongs_to_viewer
+        p.intro
+          | You can write and post content to your homepage.
+        form.hidden_fields(id='form_create_content', action="/post/#{screen_name}", method="POST")
+          div.show
+            button.show Write a new post.
+          div.show_again
+            button.show_again Write another.
+          div.fields
+            div.field
+              div
+                span.label Type of Post:
+              select(name="category")
+                option Random Thought
+                option Status/Location/Travel Update
+                option Event
+                option Emergency
+                option Full Article
+
+            div.field.title
+              div
+                span.label Title:
+              input(name="title", type="text", value="")
+            div.field
+              div
+                span.label Body:
+              textarea(rows='5')
+            div.field
+              div
+                span.label Other Keywords:
+                span.value (optional)
+              input(name="keywords", type="text", value="")
+
+            div.field
+              div.opt.privacy
+                span.value Who can see it?
+                select(id='control_priv')
+                  option(value='the_world') The World
+                  option(value='no_one') No one, but me.
+                  option(value='specify') Let me specify:
+                div.specify(id='control_priv_specify')
+                  textarea(rows='3')
+                  div.buttons
+                    button Save
+
+            div.buttons
+              button.submit Save and Post
+
+  if logged_in && homepage_belongs_to_viewer
+    div.block(id='scientist_settings')
+      h2 Genius Settings:
+      div.body
+        p
+          | Options for  
+          a(href="http://goo.gl/ZywgS") genius thinkers
+          | : You can create a web app and have it manage your 
+          | screen name or your pet.
+
+        div.forms
+
+          - var vals = [['at', ''], ['bot', 'pet']];
+          each v in vals
+            - var prog  = v[0]
+            - var human = v[1]
+            div.edit_able_s(id="update_#{prog}")
+
+              div.label #{human}@#{screen_name}:
+
+              div.edit_able.url.input
+                div.hide_able
+                  a.edit(href='#edit-url', target="#{prog}_url") Edit
+                  | &nbsp;
+                  span.title URL: 
+                  span.value #{screen_name_info[prog + '_url'] || '[none]'} 
+
+              div.edit_able.passphrase.input
+                div.hide_able
+                  a.edit(href='#edit-token', target="#{prog}_passphrase") Edit
+                  | &nbsp;
+                  span.title Token: 
+                  span.value #{screen_name_info['has_' + prog + '_passphrase'] ? '[hidden]' : '[none]'} 
+
+              div.common
+                input.field(type='hidden', name="_csrf",   value="#{token}")
+                input.field(type='hidden', name="_method", value="put")
+                input.field(type='hidden', name="action",  value="/screen_names/#{screen_name}")
+
+
+
+
+
+
+
+
+

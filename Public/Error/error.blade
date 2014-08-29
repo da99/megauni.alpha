@@ -1,0 +1,22 @@
+!!! 5
+html(lang='en')
+
+  head
+    title #{msg}
+    meta(http-equiv="Content-Type", content="text/html charet=UTF-8" )
+    meta(http-equiv="Cache-Control", content="no-cache, max-age=0, must-revalidate, no-store, max-stale=0, post-check=0, pre-check=0" )
+
+    link(rel='shortcut icon', href='/favicon.ico')
+    link(href="/Error/style.css", rel='stylesheet', media='screen', type="text/css")
+
+  body
+    - var pieces = msg.split(':')
+    - var main = pieces.shift()
+    - var rest = (pieces.length) ? pieces.join(':') : null
+    div#Message
+      div.main #{main}
+      - if (rest)
+        div.rest #{rest}
+
+
+

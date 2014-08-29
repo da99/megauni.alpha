@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+set -o pipefail
+set -e
+PORT="$PORT"
+set -u
+
+cmd="node Server/Okdoki/app.js"
+
+if [[ -n "$PORT" ]]
+then
+  cmd="$cmd $PORT"
+fi
+
+if [[ -n "$@" ]]
+then
+  cmd="$cmd $@"
+fi
+
+pkill --signal INT -f "$cmd"
+

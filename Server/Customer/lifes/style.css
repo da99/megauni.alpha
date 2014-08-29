@@ -1,0 +1,163 @@
+h2 {
+  margin: 0 10px 10px 0;
+}
+body {
+  background: #fafafa url("/img/patterns/wood_pattern.png");
+}
+div.APP_ERROR {
+  background: #f00919;
+  color: #fff;
+  padding: 10px;
+  font-size: 140%;
+  font-weight: bold;
+}
+form div.field span.label,
+form div.field label {
+  display: block;
+}
+form div.field input[type="text"] {
+  width: 100%;
+}
+form div.buttons {
+  text-align: left;
+}
+form div.buttons button {
+  margin: 0;
+}
+div.box {
+  margin: 0 0 10px 10px;
+  background: #fff;
+  border-radius: 4px;
+}
+div.box div.screen_name {
+  padding: 0 0 10px 0;
+}
+div.box div.screen_name span.screen_name {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+}
+div.box h3 {
+  padding: 0 0 0 10px;
+  text-align: left;
+  color: #f85d95;
+  font-size: 95%;
+}
+div.box div.content {
+  padding: 10px;
+}
+h1 {
+  margin: 10px 0 20px 0;
+}
+div.col {
+  float: left;
+}
+ul.screen_names {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ul.screen_names li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: inline;
+  padding: 0 10px 0 0;
+}
+ul.screen_names li:after {
+  content: ", ";
+}
+ul.screen_names li:last-child:after {
+  content: "";
+}
+#Logo {
+  padding-top: 4px;
+}
+#Chat {
+  float: left;
+  width: 55%;
+}
+#Chat #Enter_Chat_Room {
+  padding: 15px 10px 25px 10px;
+}
+#Interact {
+  width: 44%;
+  max-width: 700px;
+  padding-bottom: 100px;
+}
+#Interact #Screen_Names h3,
+#Interact #Screen_Names div.content,
+#Interact #Screen_Names ul,
+#Interact #Screen_Names li {
+  display: inline;
+  padding: 0;
+  margin: 0;
+}
+#Interact #Screen_Names h3 {
+  padding: 0 10px 0 10px;
+}
+#Interact #Screen_Names ul li {
+  padding: 0 10px 0 0;
+}
+#Interact #Screen_Names ul li:after {
+  content: ", ";
+}
+#Interact #Screen_Names ul li:last-child:after {
+  content: "";
+}
+#Interact #Create_Life div.sn_type label {
+  text-transform: none;
+  font-size: 95%;
+}
+#Interact #Create_Life div.sn_type input {
+  margin: 0 3px 0 0;
+}
+#Interact #Create_Life div.my_life div.content {
+  text-align: center;
+  padding-top: 0;
+  padding-bottom: 10px;
+  margin: 0 30px 5px 30px;
+  border-bottom: 1px dashed #ccc;
+}
+#Interact #Create_Life div.create_life div.content {
+  padding-top: 0;
+}
+#Create_Screen_Name div.sn_type label {
+  display: inline;
+}
+#Msgs {
+  float: left;
+  min-width: 300px;
+  width: 54%;
+}
+html.w600_minus div.col {
+  float: none;
+  width: auto;
+}
+html.w600_minus #Interact,
+html.w600_minus #Chat {
+  width: auto;
+}
+html.w600_minus div.box {
+  width: auto;
+  float: none;
+  border-radius: 0;
+  margin: 0 0 10px 0;
+}
+html.w600_minus div.buttons {
+  text-align: center;
+}
+h4 {
+  color: #f85d95;
+}
+#Prices div.item {
+  margin: 0 10px 3px 10px;
+  padding: 3px 0;
+  border-bottom: 1px dashed #ccc;
+}
+#Prices span.money {
+  font-weight: bold;
+  color: #f85d95;
+}
+#Prices span.sub {
+  font-size: 90%;
+  color: #888;
+}
