@@ -4,50 +4,145 @@ GEM
     Bacon_Colored (0.1.3)
       bacon (~> 1.0)
       colored
-    Bacon_Rack (0.2.2)
+    RedCloth (4.2.9)
+    addressable (2.3.6)
+    backports (3.6.0)
     bacon (1.2.0)
     coderay (1.1.0)
     colored (1.2)
+    content-security-policy (0.1.3)
+      rack (~> 1.4)
+    crass (0.2.1)
     da99_rack_middleware (1.0.1)
       rack-protection (> 1.5)
+    domain_name (0.5.20)
+      unf (>= 0.0.5, < 1.0.0)
+    dot_why (2.1.1)
+      erector (~> 0)
     dotenv (0.11.1)
       dotenv-deployment (~> 0.0.2)
     dotenv-deployment (0.0.2)
+    erector (0.10.0)
+      treetop (>= 1.2.3)
+    escape_utils (1.0.1)
     foreman (0.75.0)
       dotenv (~> 0.11.1)
       thor (~> 0.19.1)
+    hike (1.2.3)
+    htmlentities (4.3.2)
+    http-cookie (1.0.2)
+      domain_name (~> 0.5)
+    i_dig_sql (0.1.0)
+    json (1.8.1)
     kgio (2.9.2)
+    mechanize (2.7.3)
+      domain_name (~> 0.5, >= 0.5.1)
+      http-cookie (~> 1.0)
+      mime-types (~> 2.0)
+      net-http-digest_auth (~> 1.1, >= 1.1.1)
+      net-http-persistent (~> 2.5, >= 2.5.2)
+      nokogiri (~> 1.4)
+      ntlm-http (~> 0.1, >= 0.1.1)
+      webrobots (>= 0.0.9, < 0.2)
     method_source (0.8.2)
+    mime-types (2.3)
+    mini_portile (0.6.0)
+    multi_json (1.10.1)
     mustache (0.99.6)
+    net-http-digest_auth (1.4)
+    net-http-persistent (2.9.4)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
+    nokogumbo (1.1.9)
+      nokogiri
+    ntlm-http (0.1.1)
+    opal (0.6.2)
+      source_map
+      sprockets
+    pg (0.17.1)
+    polyglot (0.3.5)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
     rack (1.5.2)
+    rack-contrib (1.1.0)
+      rack (>= 0.9.1)
     rack-protection (1.5.3)
       rack
+    rack-test (0.6.2)
+      rack (>= 1.0)
+    rack_csrf (2.5.0)
+      rack (>= 1.1.0)
     raindrops (0.13.0)
+    sanitize (3.0.0)
+      crass (~> 0.2.0)
+      nokogiri (>= 1.4.4)
+      nokogumbo (= 1.1.9)
+    sequel (4.13.0)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
       tilt (~> 1.3, >= 1.3.4)
+    sinatra-contrib (1.4.2)
+      backports (>= 2.0)
+      multi_json
+      rack-protection
+      rack-test
+      sinatra (~> 1.4.0)
+      tilt (~> 1.3)
     slop (3.6.0)
+    source_map (3.0.1)
+      json
+    sprockets (2.12.1)
+      hike (~> 1.2)
+      multi_json (~> 1.0)
+      rack (~> 1.0)
+      tilt (~> 1.1, != 1.3.0)
     thor (0.19.1)
     tilt (1.4.1)
+    treetop (1.5.3)
+      polyglot (~> 0.3)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.6)
     unicorn (4.8.3)
       kgio (~> 2.6)
       rack
       raindrops (~> 0.7)
+    webrobots (0.1.1)
+    www_applet (0.2.2)
+      multi_json (~> 1.10)
+      opal (~> 0.6)
+      yajl-ruby (~> 1.2)
+    yajl-ruby (1.2.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   Bacon_Colored
-  Bacon_Rack
+  RedCloth
+  addressable
+  bacon
+  content-security-policy
   da99_rack_middleware
+  dot_why
+  escape_utils
   foreman
+  htmlentities
+  i_dig_sql
+  mechanize
+  multi_json
   mustache
+  pg
   pry
+  rack-contrib
+  rack_csrf
+  sanitize
+  sequel
   sinatra
+  sinatra-contrib
   unicorn
+  www_applet
+  yajl-ruby
