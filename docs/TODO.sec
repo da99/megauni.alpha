@@ -48,6 +48,9 @@ https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
 16: no-default (nginx config)
   https://github.com/h5bp/server-configs-nginx/blob/master/sites-available/no-default
 
+  host header attacks:
+  http://www.skeletonscribe.net/2013/05/practical-http-host-header-attacks.html
+
 
 
 
