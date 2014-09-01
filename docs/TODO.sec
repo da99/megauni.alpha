@@ -45,5 +45,15 @@ https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
 15: Securerandom + rack protection:
    https://github.com/patriciomacadden/hobbit
 
+16: no-default (nginx config)
+  https://github.com/h5bp/server-configs-nginx/blob/master/sites-available/no-default
+
+
+
+
+
+
+
+
 
 

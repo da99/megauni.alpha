@@ -28,7 +28,7 @@ fi
 # ===   each option.
 case "$action" in
 
-  examples)
+  help)
     echo ""
     echo "=== Examples for development:"
     echo "bin/migrate reset"
