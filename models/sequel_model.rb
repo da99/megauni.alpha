@@ -1,7 +1,7 @@
 module Sequel
   class << self
     def add_utc_to_pg_time(s)
-      if !s[/[\+\-][0-9]{1,2}$/]
+      if !s[/[\+\-][0-9]{1,2}\z/]
         s + ' UTC' 
       else
         s

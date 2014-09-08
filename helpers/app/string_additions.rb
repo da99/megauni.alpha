@@ -26,7 +26,7 @@ class String
 
   def has_extension? s_or_sym
     ext = '.' + s_or_sym.to_s.must_not_be_empty.sub(/^\.+/, '')
-    !!must_not_be_empty[/#{Regexp.escape(ext)}$/]
+    !!must_not_be_empty[/#{Regexp.escape(ext)}\z/]
   end
 
   def replace_extension s_or_sym
@@ -38,7 +38,7 @@ class String
         self + ext
       else
         pieces.pop
-        self.sub(/#{Regexp.escape(base_name)}$/, pieces.join('.') + ext)
+        self.sub(/#{Regexp.escape(base_name)}\z/, pieces.join('.') + ext)
     end
   end
 

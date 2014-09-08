@@ -15,10 +15,10 @@ class Faml < Thor
       # shout(capture_all('mkdir %s' % c_dir.to_s.inspect)) if !c_dir.directory?
 
       dir.each { |f|
-        if f.file? && f.to_s =~ /\.faml\.rb$/
+        if f.file? && f.to_s =~ /\.faml\.rb\z/
           content  = compile_file(f)
           dirname  = File.dirname(f.to_s)
-          filename = File.basename(f.to_s).sub(/\.faml\.rb$/,'.html')
+          filename = File.basename(f.to_s).sub(/\.faml\.rb\z/,'.html')
           Pow( c_dir,  filename ).create do |s|
             s.puts content
           end
@@ -38,7 +38,7 @@ class Faml < Thor
     starts = fn.read.split( divider)
 
     python = ''
-    add_layout = !( File.basename(fn.to_s) =~ /^_/ || fn.to_s =~ /layout.faml.rb$/ )
+    add_layout = !( File.basename(fn.to_s) =~ /^_/ || fn.to_s =~ /layout.faml.rb\z/ )
 
     faml = if starts.size == 1
       starts.pop

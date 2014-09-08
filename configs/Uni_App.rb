@@ -262,7 +262,7 @@ module Bunny_Callers
     @env['rack.errors'].puts(msg)
   end
   CALLERS_TO_IGNORE = [
-    /custom_require\.rb$/ # rubygems require hacks (Solution from Sinatra)
+    /custom_require\.rb\z/ # rubygems require hacks (Solution from Sinatra)
   ]
 
   # add rubinius (and hopefully other VM impls) ignore patterns ...

@@ -14,10 +14,10 @@ class Filer < Thor
         new_ext = get_and_validate_ext("Enter new extention:")
 
         oDir.each { |file|
-            ext_reg = /\.#{ext}$/
+            ext_reg = /\.#{ext}\z/
             if file.file? && file.to_s =~ ext_reg
                 old_name = file.to_s
-                new_name = file.to_s.sub(/\.#{ext}$/, ".#{new_ext}")
+                new_name = file.to_s.sub(/\.#{ext}\z/, ".#{new_ext}")
                 if Pow(new_name).exists?
                     shout "New file already exists: #{new_name}"
                 else

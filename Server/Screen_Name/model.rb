@@ -27,10 +27,10 @@ class Screen_Name
   Not_Read_Id     = 3
 
   SCREEN_NAME_KEYS    = [:screen_name_id, :publisher_id, :owner_id, :author_id, :follower_id]
-  BEGIN_AT_OR_HASH    = /^(\@|\#)/
+  BEGIN_AT_OR_HASH    = /\A(\@|\#)/
   ALL_WHITE_SPACE     = /\s+/
   VALID_CHARS         = "a-zA-Z0-9\\-\\_\\."
-  VALID               = /^[#{VALID_CHARS}]{4,20}$/i
+  VALID               = /\A[#{VALID_CHARS}]{4,20}\z/i
   VALID_ENGLISH       = "Screen name must be: 4-20 valid chars: 0-9 a-z A-Z _ - ."
   INVALID             = /[^#{VALID_CHARS}]/
   Table_Name          = :screen_name
@@ -39,14 +39,14 @@ class Screen_Name
     /^MEGAUNI/i,
     /^MINIUNI/i,
     /^OKDOKI/i,
-    /^(ME|MINE|MY|MI|i)$/i,
+    /\A(ME|MINE|MY|MI|i)\z/i,
     /^PET-/i,
     /^BOT-/i,
     /^okjak/i,
     /^okjon/i,
-    /^(ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)$/i,
-    /^(UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY)$/i,
-    /^[.]+-COLA$/i
+    /^(ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)\z/i,
+    /^(UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY)\z/i,
+    /^[.]+-COLA\z/i
   ]
 
   # =====================================================

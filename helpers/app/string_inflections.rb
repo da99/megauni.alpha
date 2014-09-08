@@ -7,7 +7,7 @@ class String
   # which is used to override or specify additional inflection rules. Examples:
   #
   #   String.inflections do |inflect|
-  #     inflect.plural /^(ox)$/i, '\1\2en'
+  #     inflect.plural /^(ox)\z/i, '\1\2en'
   #     inflect.singular /^(ox)en/i, '\1'
   #
   #     inflect.irregular 'octopus', 'octopi'
@@ -55,7 +55,7 @@ class String
     # The replacement should always be a string that may include references to the matched data from the rule.
     #
     # Example:
-    #   plural(/(x|ch|ss|sh)$/i, '\1es')
+    #   plural(/(x|ch|ss|sh)\z/i, '\1es')
     def self.plural(rule, replacement)
       @plurals.insert(0, [rule, replacement])
     end
@@ -64,7 +64,7 @@ class String
     # The replacement should always be a string that may include references to the matched data from the rule.
     #
     # Example:
-    #   singular(/([^aeiouy]|qu)ies$/i, '\1y') 
+    #   singular(/([^aeiouy]|qu)ies\z/i, '\1y') 
     def self.singular(rule, replacement)
       @singulars.insert(0, [rule, replacement])
     end
@@ -79,7 +79,7 @@ class String
       (@uncountables << words).flatten!
     end
 
-    plural(/$/, 's')
+    plural(/\z/, 's')
     plural(/s$/i, 's')
     plural(/(alias|(?:stat|octop|vir|b)us)$/i, '\1es')
     plural(/(buffal|tomat)o$/i, '\1oes')

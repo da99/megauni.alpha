@@ -87,7 +87,7 @@ helpers {
       path ||= request.path_info
       
       if path != '/' &&  # Request is not for homepage.
-         path !~ /\.[a-z0-9]+$/ &&  # Request is not for a file.
+         path !~ /\.[a-z0-9]+\z/ &&  # Request is not for a file.
          path[ path.size - 1 , 1] != '/'  # Request does not end in /
 
         return path + '/'

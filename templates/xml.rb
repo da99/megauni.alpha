@@ -10,7 +10,7 @@ class Ruby_To_Xml
       unknown.to_s.
         strip.
         split('/').last.
-        sub(/\.(rb|xml)$/, '')
+        sub(/\.(rb|xml)\z/, '')
     end
 
     def path type, *args

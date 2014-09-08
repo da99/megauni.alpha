@@ -164,11 +164,11 @@ class H8Tester
           @suite_order ||= []
           the_suites = {}
           Pow!("specs/js").each { |file|
-              if file.file? && file =~ /\.js$/ && file =~ /^[0-9]+/
+              if file.file? && file =~ /\.js\z/ && file =~ /^[0-9]+/
 
                   content = file.read
 
-                  content =~ /PATH\:\ +(.+)$/
+                  content =~ /PATH\:\ +(.+)\z/
                   raise "'PATH:' not found in JS suite file: #{file}" if !$1
                   path = $1.to_s.strip
 

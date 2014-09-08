@@ -129,11 +129,11 @@ class FiDi_Directory
   def ruby_files w_extension = true
     
     Dir.entries(path).map { |file_name| 
-        if file_name =~ /\.rb$/
+        if file_name =~ /\.rb\z/
           full_path = File.expand_path(File.join(path,file_name))
           w_extension ?
             full_path :
-            full_path.sub(/\.rb$/i, '') 
+            full_path.sub(/\.rb\z/i, '') 
         else
           nil
         end

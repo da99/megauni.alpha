@@ -12,8 +12,8 @@ before {
 
   # If .html file does not exist, try chopping off .html.
   # This is mainly for backwards compatibility with surferhearts.com.
-  if request.path_info =~ /\.html?$/ && !Pow('public', request.path_info).file?
-    redirect( request.path_info.sub( /\.html?$/, '') )
+  if request.path_info =~ /\.html?\z/ && !Pow('public', request.path_info).file?
+    redirect( request.path_info.sub( /\.html?\z/, '') )
   end
 
 } # === before

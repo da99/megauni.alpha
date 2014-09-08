@@ -9,7 +9,7 @@ class Model < Thor
   def list
     Pow("models").each { |ele|
       file_basename = File.basename(ele.to_s)
-      if ele.file? && file_basename !~ /init.rb$/ && file_basename[/\.rb$/]
+      if ele.file? && file_basename !~ /init.rb\z/ && file_basename[/\.rb\z/]
         whisper( file_basename.sub('.rb', '').camelize  )
       end
     }

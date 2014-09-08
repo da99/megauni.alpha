@@ -23,8 +23,8 @@ class Sass < Thor
   def delete
     return nil if !Pow('views/skins/jinx/sass').exists?
     Pow('views/skins/jinx/sass').each { |f| 
-      if f.file? && f.to_s =~ /\.sass$/ 
-        css_file = Pow( 'public/skins/jinx/css', File.basename(f.to_s).sub( /\.sass$/, '') + '.css' )
+      if f.file? && f.to_s =~ /\.sass\z/ 
+        css_file = Pow( 'public/skins/jinx/css', File.basename(f.to_s).sub( /\.sass\z/, '') + '.css' )
         css_file.delete if css_file.exists? 
       end
     }

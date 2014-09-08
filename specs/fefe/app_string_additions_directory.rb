@@ -96,7 +96,7 @@ class App_String_Additions_Directory
 
   it 'gives you the expanded path of each ruby file in a directory' do
     ruby_files = Dir.entries(@real_dir_path).select { |name|
-      name =~ /\.rb$/
+      name =~ /\.rb\z/
     }.map { |name| File.join(@real_dir_path, name) }
 
     demand_equal ruby_files, @real_dir_path.directory.ruby_files
@@ -104,7 +104,7 @@ class App_String_Additions_Directory
 
   it 'gives you the expanded path without .rb extension of each ruby file.' do
     ruby_files = Dir.entries(@real_dir_path).select { |name|
-      name =~ /\.rb$/
+      name =~ /\.rb\z/
     }.map { |name| File.join(@real_dir_path, name.sub(/\.rb$/, '') ) }
 
     demand_equal ruby_files, @real_dir_path.directory.ruby_files_wo_rb

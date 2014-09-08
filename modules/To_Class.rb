@@ -2,7 +2,7 @@
 module Symbol_To_Class
 
   def to_singular
-    to_s.sub(/s$/, '')
+    to_s.sub(/s\z/, '')
   end
     
   def to_class_name
@@ -27,7 +27,7 @@ module String_To_Class
   end
 
   def to_singular
-    sub(/s$/, '')
+    sub(/s\z/, '')
   end
     
   def to_class_name

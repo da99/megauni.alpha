@@ -9,7 +9,7 @@ class Redirect_Mobile
       /saludiphone
       /saludpda
     }
-    @url = /\/(m|mobi|mobile|iphone|pda)\/$/ 
+    @url = /\/(m|mobi|mobile|iphone|pda)\/\z/ 
   end
 
   def call env

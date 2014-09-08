@@ -11,7 +11,7 @@ def require_these( dir, allow_only=nil )
   else
     Dir[ File.join(dir, '*.rb') ].each { |file_name_rb| 
       # Replace 'models/resty.rb' to 'models/resty'
-      file_name = file_name_rb.sub(/\.rb$/, '')  
+      file_name = file_name_rb.sub(/\.rb\z/, '')  
       require file_name
     }
   end
