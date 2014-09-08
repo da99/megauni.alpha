@@ -1,3 +1,25 @@
+
+
+# =====================================================================
+helpers do
+
+  def params
+    @clean_params ||= begin
+                        dirty = super
+                        return dirty if dirty.empty?
+
+                        o = {}
+                        super.keys.each do |k|
+                          o[Okdoki::Escape_All.escape(k.to_s).to_sym] doki= Okdoki::Escape_All.escape(dirty[k])
+                        end
+
+                        o
+                      end
+  end
+
+end # === end helpers
+# =====================================================================
+
 # === The most basic stuff first... ===
 
 require 'sinatra'
