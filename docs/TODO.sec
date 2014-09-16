@@ -52,6 +52,11 @@ https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
   http://www.skeletonscribe.net/2013/05/practical-http-host-header-attacks.html
 
 
+17: CORS: https://github.com/cyu/rack-cors
+(allow origing headers).
+
+
+18: CSRF tokens
 
 
 
