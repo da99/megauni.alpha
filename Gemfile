@@ -24,7 +24,7 @@ gem 'foreman'
 gem 'sinatra'
 gem 'unicorn'
 gem 'mustache'
-gem 'da99_rack_middleware'
+gem 'da99_rack_protect'
 
 
 gem 'sinatra-contrib'
