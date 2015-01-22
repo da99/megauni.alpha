@@ -1,6 +1,6 @@
 
 source 'https://rubygems.org'
-ruby '2.1.2'
+ruby '2.2.0'
 
 # --- Security ------------------
 gem 'htmlentities'
@@ -35,4 +35,4 @@ gem 'sequel'
 gem 'pg'
 gem 'addressable'
 gem 'i_dig_sql'
-gem 'www_applet'
+gem 'www_app'
