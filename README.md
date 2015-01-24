@@ -2,4 +2,4 @@
 megaUni.com
 -----------
 
-Not sure yet what it will be.
+The USER can configure different combinations of processes.
