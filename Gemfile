@@ -24,10 +24,9 @@ gem 'foreman'
 gem 'cuba'
 gem 'unicorn'
 gem 'mustache'
-gem 'da99_rack_protect'
+gem 'da99_rack_protect', '> 2.2.2'
 
 
-gem 'sinatra-contrib'
 gem 'rack-contrib'
 gem 'multi_json'
 gem 'yajl-ruby'

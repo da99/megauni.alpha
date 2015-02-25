@@ -9,7 +9,7 @@ set -u -e -o pipefail
 pid="$(bin/pid)"
 
 if [[ -z "$PORT" ]]; then
-  PORT="4568"
+  PORT="4567"
 fi
 
 if [[ -z "$RACK_ENV" ]]; then

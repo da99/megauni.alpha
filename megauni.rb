@@ -2,20 +2,26 @@
 require 'cuba'
 require 'rack/robustness'
 
-file_403   = File.read("Public/403.html")
-file_404   = File.read("Public/404.html")
-file_500   = File.read("Public/500.html")
-file_index = File.read('Public/index.html')
+FILE_403   = File.read("Public/403.html")
+FILE_404   = File.read("Public/404.html")
+FILE_500   = File.read("Public/500.html")
+FILE_INDEX = File.read('Public/index.html')
 
 # 500 errors ===================
 Cuba.use Rack::Robustness do |g|
   g.status       500
   g.content_type 'text/plain'
-  g.body         file_500
+  g.body         FILE_500
 end
 
-require 'da99_rack_middleware'
-Cuba.use Da99_Rack_Middleware
+require 'da99_rack_protect'
+Cuba.use Da99_Rack_Protect do |da99|
+  if ENV['IS_DEV']
+    da99.config(:host, :localhost) 
+  else
+    da99.config(:host, 'megauni.com') 
+  end
+end
 
 # 404 errors ===================
 Cuba.use(Class.new {
@@ -26,11 +32,14 @@ Cuba.use(Class.new {
   def call env
     result = @app.call env
     status, headers, body = result
-    return result unless status == 404 && body.empty?
 
-    body = file_404
-    headers['Content-Length'] = body.length.to_s
-    [status, headers, body]
+    if status == 404 && body.empty?
+      headers['Content-Length'] = FILE_404.length.to_s
+      headers['Content-Type'] = 'text/html; charset=utf-8'
+      [status, headers, [FILE_404]]
+    else
+      return result
+    end
   end
 })
 
@@ -60,7 +69,7 @@ Cuba.define do
   on get do
 
     on root do
-      res.write file_index
+      res.write FILE_INDEX
     end
 
     if ENV['IS_DEV']
