@@ -6,7 +6,7 @@ GEM
       colored
     RedCloth (4.2.9)
     about_pos (2.0.0)
-    addressable (2.3.6)
+    addressable (2.3.7)
     backports (3.6.4)
     bacon (1.2.0)
     coderay (1.1.0)
@@ -14,6 +14,8 @@ GEM
     content-security-policy (0.1.3)
       rack (~> 1.4)
     crass (1.0.1)
+    cuba (3.3.0)
+      rack
     da99_rack_protect (2.0.2)
       rack-protection (> 1.5)
     domain_name (0.5.23)
@@ -54,10 +56,10 @@ GEM
     moron_text (1.1.0)
       about_pos (>= 2.0.0)
     multi_json (1.10.1)
-    mustache (1.0.0)
+    mustache (1.0.1)
     net-http-digest_auth (1.4)
     net-http-persistent (2.9.4)
-    nokogiri (1.6.5)
+    nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     nokogumbo (1.2.0)
       nokogiri
@@ -79,11 +81,11 @@ GEM
     rack_csrf (2.5.0)
       rack (>= 1.1.0)
     raindrops (0.13.0)
-    sanitize (3.1.0)
+    sanitize (3.1.2)
       crass (~> 1.0.1)
       nokogiri (>= 1.4.4)
       nokogumbo (= 1.2.0)
-    sequel (4.18.0)
+    sequel (4.19.0)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -113,7 +115,7 @@ GEM
       rack
       raindrops (~> 0.7)
     webrobots (0.1.1)
-    www_app (1.0.0)
+    www_app (1.0.1)
       escape_escape_escape (>= 0.2)
       mustache (>= 0.99)
       yajl-ruby (>= 1.2)
@@ -128,6 +130,7 @@ DEPENDENCIES
   addressable
   bacon
   content-security-policy
+  cuba
   da99_rack_protect
   dot_why
   escape_utils
@@ -144,7 +147,6 @@ DEPENDENCIES
   rack_csrf
   sanitize
   sequel
-  sinatra
   sinatra-contrib
   touch_up
   unicorn

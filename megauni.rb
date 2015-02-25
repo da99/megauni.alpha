@@ -1,90 +1,75 @@
 
+require 'cuba'
+require 'rack/robustness'
 
+file_403   = File.read("Public/403.html")
+file_404   = File.read("Public/404.html")
+file_500   = File.read("Public/500.html")
+file_index = File.read('Public/index.html')
 
-# =====================================================================
-helpers do
-
-  def params
-    @clean_params ||= begin
-                        dirty = super
-                        return dirty if dirty.empty?
-
-                        o = {}
-                        super.keys.each do |k|
-                          o[Okdoki::Escape_All.escape(k.to_s).to_sym] doki= Okdoki::Escape_All.escape(dirty[k])
-                        end
-
-                        o
-                      end
-  end
-
-end # === end helpers
-# =====================================================================
-
-# === The most basic stuff first... ===
-
-require 'sinatra'
-disable :logging
-
-require './middleware/Timer_Public_Files'
-use Timer_Public_Files
-
-require './middleware/My_Egg_Timer_Redirect'
-use My_Egg_Timer_Redirect
+# 500 errors ===================
+Cuba.use Rack::Robustness do |g|
+  g.status       500
+  g.content_type 'text/plain'
+  g.body         file_500
+end
 
 require 'da99_rack_middleware'
-use Da99_Rack_Middleware
+Cuba.use Da99_Rack_Middleware
 
-# -------------- NEWER CODE -----------------------------
+# 404 errors ===================
+Cuba.use(Class.new {
+  def initialize app
+    @app = app
+  end
+
+  def call env
+    result = @app.call env
+    status, headers, body = result
+    return result unless status == 404 && body.empty?
+
+    body = file_404
+    headers['Content-Length'] = body.length.to_s
+    [status, headers, body]
+  end
+})
+
+
 %w{
-
-   Surfer_Hearts_Archive
-
-   Mu_Archive_Redirect
-
-   Mu_Archive
-
-   Public_Files
-
+  Timer_Public_Files
+  My_Egg_Timer_Redirect
+  Surfer_Hearts_Archive
+  Mu_Archive_Redirect
+  Mu_Archive
+  Public_Files
 }.each { |name|
 
  require "./middleware/#{name}"
 
  case name
  when 'Public_Files'
-   use Public_Files, [
-     'Public',
-     Surfer_Hearts_Archive::Dir
-   ]
+   Cuba.use Public_Files, [ 'Public', Surfer_Hearts_Archive::Dir ]
  else
-   use Object.const_get(name)
+   Cuba.use Object.const_get(name)
  end
 
 }
 
+Cuba.define do
 
-[403,404,500].each { |num|
-  error num do
-    File.read("Public/#{num}.html")
-  end
-}
+  on get do
 
-get '/' do
-  File.read('Public/index.html')
-end
+    on root do
+      res.write file_index
+    end
 
-get '/my-egg-timer' do
-  File.read('Public/my-egg-timer/index.html')
-end
+    if ENV['IS_DEV']
+      on 'raise-error-for-test' do
+        something
+      end
+    end
 
-get '/busy-noise' do
-  File.read('Public/busy-noise/index.html')
-end
+  end # on get
 
-if ENV['IS_DEV']
-  get '/raise-error-for-test' do
-    something
-  end
-end
-
+end # === Cuba.define
 

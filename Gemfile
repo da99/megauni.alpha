@@ -21,7 +21,7 @@ group :development do
 end
 
 gem 'foreman'
-gem 'sinatra'
+gem 'cuba'
 gem 'unicorn'
 gem 'mustache'
 gem 'da99_rack_protect'
@@ -34,6 +34,7 @@ gem 'yajl-ruby'
 gem 'sequel'
 gem 'pg'
 gem 'addressable'
+gem 'rack-robustness'
 
 gem 'i_dig_sql'
 gem 'www_app'
