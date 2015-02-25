@@ -5,6 +5,7 @@ GEM
       bacon (~> 1.0)
       colored
     RedCloth (4.2.9)
+    about_pos (2.0.0)
     addressable (2.3.6)
     backports (3.6.4)
     bacon (1.2.0)
@@ -50,6 +51,8 @@ GEM
     method_source (0.8.2)
     mime-types (2.4.3)
     mini_portile (0.6.2)
+    moron_text (1.1.0)
+      about_pos (>= 2.0.0)
     multi_json (1.10.1)
     mustache (1.0.0)
     net-http-digest_auth (1.4)
@@ -95,8 +98,13 @@ GEM
     slop (3.6.0)
     thor (0.19.1)
     tilt (1.4.1)
+    touch_up (2.0.0)
+      escape_escape_escape (> 1.4.0)
+      twitter-text (>= 1.11.0)
     treetop (1.5.3)
       polyglot (~> 0.3)
+    twitter-text (1.11.0)
+      unf (~> 0.1.0)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.6)
@@ -127,6 +135,7 @@ DEPENDENCIES
   htmlentities
   i_dig_sql
   mechanize
+  moron_text
   multi_json
   mustache
   pg
@@ -137,6 +146,7 @@ DEPENDENCIES
   sequel
   sinatra
   sinatra-contrib
+  touch_up
   unicorn
   www_app
   yajl-ruby

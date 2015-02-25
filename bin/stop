@@ -6,17 +6,12 @@ set -e
 PORT="$PORT"
 set -u
 
-cmd="node Server/Okdoki/app.js"
+pid="$(bin/pid)"
 
-if [[ -n "$PORT" ]]
+if [[ -n "$pid" ]]
 then
-  cmd="$cmd $PORT"
+  echo "Killing pid: $pid"
+  kill "$pid"
+else
+  echo "No pid found."
 fi
-
-if [[ -n "$@" ]]
-then
-  cmd="$cmd $@"
-fi
-
-pkill --signal INT -f "$cmd"
-
