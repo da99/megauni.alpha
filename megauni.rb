@@ -68,14 +68,42 @@ Cuba.define do
 
   on get do
 
-    on root do
-      res.write FILE_INDEX
+    name = begin
+                  case
+                  when root
+                    'index'
+                  else
+                    env['PATH_INFO'].gsub('/'.freeze, '~')
+                  end
+                end
+    ext = env['HTTP_ACCEPT'].split('/').last
+    ext = 'unknown' unless ext[/\A[a-z0-9\_\-]+\Z/]
+    public_file_name = "Public/#{name}.html"
+    file_name        = "Server/actions/#{name}.#{ext}.rb"
+    meth_name        = "#{name}_#{ext}".downcase.gsub(/[^_a-z0-9]+/, '__').to_sym
+
+    not_found = false
+    if !respond_to?(meth_name)
+      case
+      when File.exists?(public_file_name)
+        eval %~
+          def #{meth_name}
+            @#{meth_name} ||= File.read(#{public_file_name.inspect})
+          end
+        ~
+      when File.exists?(file_name)
+        eval %~
+          def #{meth_name}
+            #{File.read(file_name)}
+          end
+        ~, nil, file_name, 3
+      else
+        not_found = true
+      end
     end
 
-    if ENV['IS_DEV']
-      on 'raise-error-for-test' do
-        something
-      end
+    unless not_found
+      res.write send(meth_name)
     end
 
   end # on get
