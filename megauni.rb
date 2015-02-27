@@ -23,26 +23,6 @@ Cuba.use Da99_Rack_Protect do |da99|
   end
 end
 
-# 404 errors ===================
-Cuba.use(Class.new {
-  def initialize app
-    @app = app
-  end
-
-  def call env
-    result = @app.call env
-    status, headers, body = result
-
-    if status == 404 && body.empty?
-      headers['Content-Length'] = FILE_404.length.to_s
-      headers['Content-Type'] = 'text/html; charset=utf-8'
-      [status, headers, [FILE_404]]
-    else
-      return result
-    end
-  end
-})
-
 
 %w{
   Timer_Public_Files
@@ -64,49 +44,54 @@ Cuba.use(Class.new {
 
 }
 
-Cuba.define do
+def use app
+  Cuba.use(Class.new {
+    const_set :APP, app
 
-  on get do
+    def initialize app
+      @app = app
+    end
 
-    name = begin
-                  case
-                  when root
-                    'index'
-                  else
-                    env['PATH_INFO'].gsub('/'.freeze, '~')
-                  end
-                end
-    ext = env['HTTP_ACCEPT'].split('/').last
-    ext = 'unknown' unless ext[/\A[a-z0-9\_\-]+\Z/]
-    public_file_name = "Public/#{name}.html"
-    file_name        = "Server/actions/#{name}.#{ext}.rb"
-    meth_name        = "#{name}_#{ext}".downcase.gsub(/[^_a-z0-9]+/, '__').to_sym
+    def call env
+      status, headers, body = (result = self::class::APP.call env)
 
-    not_found = false
-    if !respond_to?(meth_name)
-      case
-      when File.exists?(public_file_name)
-        eval %~
-          def #{meth_name}
-            @#{meth_name} ||= File.read(#{public_file_name.inspect})
-          end
-        ~
-      when File.exists?(file_name)
-        eval %~
-          def #{meth_name}
-            #{File.read(file_name)}
-          end
-        ~, nil, file_name, 3
+      is_empty = status == 404 && (!body || body.empty?)
+      if is_empty
+        @app.call env
       else
-        not_found = true
+        result
       end
     end
+  })
+end # def use
 
-    unless not_found
-      res.write send(meth_name)
+use(Cuba.new {
+  on get, root do
+    res.write FILE_INDEX
+  end
+})
+
+if ENV['IS_DEV']
+  use(Cuba.new {
+    on 'raise-error-for-test' do
+      something
     end
+  })
+end
 
+Cuba.define do
+
+  # 404 errors ===================
+  on default do
+    res.status = 404
+    res.write FILE_404
   end # on get
 
 end # === Cuba.define
+
+
+
+
+
+
 
