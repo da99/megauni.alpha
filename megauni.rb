@@ -2,20 +2,115 @@
 require 'cuba'
 require 'rack/robustness'
 
+class Megauni
+
+  FILE_VALS = {}
+
+  module Server
+    module DSL
+
+      def set name, val
+        file = caller(1,1).first.split(':').first
+        FILE_VALS[file] ||= {}
+        FILE_VALS[file][name] = val
+      end
+
+      def setting name, *args
+        file = caller(1,1).first.split(':').first
+        FILE_VALS[file] ||= {}
+
+        case
+        when FILE_VALS[file].has_key?(name)
+          FILE_VALS[file][name]
+        when args.empty? && block_given?
+          FILE_VALS[file][name] = yield
+        when args.size == 1
+          FILE_VALS[file][name] = args.first
+        when args.size > 0 && block_given?
+          fail "Too many arguments: arg and block"
+        when args.size > 1
+          fail "Unknown args: #{args.inspect}"
+        else
+          fail "Key not found: #{name.inspect}"
+        end
+      end
+
+      def use app, *args
+        if !app.respond_to?(:call) || !args.empty? || block_given?
+          if block_given?
+            return Cuba.use(app, *args, &(Proc.new))
+          else
+            return Cuba.use(app, *args)
+          end
+        end
+
+        middleware = Class.new {
+          const_set :APP, app
+
+          def initialize app, *args
+            @app = app
+          end
+
+          def call env
+            status, headers, body = (result = self::class::APP.call env)
+
+            is_empty = status == 404 && (!body || body.empty?)
+            if is_empty
+              @app.call env
+            else
+              result
+            end
+          end
+        }
+
+        Cuba.use(middleware)
+      end # === def use
+
+    end # === module DSL
+
+    module Plugin
+      def mu name, *args
+
+        file = caller(1,1).first.split(':').first
+        FILE_VALS[file] ||= {}
+
+        case
+        when FILE_VALS[file].has_key?(name)
+          FILE_VALS[file][name]
+        when args.empty? && block_given?
+          FILE_VALS[file][name] = yield
+        when args.size == 1
+          FILE_VALS[file][name] = args.first
+        when args.size > 0 && block_given?
+          fail "Too many arguments: arg and block"
+        when args.size > 1
+          fail "Unknown args: #{args.inspect}"
+        else
+          fail "Key not found: #{name.inspect}"
+        end
+
+      end # === def mu
+    end # === Plugin
+
+  end # === module Server
+end # === Megauni
+
+extend      Megauni::Server::DSL
+Cuba.plugin Megauni::Server::Plugin
+
 FILE_403   = File.read("Public/403.html")
 FILE_404   = File.read("Public/404.html")
 FILE_500   = File.read("Public/500.html")
-FILE_INDEX = File.read('Public/index.html')
 
 # 500 errors ===================
-Cuba.use Rack::Robustness do |g|
+use Rack::Robustness do |g|
   g.status       500
   g.content_type 'text/plain'
   g.body         FILE_500
 end
 
 require 'da99_rack_protect'
-Cuba.use Da99_Rack_Protect do |da99|
+use Da99_Rack_Protect do |da99|
   if ENV['IS_DEV']
     da99.config(:host, :localhost) 
   else
@@ -37,47 +132,17 @@ end
 
  case name
  when 'Public_Files'
-   Cuba.use Public_Files, [ 'Public', Surfer_Hearts_Archive::Dir ]
+   use Public_Files, [ 'Public', Surfer_Hearts_Archive::Dir ]
  else
-   Cuba.use Object.const_get(name)
+   use Object.const_get(name)
  end
 
 }
 
-def use app
-  Cuba.use(Class.new {
-    const_set :APP, app
-
-    def initialize app
-      @app = app
-    end
-
-    def call env
-      status, headers, body = (result = self::class::APP.call env)
-
-      is_empty = status == 404 && (!body || body.empty?)
-      if is_empty
-        @app.call env
-      else
-        result
-      end
-    end
-  })
-end # def use
-
-use(Cuba.new {
-  on get, root do
-    res.write FILE_INDEX
-  end
-})
-
-if ENV['IS_DEV']
-  use(Cuba.new {
-    on 'raise-error-for-test' do
-      something
-    end
-  })
+Dir.glob("Server/*/middleware.rb").each do |path|
+  require "./#{path}".sub(/\.rb$/, '')
 end
+
 
 Cuba.define do
 
