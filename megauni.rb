@@ -1,13 +1,41 @@
 
 require 'cuba'
 require 'rack/robustness'
+require 'www_app'
 
 class Megauni
 
   FILE_VALS = {}
 
   module Server
+
+    module Plugin
+      def mu name, *args
+
+        file = caller(1,1).first.split(':').first
+        FILE_VALS[file] ||= {}
+
+        case
+        when FILE_VALS[file].has_key?(name)
+          FILE_VALS[file][name]
+        when args.empty? && block_given?
+          FILE_VALS[file][name] = yield
+        when args.size == 1
+          FILE_VALS[file][name] = args.first
+        when args.size > 0 && block_given?
+          fail "Too many arguments: arg and block"
+        when args.size > 1
+          fail "Unknown args: #{args.inspect}"
+        else
+          fail "Key not found: #{name.inspect}"
+        end
+
+      end # === def mu
+    end # === Plugin
+
     module DSL
+
+      include Plugin
 
       def set name, val
         file = caller(1,1).first.split(':').first
@@ -68,30 +96,6 @@ class Megauni
 
     end # === module DSL
 
-    module Plugin
-      def mu name, *args
-
-        file = caller(1,1).first.split(':').first
-        FILE_VALS[file] ||= {}
-
-        case
-        when FILE_VALS[file].has_key?(name)
-          FILE_VALS[file][name]
-        when args.empty? && block_given?
-          FILE_VALS[file][name] = yield
-        when args.size == 1
-          FILE_VALS[file][name] = args.first
-        when args.size > 0 && block_given?
-          fail "Too many arguments: arg and block"
-        when args.size > 1
-          fail "Unknown args: #{args.inspect}"
-        else
-          fail "Key not found: #{name.inspect}"
-        end
-
-      end # === def mu
-    end # === Plugin
-
   end # === module Server
 end # === Megauni
 
@@ -112,9 +116,9 @@ end
 require 'da99_rack_protect'
 use Da99_Rack_Protect do |da99|
   if ENV['IS_DEV']
-    da99.config(:host, :localhost) 
+    da99.config(:host, :localhost)
   else
-    da99.config(:host, 'megauni.com') 
+    da99.config(:host, 'megauni.com')
   end
 end
 
