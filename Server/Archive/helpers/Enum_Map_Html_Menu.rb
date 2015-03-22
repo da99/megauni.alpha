@@ -1,12 +1,12 @@
 
 
 module Enum_Map_Html_Menu
-  
-  def map_html_menu &blok
-    
+
+  def map_html_menu
+
     map { |orig|
-      raw_results = blok.call(orig)
-      
+      raw_results = yield(orig)
+
       selected, attrs = if raw_results.is_a?(Array)
         assert_size raw_results, 2
         raw_results
@@ -18,7 +18,7 @@ module Enum_Map_Html_Menu
         :selected? => selected, 
         :not_selected? =>!selected
       }
-      
+
       if orig.is_a?(Hash)
         orig.update add_attrs
       else
