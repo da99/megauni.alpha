@@ -20,7 +20,8 @@ case "$action" in
 
   "start")
     # puma --config configs/puma.rb configs/config.ru
-    bundle exec passenger start --port 4567 --rackup configs/config.ru
+    dir="$(pwd)/tmp"
+    RACK_ENV=production bundle exec passenger start --pid-file=$dir/4567.pid --log-file=$dir/4567.log --port 4567 --rackup configs/config.ru
     ;;
 
   "stop")

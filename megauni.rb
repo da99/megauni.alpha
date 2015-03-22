@@ -1,12 +1,13 @@
 
 require 'cuba'
-require 'rack/robustness'
-
 require 'www_app'
 
 FILE_403   = File.read("Public/403.html")
 FILE_404   = File.read("Public/404.html")
 FILE_500   = File.read("Public/500.html")
+
+
+
 
 class Megauni
 
@@ -109,17 +110,7 @@ end # === Megauni
 extend      Megauni::Server::DSL
 Cuba.plugin Megauni::Server::Plugin
 
-use Rack::CommonLogger if ENV['IS_DEV']
-
-# 500 errors ===================
-# We place this at the top level
-# to catch any server app errors
-# (aka 500).
-use Rack::Robustness do |g|
-  g.status       500
-  g.content_type 'text/plain'
-  g.body         FILE_500
-end
+use Rack::CommonLogger
 
 require 'da99_rack_protect'
 use Da99_Rack_Protect do |da99|
@@ -129,6 +120,26 @@ use Da99_Rack_Protect do |da99|
     da99.config(:host, 'megauni.com')
   end
 end
+
+# 500 errors ===================
+# We place this at the top level
+# to catch any server app errors
+# (aka 500).
+Cuba.use(Class.new {
+  def initialize app
+    @app = app
+  end
+
+  def call env
+    dup._call env
+  end
+
+  def _call env
+    @app.call env
+  rescue Object => ex
+    [500, {'Content-Type'=>'text/html'}, [FILE_500]]
+  end
+})
 
 %w{
   Timer_Public_Files
