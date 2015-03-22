@@ -150,7 +150,7 @@ Cuba.use(Class.new {
   Public_Files
 }.each { |name|
 
- require "./middleware/#{name}"
+ require "./Server/Archive/#{name}"
 
  case name
  when 'Public_Files'

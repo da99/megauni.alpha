@@ -1,6 +1,6 @@
 
-require "./middleware/Mu_Archive"
-require "./middleware/Surfer_Hearts_Archive"
+require "./Server/Archive/Mu_Archive"
+require "./Server/Archive/Surfer_Hearts_Archive"
 
 #
 # Serve assets: .js, .css, etc.
