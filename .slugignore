@@ -1,8 +1,25 @@
-# Ignore sensitive info. in /config dir.
-tests/*
-templates/en-us/mab/*
-templates/en-us/xml/*
-templates/en-us/sass/*
+# .slugignore
+#  -- Ignore files for the final slug
+#
+#     The .slugignore file causes files to be
+#     removed after you push code to Heroku and
+#     before the buildpack runs. This lets you
+#     prevent large files from being included in
+#     the final slug.
+#     Unlike .gitignore, .slugignore does not support negated ! patterns.
+#
+#     More info:
+#     https://devcenter.heroku.com/articles/slug-compiler#ignoring-files-with-slugignore
+#
+/specs
+/Bookmarks
+/Docs
+/rake
+/tmp
+/templates
+/templates/en-us/mab/*
+/templates/en-us/xml/*
+/templates/en-us/sass/*
 
 
 
