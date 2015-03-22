@@ -5,18 +5,68 @@
 action="$1"
 shift
 
+if [[ ! -z "$IS_DEV" ]]; then
+  dir="$(pwd)"
+  export PORT=4567
+  export JAR="$dir/tmp/cookies.txt"
+  export PID="$dir/tmp/{$PORT}.pid"
+  export LOG="$dir/tmp/log.txt"
+fi
+
 set -u -e -o pipefail
+
+export RACK_ENV="production"
+
+# ===============================================
+mods=(
+Customer
+Screen_Name
+File_Name
+Label
+Consume
+Computer
+)
+
+# === Create a reverse of the list.
+rev_mods=()
+for (( idx=${#mods[@]}-1 ; idx >= 0 ; idx-- ))
+do
+  rev_mods+=( "${mods[idx]}" )
+done
+# ===============================================
 
 case "$action" in
 
   "help")
     echo ""
-    echo "  $ megauni   start"
-    echo "  $ megauni   stop"
-    echo "  $ megauni   watch"
+    echo "  $  start"
+    echo "  $  stop"
+    echo "  $  watch"
     echo ""
+    echo "  $  migrate   reset"
+    echo "  $  migrate   reset   MODEL"
+    echo "  $  migrate   default_data"
+    echo "  $  migrate   list"
+    echo ""
+    echo "  $  model_list"
+    echo "  $  model_list  rsort"
     exit 0
     ;;
+
+  "model_list")
+    if [[ "$@" == "rsort" ]]; then
+      for (( idx=${#mods[@]}-1 ; idx >= 0 ; idx-- ))
+      do
+        echo "${mods[idx]}"
+      done
+    else
+      for i in ${mods[@]}
+      do
+        echo "$i"
+      done
+    fi
+    ;;
+
 
   "start")
     # puma --config configs/puma.rb configs/config.ru
@@ -30,6 +80,99 @@ case "$action" in
 
   "watch")
     echo "not done yet" 1>&2
+    ;;
+
+  "migrate")
+    sub_action="$1"
+    shift
+    if [[ -z "$sub_action" ]]; then
+      sub_action="up"
+    fi
+
+    case "$sub_action" in
+      "reset")
+        if [[ -z "$@" ]]; then
+          model="ALL!"
+        else
+          model="$1"
+          shift
+        fi
+
+        bin/megauni migrate down "$model"
+        bin/migrate migrate up   "$model"
+        if [[ -z "$model" ]]; then
+          ALLOW_BANNED_SCREEN_NAME=true bin/megauni migrate default_data
+        fi
+        echo -e "\n===== DONE =====\n"
+        ;;
+
+      "default_data")
+        bin/migrate_default_data
+        ;;
+
+      "list")
+        echo "not ready" 1>&2
+        exit 1
+        ;;
+
+      "up")
+        if [[ -z "$@" ]]; then
+          model="ALL!"
+        else
+          model="$1"
+          shift
+        fi
+
+        if [[ -z "$model" ]]
+        then
+
+          for m in ${mods[@]}
+          do
+            echo "=== Migrating: up $m"
+            bin/migrate_up $m
+            echo ""
+          done
+        else
+          bin/migrate_up $model
+        fi
+        ;;
+
+      "down")
+        if [[ -z "$@" ]]; then
+          model="ALL!"
+        else
+          model="$1"
+          shift
+        fi
+
+        if [[ -z "$model" ]]
+        then
+
+          # === Ensure dev machine.
+          if [ ! -n "${IS_DEV+x}" ]
+          then
+            echo "This is not a dev machine."
+            exit 1
+          fi
+
+          # === Reverse list
+          for m in ${rev_mods[@]}
+          do
+            echo "=== Migrating: down $m"
+            bin/migrate_down $m
+            echo ""
+          done
+
+        else
+          bin/migrate_down $model
+        fi
+        ;;
+
+      *)
+        echo "Unknown command for migrate: $sub_action"
+        exit 1
+        ;;
+    esac # === sub_action
     ;;
 
   *)
