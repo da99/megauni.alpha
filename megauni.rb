@@ -1,7 +1,12 @@
 
 require 'cuba'
 require 'rack/robustness'
+
 require 'www_app'
+
+FILE_403   = File.read("Public/403.html")
+FILE_404   = File.read("Public/404.html")
+FILE_500   = File.read("Public/500.html")
 
 class Megauni
 
@@ -72,7 +77,7 @@ class Megauni
           end
         end
 
-        middleware = Class.new {
+        Cuba.use(Class.new {
           const_set :APP, app
 
           def initialize app, *args
@@ -80,6 +85,10 @@ class Megauni
           end
 
           def call env
+            dup._call env
+          end
+
+          def _call env
             status, headers, body = (result = self::class::APP.call env)
 
             is_empty = status == 404 && (!body || body.empty?)
@@ -89,9 +98,7 @@ class Megauni
               result
             end
           end
-        }
-
-        Cuba.use(middleware)
+        })
       end # === def use
 
     end # === module DSL
@@ -102,11 +109,12 @@ end # === Megauni
 extend      Megauni::Server::DSL
 Cuba.plugin Megauni::Server::Plugin
 
-FILE_403   = File.read("Public/403.html")
-FILE_404   = File.read("Public/404.html")
-FILE_500   = File.read("Public/500.html")
+use Rack::CommonLogger if ENV['IS_DEV']
 
 # 500 errors ===================
+# We place this at the top level
+# to catch any server app errors
+# (aka 500).
 use Rack::Robustness do |g|
   g.status       500
   g.content_type 'text/plain'
@@ -121,7 +129,6 @@ use Da99_Rack_Protect do |da99|
     da99.config(:host, 'megauni.com')
   end
 end
-
 
 %w{
   Timer_Public_Files
@@ -146,7 +153,6 @@ end
 Dir.glob("Server/*/middleware.rb").each do |path|
   require "./#{path}".sub(/\.rb$/, '')
 end
-
 
 Cuba.define do
 

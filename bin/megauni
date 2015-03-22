@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# -*- bash -*-
+#
+#
+action="$1"
+shift
+
+set -u -e -o pipefail
+
+case "$action" in
+
+  "help")
+    echo ""
+    echo "  $ megauni   start"
+    echo "  $ megauni   stop"
+    echo "  $ megauni   watch"
+    echo ""
+    exit 0
+    ;;
+
+  "start")
+    # puma --config configs/puma.rb configs/config.ru
+    bundle exec passenger start --port 4567 --rackup configs/config.ru
+    ;;
+
+  "stop")
+    echo "not done yet" 1>&2
+    ;;
+
+  "watch")
+    echo "not done yet" 1>&2
+    ;;
+
+  *)
+    echo "Unknown action: $action" 1>&2
+    exit 1
+    ;;
+
+esac # === case $action
+
+
+

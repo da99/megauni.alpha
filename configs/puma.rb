@@ -1,25 +1,22 @@
-worker_processes 2
 
+port 4567
+workers 2
+
+if ENV['USER'] == 'root'
+  user "deploy_okdoki", "deploy_okdoki"
+end
+
+preload_app!
+
+on_worker_boot do
+  DB.disconnect if defined? DB
+end
+
+#
 # listen '/home/da01/Documents/unicorn/the_stable.sock'
-
+#
 # :tcp_nodelay has no effect on UNIX sockets.
 # :tcp_nopush has no effect on UNIX sockets. It is not needed or recommended.
-
-
-# Combine Ruby Enterprise Edition (REE) with "preload_app true" 
-# for memory savings.
-# http://rubyenterpriseedition.com/faq.html#adapt_apps_for_cow
-# 
-# However, I don't trust any type of preloading at this
-# stage of the stack.
-preload_app false 
-
-# Are we using REE? Yes? 
-# Then let's use it's garbage collecting features.
-# GC.respond_to?(:copy_on_write_friendly=) and
-    # GC.copy_on_write_friendly = true
-
-
 # 
 # after_fork do |server,worker|
 # 

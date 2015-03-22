@@ -22,7 +22,7 @@ end
 
 gem 'foreman'
 gem 'cuba'
-gem 'unicorn'
+gem 'passenger'
 gem 'mustache'
 gem 'da99_rack_protect', '> 2.2.2'
 
@@ -33,7 +33,6 @@ gem 'yajl-ruby'
 gem 'sequel'
 gem 'pg'
 gem 'addressable'
-gem 'rack-robustness'
 
 gem 'i_dig_sql'
 gem 'www_app'
