@@ -21,6 +21,7 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     dot_why (2.1.1)
       erector (~> 0)
+    duck_duck_duck (1.0.0)
     erector (0.10.0)
       treetop (>= 1.2.3)
     escape_escape_escape (1.4.3)
@@ -114,6 +115,7 @@ DEPENDENCIES
   cuba
   da99_rack_protect (> 2.2.2)
   dot_why
+  duck_duck_duck
   escape_utils
   foreman
   htmlentities

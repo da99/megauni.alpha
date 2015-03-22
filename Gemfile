@@ -38,3 +38,5 @@ gem 'i_dig_sql'
 gem 'www_app'
 gem 'moron_text'
 gem 'touch_up'
+gem 'duck_duck_duck'
+
