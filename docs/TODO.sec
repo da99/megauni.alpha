@@ -58,7 +58,7 @@ https://www.djangoproject.com/weblog/2013/aug/06/breach-and-django/
 
 18: CSRF tokens
 
-
+19: can't deploy w/o filter out binding.pry for all personal gems
 
 
 
