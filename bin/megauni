@@ -17,6 +17,15 @@ set -u -e -o pipefail
 
 export RACK_ENV="production"
 
+# ==============================================================
+# http://www.ibm.com/developerworks/aix/library/au-learningtput/
+green_bg=$(tput setb 2)
+white=$(tput setaf 7)
+bold_white_on_green=$(tput bold)${white}${green_bg}
+bold_white=$(tput bold)${white}
+reset_color=$(tput sgr0)
+# ==============================================================
+
 # ===============================================
 mods=(
   Customer
@@ -174,6 +183,64 @@ case "$action" in
         exit 1
         ;;
     esac # === sub_action
+    ;;
+
+  "test")
+    files=""
+    model=""
+    spec=""
+    reset=""
+
+    if [[ ! -z "$@" && "$1" == "reset" ]]; then
+      reset="true"
+      shift
+    fi
+
+    if [[ ! -z "$@" && -d "Server/$1" ]]; then
+      model="$1"
+      files="$(echo Server/$model/specs/*-*.rb)"
+      shift
+    fi
+
+    if [[ ! -z "$@" && -f "$(echo -n Server/$model/specs/*-${1}.rb)" ]]; then
+      spec="$1"
+      files="$(echo Server/$model/specs/*-${spec}.rb)"
+      shift
+    fi
+
+    if [[ -z "$model" && -z "$spec" ]]; then
+      files="$(echo Server/*/specs/*-*.rb)"
+    fi
+
+    echo $files
+    exit 0
+
+    if [[ -z "$files" ]]; then
+      colorize yellow "No tests found." 1>&2
+      exit 0
+    fi
+
+    if [[ -z "$model" && -z "$spec" ]]; then
+      # === Stop the server at the end
+      trap "bin/server stop" EXIT
+
+      # === Start server:
+      bin/megauni start
+    fi # === if start server
+
+    # === Migrate: ==========================================
+    if [[ ! -z "$@" && "$1" == "reset" ]]; then
+      reset="true"
+      shift
+    fi
+
+    if [[ ( ! -z "$reset" ) || ( -z "$model" && -z "$spec" ) ]]; then
+      bin/megauni migrate reset "$model" # > /dev/null
+    fi
+    # =======================================================
+
+    bundle exec bacon Server/specs/helper.rb $files "$@"
+    exit 0
     ;;
 
   *)
