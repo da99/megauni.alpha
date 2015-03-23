@@ -94,19 +94,15 @@ case "$action" in
 
     case "$sub_action" in
       "reset")
-        if [[ -z "$@" ]]; then
-          model="ALL!"
-        else
-          model="$1"
-          shift
-        fi
+        model="$@"
 
         bin/megauni migrate down "$model"
-        bin/migrate migrate up   "$model"
-        if [[ -z "$model" ]]; then
-          ALLOW_BANNED_SCREEN_NAME=true bin/megauni migrate default_data
-        fi
-        echo -e "\n===== DONE =====\n"
+        bin/megauni migrate up   "$model"
+        echo ""
+        # if [[ -z "$model" ]]; then
+          # ALLOW_BANNED_SCREEN_NAME=true bin/megauni migrate default_data
+        # fi
+        # echo -e "\n===== DONE =====\n"
         ;;
 
       "default_data")
@@ -143,7 +139,6 @@ case "$action" in
         else
           cd Server
           echo ""
-          echo "=== Migrating: up $model"
           bundle exec duck_duck_duck up $model
         fi
         ;;
@@ -168,10 +163,9 @@ case "$action" in
           done
 
         else
-          cd Server/$model
+          cd Server
           echo ""
-          echo "=== Migrating: down $model"
-          bundle exec duck_duck_duck down
+          bundle exec duck_duck_duck down $model
         fi
         ;;
 
