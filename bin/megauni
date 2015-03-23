@@ -46,7 +46,7 @@ case "$action" in
     echo "  $  migrate   reset"
     echo "  $  migrate   reset   MODEL"
     echo "  $  migrate   default_data"
-    echo "  $  migrate   list"
+    echo "  $  migrate   status"
     echo ""
     echo "  $  model_list"
     echo "  $  model_list  rsort"
@@ -110,9 +110,19 @@ case "$action" in
         bin/migrate_default_data
         ;;
 
-      "list")
-        echo "not ready" 1>&2
-        exit 1
+      "status")
+        script="
+          require 'sequel'
+          DB = Sequel.connect('$DATABASE_URL')
+          if DB.table_exists?(:schema)
+            DB.from(:schema).each { |r|
+              puts r.inspect
+            }
+          else
+            puts '== None ==' 
+          end
+        "
+        ruby -e "$script"
         ;;
 
       "up")
