@@ -19,13 +19,13 @@ export RACK_ENV="production"
 
 # ===============================================
 mods=(
-Customer
-Screen_Name
-File_Name
-Label
-Consume
-Computer
+  Customer
+  Screen_Name
 )
+  # File_Name
+  # Label
+  # Consume
+  # Computer
 
 # === Create a reverse of the list.
 rev_mods=()
@@ -43,6 +43,9 @@ case "$action" in
     echo "  $  stop"
     echo "  $  watch"
     echo ""
+    echo "  $  migrate"
+    echo "  $  migrate   up"
+    echo "  $  migrate   down"
     echo "  $  migrate   reset"
     echo "  $  migrate   reset   MODEL"
     echo "  $  migrate   default_data"
@@ -114,46 +117,39 @@ case "$action" in
         script="
           require 'sequel'
           DB = Sequel.connect('$DATABASE_URL')
-          if DB.table_exists?(:schema)
-            DB.from(:schema).each { |r|
+          if DB.table_exists?(:_schema)
+            rows = []
+            DB.from(:_schema).each { |r|
+              rows << r
               puts r.inspect
             }
+            puts '== No records found.' if rows.empty?
           else
-            puts '== None ==' 
+            puts '== Table not found.'
           end
         "
         ruby -e "$script"
         ;;
 
       "up")
-        if [[ -z "$@" ]]; then
-          model="ALL!"
-        else
-          model="$1"
-          shift
-        fi
+        model="$@"
 
         if [[ -z "$model" ]]
         then
-
           for m in ${mods[@]}
           do
-            echo "=== Migrating: up $m"
-            bin/migrate_up $m
-            echo ""
+            bin/megauni migrate up $m
           done
         else
-          bin/migrate_up $model
+          cd Server
+          echo ""
+          echo "=== Migrating: up $model"
+          bundle exec duck_duck_duck up $model
         fi
         ;;
 
       "down")
-        if [[ -z "$@" ]]; then
-          model="ALL!"
-        else
-          model="$1"
-          shift
-        fi
+        model="$@"
 
         if [[ -z "$model" ]]
         then
@@ -168,13 +164,14 @@ case "$action" in
           # === Reverse list
           for m in ${rev_mods[@]}
           do
-            echo "=== Migrating: down $m"
-            bin/migrate_down $m
-            echo ""
+            bundle exec bin/megauni migrate down $m
           done
 
         else
-          bin/migrate_down $model
+          cd Server/$model
+          echo ""
+          echo "=== Migrating: down $model"
+          bundle exec duck_duck_duck down
         fi
         ;;
 
