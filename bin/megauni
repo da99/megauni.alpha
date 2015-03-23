@@ -212,9 +212,6 @@ case "$action" in
       files="$(echo Server/*/specs/*-*.rb)"
     fi
 
-    echo $files
-    exit 0
-
     if [[ -z "$files" ]]; then
       colorize yellow "No tests found." 1>&2
       exit 0
@@ -239,7 +236,7 @@ case "$action" in
     fi
     # =======================================================
 
-    bundle exec bacon Server/specs/helper.rb $files "$@"
+    bundle exec bacon Server/specs/helpers.rb $files "$@"
     exit 0
     ;;
 
