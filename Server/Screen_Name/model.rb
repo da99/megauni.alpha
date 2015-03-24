@@ -17,8 +17,6 @@ class Screen_Name
   VALID               = /\A[#{VALID_CHARS}]{4,20}\z/i
   VALID_ENGLISH       = "Screen name must be: 4-20 valid chars: 0-9 a-z A-Z _ - ."
   INVALID             = /[^#{VALID_CHARS}]/
-  Table_Name          = :screen_name
-  TABLE               = DB[Table_Name]
   BANNED_SCREEN_NAMES = [
     /^MEGAUNI/i,
     /^MINIUNI/i,
@@ -114,26 +112,44 @@ class Screen_Name
   field(:screen_name) {
     varchar 4, 30
     upcase
-    match(VALID, "Invalid screen name. #{VALID_ENGLISH}")
-    not_match(BANNED_SCREEN_NAMES, 'Screen name not allowed.')
-    unique '"screen_name_unique_idx"', "Screen name already taken: !value"
+    matches do |r, val|
+      fail!("Invalid screen name. #{VALID_ENGLISH}") if val !~ VALID
+      fail!('Screen name not allowed.') if val =~ BANNED_SCREEN_NAMES
+      true
+    end
+    # unique '"screen_name_unique_idx"', "Screen name already taken: !value"
   }
 
-  field(:class_id) {
-    smallint
-    set_to(0, lambda { |v| v < 0 || v > 2 })
+  field(:display_name) {
+    varchar 4, 30
+    set_to { |r, val|
+      r.clean[:screen_name]
+    }
   }
+
+  # field(:class_id) {
+    # smallint
+    # set_to do |r, v|
+      # if v < 0 || v > 2
+        # 0
+      # else
+        # v
+      # end
+    # end
+  # }
 
   field(:nick_name) {
-    varchar nil, 1, 20
+    varchar nil, 1, 30
   }
 
-  field(:read_able) {
-    one_of_these([1, 2, 3], "Allowed values: @W (world) @P (private) @N (no one)")
-  }
-
-  field(:about) {
-    varchar nil, 1, 900
+  field(:privacy) {
+    smallint 1, 3
+    matches do |r, v|
+      if ![1, 2, 3].include?(v)
+        fail! "Allowed values: @W (world) @P (private) @N (no one)"
+      end
+      true
+    end
   }
 
   def to_href
@@ -177,34 +193,12 @@ class Screen_Name
   end
 
   def create
+    clean :screen_name!, :display_name, :class_id, :read_able
 
-    is_new_owner = @raw[:customer].new?
-
-    clean :screen_name!, :class_id, :read_able
-
-    insert_data = {
-       :owner_id     => is_new_owner ? 0 : new_data[:customer].data[:id],
-       :screen_name  => clean[:screen_name],
-       :display_name => clean[:screen_name]
-    }
-
-    me = self.class.new(new_record)
-    if is_new_owner
-      me.data[:owner_id] = me.id
-      new_data[:customer].clean_data[:id] = me.id
-    end
-
-    return me unless is_new_owner
-
-    # ==== This is a new customer
-    # ==== so we must use the screen name id
-    # ==== as the owner_id because customer record
-    # ==== has not been created.
-    new_row = TABLE.returning.where(:id=>me.id).update(:owner_id=>me.id).first
-    new_data[:customer].data[:id] = me.id
-    new_data[:customer].clear_cache
-
-    self.class.new(me.data.merge new_row)
+    # === Inspired from: http://www.neilconway.org/docs/sequences/
+    clean[:owner_id] = @raw[:customer] ?
+      Sequel.lit("CURRVAL(PG_GET_SERIAL_SEQUENCE('#{self.class.table_name}', 'id'))") :
+      @raw[:customer].data[:id]
   end # === def create
 
   # === UPDATE ================================================================
@@ -233,7 +227,7 @@ class Screen_Name
   def update
     @new_data = raw_data
 
-    clean :screen_name, :about, :nick_name)
+    clean :screen_name, :about, :nick_name
 
     if clean_data[:screen_name]
       clean_data[:display_name] = clean_data[:screen_name]

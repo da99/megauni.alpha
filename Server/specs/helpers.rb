@@ -1,7 +1,7 @@
 
 require 'Bacon_Colored'
 require 'pry'
-require './Server/Customer/model'
+require './Server/Megauni/model'
 
 def days_ago_in_sql days
   Sequel.lit(Okdoki::Model::PG::UTC_NOW_RAW + " - interval '#{days * 24} hours'")

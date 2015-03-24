@@ -1,22 +1,17 @@
 
-require './Server/Customer/model'
-
-include Customer_Test
-
 PASS_WORD="this_is_my pass word"
 
 describe 'create:' do
 
   it 'checks min length of screen_name' do
 
-    lambda {
+    catch(:invalid) {
       Customer.create screen_name: "a",
       pass_word: "this is my password",
       confirm_pass_word: "this is my password",
       ip: '000.00.00'
-    }.should.raise(Screen_Name::Invalid).
-    message.
-    should.match /Screen name must be: 4-\d\d valid chars/
+    }.error[:msg].
+    should.match /Screen name must be between 4 and \d\d char/
 
   end # === it
 

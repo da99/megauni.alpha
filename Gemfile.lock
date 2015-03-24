@@ -17,7 +17,7 @@ GEM
       rack
     da99_rack_protect (3.1.1)
       rack-protection (> 1.5)
-    datoki (2.0.1)
+    datoki (3.1.2)
       pg (>= 0.17)
       sequel (> 4.12)
     domain_name (0.5.23)
@@ -65,7 +65,7 @@ GEM
       nokogiri
     ntlm-http (0.1.1)
     oj (2.12.1)
-    passenger (5.0.4)
+    passenger (5.0.5)
       rack
       rake (>= 0.8.1)
     pg (0.18.1)
