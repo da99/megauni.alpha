@@ -35,6 +35,7 @@ gem 'pg'
 gem 'addressable'
 
 gem 'i_dig_sql'
+gem 'datoki'
 gem 'www_app'
 gem 'moron_text'
 gem 'touch_up'

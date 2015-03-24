@@ -1,27 +1,11 @@
 
-require './Server/Okdoki/model'
-require './Server/Screen_Name/List'
-require './Server/Okdoki/Escape_All'
-require 'multi_json'
-
-require_crud :Screen_Name
+require 'datoki'
 
 class Screen_Name
 
-  include Okdoki::Model
-  attr_reader :clean_data
+  include Datoki
 
-  # =====================================================
-  # Errors
-  # =====================================================
-
-  class Dup < Okdoki::Invalid
-  end
-
-  # =====================================================
-  # Settings
-  # =====================================================
-
+  # === Settings ========================================
   World_Read_Id   = 1
   Private_Read_Id = 2
   Not_Read_Id     = 3
@@ -48,10 +32,9 @@ class Screen_Name
     /^(UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY)\z/i,
     /^[.]+-COLA\z/i
   ]
+  # =====================================================
 
-  # =====================================================
-  # Helpers
-  # =====================================================
+  # === Helpers =========================================
 
   class << self
 
@@ -79,6 +62,45 @@ class Screen_Name
       sn
     end # === def canonize_screen_name
 
+    def delete_by_owner_ids ids
+      return if ids.empty?
+      TABLE.
+        where(TABLE.literal [[ :owner_id, ids]]).
+        delete
+    end # === def delete
+
+    def read *args
+      case args.size
+      when 1
+        case args.first
+        when Customer
+          return read_list_by_customer args.first
+        end
+      end
+      raise "Go back and correct your args."
+    end
+
+    def read_by_id id
+      new TABLE.limit(1)[:id=>id], "Screen name not found."
+    end
+
+    def read_by_screen_names arr
+      new TABLE.where(screen_name: Screen_Name.canonize(arr)).all
+    end
+
+    def read_by_screen_name raw_sn
+      new TABLE[:screen_name=>Screen_Name.canonize(raw_sn)], "Screen name not found: #{raw_sn}"
+    end
+
+    def read_first_by_customer customer
+      new TABLE.where(:owner_id=>customer.id).limit(1).first
+    end
+
+    def read_list_by_customer c
+      new TABLE.where(owner_id: c.data[:id]).all
+    end
+
+
   end # === class self ==================================
 
   # =====================================================
@@ -97,26 +119,30 @@ class Screen_Name
     "/@#{screen_name}"
   end
 
-  def validate *args
-    case args.first
-    when :screen_name
-      v = super(*args).
-        clean('strip', 'upcase').
-        match(VALID, "Invalid: \"#{clean_data[:screen_name]}\". #{VALID_ENGLISH}")
-      unless ENV['ALLOW_BANNED_SCREEN_NAME'] == 'true'
-        v.not_match(BANNED_SCREEN_NAMES, 'Screen name not allowed.')
-      end
-      v
-    when :class_id
-      super(*args).
-        clean('to_i').
-        set_to(0, lambda { |v| v < 0 || v > 2 })
-    when :about
-      super(*args).set_to_nil_if_empty
-    else
-      super
-    end
-  end
+  field(:screen_name) {
+    varchar 4, 30
+    upcase
+    match(VALID, "Invalid screen name. #{VALID_ENGLISH}")
+    not_match(BANNED_SCREEN_NAMES, 'Screen name not allowed.')
+    unique '"screen_name_unique_idx"', "Screen name already taken: !value"
+  }
+
+  field(:class_id) {
+    smallint
+    set_to(0, lambda { |v| v < 0 || v > 2 })
+  }
+
+  field(:nick_name) {
+    varchar nil, 1, 20
+  }
+
+  field(:read_able) {
+    one_of_these([1, 2, 3], "Allowed values: @W (world) @P (private) @N (no one)")
+  }
+
+  field(:about) {
+    varchar nil, 1, 900
+  }
 
   #
   # Like :attach_screen_names,
@@ -152,6 +178,186 @@ class Screen_Name
     end
 
     arr
+  end
+
+  on :create do
+
+    is_new_owner = !@raw[:customer].data
+
+    clean :screen_name!, :class_id, :read_able
+
+    insert_data = {
+       :owner_id     => is_new_owner ? 0 : new_data[:customer].data[:id],
+       :screen_name  => clean[:screen_name],
+       :display_name => clean[:screen_name]
+    }
+
+    me = self.class.new(new_record)
+    if is_new_owner
+      me.data[:owner_id] = me.id
+      new_data[:customer].clean_data[:id] = me.id
+    end
+
+    return me unless is_new_owner
+
+    # ==== This is a new customer
+    # ==== so we must use the screen name id
+    # ==== as the owner_id because customer record
+    # ==== has not been created.
+    new_row = TABLE.returning.where(:id=>me.id).update(:owner_id=>me.id).first
+    new_data[:customer].data[:id] = me.id
+    new_data[:customer].clear_cache
+
+    self.class.new(me.data.merge new_row)
+  end # === def create
+
+  # === UPDATE ================================================================
+
+  def update_privacy type
+    pid = case type
+          when :public
+            World_Read_Id
+          when :private
+            Private_Read_Id
+          when :no_one
+            Not_Read_Id
+          else
+            raise "Unknown val: #{type.inspect}"
+          end
+    row = TABLE.returning.
+      where(:id=>id).
+      update(:privacy=>pid).
+      first
+
+    @data.merge!(row || {})
+
+    self
+  end
+
+  on update do
+    @new_data = raw_data
+
+    clean :screen_name, :about, :nick_name)
+
+    if clean_data[:screen_name]
+      clean_data[:display_name] = clean_data[:screen_name]
+    end
+
+    row = TABLE.
+      returning.
+      where(:screen_name=>data[:screen_name]).
+      update(clean_data).
+      first
+
+    @data.merge!(row || {})
+
+    self
+  end # === def update
+
+  # === READ ==================================================================
+
+  def owner
+    @owner ||= Customer.read_by_id(data[:owner_id])
+  end
+
+  def bot cmd = nil
+    if !@bot_read
+      @bot_read = true
+      @bot = Bot.read_by_screen_name(self) rescue nil
+    end
+
+    return @bot.send(cmd) if cmd && @bot
+    @bot
+  end
+
+  def bot_uses cmd = nil
+    @bot_uses ||= begin
+                    bots = Hash[ Bot.new(
+                      DB[%^
+                        SELECT bot.*, screen_name.screen_name as screen_name
+                        FROM bot inner join screen_name
+                          ON bot.id = screen_name.id
+                        WHERE bot.id IN (
+                          SELECT bot_id
+                          FROM bot_use
+                          WHERE sn_id = :sn_id AND is_on IS TRUE
+                        )
+                      ^, :sn_id=>id].all
+                    ).map { |b| [b.id, b] } ]
+
+                    codes = Code.new(DB[%^
+                      SELECT *
+                      FROM code
+                      WHERE bot_id IN :ids
+                    ^, :ids=>bots.keys].all)
+
+                    codes.each { |c|
+                      bots[c.bot_id].codes c
+                    }
+
+                    bots.values
+                  end
+
+    return @bot_uses unless cmd
+
+    @bot_uses.map(&cmd)
+  end # === def bot_uses
+
+  def read type, *args
+    case type
+    when :chit_chat_inbox
+      Chit_Chat.read_inbox self
+    else
+      raise "Unknown action: #{type}"
+    end
+  end
+
+  def read_bot_menu val = nil
+    sql = %^
+      SELECT bot.*, screen_name.screen_name, bot_use_select.is_on
+      FROM (bot Left JOIN screen_name
+        ON bot.id = screen_name.id)
+           LEFT JOIN ( SELECT bot_id, is_on FROM bot_use WHERE sn_id = :sn_id )
+            AS bot_use_select
+            ON screen_name.id = bot_use_select.bot_id
+      ORDER BY screen_name ASC
+    ^
+    bots = Bot.new(DB[sql, :sn_id=>id].all)
+
+    return bots unless val
+    bots.map(&val)
+  end
+
+  def is? o
+    return true if data[:screen_name] == Screen_Name.canonize(o)
+    o.is_a?(Screen_Name) && owner_id == o.owner_id
+  end
+
+  def href
+    "/@#{screen_name}"
+  end
+
+  def to_public
+    {
+      :screen_name => screen_name,
+      :href => href
+    }
+  end
+
+  def owner_id
+    data[:owner_id]
+  end
+
+  def screen_name
+    data[:screen_name]
+  end
+
+  def find_screen_name_keys arr
+    rec     = arr[0] || {:screen_name_id=>nil}
+    key     = SCREEN_NAME_KEYS.detect { |k| rec.has_key? k }
+    key     = key || :screen_name_id
+    new_key = key.to_s.sub('_id', '_screen_name').to_sym
+    [key, new_key]
   end
 
 end # === Screen_Name ========================================
