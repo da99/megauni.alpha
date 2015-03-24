@@ -6,18 +6,38 @@ class Customer
 
   include Datoki
 
-  # =====================================================
-  # Settings
-  # =====================================================
+  field(:ip) {
+    string_ish 7, 50, /\A[0-9\.\:]{5,}\Z/.freeze
+    mis_match 'Invalid format for IP address: {{raw}}'
+  }
 
-  Table_Name = :customer
-  TABLE = DB[Table_Name]
+  field(:pass_word) {
+    pseudo
+    varchar 8, 300, lambda { |v| v.split.size >= 3 }
 
-  # =====================================================
-  # Errors
-  # =====================================================
-  Wrong_Pass_Word = Class.new(RuntimeError)
-  Too_Many_Bad_Logins = Class.new(RuntimeError)
+    mis_match 'Pass phrase must be three words or more... with spaces.')
+    required  'Pass phrase is required.'
+    small     'Pass phrase is not long enough.'
+    big       'Pass phrase is too big.'
+  }
+
+  field(:confirm_pass_word) {
+    pseudo
+    must_equal 'Pass phrase confirmation does not match with pass phrase.' do |r, raw|
+      raw[:pass_word]
+    end
+  }
+
+  field(:pswd_hash) {
+    set_to do |r|
+      encode_pass_word(r.clean[:pass_word])
+    end
+  }
+
+  def create
+    clean! :pass_word, :confirm_pass_word, :pswd_hash
+  end # === create
+
 
   # =====================================================
   # Class
@@ -35,38 +55,7 @@ class Customer
   # =====================================================
   # Instance
   # =====================================================
-
-  field(:ip) {
-    varchar
-    matches(/\A[0-9\.\:]{5,}\Z/.freeze)
-  }
-
-  field(:pass_word) {
-    pseudo
-    varchar 8, 300
-    on_empty 'Pass phrase is required.'
-    on_short 'Pass phrase is not long enough.'
-    on_long  'Pass phrase is too big.'
-    be(lambda { |v| v.split.size >= 3 }, 'Pass phrase must be three words or more... with spaces.')
-  }
-
-  field(:confirm_pass_word) {
-    pseudo
-    must_equal 'Pass phrase confirmation does not match with pass phrase.' do |r, raw|
-      raw[:pass_word]
-    end
-  }
-
-  field(:pswd_hash) {
-    set_to do |r|
-      encode_pass_word(r.clean[:pass_word])
-    end
-  }
-
-  def create
-    clean(:ip, :pass_word, :confirm_pass_word, :pswd_hash)
-  end # === create
-
+  #
   # NOTE: We have to put newlines. In case of an error,
   # the error message won't include the pass_word if the pass_word
   # is on it's own line.
