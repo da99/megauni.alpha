@@ -1,14 +1,10 @@
 
-require './Server/Okdoki/model'
-require './Server/Screen_Name/model'
 require './Server/Customer/Log_In_By_IP'
-
-require_crud :Customer
+require 'datoki'
 
 class Customer
 
-  include Okdoki::Model
-  attr_reader :clean_data
+  include Datoki
 
   # =====================================================
   # Settings
@@ -20,23 +16,56 @@ class Customer
   # =====================================================
   # Errors
   # =====================================================
-  Wrong_Pass_Word = Class.new(Okdoki::Invalid)
-  Too_Many_Bad_Logins = Class.new(Okdoki::Invalid)
+  Wrong_Pass_Word = Class.new(RuntimeError)
+  Too_Many_Bad_Logins = Class.new(RuntimeError)
 
   # =====================================================
   # Class
   # =====================================================
 
   class << self
+
+    def create *args
+      r = new
+      r.create *args
+    end
+
   end # === class self
 
   # =====================================================
   # Instance
   # =====================================================
 
-  def initialize *args
-    super
-  end
+  field(:ip) {
+    varchar
+    matches(/\A[0-9\.\:]{5,}\Z/.freeze)
+  }
+
+  field(:pass_word) {
+    pseudo
+    varchar 8, 300
+    on_empty 'Pass phrase is required.'
+    on_short 'Pass phrase is not long enough.'
+    on_long  'Pass phrase is too big.'
+    be(lambda { |v| v.split.size >= 3 }, 'Pass phrase must be three words or more... with spaces.')
+  }
+
+  field(:confirm_pass_word) {
+    pseudo
+    must_equal 'Pass phrase confirmation does not match with pass phrase.' do |r, raw|
+      raw[:pass_word]
+    end
+  }
+
+  field(:pswd_hash) {
+    set_to do |r|
+      encode_pass_word(r.clean[:pass_word])
+    end
+  }
+
+  def create
+    clean(:ip, :pass_word, :confirm_pass_word, :pswd_hash)
+  end # === create
 
   # NOTE: We have to put newlines. In case of an error,
   # the error message won't include the pass_word if the pass_word
@@ -51,27 +80,6 @@ class Customer
   def decode_pass_word val
     Sequel.lit "\ncrypt(\n?\n, pswd_hash)", val
   end
-
-  def validate name
-    case name
-    when :pass_word
-      super(name).
-        at_least(6, 'Pass phrase is too short.').
-        at_most(300, 'Pass phrase is too big.').
-        be(lambda { |v| v.split.size >= 3 }, 'Pass phrase must be three words or more... with spaces.')
-    when :confirm_pass_word
-      super.
-        equals(clean_data[:pass_word], "Pass phrase is different than pass phrase confirmation.")
-    when :email
-      raise "not ready"
-    when :ip
-      super.
-        required('IP address is required.').
-        be(lambda { |v| v.size > 5 }, 'Valid ip address is required.')
-    else
-      super
-    end # === case
-  end # === def validate
 
 end # === Customer
 

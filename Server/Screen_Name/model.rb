@@ -111,14 +111,6 @@ class Screen_Name
   # Instance
   # =====================================================
 
-  def initialize *args
-    super
-  end
-
-  def to_href
-    "/@#{screen_name}"
-  end
-
   field(:screen_name) {
     varchar 4, 30
     upcase
@@ -143,6 +135,10 @@ class Screen_Name
   field(:about) {
     varchar nil, 1, 900
   }
+
+  def to_href
+    "/@#{screen_name}"
+  end
 
   #
   # Like :attach_screen_names,
@@ -180,9 +176,9 @@ class Screen_Name
     arr
   end
 
-  on :create do
+  def create
 
-    is_new_owner = !@raw[:customer].data
+    is_new_owner = @raw[:customer].new?
 
     clean :screen_name!, :class_id, :read_able
 
@@ -234,7 +230,7 @@ class Screen_Name
     self
   end
 
-  on update do
+  def update
     @new_data = raw_data
 
     clean :screen_name, :about, :nick_name)
