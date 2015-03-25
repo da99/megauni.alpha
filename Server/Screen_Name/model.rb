@@ -113,8 +113,8 @@ class Screen_Name
     varchar 4, 30
     upcase
     matches do |r, val|
-      fail!("Invalid screen name. #{VALID_ENGLISH}") if val !~ VALID
-      fail!('Screen name not allowed.') if val =~ BANNED_SCREEN_NAMES
+      r.fail!("Invalid screen name. #{VALID_ENGLISH}") if val !~ VALID
+      r.fail!('Screen name not allowed.') if val =~ BANNED_SCREEN_NAMES
       true
     end
     # unique '"screen_name_unique_idx"', "Screen name already taken: !value"
@@ -125,6 +125,13 @@ class Screen_Name
     set_to { |r, val|
       r.clean[:screen_name]
     }
+  }
+
+  field(:owner_id) {
+    integer
+    matches do |r, v|
+      v > 0
+    end
   }
 
   # field(:class_id) {
@@ -146,7 +153,7 @@ class Screen_Name
     smallint 1, 3
     matches do |r, v|
       if ![1, 2, 3].include?(v)
-        fail! "Allowed values: @W (world) @P (private) @N (no one)"
+        r.fail! "Allowed values: @W (world) @P (private) @N (no one)"
       end
       true
     end
@@ -193,12 +200,13 @@ class Screen_Name
   end
 
   def create
+    @raw[:display_name] = @raw[:screen_name]
     clean :screen_name!, :display_name, :class_id, :read_able
 
     # === Inspired from: http://www.neilconway.org/docs/sequences/
     clean[:owner_id] = @raw[:customer] ?
-      Sequel.lit("CURRVAL(PG_GET_SERIAL_SEQUENCE('#{self.class.table_name}', 'id'))") :
-      @raw[:customer].data[:id]
+      @raw[:customer].data[:id] :
+      Sequel.lit("CURRVAL(PG_GET_SERIAL_SEQUENCE('#{self.class.table_name}', 'id'))")
   end # === def create
 
   # === UPDATE ================================================================

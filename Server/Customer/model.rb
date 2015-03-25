@@ -12,7 +12,7 @@ class Customer
 
   field(:pass_word) {
     pseudo
-    string_ish 10, 300, lambda { |v| v.split.size >= 3 }
+    string_ish 10, 300, lambda { |r, v| v.split.size >= 3 }
 
     mis_match 'Pass phrase must be three words or more... with spaces.'
     small     'Pass phrase is not long enough: at least {{min}} characters.'
@@ -23,22 +23,23 @@ class Customer
     string_ish
     pseudo
     matches do |r, raw|
-      r.raw[:pass_word] == raw
+      r.clean[:pass_word] == raw
     end
     mis_match 'Pass phrase confirmation does not match with pass phrase.'
   }
 
-  field(:pswd_hash) {
-    string_ish 10, 100
-    set_to do |r|
-      r.encode_pass_word(r.clean[:pass_word])
-    end
-  }
-
   def create
+    # === Make sure to clean Customer data
+    # first, or else
+    # a valid Screen Name will be created
+    # for an invalid pass phrase.
+    # ====================================
+    clean! :pass_word, :confirm_pass_word
+    pswd_hash = encode_pass_word(clean[:pass_word])
+
     sn = Screen_Name.create(@raw)
     clean[:id] = sn.data[:id]
-    clean! :pass_word, :confirm_pass_word, :pswd_hash
+    clean[:pswd_hash] = pswd_hash
   end # === create
 
 

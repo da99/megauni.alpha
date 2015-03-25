@@ -17,65 +17,65 @@ describe 'create:' do
 
   it 'checks max length of screen_name' do
     screen_name = "123456789012345678901234567"
-    lambda {
+    catch(:invalid) {
       Customer.create(
         screen_name: screen_name,
         pass_word: PASS_WORD,
         confirm_pass_word: PASS_WORD,
         ip: '00.000.000'
       )
-    }.should.raise(Screen_Name::Invalid).
-    message.should.match /Screen name must be: 4-\d\d valid chars/
+    }.
+    error[:msg].should.match /Screen name must be: 4-\d\d/
   end
 
   it 'checks min length of pass_word' do
-    lambda {
-      Customer.create screen_name: new_name,
-      pass_word: "t",
-      confirm_pass_word: "t",
-      ip: '000.00.00'
-    }.should.raise(Customer::Invalid).
-    message.
-    should.match /Pass phrase is too short./
+    new_name = "1234567"
+    catch(:invalid) {
+      Customer.create(
+        screen_name: new_name,
+        pass_word: "t",
+        confirm_pass_word: "t",
+        ip: '000.00.00'
+      )
+    }.
+    error[:msg].should.match /Pass phrase is not long enough/
   end # === it
 
   it 'checks max length of pass_word' do
+    new_name = "name_name_#{rand(10000)}"
     pswd = "100000 10000 " * 100
-    lambda {
+    catch(:invalid) {
       Customer.create(
         screen_name: new_name,
         pass_word: pswd,
         confirm_pass_word: pswd,
         ip: '00.000.000'
       )
-    }.should.raise(Customer::Invalid).
-    message.
-    should.match /Pass phrase is too big/
+    }.
+    error[:msg].should.match /Pass phrase is too big/
   end
 
   it 'checks pass_phrase and confirm_pass_phrase match' do
     screen_name = "123456789";
-    lambda {
+    catch(:invalid) {
       Customer.create(
         screen_name: screen_name,
         pass_word: PASS_WORD,
         confirm_pass_word: PASS_WORD + "a",
         ip: '00.000.000'
       )
-    }.should.raise(Customer::Invalid).
-    message.should.match /Pass phrase is different than pass phrase confirmation/
-  end
-
-  it 'saves screen_name to Customer object' do
-    o = create_screen_name
-    assert :==, o[:c].screen_names.map(&:screen_name), [o[:sn].screen_name.upcase]
+    }.
+    error[:msg].should.match /Pass phrase confirmation does not match/
   end
 
   it 'saves Customer id to Customer object' do
-    o = create_screen_name
-
-    # Has the customer id been saved?
-    assert :is_a, Numeric, o[:c].data[:id]
+    o = Customer.create(
+      screen_name: "sn_1235_#{rand(10000)}",
+      pass_word: PASS_WORD,
+      confirm_pass_word: PASS_WORD,
+      ip: '00.000.000'
+    )
+    o.data[:id].class.should == Fixnum
   end
 
 end # === desc create
