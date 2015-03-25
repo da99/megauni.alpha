@@ -14,6 +14,7 @@ use(
 
 mu(:FILE_INDEX) {
   WWW_App.new {
+    link.type('text/css').rel('stylesheet').href('/css/vanilla.reset.css')./
     title { 'Almost there...' }
     p { 'Not ready yet.' }
   }.to_html

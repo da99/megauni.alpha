@@ -100,7 +100,7 @@ GEM
       unf_ext
     unf_ext (0.0.6)
     webrobots (0.1.1)
-    www_app (2.1.1)
+    www_app (2.1.2)
       escape_escape_escape (>= 1.4.2)
       mustache (>= 0.99)
       yajl-ruby (>= 1.2)
