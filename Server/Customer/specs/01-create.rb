@@ -78,6 +78,21 @@ describe 'create:' do
     o.data[:id].class.should == Fixnum
   end
 
+  it "does not return :pswd_hash" do
+    o = Customer.create(
+      screen_name: "sn_hash_#{rand(10000)}",
+      pass_word: PASS_WORD,
+      confirm_pass_word: PASS_WORD,
+      ip: '00.000.000'
+    )
+    o.data.keys.include?(:pswd_hash).should == false
+  end # === it does not return :pswd_hash
+
+  it "has secret fields: :pswd_hash" do
+    Customer.fields.select { |f, meta| meta[:secret] }.keys.
+      should == [:pswd_hash]
+  end # === it has secret fields: :pswd_hash
+
 end # === desc create
 
 
