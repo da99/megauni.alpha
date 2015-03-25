@@ -36,16 +36,16 @@ describe "Screen Name: create" do
   end
 
   it "updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id" do
-    name = new_name
+    name = "name_name_#{rand(10000)}"
     sn = Screen_Name.create(:screen_name=>name)
-    assert :equal, sn.data[:id], sn.data[:owner_id]
+    sn.data[:id].should == sn.data[:owner_id]
   end
 
   it "uses Customer :id as it's :owner_id" do
     o = Customer.create(
       screen_name: "sn_1235_#{rand(10000)}",
-      pass_word: PASS_WORD,
-      confirm_pass_word: PASS_WORD,
+      pass_word: "this is my weak password",
+      confirm_pass_word: "this is my weak password",
       ip: '00.000.000'
     )
     Screen_Name::TABLE.where(owner_id: o.data[:id]).first[:owner_id].should == o.data[:id]
