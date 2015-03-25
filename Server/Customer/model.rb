@@ -28,6 +28,11 @@ class Customer
     mis_match 'Pass phrase confirmation does not match with pass phrase.'
   }
 
+  field(:pswd_hash) {
+    string_ish 4, 100
+    secret
+  }
+
   def create
     # === Make sure to clean Customer data
     # first, or else

@@ -5,6 +5,55 @@ class Screen_Name
 
   include Datoki
 
+  field(:screen_name) {
+    varchar 4, 30
+    upcase
+    matches do |r, val|
+      r.fail!("Invalid screen name. #{VALID_ENGLISH}") if val !~ VALID
+      r.fail!('Screen name not allowed: {{val}}') if BANNED_SCREEN_NAMES.detect { |reg| val =~ reg }
+      true
+    end
+    unique_index 'screen_name_unique_idx', "Screen name already taken: {{val}}"
+  }
+
+  field(:display_name) {
+    varchar 4, 30
+    set_to { |r, val|
+      r.clean[:screen_name]
+    }
+  }
+
+  field(:owner_id) {
+    integer
+    matches do |r, v|
+      v > 0
+    end
+  }
+
+  # field(:class_id) {
+    # smallint
+    # set_to do |r, v|
+      # if v < 0 || v > 2
+        # 0
+      # else
+        # v
+      # end
+    # end
+  # }
+
+  field(:nick_name) {
+    varchar nil, 1, 30
+  }
+
+  field(:privacy) {
+    smallint 1, 3
+    matches do |r, v|
+      if ![1, 2, 3].include?(v)
+        r.fail! "Allowed values: @W (world) @P (private) @N (no one)"
+      end
+      true
+    end
+  }
   # === Settings ========================================
   World_Read_Id   = 1
   Private_Read_Id = 2
@@ -109,55 +158,6 @@ class Screen_Name
   # Instance
   # =====================================================
 
-  field(:screen_name) {
-    varchar 4, 30
-    upcase
-    matches do |r, val|
-      r.fail!("Invalid screen name. #{VALID_ENGLISH}") if val !~ VALID
-      r.fail!('Screen name not allowed.') if val =~ BANNED_SCREEN_NAMES
-      true
-    end
-    # unique '"screen_name_unique_idx"', "Screen name already taken: !value"
-  }
-
-  field(:display_name) {
-    varchar 4, 30
-    set_to { |r, val|
-      r.clean[:screen_name]
-    }
-  }
-
-  field(:owner_id) {
-    integer
-    matches do |r, v|
-      v > 0
-    end
-  }
-
-  # field(:class_id) {
-    # smallint
-    # set_to do |r, v|
-      # if v < 0 || v > 2
-        # 0
-      # else
-        # v
-      # end
-    # end
-  # }
-
-  field(:nick_name) {
-    varchar nil, 1, 30
-  }
-
-  field(:privacy) {
-    smallint 1, 3
-    matches do |r, v|
-      if ![1, 2, 3].include?(v)
-        r.fail! "Allowed values: @W (world) @P (private) @N (no one)"
-      end
-      true
-    end
-  }
 
   def to_href
     "/@#{screen_name}"
