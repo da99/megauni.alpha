@@ -8,6 +8,7 @@ gem 'sanitize'
 gem 'content-security-policy'
 gem 'escape_utils'
 gem 'rack_csrf'
+gem 'warden'
 # --------------------------------
 
 

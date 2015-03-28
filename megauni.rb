@@ -125,21 +125,25 @@ end
 # We place this at the top level
 # to catch any server app errors
 # (aka 500).
-Cuba.use(Class.new {
-  def initialize app
-    @app = app
-  end
+  Cuba.use(Class.new {
+    def initialize app
+      @app = app
+    end
 
-  def call env
-    dup._call env
-  end
+    def call env
+      dup._call env
+    end
 
-  def _call env
-    @app.call env
-  rescue Object => ex
-    [500, {'Content-Type'=>'text/html'}, [FILE_500]]
-  end
-})
+    def _call env
+      @app.call env
+    rescue Object => ex
+      if ENV['IS_DEV']
+        puts ex.message
+        ex.backtrace.map { |b| puts b }
+      end
+      [500, {'Content-Type'=>'text/html'}, [FILE_500]]
+    end
+  })
 
 %w{
   Timer_Public_Files

@@ -296,7 +296,7 @@ case "$action" in
           exec bin/megauni watch
         fi
 
-        if [[ "$file" =~ ".rb" ]]; then
+        if [[ "$file" =~ ".rb" || "$file" =~ ".lock" ]]; then
           echo "=== Touching: tmp/restart.txt"
           touch tmp/restart.rb
         fi
