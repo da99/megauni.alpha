@@ -20,6 +20,7 @@ group :development do
   gem 'RedCloth'
   gem 'pry'
   gem 'thin'
+  gem 'shotgun'
 end
 
 gem 'foreman'

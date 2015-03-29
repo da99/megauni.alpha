@@ -37,8 +37,9 @@ mu(:HOME) {
       h3 'Post:'
     } # === div.block
 
-  } # === WWW_App
+    title 'Latest'
 
+  } # === WWW_App
 } # === mu :HOME_STACHE
 __END__
 # if logged_in?

@@ -81,6 +81,16 @@ case "$action" in
     ;;
 
 
+  "shotgun")
+    bundle exec shotgun \
+      --server      thin                 \
+      --env         production           \
+      --public      Public/              \
+      --port        4567                 \
+      $@                                 \
+      configs/config.ru
+    ;;
+
   "thin")
     bundle exec thin \
       --environment production           \
