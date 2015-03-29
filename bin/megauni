@@ -298,7 +298,7 @@ case "$action" in
 
         if [[ "$file" =~ ".rb" || "$file" =~ ".lock" ]]; then
           echo "=== Touching: tmp/restart.txt"
-          touch tmp/restart.rb
+          touch tmp/restart.txt
         fi
 
         if [[ "$file" =~ ".js" ]]; then
