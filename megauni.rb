@@ -12,10 +12,27 @@ FILE_500   = File.read("Public/500.html")
 class Megauni
 
   FILE_VALS = {}
+  VALS      = {}
+  VALS.default_proc = lambda {|h,k|
+    fail ArgumentError, "Key not found: #{k.inspect}"
+  }
 
   module Server
 
     module Plugin
+
+      def mu! name, *arg
+        if !arg.empty?
+          VALS[name] = arg.first
+        end
+
+        if block_given?
+          VALS[name] = yield
+        end
+
+        VALS[name]
+      end # === def mu!
+
       def mu name, *args
 
         file = caller(1,1).first.split(':').first

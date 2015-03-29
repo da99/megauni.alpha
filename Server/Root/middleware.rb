@@ -1,25 +1,13 @@
 
+require './Server/Root/MUE'
+require('./Server/Root/home') if ENV['IS_DEV']
+
 use(
 
   Cuba.new {
 
     on get, root do
-      # if logged_in?
-        # html 'Customer/lifes', {
-          # :intro        => "My Account...",
-          # :default_sn   => user.screen_names.first.to_public,
-          # :screen_names => user.screen_names.map(&:to_public),
-          # :sn_all       => user.screen_names.map(&:screen_name).join(', '),
-          # :is_owner     => logged_in?
-        # }
-      # else
-        # html 'Okdoki/top_slash', {
-          # title: 'OkDoki.com',
-          # YEAR: Time.now.year
-        # }
-      # end
-
-      res.write mu(:FILE_INDEX).to_html(YEAR: Time.now.utc.year, auth_token: 'TEMP')
+      res.write mu(:ROOT).to_html(YEAR: Time.now.utc.year, auth_token: 'TEMP')
     end
 
     if ENV['IS_DEV']
@@ -30,139 +18,119 @@ use(
 
 ) # === use
 
-
-mu(:FILE_INDEX) {
+mu(:ROOT) {
+  mue = mu!(:MUE)
   WWW_App.new {
 
-    link.href('/css/vanilla.reset.css')./
-    link.href('/css/fonts.css')./
-    link.href('/css/otfpoc.css')./
-
-    heading_color = '#357BB5'
-    light_text_color = '#8E8E8E'
-
-    style {
-      background_color "#f5f5f5"
-      a._hover {
-        color '#C0002C'
-      }
-      div.^(:section) {
-        border_right '1px dashed #C7C7C7'
-        width '30%'
-        float 'left'
-        padding '0 1em 0 0'
-      }
-
-      h3 {
-        color          heading_color
-        text_transform 'uppercase'
-        font_size      'smaller'
-        padding        '0.5em 0'
-        margin         '0'
-      }
-
-      label {
-        display 'block'
-        span.^(:sub) {
-          color light_text_color
-        }
-      }
-
-      p {
-        margin '0 0 0.5em 0'
-      }
-
-      div.^(:footer) {
-        color light_text_color
-      }
-
-    }
+    use mue
 
     title "megaUNI Homepage"
 
-    div.^(:section) {
-      div.id(:New_Customer).^(:box) {
-        h3 "Create a New Account"
-        div.^(:content) {
+    div.^(:block).id(:New_Session) {
 
-          form.id(:create_account).action('/user').method('post') {
+      h3 "Log-In"
 
-            div.^(:fields) {
+      div.^(:content) {
 
-              div.^(:field, :screen_name) {
-                label.for(:NEW_CUSTOMER_SCREEN_NAME) { "Screen name:" }
-                input(:text, "screen_name","")./
+        form.id(:sign_in).action('/sign-in').method('post') {
+
+          div.^(:fields) {
+
+            div.^(:field, :screen_name) {
+              label.for("LOGIN_SCREEN_NAME") { "Screen name:" }
+              input('text', "screen_name", "")./
+            }
+
+            div.^(:field).^(:passphrase) {
+              label.for("LOGIN_PASS_PHRASE") { "Pass phrase:" }
+              input('password', "pswd", "")./
+            }
+
+            div.^(:field, :buttons) {
+              button.^(:submit) { "Log-In" }
+            }
+
+          } # --- div.fields
+        } # --- form
+      } # --- div.content
+    } # --- div.box
+
+    div.id(:New_Customer).^(:block) {
+
+      h3 "Create a New Account"
+      div.^(:content) {
+
+        form.id(:create_account).action('/user').method('post') {
+
+          div.^(:fields) {
+
+            div.^(:field, :screen_name) {
+              label.for(:NEW_CUSTOMER_SCREEN_NAME) { "Screen name:" }
+              input(:text, "screen_name","")./
+            }
+
+            div.^(:field, :pswd) {
+              label.for(:NEW_CUSTOMER_PASS_PHRASE) {
+                span.^(:main) { "Pass phrase" }
+                span.^(:sub)  { " (for better security, use spaces and words)" }
+                span.^(:main) { ":" }
               }
+              input(:password, :pswd, "")./
+            }
 
-              div.^(:field, :pswd) {
-                label.for(:NEW_CUSTOMER_PASS_PHRASE) {
-                  span.^(:main) { "Pass phrase" }
-                  span.^(:sub)  { " (for better security, use spaces and words)" }
-                  span.^(:main) { ":" }
-                }
-                input(:password, :pswd, "")./
+            div.^(:field).^(:confirm_pass_phrase) {
+              label.for(:NEW_CUSTOMER_CONFIRM_PASS_PHRASE) {
+                span.^(:main) { "Re-type the pass phrase:" }
               }
-
-              div.^(:field).^(:confirm_pass_phrase) {
-                label.for(:NEW_CUSTOMER_CONFIRM_PASS_PHRASE) {
-                  span.^(:main) { "Re-type the pass phrase:" }
-                }
-                input(:password, :confirm_pass_word, "")./
-              }
+              input(:password, :confirm_pass_word, "")./
+            }
 
 
-              div.^(:buttons) {
-                # input(type: 'hidden', name: "_csrf", value: "{{_csrf}}")
-                button.^(:submit) { "Create Account" }
-              }
+            div.^(:buttons) {
+              # input(type: 'hidden', name: "_csrf", value: "{{_csrf}}")
+              button.^(:submit) { "Create Account" }
+            }
 
-            } # --- div.fields
+          } # --- div.fields
 
-          } # --- form
+        } # --- form
 
-        } # --- div.content
-      } # --- div.box
-    } # === div section
+      } # --- div.content
+    } # === div block
 
-    div.^(:main, :section) {
+    div.^(:block).id(:intro) {
 
-      div.^(:sidebar).id(:sidebar) {
+      border '0'
+      max_width '200px'
 
-        h1.^(:title) {
-          font_family 'AghjaMedium'
-          font_weight 'normal'
-          font_style  'normal'
-          color       heading_color
-          margin      '0.5em 0'
+      h1.^(:title) {
 
-          span.^(:main) { "mega" }
-          span.^(:sub) {  "UNI" }
+        span.^(:main) { "mega" }
+        span.^(:sub) {  "UNI" }
+      }
+
+      div.^(:disclaimer) {
+        p  {
+          raw_text "&copy;"
+          text  " 2012-{{num.YEAR}} megauni.com. Some rights reserved."
         }
 
-        div.id(:footer).^(:footer) {
-          p  {
-            raw_text "&copy;"
-            text  " 2012-{{num.YEAR}} megauni.com. Some rights reserved."
-          }
+        p { "All other copyrights belong to their respective owners, who have no association to this site:" }
 
-          p { "All other copyrights belong to their respective owners." }
+        p {
+          span { "Logo font: " }
+          a.href("http://openfontlibrary.org/en/font/otfpoc") {"Aghja" }
+        }
 
-          p {
-            span { "Logo font: " }
-            a.href("http://openfontlibrary.org/en/font/otfpoc") {"Aghja" }
-          }
+        p {
+          span  { "Palettes: " }
+          a.href("http://www.colourlovers.com/lover/dvdcpd") { "dvdcpd" }
+          a.href("http://www.colourlovers.com/palette/154398/bedouin") { "shari_foru" }
+        }
 
-          p {
-            span  { "Palettes: " }
-            a.href("http://www.colourlovers.com/lover/dvdcpd") { "dvdcpd" }
-            a.href("http://www.colourlovers.com/palette/154398/bedouin") { "shari_foru" }
-          }
+      } # === div.disclaimer
 
-        } # === div.id :footer
-
-      } # div #siderbar
-
-    } # div #main
+    } # div block
 
   } # === WWW_App.new
 } # === mu :FILE_INDEX
