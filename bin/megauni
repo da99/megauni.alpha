@@ -306,12 +306,6 @@ case "$action" in
     }
     trap cleanup SIGINT SIGTERM
 
-    if [[ ! -f tmp/4567.thin.pid ]]; then
-      echo === Starting server:
-      bin/megauni thin -d start
-    fi
-
-
     IFS=$'\n'
     re='^[0-9]+$'
 
@@ -325,7 +319,7 @@ case "$action" in
     old_log="$(cat tmp/log.log || echo "")"
 
     echo "=== Watching:"
-    inotifywait -q -m -e modify,close_write,close --exclude .git/ -r .  | while read CHANGE
+    inotifywait -q -m -e close_write,close --exclude .git/ -r .  | while read CHANGE
     do
       dir=$(echo "$CHANGE" | cut -d' ' -f 1)
       op=$(echo "$CHANGE" | cut -d' ' -f 2)
