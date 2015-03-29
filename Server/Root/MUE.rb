@@ -1,17 +1,63 @@
+
+
+class WWW_App
+  module CSS
+    BORDER_RADIUS = %w{
+      _moz_border_radius 
+      _webkit_border_radius
+      border_radius
+      _khtml_border_radius
+    }.map(&:to_sym)
+    PROPERTIES.concat BORDER_RADIUS
+  end
+end
+
 mu!(:MUE) {
   WWW_App.new {
     link.href('/css/vanilla.reset.css')./
     link.href('/css/fonts.css')./
     link.href('/css/otfpoc.css')./
 
-    heading_color = '#357BB5'
-    light_text_color = '#8E8E8E'
+    def bg_color
+      "#f5f5f5"
+    end
+
+    def heading_color 
+      '#357BB5'
+    end
+
+    def light_text_color
+      '#8E8E8E'
+    end
+
+    def visited_color
+      '#956893'
+    end
+
+    def hover_color
+      '#C0002C'
+    end
+
+    def border_radius arg
+      ::WWW_App::CSS::BORDER_RADIUS.each { |name|
+        alter_css_property name.to_sym, arg
+      }
+      self
+    end
 
     style {
-      background_color "#f5f5f5"
+      background_color bg_color
+
+      a._link {
+        color heading_color
+      }
+
+      a._visited {
+        color visited_color
+      }
 
       a._hover {
-        color '#C0002C'
+        color hover_color
       }
 
       div.^(:block) {
@@ -49,6 +95,27 @@ mu!(:MUE) {
 
       div.^(:disclaimer) {
         color light_text_color
+      }
+
+      div.id(:nav_bar) {
+        padding          '0 0 0.5em 0'
+        float            'right'
+        margin_right     '1em'
+        background_color '#fffffc'
+        position         'absolute'
+        top              '0'
+        right            '10px'
+        border_radius    '0 0 4px 4px'
+
+        a._link {
+          display 'block'
+          padding  '0.3em 1em'
+        }
+
+        a._hover {
+          background_color hover_color
+          color '#fff'
+        }
       }
 
     } # === style

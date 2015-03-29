@@ -106,6 +106,12 @@ mu(:ROOT) {
         span.^(:sub) {  "UNI" }
       }
 
+      if ENV['IS_DEV']
+        p { a.href('/home') { '/home' } }
+        p { a.href('/@da99') { '/@da99' } }
+        p { a.href('/!4567') { '/!4567' } }
+      end
+
       div.^(:disclaimer) {
         p  {
           raw_text "&copy;"
