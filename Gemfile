@@ -19,6 +19,7 @@ group :development do
   gem 'mechanize'
   gem 'RedCloth'
   gem 'pry'
+  gem 'thin'
 end
 
 gem 'foreman'

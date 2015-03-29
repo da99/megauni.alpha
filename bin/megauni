@@ -81,6 +81,16 @@ case "$action" in
     ;;
 
 
+  "thin")
+    bundle exec thin \
+      --environment production           \
+      --log         tmp/log.log          \
+      --pid         tmp/4567.thin.pid    \
+      --rackup      configs/config.ru    \
+      --port        4567                 \
+      $@
+    ;;
+
   "start")
     dir="$(pwd)/tmp"
     args=""
@@ -115,6 +125,7 @@ case "$action" in
     fi
 
     # puma --config configs/puma.rb configs/config.ru
+
 
     # More options at:
     # https://github.com/phusion/passenger/blob/master/lib/phusion_passenger/standalone/start_command.rb
@@ -278,13 +289,71 @@ case "$action" in
     ;;
 
   "watch")
+    cleanup () {
+      echo -e "\n\n=== Please wait... shutting down thin..."
+      bin/megauni thin stop
+      echo -e "=== Done.\n"
+    }
+    trap cleanup SIGINT SIGTERM
+
+    IFS=$'\n'
+    re='^[0-9]+$'
+
+    # From: http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
+    Color_Off='\e[0m'
+    BRed='\e[1;31m'
+    Red='\e[0;31m'
+    Green='\e[0;32m'
+    Orange='\e[0;33m'
+
+    if [[ ! -f tmp/4567.thin.pid ]]; then
+      echo === Starting server:
+      bin/megauni thin -d start
+    fi
+
+    old_log="$(cat tmp/log.log || echo "")"
+
     echo "=== Watching:"
-    inotifywait -q -m -e close_write,close --exclude .git/ --exclude tmp/ -r .  | while read CHANGE
+    inotifywait -q -m -e modify,close_write,close --exclude .git/ -r .  | while read CHANGE
     do
       dir=$(echo "$CHANGE" | cut -d' ' -f 1)
       op=$(echo "$CHANGE" | cut -d' ' -f 2)
       file=$(echo "$CHANGE" | cut -d' ' -f 3)
       path="${dir}$file"
+
+      if [[ "$op" == "MODIFY" && "$file" == "log.log" ]]; then
+          new_log="$(cat tmp/log.log)"
+          output=${new_log/"$old_log"}
+          for i in $output; do
+            code="$(echo "$i" | cut -d' ' -f9 || echo '')"
+            path="$(echo "$i" | cut -d' ' -f7 || echo '')"
+            if [[ ! -z "$code" && "$code" =~ $re ]]; then
+              if [[ "$code" -gt 199 && "$code" -lt 300 ]]; then
+                color="$Green"
+              fi
+              if [[ "$code" -gt 299 && "$code" -lt 400 ]]; then
+                color="$Orange"
+              fi
+              if [[ "$code" -gt 399 && "$code" -lt 500 ]]; then
+                color="$Red"
+              fi
+              if [[ "$code" -gt 499 ]]; then
+                color="$BRed"
+              fi
+              color_code="${i/"$code"/"${color}${code}${Color_Off}"}"
+              echo -e "${color_code/"$path "/"${color}$path ${Color_Off}"}"
+            else
+              if [[ ! ( "$i" == *ruby* ) ]]; then
+                if [[ "$i" =~ ':in ' ]]; then
+                  echo -e "${Red}$i${Color_Off}"
+                else
+                  echo -e "$i"
+                fi
+              fi
+            fi
+          done
+          old_log="$new_log"
+      fi # === if MODIFY log
 
       if [[ ( ! "$op" =~ "NOWRITE" ) && ( "$op" =~ "CLOSE" || "$op" =~ "WRITE" )  && ! -z "$file" ]]; then
 
@@ -299,6 +368,7 @@ case "$action" in
         if [[ "$file" =~ ".rb" || "$file" =~ ".lock" ]]; then
           echo "=== Touching: tmp/restart.txt"
           touch tmp/restart.txt
+          bin/megauni thin -d restart
         fi
 
         if [[ "$file" =~ ".js" ]]; then
