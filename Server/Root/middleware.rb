@@ -38,7 +38,13 @@ mu(:FILE_INDEX) {
     link.href('/css/fonts.css')./
     link.href('/css/otfpoc.css')./
 
-    background_color "#f5f5f5"
+
+    style {
+      background_color "#f5f5f5"
+      a._hover {
+        color '#C0002C'
+      }
+    }
 
     title "megaUNI Homepage"
 
@@ -51,14 +57,15 @@ mu(:FILE_INDEX) {
           font_weight 'normal'
           font_style  'normal'
           color       '#357BB5'
+          margin      '0.5em 0'
 
           span.^(:main) { "mega" }
           span.^(:sub) {  "UNI" }
         }
 
         div.id(:footer) {
-
           style {
+            color '#B0B0B0'
             p {
               margin '0 0 0.5em 0'
             }

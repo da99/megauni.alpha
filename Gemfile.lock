@@ -27,7 +27,7 @@ GEM
     duck_duck_duck (2.0.0)
     erector (0.10.0)
       treetop (>= 1.2.3)
-    escape_escape_escape (1.6.1)
+    escape_escape_escape (1.6.2)
       addressable (> 2.3.5)
       escape_utils (> 1.0.0)
       htmlentities (>= 4.3.2)
