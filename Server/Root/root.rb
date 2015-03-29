@@ -20,6 +20,11 @@ mu(:ROOT) {
   WWW_App.new {
 
     use mue
+    style {
+      div.^(:block) {
+        float        'left'
+      }
+    }
 
     title "megaUNI Homepage"
 

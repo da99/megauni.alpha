@@ -62,7 +62,6 @@ mu!(:MUE) {
 
       div.^(:block) {
         border_right '1px dashed #C7C7C7'
-        float        'left'
         padding      '0 1.5em 1.5em 1.5em'
       }
 
