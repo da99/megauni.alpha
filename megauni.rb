@@ -180,9 +180,11 @@ if ENV['IS_DEV']
   use Public_Files, [ 'Public', Surfer_Hearts_Archive::Dir ]
 end
 
-Dir.glob("Server/*/middleware.rb").each do |path|
-  require "./#{path}".sub(/\.rb$/, '')
-end
+require './Server/Root/MUE'
+require './Server/Root/root'
+require './Server/Root/home' if ENV['IS_DEV']
+require './Server/Root/@screen_name'
+require './Server/Root/post'
 
 Cuba.define do
 

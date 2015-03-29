@@ -1,7 +1,4 @@
 
-require './Server/Root/MUE'
-require('./Server/Root/home') if ENV['IS_DEV']
-
 use(
 
   Cuba.new {

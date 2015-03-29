@@ -1,3 +1,15 @@
+
+
+# NOTE: I realize I have to find a better
+# way of allowing special cars in the URLS
+# because I hate monkey patches:
+class Da99_Rack_Protect
+  class Allow_Only_Roman_Uri
+    remove_const :INVALID
+    const_set :INVALID, /[^a-zA-Z0-9\_\-\/\.\?\!\@\*\=]+/
+  end
+end
+
 use(
 
   Cuba.new {
