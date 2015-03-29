@@ -1,16 +1,6 @@
 @font-face {
     font-family: 'AghjaMedium';
-        src: url('http://openfontlibrary.org/assets/fonts/otfpoc/080dd7a4cbefec3a7797d583055e8a44/239bf97b85ddcd315304194192f3a62a/AghjaMedium.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-      }
-
-
-/* The following rules are deprecated. */
-
-@font-face {
-    font-family: 'Aghja';
-        src: url('http://openfontlibrary.org/assets/fonts/otfpoc/080dd7a4cbefec3a7797d583055e8a44/239bf97b85ddcd315304194192f3a62a/AghjaMedium.otf') format('opentype');
+        src: url('/css/AghjaMedium.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
       }

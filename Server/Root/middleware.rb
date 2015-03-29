@@ -19,7 +19,7 @@ use(
         # }
       # end
 
-      res.write mu(:FILE_INDEX).to_html(YEAR: Time.now.utc.year)
+      res.write mu(:FILE_INDEX).to_html(YEAR: Time.now.utc.year, auth_token: 'TEMP')
     end
 
     if ENV['IS_DEV']
@@ -44,11 +44,61 @@ mu(:FILE_INDEX) {
       a._hover {
         color '#C0002C'
       }
+      div.^(:section) {
+        border_right '1px dashed #C7C7C7'
+        width '30%'
+        float 'left'
+        padding '0 1em 0 0'
+      }
     }
 
     title "megaUNI Homepage"
 
-    div.^(:main) {
+    div.^(:section) {
+      div.id(:New_Customer).^(:box) {
+        h3 "Create a New Account"
+        div.^(:content) {
+
+          form.id(:create_account).action('/user').method('post') {
+
+            div.^(:fields) {
+
+              div.^(:field, :screen_name) {
+                label.for(:NEW_CUSTOMER_SCREEN_NAME) { "Screen name:" }
+                input(:text, "screen_name","")./
+              }
+
+              div.^(:field, :pswd) {
+                label.for(:NEW_CUSTOMER_PASS_PHRASE) {
+                  span.^(:main) { "Pass phrase" }
+                  span.^(:sub)  { " (for better security, use spaces and words)" }
+                  span.^(:main) { ":" }
+                }
+                input(:password, :pswd, "")./
+              }
+
+              div.^(:field).^(:confirm_pass_phrase) {
+                label.for(:NEW_CUSTOMER_CONFIRM_PASS_PHRASE) {
+                  span.^(:main) { "Re-type the pass phrase:" }
+                }
+                input(:password, :confirm_pass_word, "")./
+              }
+
+
+              div.^(:buttons) {
+                # input(type: 'hidden', name: "_csrf", value: "{{_csrf}}")
+                button.^(:submit) { "Create Account" }
+              }
+
+            } # --- div.fields
+
+          } # --- form
+
+        } # --- div.content
+      } # --- div.box
+    } # === div section
+
+    div.^(:main, :section) {
 
       div.^(:sidebar).id(:sidebar) {
 

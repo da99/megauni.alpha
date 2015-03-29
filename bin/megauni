@@ -296,6 +296,12 @@ case "$action" in
     }
     trap cleanup SIGINT SIGTERM
 
+    if [[ ! -f tmp/4567.thin.pid ]]; then
+      echo === Starting server:
+      bin/megauni thin -d start
+    fi
+
+
     IFS=$'\n'
     re='^[0-9]+$'
 
@@ -305,11 +311,6 @@ case "$action" in
     Red='\e[0;31m'
     Green='\e[0;32m'
     Orange='\e[0;33m'
-
-    if [[ ! -f tmp/4567.thin.pid ]]; then
-      echo === Starting server:
-      bin/megauni thin -d start
-    fi
 
     old_log="$(cat tmp/log.log || echo "")"
 
@@ -340,7 +341,7 @@ case "$action" in
               if [[ "$code" -gt 499 ]]; then
                 color="$BRed"
               fi
-              color_code="${i/"$code"/"${color}${code}${Color_Off}"}"
+              color_code="${i/" $code "/"${color} ${code} ${Color_Off}"}"
               echo -e "${color_code/"$path "/"${color}$path ${Color_Off}"}"
             else
               if [[ ! ( "$i" == *ruby* ) ]]; then

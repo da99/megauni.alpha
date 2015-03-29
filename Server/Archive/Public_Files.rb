@@ -18,6 +18,7 @@ class Public_Files
       .jpg
       .png
       .ico
+      .otf
       /robots.txt
     }
 

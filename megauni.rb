@@ -151,19 +151,17 @@ end
   Surfer_Hearts_Archive
   Mu_Archive_Redirect
   Mu_Archive
-  Public_Files
 }.each { |name|
 
  require "./Server/Archive/#{name}"
-
- case name
- when 'Public_Files'
-   use Public_Files, [ 'Public', Surfer_Hearts_Archive::Dir ]
- else
-   use Object.const_get(name)
- end
+ use Object.const_get(name)
 
 }
+
+if ENV['IS_DEV']
+  require "./Server/Archive/Public_Files"
+  use Public_Files, [ 'Public', Surfer_Hearts_Archive::Dir ]
+end
 
 Dir.glob("Server/*/middleware.rb").each do |path|
   require "./#{path}".sub(/\.rb$/, '')
