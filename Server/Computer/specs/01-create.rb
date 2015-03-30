@@ -1,14 +1,10 @@
 
 
-require './Server/Computer/model'
-require './Server/Screen_Name/specs/helpers'
-require './Server/Computer/specs/helpers'
 
 describe "Computer: create" do
 
   before do
-    Computer_Test.delete
-    @sn = Screen_Name_Test.list(0)
+    DB[Computer.table_name].delete
     @code = [
       "path" , ["/"],
       "a"    , ["a"],
@@ -17,9 +13,12 @@ describe "Computer: create" do
   end
 
   it "escapes :code" do
-    r = Computer.create @sn, MultiJson.dump(@code)
-    raw = Computer::TABLE.where(:id=>r.id).first
-    raw[:code].should == MultiJson.dump(Okdoki::Escape_All.escape @code)
+    r = Computer.create(
+      owner_id: 1,
+      code: @code
+    )
+    raw = Computer::TABLE.where(:id=>r.data[:id]).first
+    raw[:code].should == @code
   end
 
   it 'allows path: ""' do
