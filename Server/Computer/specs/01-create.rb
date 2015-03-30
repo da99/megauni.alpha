@@ -21,33 +21,12 @@ describe "Computer: create" do
     Escape_Escape_Escape.json_decode(raw[:code])['instructs'].should == @code
   end
 
-  it 'fails w/ArgumentError if code is not a Hash' do
-    should.raise(ArgumentError) {
-      Computer.create(:owner_id=>1, :code=>[])
-    }.message.should.match /hash/
+  it 'turns value into a Hash' do
+    r = Computer.create(:owner_id=>1, :code=>[])
+    Escape_Escape_Escape.json_decode(r.data[:code]).
+      should == {'code'=>[]}
   end
 
-  it "allows path: /" do
-    @code[1] = ["/"]
-    r = Computer.create @sn, MultiJson.dump(@code)
-    raw = Computer::TABLE.where(:id=>r.id).first
-    raw[:path].should == '/'
-  end
-
-  it "lowercases the path" do
-    @code[1] = ['ABC/DEF/']
-    r = Computer.create @sn, MultiJson.dump(@code)
-    raw = Computer::TABLE.where(:id=>r.id).first
-    raw[:path].should == 'abc/def/'
-  end
-
-  it "raises Invalid for path: /*" do
-    @code[1] = ['/*']
-    lambda {
-      Computer.create @sn, MultiJson.dump(@code)
-    }.should.raise(Computer::Invalid)
-    .message.should.match /Not allowed. \/\*/
-  end
 
 end # === describe Code: create ===
 
