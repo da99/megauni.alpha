@@ -279,10 +279,13 @@ case "$action" in
       shift
     fi
 
-    if [[ ! -z "$@" && -f "$(echo -n Server/$model/specs/*-${1}.rb)" ]]; then
-      spec="$1"
-      files="$(echo Server/$model/specs/*-${spec}.rb)"
-      shift
+    if [[ ! -z "$@" ]]; then
+      temp="$(find Server/$model/specs -regextype posix-extended -regex ".*/[0-9]{1,4}-${1}.rb")"
+      if [[ -f "$temp" ]]; then
+        spec="$1"
+        shift
+        files="$temp"
+      fi
     fi
 
     if [[ -z "$files" ]]; then
