@@ -61,10 +61,16 @@ case "$action" in
     echo "  $  migrate   reset"
     echo "  $  migrate   reset   MODEL"
     echo "  $  migrate   default_data"
+    echo "  $  migrate   create  MODEL name"
     echo "  $  migrate   status"
     echo ""
     echo "  $  model_list"
     echo "  $  model_list  rsort"
+    echo ""
+    echo "  $  test"
+    echo "  $  test reset"
+    echo "  $  test Model spec"
+    echo ""
     exit 0
     ;;
 
@@ -163,6 +169,15 @@ case "$action" in
     fi
 
     case "$sub_action" in
+      "create")
+        model="$1"
+        shift
+        name="$2"
+        shift
+        cd Server
+        bundle exec duck_duck_duck create $model $name
+        ;;
+
       "reset")
         model="$@"
 
@@ -270,8 +285,13 @@ case "$action" in
       shift
     fi
 
-    if [[ -z "$model" && -z "$spec" ]]; then
-      files="$(echo Server/*/specs/*-*.rb)"
+    if [[ -z "$files" ]]; then
+      files="\
+        Server/Customer/specs/01-create.rb \
+        Server/Screen_Name/specs/01-create.rb \
+        Server/Computer/specs/01-create.rb \
+        Server/Link/specs/01-create.rb \
+      "
     fi
 
     if [[ -z "$files" ]]; then
@@ -279,13 +299,13 @@ case "$action" in
       exit 0
     fi
 
-    if [[ -z "$model" && -z "$spec" ]]; then
-      # === Stop the server at the end
-      trap "bin/server stop" EXIT
+    # if [[ -z "$model" && -z "$spec" ]]; then
+      # # === Stop the server at the end
+      # trap "bin/megauni stop" EXIT
 
-      # === Start server:
-      bin/megauni start
-    fi # === if start server
+      # # === Start server:
+      # bin/megauni start
+    # fi # === if start server
 
     # === Migrate: ==========================================
     if [[ ! -z "$@" && "$1" == "reset" ]]; then
@@ -293,13 +313,12 @@ case "$action" in
       shift
     fi
 
-    if [[ ( ! -z "$reset" ) || ( -z "$model" && -z "$spec" ) ]]; then
-      bin/megauni migrate reset "$model" # > /dev/null
+    if [[ ! -z "$reset" ]]; then
+      bin/megauni migrate reset # > /dev/null
     fi
     # =======================================================
 
-    bundle exec bacon Server/specs/helpers.rb $files "$@"
-    exit 0
+    bundle exec bacon Server/specs/helpers.rb $files $@
     ;;
 
   "watch")
@@ -387,6 +406,11 @@ case "$action" in
 
       fi
     done
+    ;;
+
+  "POST")
+    curl -k -X POST --header "Content-Type:application/json" -d "$1" https://localhost$2
+    echo ""
     ;;
 
   *)
