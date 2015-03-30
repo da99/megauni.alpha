@@ -1,6 +1,4 @@
 
-require 'datoki'
-
 class Screen_Name
 
   include Datoki

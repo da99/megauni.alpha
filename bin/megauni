@@ -31,6 +31,8 @@ reset_color=$(tput sgr0)
 mods=(
   Customer
   Screen_Name
+  Computer
+  Link
 )
   # File_Name
   # Label
@@ -153,10 +155,11 @@ case "$action" in
     ;;
 
   "migrate")
-    sub_action="$1"
-    shift
-    if [[ -z "$sub_action" ]]; then
+    if [[ -z "$@" ]]; then
       sub_action="up"
+    else
+      sub_action="$1"
+      shift
     fi
 
     case "$sub_action" in
@@ -203,6 +206,7 @@ case "$action" in
           do
             bin/megauni migrate up $m
           done
+          echo -e "\n=== Done.\n"
         else
           cd Server
           echo ""
