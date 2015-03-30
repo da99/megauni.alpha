@@ -4,7 +4,6 @@
 describe "Computer: create" do
 
   before do
-    DB[Computer.table_name].delete
     @code = [
       "path" , ["/"],
       "a"    , ["a"],
