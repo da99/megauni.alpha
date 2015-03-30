@@ -23,34 +23,19 @@ mu(:@SCREEN_NAME) {
     use mue
 
     style {
-      h1 {
-        color '#000'
+
+      body {
+        padding '0'
+        margin  '0'
       }
 
       div.^(:block) {
         max_width '500px'
         width     'auto'
         border '0'
-
-        h3 {
-          color '#000'
-        }
-
-        div.^(:item) {
-          background_color '#fff'
-          padding '0 1em 1em 1em'
-          margin  '1em'
-          border  "1px dashed #D5D5D5"
-          color   '#3d3d3d'
-          border_radius '5px'
-          max_width  '600px'
-        }
       }
 
     } # === style
-
-    padding '0'
-    margin  '0'
 
     title '{{{html.screen_name}}}'
 

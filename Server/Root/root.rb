@@ -16,15 +16,21 @@ use(
 ) # === use
 
 mu(:ROOT) {
+
   mue = mu!(:MUE)
+
   WWW_App.new {
 
+    var :heading_color       , '#357BB5'
     use mue
+
     style {
+
       div.^(:block) {
         float        'left'
       }
-    }
+
+    } # === style
 
     title "megaUNI Homepage"
 

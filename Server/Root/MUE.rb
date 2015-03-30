@@ -1,6 +1,7 @@
 
 
-class WWW_App
+class WWW_App # === CUSTOMIZATIONS ===============
+
   module CSS
     BORDER_RADIUS = %w{
       _moz_border_radius 
@@ -10,7 +11,32 @@ class WWW_App
     }.map(&:to_sym)
     PROPERTIES.concat BORDER_RADIUS
   end
-end
+
+  def var *args
+    @vars ||= begin
+                v = {}
+                v.default_proc = lambda { |h,k|
+                  fail ArgumentError, "Key not found: #{k.inspect}"
+                }
+                v
+              end
+    return @vars[args.first] if args.size == 1
+    name, val  = args
+    var!(name, val) unless @vars.has_key?(name)
+    val
+  end # === def var
+
+  def var! name, val
+    @vars[name] = val 
+    eval <<-EOF, nil, __FILE__, __LINE__ + 1
+          def #{name}
+            @vars[:#{name}]
+          end
+          EOF
+    var name
+  end
+
+end # === class WWW_App =========================
 
 mu!(:MUE) {
   WWW_App.new {
@@ -18,25 +44,14 @@ mu!(:MUE) {
     link.href('/css/fonts.css')./
     link.href('/css/otfpoc.css')./
 
-    def bg_color
-      "#f5f5f5"
-    end
 
-    def heading_color 
-      '#357BB5'
-    end
-
-    def light_text_color
-      '#8E8E8E'
-    end
-
-    def visited_color
-      '#956893'
-    end
-
-    def hover_color
-      '#C0002C'
-    end
+    var :bg_color            , "#f5f5f5"
+    var :heading_color       , '#000'
+    var :light_text_color    , '#8E8E8E'
+    var :visited_color       , '#956893'
+    var :hover_color         , '#C0002C'
+    var :dashed_border_color , '#C7C7C7'
+    var :subtle_white        , "#fffffc"
 
     def border_radius arg
       ::WWW_App::CSS::BORDER_RADIUS.each { |name|
@@ -61,9 +76,19 @@ mu!(:MUE) {
       }
 
       div.^(:block) {
-        border_right '1px dashed #C7C7C7'
+        border_right "1px dashed #{dashed_border_color}"
         padding      '0 1.5em 1.5em 1.5em'
-      }
+
+        div.^(:item) {
+          background_color '#fff'
+          padding '0 1em 1em 1em'
+          margin  '1em'
+          border  "1px dashed #D5D5D5"
+          color   '#3d3d3d'
+          border_radius '5px'
+          max_width  '600px'
+        }
+      } # === div.block
 
       h1 {
         font_family 'AghjaMedium'
@@ -100,7 +125,7 @@ mu!(:MUE) {
         padding          '0 0 0.5em 0'
         float            'right'
         margin_right     '1em'
-        background_color '#fffffc'
+        background_color subtle_white
         position         'absolute'
         top              '0'
         right            '10px'
