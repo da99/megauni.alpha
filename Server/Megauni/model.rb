@@ -13,3 +13,5 @@ end # === module Megauni
 
 require './Server/Customer/model'
 require './Server/Screen_Name/model'
+require './Server/Computer/model'
+require './Server/Link/model'

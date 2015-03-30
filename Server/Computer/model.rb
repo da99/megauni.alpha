@@ -1,25 +1,26 @@
 
-require './Server/Okdoki/model'
-require './Server/Okdoki/Vador'
-require './Server/Okdoki/Escape_All'
-require 'www_applet'
-
-require_crud :Computer
-
 class Computer
 
-  include Okdoki::Model
+  include Datoki
 
   EVENT_NAMES = {
     1 => "ON VIEW PROFILE"
   }
 
+  field(:owner_id) {
+    integer
+  }
+
+  field(:code) {
+    string_ish 1, 1000
+    set_to { |r, val|
+      Escape_Escape_Escape.json_encode val
+    }
+  }
+
   # =====================================================
   # Settings
   # =====================================================
-
-  Table_Name = :computer
-  TABLE = DB[Table_Name]
 
   # =====================================================
   # Class
@@ -31,6 +32,10 @@ class Computer
   # =====================================================
   # Instance
   # =====================================================
+
+  def create
+    clean! :owner_id, :code
+  end
 
   def validate_code hash
     if !hash.has_key?(:code)
