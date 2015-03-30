@@ -92,12 +92,17 @@ mu!(:MUE) {
         }
       } # === div.block
 
-      h1 {
+      h1.^(:site) {
         font_family 'AghjaMedium'
         font_weight 'normal'
         font_style  'normal'
         color       heading_color
         margin      '0.5em 0'
+      }
+
+      h1 {
+        color       heading_color
+        font_weight 'normal'
       }
 
       h3 {
@@ -123,6 +128,18 @@ mu!(:MUE) {
         color light_text_color
       }
 
+
+    } # === style
+  }
+} # === mu :MUE
+
+
+mu!(:NAV_BAR) {
+
+  WWW_App.new {
+
+    style {
+
       div.id(:nav_bar) {
         padding          '0 0 0.5em 0'
         float            'right'
@@ -143,9 +160,26 @@ mu!(:MUE) {
           color '#fff'
         }
       }
-
     } # === style
-  }
-} # === mu :MUE
+
+    div.id(:nav_bar) {
+      style {
+        a._link {
+          color '#000'
+        }
+        a._visited {
+          color light_text_color
+        }
+        a._hover {
+          color '#fff'
+        }
+      }
+      a.href('/') { 'megauni home' }
+      a.href('/log-out') { 'Log-Out' }
+    }
+  } # === WWW_App.new
+
+} # === mu! :NAV_BAR
+
 
 

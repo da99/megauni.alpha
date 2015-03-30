@@ -17,6 +17,7 @@ use(
 mu(:@SCREEN_NAME) {
 
   mue = mu! :MUE
+  nav_bar = mu! :NAV_BAR
 
   WWW_App.new {
 
@@ -48,21 +49,7 @@ mu(:@SCREEN_NAME) {
      '{{{html.screen_name}}}'
     }
 
-    div.id(:nav_bar) {
-      style {
-        a._link {
-          color '#000'
-        }
-        a._visited {
-          color light_text_color
-        }
-        a._hover {
-          color '#fff'
-        }
-      }
-      a.href('/') { 'megauni home' }
-      a.href('/log-out') { 'Log-Out' }
-    }
+    use nav_bar
 
     div.^(:block) {
 

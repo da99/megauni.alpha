@@ -111,7 +111,7 @@ mu(:ROOT) {
       border '0'
       max_width '200px'
 
-      h1.^(:title) {
+      h1.^(:site) {
 
         span.^(:main) { "mega" }
         span.^(:sub) {  "UNI" }
