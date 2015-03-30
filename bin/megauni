@@ -321,7 +321,7 @@ case "$action" in
     fi
     # =======================================================
 
-    bundle exec bacon Server/specs/helpers.rb $files $@
+    bundle exec bacon Server/specs/helpers.rb $files "$@"
     ;;
 
   "watch")

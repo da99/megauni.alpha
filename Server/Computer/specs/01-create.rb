@@ -15,17 +15,16 @@ describe "Computer: create" do
   it "escapes :code" do
     r = Computer.create(
       owner_id: 1,
-      code: @code
+      code: {:instructs=>@code}
     )
     raw = Computer::TABLE.where(:id=>r.data[:id]).first
-    raw[:code].should == @code
+    Escape_Escape_Escape.json_decode(raw[:code])['instructs'].should == @code
   end
 
-  it 'allows path: ""' do
-    @code[1] = [""]
-    r = Computer.create @sn, MultiJson.dump(@code)
-    raw = Computer::TABLE.where(:id=>r.id).first
-    raw[:path].should == ''
+  it 'fails w/ArgumentError if code is not a Hash' do
+    should.raise(ArgumentError) {
+      Computer.create(:owner_id=>1, :code=>[])
+    }.message.should.match /hash/
   end
 
   it "allows path: /" do

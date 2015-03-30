@@ -2,6 +2,7 @@
 
 require 'sequel'
 require 'datoki'
+require 'escape_escape_escape'
 DB = Sequel.connect ENV['DATABASE_URL']
 DB.cache_schema = false
 Datoki.db DB

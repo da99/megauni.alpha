@@ -14,7 +14,11 @@ class Computer
   field(:code) {
     string_ish 1, 1000
     set_to { |r, val|
-      Escape_Escape_Escape.json_encode val
+      if val.is_a?(Hash)
+        Escape_Escape_Escape.json_encode val
+      else
+        Escape_Escape_Escape.json_encode(:code=>val)
+      end
     }
   }
 
