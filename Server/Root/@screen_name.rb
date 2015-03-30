@@ -25,14 +25,14 @@ mu(:@SCREEN_NAME) {
     style {
 
       body {
-        padding '0'
-        margin  '0'
+        padding 0
+        margin  0
       }
 
       div.^(:block) {
         max_width '500px'
         width     'auto'
-        border '0'
+        border    0
       }
 
     } # === style
@@ -40,8 +40,8 @@ mu(:@SCREEN_NAME) {
     title '{{{html.screen_name}}}'
 
     h1 {
-      background_color '#000'
-      color            '#fff'
+      background_color black
+      color            white
       margin_top       '0'
       margin_bottom    '0'
       padding          '0.5em'

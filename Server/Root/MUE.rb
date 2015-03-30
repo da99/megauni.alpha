@@ -52,6 +52,8 @@ mu!(:MUE) {
     var :hover_color         , '#C0002C'
     var :dashed_border_color , '#C7C7C7'
     var :subtle_white        , "#fffffc"
+    var :white               , '#fff'
+    var :black               , '#000'
 
     def border_radius arg
       ::WWW_App::CSS::BORDER_RADIUS.each { |name|
