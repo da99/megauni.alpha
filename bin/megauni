@@ -290,11 +290,11 @@ case "$action" in
 
     if [[ -z "$files" ]]; then
       files="\
-        Server/Customer/specs/01-create.rb \
+        Server/Customer/specs/01-create.rb    \
         Server/Screen_Name/specs/01-create.rb \
-        Server/Computer/specs/01-create.rb \
-        Server/Link/specs/01-create.rb \
-      "
+        Server/Computer/specs/01-create.rb    \
+        Server/Link/specs/01-create.rb        \
+        Server/Link/specs/02-read.rb"
     fi
 
     if [[ -z "$files" ]]; then

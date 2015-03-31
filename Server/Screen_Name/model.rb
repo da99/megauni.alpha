@@ -3,6 +3,10 @@ class Screen_Name
 
   include Datoki
 
+  WORLD     = 1
+  PROTECTED = 2
+  PRIVATE   = 3
+
   field(:id) {
     integer
     primary_key
@@ -23,7 +27,7 @@ class Screen_Name
     smallint 1, 3
     matches do |r, v|
       if ![1, 2, 3].include?(v)
-        r.fail! "Allowed values: 1 (world) 2 (protected) 3 (private, no one)"
+        r.fail! "Allowed values: #{WOLRD} (world) #{PROTECTED} (protected) #{PRIVATE} (private, no one)"
       end
       true
     end
