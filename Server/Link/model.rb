@@ -20,6 +20,11 @@ class Link
   }
 
   class << self
+
+    def read data
+      {}
+    end
+
   end # === class << self
 
   def create

@@ -3,6 +3,7 @@ CREATE TABLE computer (
 
   id                SERIAL                PRIMARY KEY,
   owner_id          integer               NOT NULL,
+  privacy           smallint              NOT NULL DEFAULT 4,
   code              jsonb                 NOT NULL,
 
   created_at     timestamp with time zone NOT NULL DEFAULT timezone('UTC'::text, now()),

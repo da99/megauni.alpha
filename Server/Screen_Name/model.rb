@@ -3,6 +3,11 @@ class Screen_Name
 
   include Datoki
 
+  field(:id) {
+    integer
+    primary_key
+  }
+
   field(:screen_name) {
     varchar 4, 30
     upcase
@@ -12,6 +17,16 @@ class Screen_Name
       true
     end
     unique_index 'screen_name_unique_idx', "Screen name already taken: {{val}}"
+  }
+
+  field(:privacy) {
+    smallint 1, 3
+    matches do |r, v|
+      if ![1, 2, 3].include?(v)
+        r.fail! "Allowed values: 1 (world) 2 (protected) 3 (private, no one)"
+      end
+      true
+    end
   }
 
   field(:display_name) {
@@ -27,31 +42,10 @@ class Screen_Name
       v > 0
     end
   }
-
-  # field(:class_id) {
-    # smallint
-    # set_to do |r, v|
-      # if v < 0 || v > 2
-        # 0
-      # else
-        # v
-      # end
-    # end
-  # }
-
   field(:nick_name) {
     varchar nil, 1, 30
   }
 
-  field(:privacy) {
-    smallint 1, 3
-    matches do |r, v|
-      if ![1, 2, 3].include?(v)
-        r.fail! "Allowed values: @W (world) @P (private) @N (no one)"
-      end
-      true
-    end
-  }
   # === Settings ========================================
   World_Read_Id   = 1
   Private_Read_Id = 2
@@ -231,23 +225,11 @@ class Screen_Name
   end
 
   def update
-    @new_data = raw_data
+    clean :screen_name, :privacy, :nick_name
 
-    clean :screen_name, :about, :nick_name
-
-    if clean_data[:screen_name]
-      clean_data[:display_name] = clean_data[:screen_name]
+    if clean[:screen_name]
+      clean[:display_name] = clean[:screen_name]
     end
-
-    row = TABLE.
-      returning.
-      where(:screen_name=>data[:screen_name]).
-      update(clean_data).
-      first
-
-    @data.merge!(row || {})
-
-    self
   end # === def update
 
   # === READ ==================================================================
