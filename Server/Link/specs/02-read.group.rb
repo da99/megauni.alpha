@@ -31,7 +31,7 @@ describe 'Link.read group' do
     Screen_Name.update(id: sn.id, privacy: Screen_Name::PROTECTED)
 
     computer = Computer.create( owner_id: sn.id, code: {} )
-    link     = Link.create(owner_id: sn.id, type_id: Link::POST_TO_SCREEN_NAME, left_id: sn.id, right_id: computer.id)
+    link     = Link.create(owner_id: sn.data[:owner_id], type_id: Link::POST_TO_SCREEN_NAME, left_id: sn.id, right_id: computer.id)
 
     catch(:not_found) {
       link = Link.read(
@@ -42,9 +42,32 @@ describe 'Link.read group' do
     }.should == {:type_id=>Link::READ_SCREEN_NAME, :audience_id=>nil, :target_id=>sn.id}
   end
 
-  it "allows: OWNER -> POST from PRIVATE SCREEN_NAME"
+  it "disallows: computer being listed from a BLOCKed user by Screen_Name/Owner" do
+    sn      = Screen_Name.create(screen_name: "private_#{rand(1000)}")
+    Screen_Name.update(id: sn.id, privacy: Screen_Name::WORLD)
 
-  it "allows: CUSTOMER -> POST from PRIVATE SCREEN_NAME w/exceptions"
+    meanie = Screen_Name.create(screen_name: "meanig_#{rand(1000)}")
 
+
+    computer = Computer.create( owner_id: sn.id, code: {} )
+    Link.create owner_id: sn.data[:owner_id], type_id: Link::POST_TO_SCREEN_NAME, left_id: sn.id, right_id: computer.id
+    Link.create owner_id: sn.data[:owner_id], type_id: Link::ALLOW_TO_LINK,       left_id: meanie.id, right_id: sn.id
+
+    blocked  = Computer.create( owner_id: meanie.id, code: {} )
+    Link.create owner_id: meanie.id, type_id: Link::POST_TO_SCREEN_NAME, left_id: sn.id, right_id: blocked.id
+
+    Link.create owner_id: sn.data[:owner_id], type_id: Link::BLOCK_ACCESS_SCREEN_NAME, left_id: meanie.id, right_id: sn.id
+
+    Link.read(
+      audience_id: nil,
+      target_id:   sn.id,
+      type_id:     Link::READ_GROUP
+    ).map(&:id).should == [computer.id]
+
+  end # === it disallows: computer being listed from a BLOCKed user by Screen_Name/Owner
+
+  it "disallows: Computer being listed if set to PRIVATE by owner, not SN owner." do
+    
+  end # === it disallows: Private Computer being listed if set to PRIVATE by owner, not SN owner.
 
 end # === describe 'Link.read group'

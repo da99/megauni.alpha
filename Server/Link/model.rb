@@ -4,9 +4,10 @@ class Link
   include Datoki
 
   # === Link Types
-  BLOCK               = 1
-  ALLOW               = 2
+  BLOCK_ACCESS_SCREEN_NAME = 1
+  ALLOW_ACCESS_SCREEN_NAME = 2
   POST_TO_SCREEN_NAME = 3
+  ALLOW_TO_LINK       = 4
 
   # === Read Types
   READ_TREE        = 10_000
@@ -41,16 +42,16 @@ class Link
              ON
                block.type_id = :LINK_BLOCK
                AND
-               block.left_id = screen_name.id
+               block.right_id = screen_name.id
                AND
-               block.right_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id) 
+               block.left_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id) 
              LEFT JOIN link AS allow
              ON
                allow.type_id = :LINK_ALLOW
                AND
-               allow.left_id = screen_name.id
+               allow.right_id = screen_name.id
                AND
-               allow.right_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id)
+               allow.left_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id)
           WHERE
             screen_name.id = :SCREEN_NAME_ID
             AND (
@@ -71,8 +72,8 @@ class Link
           SCREEN_NAME_PRIVATE: Screen_Name::PRIVATE,
           SCREEN_NAME_PROTECTED: Screen_Name::PROTECTED,
           audience_id:         data[:audience_id],
-          LINK_BLOCK:          Link::BLOCK,
-          LINK_ALLOW:          Link::ALLOW
+          LINK_BLOCK:          Link::BLOCK_ACCESS_SCREEN_NAME,
+          LINK_ALLOW:          Link::ALLOW_ACCESS_SCREEN_NAME
         }
 
         r = DB[sql, vals].first
@@ -97,11 +98,21 @@ class Link
             type_id = :POST_TO_SCREEN_NAME
             AND
             left_id = :SN_ID
+            AND
+            owner_id NOT IN (
+              SELECT left_id
+              FROM link AS block
+              WHERE
+                type_id = :BLOCK_ACCESS_SCREEN_NAME
+                AND
+                right_id = :SN_ID
+            )
         )
         EOF
         vals = {
           :SN_ID               => sn.id,
-          :POST_TO_SCREEN_NAME => Link::POST_TO_SCREEN_NAME
+          :POST_TO_SCREEN_NAME => Link::POST_TO_SCREEN_NAME,
+          :BLOCK_ACCESS_SCREEN_NAME => Link::BLOCK_ACCESS_SCREEN_NAME
         }
         r = DB[sql, vals].all
         throw(:not_found, data) if !r || r.empty?
