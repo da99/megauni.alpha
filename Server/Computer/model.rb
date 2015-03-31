@@ -14,6 +14,10 @@ class Computer
     1 => "ON VIEW PROFILE"
   }
 
+  field(:id) {
+    primary_key
+  }
+
   field(:owner_id) {
     integer
   }
