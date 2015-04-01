@@ -46,9 +46,9 @@ mu!(:MUE) {
 
 
     var :bg_color            , "#f5f5f5"
-    var :heading_color       , '#000'
-    var :light_text_color    , '#8E8E8E'
-    var :visited_color       , '#956893'
+    var :heading_color       , '#616161'
+    var :sub_heading_color   , '#8E8E8E'
+    var :visited_color       , heading_color
     var :hover_color         , '#C0002C'
     var :dashed_border_color , '#C7C7C7'
     var :subtle_white        , "#fffffc"
@@ -66,7 +66,7 @@ mu!(:MUE) {
       background_color bg_color
 
       a._link {
-        color heading_color
+        color '#000'
       }
 
       a._visited {
@@ -96,7 +96,7 @@ mu!(:MUE) {
         font_family 'AghjaMedium'
         font_weight 'normal'
         font_style  'normal'
-        color       heading_color
+        color       '#000'
         margin      '0.5em 0'
       }
 
@@ -106,7 +106,7 @@ mu!(:MUE) {
       }
 
       h3 {
-        color          heading_color
+        color          sub_heading_color
         text_transform 'uppercase'
         font_size      'smaller'
         padding        '0.5em 0'
@@ -116,7 +116,7 @@ mu!(:MUE) {
       label {
         display 'block'
         span.^(:sub) {
-          color light_text_color
+          color sub_heading_color
         }
       }
 
@@ -125,7 +125,7 @@ mu!(:MUE) {
       }
 
       div.^(:disclaimer) {
-        color light_text_color
+        color sub_heading_color
       }
 
 
@@ -168,7 +168,7 @@ mu!(:NAV_BAR) {
           color '#000'
         }
         a._visited {
-          color light_text_color
+          color sub_heading_color
         }
         a._hover {
           color '#fff'

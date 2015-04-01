@@ -21,7 +21,6 @@ mu(:ROOT) {
 
   WWW_App.new {
 
-    var :heading_color       , '#357BB5'
     use mue
 
     style {
@@ -121,6 +120,7 @@ mu(:ROOT) {
         p { a.href('/home') { '/home' } }
         p { a.href('/@da99') { '/@da99' } }
         p { a.href('/!4567') { '/!4567' } }
+        p { a.href('/nowhere') { '/nowhere' } }
       end
 
       div.^(:disclaimer) {
