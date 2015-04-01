@@ -177,6 +177,17 @@ class Screen_Name
     )
   end
 
+  def comments_on computer, msg
+    comment = self.computer({:msg=>msg})
+    Link.create(
+      owner_id: id,
+      type_id:  Link::COMMENT,
+      asker_id: comment.id,
+      giver_id: computer.id
+    )
+    comment
+  end
+
   def to_href
     "/@#{screen_name}"
   end
@@ -233,16 +244,18 @@ class Screen_Name
   # This method is mainly used in tests.
   #
   def is type
-    priv = Screen_Name.const_get(type.to_s.upcase.to_sym)
-    sn = Screen_Name.update id: id, privacy: priv
-    @data = @data.merge sn.data
+    new_sn = Screen_Name.update(
+      id: id,
+      privacy: Screen_Name.const_get(type.to_s.upcase.to_sym)
+    )
+    @data = @data.merge new_sn.data
     self
   end
 
   #
   # This method is mainly used in tests.
   #
-  def computer code, priv = :PRIVATE
+  def computer code, priv = :PROTECTED
     Computer.create owner_id: id, code: code, privacy: Computer.const_get(priv)
   end
 

@@ -98,6 +98,15 @@ class Computer
     )
   end
 
+  def is type
+    new_computer = Computer.update(
+      id: id,
+      privacy: self.class.const_get(type.to_s.upcase.to_sym)
+    )
+    @data = @data.merge new_computer.data
+    self
+  end
+
 end # === class Computer ===
 
 

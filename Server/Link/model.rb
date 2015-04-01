@@ -8,11 +8,14 @@ class Link
   ALLOW_ACCESS_SCREEN_NAME = 2 # friend  -> target
   POST_TO_SCREEN_NAME = 3      # content -> target
   ALLOW_TO_LINK       = 4      # friend  -> target
+  COMMENT             = 5      # comment -> post
 
   # === Read Types
   READ_TREE        = 10_000
   READ_SCREEN_NAME = 10
   READ_GROUP       = 11
+  READ_POST        = 12
+  READ_COMMENTS    = 13
 
   field(:id) {
     primary_key
@@ -97,7 +100,7 @@ class Link
         }
 
         r = DB[sql, vals].first
-        throw(:not_found, data) unless r
+        throw(:not_found, {:type=>:READ_SCREEN_NAME, :id=>data[:target_id]}) unless r
 
         r.delete :allow_id
         r.delete :block_id
