@@ -173,6 +173,24 @@ class Link
           Computer.new d
         }
 
+      when READ_COMMENTS
+        post = read(:type_id=>READ_POST, :target_id=>data[:target_id], :audience_id=>data[:audience_id])
+        sql = <<-EOF
+
+          SELECT *
+          FROM computer
+          WHERE
+            id IN (
+              SELECT left_id
+              FROM link AS comment_to_computer
+              WHERE
+                right_id = :POST_ID
+                AND
+                type_id = :LINK_COMMENT
+            )
+
+        EOF
+
       when READ_TREE
         fail %^
         This is not done. It can only handle a simple line of:

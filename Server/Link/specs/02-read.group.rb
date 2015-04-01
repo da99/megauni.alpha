@@ -4,7 +4,7 @@ describe 'Link.read group' do
 
   it "allows: STRANGER -> GROUP from WORLD Screen_Name" do
     sn = Screen_Name.create(screen_name: "group_#{rand(10000)}")
-    Screen_Name.update(id: sn.id, privacy: Screen_Name::WORLD)
+    sn.is :WORLD
 
     computers = []
     [1,2,3].each { |n|
@@ -22,10 +22,10 @@ describe 'Link.read group' do
   end
 
   it "disallows: STRANGER -> POST from PROTECTED SCREEN_NAME" do
-    sn = Screen_Name.create(screen_name: "sn_#{rand(10000)}")
-    Screen_Name.update(id: sn.id, privacy: Screen_Name::PROTECTED)
+    sn = screen_name
+    sn.is :PROTECTED
 
-    computer = Computer.create( owner_id: sn.id, code: {}, privacy: Computer::WORLD )
+    computer = sn.computer( {}, :WORLD )
     link     = computer.posted_to(sn, sn) 
 
     catch(:not_found) {
@@ -81,8 +81,8 @@ describe 'Link.read group' do
   end # === it disallows: Private Computer being listed if set to PRIVATE by owner, not SN owner.
 
   it "disallows: listing computers if link is made by someone that has been removed from the ALLOW list" do
-    friend = Screen_Name.rand("removed")
-    sn     = Screen_Name.rand("remover")
+    friend = screen_name("removed")
+    sn     = screen_name("remover")
     link = friend.is_allowed_to_link_to(sn)
     computer = Computer.create :owner_id=>friend.data[:owner_id], :code=>{}, :privacy=>Computer::WORLD
     computer.posted_to(sn, friend)

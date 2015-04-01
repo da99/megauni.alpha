@@ -33,8 +33,8 @@ describe 'Link.read screen_name' do
   end # === it allows: Customer -> Screen_Name Protected, Allowed
 
   it "allows: OWNER -> Screen_Name PROTECTED" do
-    sn = Screen_Name.rand("pro")
-    Screen_Name.update id: sn.id, privacy: Screen_Name::PROTECTED
+    sn = screen_name("pro")
+    sn.is :protected
 
     Link.read(:READ_SCREEN_NAME, sn.data[:owner_id], sn.id).id.should == sn.id
 

@@ -59,6 +59,10 @@ class Bacon::Context
     Sequel.lit(Okdoki::Model::PG::UTC_NOW_RAW + " - interval '#{days * 24} hours'")
   end
 
+  def screen_name prefix = "rand"
+    Screen_Name.create screen_name: "#{prefix}_#{rand(10000)}"
+  end
+
   def customer
     Customer.new(:data)
   end

@@ -143,10 +143,6 @@ class Screen_Name
       new TABLE.where(owner_id: c.data[:id]).all
     end
 
-    def rand prefix = "rand"
-      Screen_Name.create screen_name: "#{prefix}_#{super(10000)}"
-    end
-
   end # === class self ==================================
 
 
@@ -233,25 +229,21 @@ class Screen_Name
 
   # === UPDATE ================================================================
 
-  def update_privacy type
-    pid = case type
-          when :public
-            World_Read_Id
-          when :private
-            Private_Read_Id
-          when :no_one
-            Not_Read_Id
-          else
-            raise "Unknown val: #{type.inspect}"
-          end
-    row = TABLE.returning.
-      where(:id=>id).
-      update(:privacy=>pid).
-      first
-
-    @data.merge!(row || {})
-
+  #
+  # This method is mainly used in tests.
+  #
+  def is type
+    priv = Screen_Name.const_get(type.to_s.upcase.to_sym)
+    sn = Screen_Name.update id: id, privacy: priv
+    @data = @data.merge sn.data
     self
+  end
+
+  #
+  # This method is mainly used in tests.
+  #
+  def computer code, priv = :PRIVATE
+    Computer.create owner_id: id, code: code, privacy: Computer.const_get(priv)
   end
 
   def update
