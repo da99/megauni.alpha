@@ -154,8 +154,8 @@ class Screen_Name
     Link.create(
       :owner_id =>sn.data[:owner_id],
       :type_id   =>Link::ALLOW_TO_LINK,
-      :left_id  =>id,
-      :right_id =>sn.id
+      :asker_id  =>id,
+      :giver_id =>sn.id
     )
   end
 
@@ -163,8 +163,8 @@ class Screen_Name
     Link.create(
       owner_id: sn.id,
       type_id: Link::ALLOW_ACCESS_SCREEN_NAME,
-      left_id: id,
-      right_id: sn.id
+      asker_id: id,
+      giver_id: sn.id
     )
   end
 
@@ -172,8 +172,8 @@ class Screen_Name
     Link.create(
       owner_id: sn.id,
       type_id: Link::BLOCK_ACCESS_SCREEN_NAME,
-      left_id: id,
-      right_id: sn.id
+      asker_id: id,
+      giver_id: sn.id
     )
   end
 

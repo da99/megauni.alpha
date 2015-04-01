@@ -93,8 +93,8 @@ class Computer
     Link.create(
       owner_id: by.data[:owner_id],
       type_id: Link::POST_TO_SCREEN_NAME,
-      left_id: id,
-      right_id: sn.id
+      asker_id: id,
+      giver_id: sn.id
     )
   end
 

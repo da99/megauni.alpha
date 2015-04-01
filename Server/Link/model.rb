@@ -26,11 +26,11 @@ class Link
     smallint
   }
 
-  field(:left_id) {
+  field(:asker_id) {
     integer
   }
 
-  field(:right_id) {
+  field(:giver_id) {
     integer
   }
 
@@ -60,16 +60,16 @@ class Link
              ON
                block.type_id = :LINK_BLOCK
                AND
-               block.right_id = screen_name.id
+               block.giver_id = screen_name.id
                AND
-               block.left_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id) 
+               block.asker_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id) 
              LEFT JOIN link AS allow
              ON
                allow.type_id = :LINK_ALLOW
                AND
-               allow.left_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id)
+               allow.asker_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id)
                AND
-               allow.right_id = screen_name.id
+               allow.giver_id = screen_name.id
           WHERE
             screen_name.id = :SCREEN_NAME_ID
             AND
@@ -119,12 +119,12 @@ class Link
         )
         AND
         id IN (
-          SELECT left_id
+          SELECT asker_id
           FROM link AS computers_to_screen_names
           WHERE
             type_id = :POST_TO_SCREEN_NAME
             AND
-            right_id = :SN_ID
+            giver_id = :SN_ID
             AND
             (
               owner_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id)
@@ -133,21 +133,21 @@ class Link
               OR
               (
                 owner_id IN (
-                  SELECT left_id
+                  SELECT asker_id
                   FROM link as allow
                   WHERE
                     type_id = :ALLOW_TO_LINK
                     AND
-                    right_id = :SN_ID
+                    giver_id = :SN_ID
                 )
                 AND
                 owner_id NOT IN (
-                  SELECT left_id
+                  SELECT asker_id
                   FROM link AS block
                   WHERE
                     type_id = :BLOCK_ACCESS_SCREEN_NAME
                     AND
-                    right_id = :SN_ID
+                    giver_id = :SN_ID
                 )
               )
 
@@ -181,10 +181,10 @@ class Link
           FROM computer
           WHERE
             id IN (
-              SELECT left_id
+              SELECT asker_id
               FROM link AS comment_to_computer
               WHERE
-                right_id = :POST_ID
+                giver_id = :POST_ID
                 AND
                 type_id = :LINK_COMMENT
             )
@@ -216,13 +216,13 @@ class Link
 
         sql = <<-EOF
           WITH RECURSIVE links(id, oid, tid, lid, rid) AS (
-             SELECT id, owner_id, type_id, left_id, right_id
+             SELECT id, owner_id, type_id, asker_id, giver_id
              FROM link
-             WHERE owner_id = 1 AND right_id = 4
+             WHERE owner_id = 1 AND giver_id = 4
           UNION
-             SELECT l.id, l.owner_id, l.type_id, l.left_id, l.right_id
+             SELECT l.id, l.owner_id, l.type_id, l.asker_id, l.giver_id
              FROM link l, links ls
-             WHERE l.owner_id = 1 AND l.right_id = ls.lid 
+             WHERE l.owner_id = 1 AND l.giver_id = ls.lid 
           )
         EOF
 
@@ -243,7 +243,7 @@ class Link
   end # === class << self
 
   def create
-    clean! :owner_id, :type_id, :left_id, :right_id
+    clean! :owner_id, :type_id, :asker_id, :giver_id
   end
 
 end # === Link

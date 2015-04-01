@@ -14,7 +14,7 @@ describe 'Link.read screen_name' do
     meanie = screen_name "meanie"
     sn     = screen_name "blocked"
     sn.is :WORLD
-    Link.create owner_id: sn.data[:owner_id], type_id: Link::BLOCK_ACCESS_SCREEN_NAME, left_id: meanie.id, right_id: sn.id
+    Link.create owner_id: sn.data[:owner_id], type_id: Link::BLOCK_ACCESS_SCREEN_NAME, asker_id: meanie.id, giver_id: sn.id
 
     read = {audience_id: meanie.data[:owner_id], target_id: sn.id, type_id: Link::READ_SCREEN_NAME}
     catch(:not_found) {
