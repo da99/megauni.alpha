@@ -165,8 +165,17 @@ class Screen_Name
 
   def is_allowed_to_read sn
     Link.create(
-      owner_id: sn.data[:owner_id],
+      owner_id: sn.id,
       type_id: Link::ALLOW_ACCESS_SCREEN_NAME,
+      left_id: id,
+      right_id: sn.id
+    )
+  end
+
+  def is_block_from sn
+    Link.create(
+      owner_id: sn.id,
+      type_id: Link::BLOCK_ACCESS_SCREEN_NAME,
       left_id: id,
       right_id: sn.id
     )

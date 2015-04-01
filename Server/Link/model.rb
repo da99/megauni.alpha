@@ -127,7 +127,9 @@ class Link
             right_id = :SN_ID
             AND
             (
-              owner_id = :audience_id
+              owner_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id)
+              OR
+              owner_id = :SN_ID
               OR
               (
                 owner_id IN (

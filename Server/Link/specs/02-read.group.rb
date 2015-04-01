@@ -9,12 +9,8 @@ describe 'Link.read group' do
     computers = []
     [1,2,3].each { |n|
       computers << (c = Computer.create(owner_id: sn.id, code: {}))
-      Link.create(
-        owner_id: sn.data[:owner_id],
-        type_id:  Link::POST_TO_SCREEN_NAME,
-        left_id:  c.id,
-        right_id: sn.id
-      )
+      Computer.update id: c.id, privacy: Computer::WORLD
+      c.posted_to(sn, sn)
     }
 
     targets = Link.read(
@@ -31,7 +27,7 @@ describe 'Link.read group' do
     Screen_Name.update(id: sn.id, privacy: Screen_Name::PROTECTED)
 
     computer = Computer.create( owner_id: sn.id, code: {} )
-    link     = computer.posted_to(sn) 
+    link     = computer.posted_to(sn, sn) 
 
     catch(:not_found) {
       link = Link.read(
@@ -50,13 +46,13 @@ describe 'Link.read group' do
 
 
     computer = Computer.create( owner_id: sn.id, code: {} )
-    Link.create owner_id: sn.data[:owner_id], type_id: Link::POST_TO_SCREEN_NAME, left_id: sn.id, right_id: computer.id
-    Link.create owner_id: sn.data[:owner_id], type_id: Link::ALLOW_TO_LINK,       left_id: meanie.id, right_id: sn.id
+    computer.posted_to(sn, sn)
+    meanie.is_allowed_to_link_to(sn)
 
     blocked  = Computer.create( owner_id: meanie.id, code: {} )
-    Link.create owner_id: meanie.id, type_id: Link::POST_TO_SCREEN_NAME, left_id: sn.id, right_id: blocked.id
+    blocked.posted_to(sn, meanie)
 
-    Link.create owner_id: sn.data[:owner_id], type_id: Link::BLOCK_ACCESS_SCREEN_NAME, left_id: meanie.id, right_id: sn.id
+    meanie.is_block_from(sn)
 
     Link.read(
       audience_id: nil,
