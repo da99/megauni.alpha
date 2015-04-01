@@ -3,7 +3,7 @@
 describe 'Link.read group' do
 
   it "allows: STRANGER -> GROUP from WORLD Screen_Name" do
-    sn = Screen_Name.create(screen_name: "group_#{rand(10000)}")
+    sn = screen_name "group"
     sn.is :WORLD
 
     computers = []
@@ -29,41 +29,35 @@ describe 'Link.read group' do
     link     = computer.posted_to(sn, sn) 
 
     catch(:not_found) {
-      link = Link.read(
-        consumer_id: nil,
-        target_id:   sn.id,
-        type_id:     Link::READ_GROUP
-      )
+      link = Link.read( :GROUP, nil, sn.id )
     }.should == {:type_id=>Link::READ_SCREEN_NAME, :audience_id=>nil, :target_id=>sn.id}
   end
 
   it "disallows: computer being listed from a BLOCKed user by Screen_Name/Owner" do
-    sn      = Screen_Name.create(screen_name: "private_#{rand(1000)}")
-    Screen_Name.update(id: sn.id, privacy: Screen_Name::WORLD)
+    sn      = screen_name "private"
+    sn.is :WORLD
 
-    meanie = Screen_Name.create(screen_name: "meanig_#{rand(1000)}")
+    meanie = screen_name "meanie"
 
 
-    computer = Computer.create( owner_id: sn.id, code: {}, privacy: Computer::WORLD )
+    computer = sn.computer({}, :WORLD)
     computer.posted_to(sn, sn)
     meanie.is_allowed_to_link_to(sn)
 
-    blocked  = Computer.create( owner_id: meanie.id, code: {}, privacy: Computer::WORLD )
+    blocked  = meanie.computer({}, :WORLD)
     blocked.posted_to(sn, meanie)
 
     meanie.is_block_from(sn)
 
-    Link.read(
-      audience_id: nil,
-      target_id:   sn.id,
-      type_id:     Link::READ_GROUP
-    ).map(&:id).should == [computer.id]
+    Link.read(:GROUP, nil, sn.id).
+      map(&:id).
+      should == [computer.id]
 
   end # === it disallows: computer being listed from a BLOCKed user by Screen_Name/Owner
 
   it "disallows: Computer being listed if set to PRIVATE by owner who linked it, not SN owner." do
-    sn = Screen_Name.create screen_name: "o_#{rand 1000}"
-    friend = Screen_Name.create screen_name: "f_#{rand 1000}"
+    sn     = screen_name "o"
+    friend = screen_name "f"
     friend.is_allowed_to_link_to(sn)
 
     computer = Computer.create owner_id: friend.id, code: {}, privacy: Computer::WORLD

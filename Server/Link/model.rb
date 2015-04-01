@@ -41,7 +41,7 @@ class Link
       case args.size
       when 3
         data = {
-          type_id: args.first.is_a?(Symbol) ? const_get(args.first) : args.first,
+          type_id: args.first.is_a?(Symbol) ? const_get("READ_#{args.first.to_s.upcase.sub('READ_', '')}".to_sym) : args.first,
           audience_id: args[1],
           target_id: args.last
         }

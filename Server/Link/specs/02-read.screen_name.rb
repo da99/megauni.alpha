@@ -2,7 +2,7 @@
 describe 'Link.read screen_name' do
 
   it "allows: STRANGER -> Screen_Name World Public" do
-    sn = Screen_Name.create screen_name: "world_#{rand(1000)}"
+    sn = screen_name "world"
     Screen_Name.update id: sn.data[:id], privacy: Screen_Name::WORLD
 
     link = Link.read(audience_id: nil, target_id: sn.id, type_id: Link::READ_SCREEN_NAME)
@@ -11,7 +11,7 @@ describe 'Link.read screen_name' do
   end
 
   it "does not allow: Customer -> Screen_Name World Public, Blocked" do
-    meanie = Screen_Name.create screen_name: "mean_#{rand(1000)}"
+    meanie = screen_name "mean"
     sn = Screen_Name.create screen_name: "blocked_#{rand(10000)}"
     Screen_Name.update id: sn.id, privacy: Screen_Name::WORLD
     Link.create owner_id: sn.data[:owner_id], type_id: Link::BLOCK_ACCESS_SCREEN_NAME, left_id: meanie.id, right_id: sn.id
@@ -24,8 +24,8 @@ describe 'Link.read screen_name' do
   end # === it does not allow: STRANGER -> Screen_Name World Public, Blocked
 
   it "allows: Customer -> Screen_Name PROTECTED, Allowed" do
-    friend = Screen_Name.create screen_name: "pheobe_#{rand(10000)}"
-    sn = Screen_Name.create screen_name: "allow_#{rand(1000)}"
+    friend = screen_name "pheobe"
+    sn     = screen_name "allow"
     Screen_Name.update id: sn.id, privacy: Screen_Name::PROTECTED
     friend.is_allowed_to_read(sn)
 
