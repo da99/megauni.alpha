@@ -165,6 +165,7 @@ class Link
         }
 
         r = DB[sql, vals].all
+
         throw(:not_found, data) if !r || r.empty?
 
         # === Finally, send back the computer:

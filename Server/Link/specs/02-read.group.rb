@@ -8,8 +8,7 @@ describe 'Link.read group' do
 
     computers = []
     [1,2,3].each { |n|
-      computers << (c = Computer.create(owner_id: sn.id, code: {}))
-      Computer.update id: c.id, privacy: Computer::WORLD
+      computers << (c = Computer.create(owner_id: sn.id, code: {}, privacy: Computer::WORLD))
       c.posted_to(sn, sn)
     }
 
@@ -26,7 +25,7 @@ describe 'Link.read group' do
     sn = Screen_Name.create(screen_name: "sn_#{rand(10000)}")
     Screen_Name.update(id: sn.id, privacy: Screen_Name::PROTECTED)
 
-    computer = Computer.create( owner_id: sn.id, code: {} )
+    computer = Computer.create( owner_id: sn.id, code: {}, privacy: Computer::WORLD )
     link     = computer.posted_to(sn, sn) 
 
     catch(:not_found) {
@@ -45,11 +44,11 @@ describe 'Link.read group' do
     meanie = Screen_Name.create(screen_name: "meanig_#{rand(1000)}")
 
 
-    computer = Computer.create( owner_id: sn.id, code: {} )
+    computer = Computer.create( owner_id: sn.id, code: {}, privacy: Computer::WORLD )
     computer.posted_to(sn, sn)
     meanie.is_allowed_to_link_to(sn)
 
-    blocked  = Computer.create( owner_id: meanie.id, code: {} )
+    blocked  = Computer.create( owner_id: meanie.id, code: {}, privacy: Computer::WORLD )
     blocked.posted_to(sn, meanie)
 
     meanie.is_block_from(sn)
@@ -67,7 +66,7 @@ describe 'Link.read group' do
     friend = Screen_Name.create screen_name: "f_#{rand 1000}"
     friend.is_allowed_to_link_to(sn)
 
-    computer = Computer.create owner_id: friend.id, code: {}
+    computer = Computer.create owner_id: friend.id, code: {}, privacy: Computer::WORLD
     computer.posted_to sn, friend
     Computer.update(id: computer.id, privacy: Computer::PRIVATE)
 
@@ -85,8 +84,7 @@ describe 'Link.read group' do
     friend = Screen_Name.rand("removed")
     sn     = Screen_Name.rand("remover")
     link = friend.is_allowed_to_link_to(sn)
-    computer = Computer.create :owner_id=>friend.data[:owner_id], :code=>{}
-    Computer.update :id=>computer.id, :privacy=>Computer::WORLD
+    computer = Computer.create :owner_id=>friend.data[:owner_id], :code=>{}, :privacy=>Computer::WORLD
     computer.posted_to(sn, friend)
 
     DB[Link.table_name].where(id: link.id).delete

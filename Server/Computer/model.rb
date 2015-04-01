@@ -56,6 +56,7 @@ class Computer
 
   def create
     clean! :owner_id, :code
+    clean :privacy
   end
 
   def update
