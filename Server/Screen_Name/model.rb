@@ -168,7 +168,7 @@ class Screen_Name
     )
   end
 
-  def is_block_from sn
+  def is_blocked_from sn
     Link.create(
       owner_id: sn.id,
       type_id: Link::BLOCK_ACCESS_SCREEN_NAME,

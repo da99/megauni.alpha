@@ -47,7 +47,7 @@ describe 'Link.read group' do
     blocked  = meanie.computer({}, :WORLD)
     blocked.posted_to(sn, meanie)
 
-    meanie.is_block_from(sn)
+    meanie.is_blocked_from(sn)
 
     Link.read(:GROUP, nil, sn.id).
       map(&:id).
