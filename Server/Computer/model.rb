@@ -3,12 +3,9 @@ class Computer
 
   include Datoki
 
-  PRIVACY = {
-    1 => :world,
-    2 => :protected,
-    3 => :private,
-    4 => :author   # === eg comment to a post
-  }
+  WORLD     = 1
+  PROTECTED = 2
+  PRIVATE   = 3
 
   EVENT_NAMES = {
     1 => "ON VIEW PROFILE"
@@ -25,7 +22,7 @@ class Computer
   field(:privacy) {
     smallint 1, 3
     matches do |r, v|
-      if !PRIVACY.keys?.include?(v)
+      if ![WORLD, PROTECTED, PRIVATE].include?(v)
         r.fail! "Allowed values: 1 (world) 2 (protected) 3 (private, no one) 4 (me and the author, eg comment)"
       end
       true
@@ -61,6 +58,10 @@ class Computer
     clean! :owner_id, :code
   end
 
+  def update
+    clean :privacy
+  end
+
   def validate_code hash
     if !hash.has_key?(:code)
       raise Invalid.new(self, "Code is required.")
@@ -85,6 +86,15 @@ class Computer
 
     hash[:path] = raw
     hash
+  end
+
+  def posted_to sn, by
+    Link.create(
+      owner_id: by.data[:owner_id],
+      type_id: Link::POST_TO_SCREEN_NAME,
+      left_id: id,
+      right_id: sn.id
+    )
   end
 
 end # === class Computer ===

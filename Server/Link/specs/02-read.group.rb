@@ -12,8 +12,8 @@ describe 'Link.read group' do
       Link.create(
         owner_id: sn.data[:owner_id],
         type_id:  Link::POST_TO_SCREEN_NAME,
-        left_id:  sn.id,
-        right_id: c.id
+        left_id:  c.id,
+        right_id: sn.id
       )
     }
 
@@ -31,7 +31,7 @@ describe 'Link.read group' do
     Screen_Name.update(id: sn.id, privacy: Screen_Name::PROTECTED)
 
     computer = Computer.create( owner_id: sn.id, code: {} )
-    link     = Link.create(owner_id: sn.data[:owner_id], type_id: Link::POST_TO_SCREEN_NAME, left_id: sn.id, right_id: computer.id)
+    link     = computer.posted_to(sn) 
 
     catch(:not_found) {
       link = Link.read(
@@ -66,8 +66,37 @@ describe 'Link.read group' do
 
   end # === it disallows: computer being listed from a BLOCKed user by Screen_Name/Owner
 
-  it "disallows: Computer being listed if set to PRIVATE by owner, not SN owner." do
-    
+  it "disallows: Computer being listed if set to PRIVATE by owner who linked it, not SN owner." do
+    sn = Screen_Name.create screen_name: "o_#{rand 1000}"
+    friend = Screen_Name.create screen_name: "f_#{rand 1000}"
+    friend.is_allowed_to_link_to(sn)
+
+    computer = Computer.create owner_id: friend.id, code: {}
+    computer.posted_to sn, friend
+    Computer.update(id: computer.id, privacy: Computer::PRIVATE)
+
+    catch(:not_found) {
+      Link.read(
+        audience_id: sn.data[:owner_id],
+        target_id:   sn.id,
+        type_id:     Link::READ_GROUP
+      )
+    }.should == {:audience_id=>sn.data[:owner_id], :type_id=>Link::READ_GROUP, :target_id=>sn.id}
+
   end # === it disallows: Private Computer being listed if set to PRIVATE by owner, not SN owner.
+
+  it "disallows: listing computers if link is made by someone that has been removed from the ALLOW list" do
+    friend = Screen_Name.rand("removed")
+    sn     = Screen_Name.rand("remover")
+    link = friend.is_allowed_to_link_to(sn)
+    computer = Computer.create :owner_id=>friend.data[:owner_id], :code=>{}
+    Computer.update :id=>computer.id, :privacy=>Computer::WORLD
+    computer.posted_to(sn, friend)
+
+    DB[Link.table_name].where(id: link.id).delete
+    catch(:not_found) {
+      Link.read :READ_GROUP, sn.data[:owner_id], sn.id
+    }.should == {:audience_id=>sn.data[:owner_id], :target_id=>sn.id, :type_id=>Link::READ_GROUP}
+  end # === it
 
 end # === describe 'Link.read group'

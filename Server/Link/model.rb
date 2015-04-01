@@ -14,6 +14,10 @@ class Link
   READ_SCREEN_NAME = 10
   READ_GROUP       = 11
 
+  field(:id) {
+    primary_key
+  }
+
   field(:owner_id) {
     integer
   }
@@ -101,38 +105,63 @@ class Link
 
       when READ_GROUP
         # === Check to see if member is allowed to view screen name:
-
-        binding.pry
-
         sn = read(:type_id=> READ_SCREEN_NAME, :audience_id=>data[:audience_id], :target_id=>data[:target_id])
 
         # === Read group:
         sql = <<-EOF
         SELECT *
         FROM computer
-        WHERE id IN (
+        WHERE
+        (
+          privacy = :COMPUTER_WORLD
+          OR
+          (privacy = :COMPUTER_PRIVATE AND owner_id = :audience_id)
+        )
+        AND
+        id IN (
           SELECT left_id
-          FROM link
+          FROM link AS computers_to_screen_names
           WHERE
             type_id = :POST_TO_SCREEN_NAME
             AND
             right_id = :SN_ID
             AND
-            owner_id NOT IN (
-              SELECT left_id
-              FROM link AS block
-              WHERE
-                type_id = :BLOCK_ACCESS_SCREEN_NAME
+            (
+              owner_id = :audience_id
+              OR
+              (
+                owner_id IN (
+                  SELECT left_id
+                  FROM link as allow
+                  WHERE
+                    type_id = :ALLOW_TO_LINK
+                    AND
+                    right_id = :SN_ID
+                )
                 AND
-                right_id = :SN_ID
+                owner_id NOT IN (
+                  SELECT left_id
+                  FROM link AS block
+                  WHERE
+                    type_id = :BLOCK_ACCESS_SCREEN_NAME
+                    AND
+                    right_id = :SN_ID
+                )
+              )
+
             )
         )
         EOF
         vals = {
-          :SN_ID               => sn.id,
-          :POST_TO_SCREEN_NAME => Link::POST_TO_SCREEN_NAME,
-          :BLOCK_ACCESS_SCREEN_NAME => Link::BLOCK_ACCESS_SCREEN_NAME
+          :SN_ID                    => sn.id,
+          :POST_TO_SCREEN_NAME      => Link::POST_TO_SCREEN_NAME,
+          :BLOCK_ACCESS_SCREEN_NAME => Link::BLOCK_ACCESS_SCREEN_NAME,
+          :ALLOW_TO_LINK            => Link::ALLOW_TO_LINK,
+          :COMPUTER_WORLD           => Computer::WORLD,
+          :COMPUTER_PRIVATE         => Computer::PRIVATE,
+          :audience_id              => data[:audience_id]
         }
+
         r = DB[sql, vals].all
         throw(:not_found, data) if !r || r.empty?
 
