@@ -4,10 +4,10 @@ class Link
   include Datoki
 
   # === Link Types
-  BLOCK_ACCESS_SCREEN_NAME = 1
-  ALLOW_ACCESS_SCREEN_NAME = 2
-  POST_TO_SCREEN_NAME = 3
-  ALLOW_TO_LINK       = 4
+  BLOCK_ACCESS_SCREEN_NAME = 1 # meanie  -> target
+  ALLOW_ACCESS_SCREEN_NAME = 2 # friend  -> target
+  POST_TO_SCREEN_NAME = 3      # content -> target
+  ALLOW_TO_LINK       = 4      # friend  -> target
 
   # === Read Types
   READ_TREE        = 10_000
@@ -32,7 +32,21 @@ class Link
 
   class << self
 
-    def read data
+    def read *args
+
+      case args.size
+      when 3
+        data = {
+          type_id: args.first.is_a?(Symbol) ? const_get(args.first) : args.first,
+          audience_id: args[1],
+          target_id: args.last
+        }
+      when 1
+        data = args.first
+      else
+        fail ArgumentError, "Unknown args: #{args.inspect}"
+      end
+
       case data[:type_id]
       when READ_SCREEN_NAME
         sql = <<-EOF
@@ -49,23 +63,25 @@ class Link
              ON
                allow.type_id = :LINK_ALLOW
                AND
-               allow.right_id = screen_name.id
-               AND
                allow.left_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id)
+               AND
+               allow.right_id = screen_name.id
           WHERE
             screen_name.id = :SCREEN_NAME_ID
-            AND (
-                screen_name.privacy = :SCREEN_NAME_WORLD
-                OR
-                (screen_name.privacy = :SCREEN_NAME_PRIVATE AND screen_name.owner_id = :audience_id)
-                OR
-                (screen_name.privacy = :SCREEN_NAME_PROTECTED AND allow.id IS NOT NULL)
-              )
             AND
             block.id IS NULL
+            AND (
+                screen_name.owner_id = :audience_id
+                OR (
+                  screen_name.privacy = :SCREEN_NAME_WORLD
+                  OR
+                  (screen_name.privacy = :SCREEN_NAME_PROTECTED AND allow.id IS NOT NULL)
+                )
+              )
 
           LIMIT 1
         EOF
+
         vals = {
           SCREEN_NAME_ID:      data[:target_id],
           SCREEN_NAME_WORLD:   Screen_Name::WORLD,
@@ -85,6 +101,9 @@ class Link
 
       when READ_GROUP
         # === Check to see if member is allowed to view screen name:
+
+        binding.pry
+
         sn = read(:type_id=> READ_SCREEN_NAME, :audience_id=>data[:audience_id], :target_id=>data[:target_id])
 
         # === Read group:
@@ -92,12 +111,12 @@ class Link
         SELECT *
         FROM computer
         WHERE id IN (
-          SELECT right_id
+          SELECT left_id
           FROM link
           WHERE
             type_id = :POST_TO_SCREEN_NAME
             AND
-            left_id = :SN_ID
+            right_id = :SN_ID
             AND
             owner_id NOT IN (
               SELECT left_id
