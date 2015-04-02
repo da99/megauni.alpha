@@ -60,15 +60,19 @@ class Megauni_DSL
       when :WORLD!
         cache_and_settings[:default_privacy] = :WORLD
       when :sn, :friend, :meanie, :aud
-        cache_and_settings[type] ||= begin
+        if cache_and_settings.has_key?(type)
+          cache_and_settings[type]
+        else
+          cache_and_settings[type] = begin
                                        vals = {
-                                         :screen_name => "#{type}_#{rand(10000)}")
+                                         :screen_name => "#{type}_#{rand(10000)}"
                                        }
                                        if cache_and_settings.has_key?(:default_privacy)
-                                         vals[:privacy] = cache_and_settings[:default_privacy]
+                                         vals[:privacy] = Screen_Name.const_get cache_and_settings[:default_privacy]
                                        end
                                        Megauni_DSL.new(cache_and_settings, Screen_Name.create(vals))
                                      end
+        end
       else
         fail ArgumentError, "Unknown type: #{type.inspect}"
       end
@@ -117,7 +121,7 @@ class Megauni_DSL
       vals[:privacy] = priv
     else
       if @settings.has_key?(:default_privacy)
-        vals[:privacy] = @settings[:default_privacy]
+        vals[:privacy] = Computer.const_get @settings[:default_privacy]
       end
     end
     Megauni_DSL.new(@settings, Computer.create( vals ))
@@ -125,15 +129,24 @@ class Megauni_DSL
 
   def reads type
     @read_type = type
+    self
   end
 
   def of post
     Link.read(@read_type, $o.id, post.o.id)
   end
 
+  %w{ sn friend meanie aud STRANGER }.each { |name|
+    eval <<-EOF, nil, __FILE__, __LINE__ + 1
+      def #{name}
+        @settings[:context].#{name}
+      end
+    EOF
+  }
+
 end # === Megauni_DSL
 
-class Bacon
+module Bacon
   class Context
 
   # === Custom Helpers ===
@@ -142,14 +155,15 @@ class Bacon
     Sequel.lit(Okdoki::Model::PG::UTC_NOW_RAW + " - interval '#{days * 24} hours'")
   end
 
-  alias_method :run_requirement, :run_requirement_without_reset_my_cache
-  def run_req_and_reset_my_cache
-    @my_cache = {}
+  alias_method :run_requirement_without_reset_my_cache, :run_requirement
+  def run_req_and_reset_my_cache *args
+    @my_cache = {:context => self}
     @my_cache.default_proc = lambda { |h, k|
       fail ArgumentError, "Unknown key: #{k.inspect}"
     }
+    run_requirement_without_reset_my_cache *args
   end
-  alias_method :run_req_and_reset_my_cache, :run_requirement
+  alias_method :run_requirement, :run_req_and_reset_my_cache
 
   %w{ WORLD! sn friend meanie aud STRANGER }.each { |name|
     eval <<-EOF, nil, __FILE__, __LINE__ + 1

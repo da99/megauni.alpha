@@ -27,7 +27,7 @@ class Screen_Name
     smallint 1, 3
     matches do |r, v|
       if ![1, 2, 3].include?(v)
-        r.fail! "Allowed values: #{WOLRD} (world) #{PROTECTED} (protected) #{PRIVATE} (private, no one)"
+        r.fail! "Allowed values: #{WORLD} (world) #{PROTECTED} (protected) #{PRIVATE} (private, no one)"
       end
       true
     end
