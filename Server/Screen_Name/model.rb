@@ -230,7 +230,8 @@ class Screen_Name
 
   def create
     @raw[:display_name] = @raw[:screen_name]
-    clean :screen_name!, :display_name, :class_id, :read_able
+    clean! :screen_name
+    clean :display_name, :privacy
 
     # === Inspired from: http://www.neilconway.org/docs/sequences/
     clean[:owner_id] = @raw[:customer] ?
@@ -239,25 +240,6 @@ class Screen_Name
   end # === def create
 
   # === UPDATE ================================================================
-
-  #
-  # This method is mainly used in tests.
-  #
-  def is type
-    new_sn = Screen_Name.update(
-      id: id,
-      privacy: Screen_Name.const_get(type.to_s.upcase.to_sym)
-    )
-    @data = @data.merge new_sn.data
-    self
-  end
-
-  #
-  # This method is mainly used in tests.
-  #
-  def computer code, priv = :PROTECTED
-    Computer.create owner_id: id, code: code, privacy: Computer.const_get(priv)
-  end
 
   def update
     clean :screen_name, :privacy, :nick_name

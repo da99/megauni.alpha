@@ -50,8 +50,91 @@ def it_redirects code, path, new_path
 end
 # =============================================
 
+class Megauni_DSL
 
-class Bacon::Context
+  class << self # =======================================
+
+    def run cache_and_settings, type, args
+      cache_and_settings
+      case type
+      when :WORLD!
+        cache_and_settings[:default_privacy] = :WORLD
+      when :sn, :friend, :meanie, :aud
+        cache_and_settings[type] ||= begin
+                                       vals = {
+                                         :screen_name => "#{type}_#{rand(10000)}")
+                                       }
+                                       if cache_and_settings.has_key?(:default_privacy)
+                                         vals[:privacy] = cache_and_settings[:default_privacy]
+                                       end
+                                       Megauni_DSL.new(cache_and_settings, Screen_Name.create(vals))
+                                     end
+      else
+        fail ArgumentError, "Unknown type: #{type.inspect}"
+      end
+    end # === def run cache_and_settings, type, args
+
+  end # === class << self ==============================
+
+  attr_reader :post, :comment, :o
+  def initialize settings, o
+    @post     = nil
+    @settings = settings
+    @o        = o
+  end
+
+  def is type
+    $o = @o.class.update(
+      id: @o.id,
+      privacy: @o.class.const_get(type.to_s.upcase.to_sym)
+    )
+    self
+  end
+
+  def posts msg, *args
+    @post = computer({:msg=>msg.to_s}, *args)
+    Link.create owner_id: @o.id, type_id: Link::POST_TO_SCREEN_NAME, asker_id: @post.o.id, giver_id: @o.id
+    if block_given?
+      @settings[:post] = @post
+      @post.instance_eval(&Proc.new)
+      @settings[:post] = nil
+    end
+    @post
+  end
+
+  def comments msg, *args
+    @comment = computer({:msg=>msg.to_s}, *args)
+    Link.create owner_id: @o.id, type_id: Link::COMMENT, asker_id: @comment.o.id, giver_id: @settings[:post].o.id
+    @comment
+  end
+
+  def computer code, priv = nil
+    vals = {
+      owner_id: @o.id,
+      code:     code
+    }
+    if priv
+      vals[:privacy] = priv
+    else
+      if @settings.has_key?(:default_privacy)
+        vals[:privacy] = @settings[:default_privacy]
+      end
+    end
+    Megauni_DSL.new(@settings, Computer.create( vals ))
+  end
+
+  def reads type
+    @read_type = type
+  end
+
+  def of post
+    Link.read(@read_type, $o.id, post.o.id)
+  end
+
+end # === Megauni_DSL
+
+class Bacon
+  class Context
 
   # === Custom Helpers ===
 
@@ -59,13 +142,22 @@ class Bacon::Context
     Sequel.lit(Okdoki::Model::PG::UTC_NOW_RAW + " - interval '#{days * 24} hours'")
   end
 
-  def screen_name prefix = "rand"
-    Screen_Name.create screen_name: "#{prefix}_#{rand(10000)}"
+  alias_method :run_requirement, :run_requirement_without_reset_my_cache
+  def run_req_and_reset_my_cache
+    @my_cache = {}
+    @my_cache.default_proc = lambda { |h, k|
+      fail ArgumentError, "Unknown key: #{k.inspect}"
+    }
   end
+  alias_method :run_req_and_reset_my_cache, :run_requirement
 
-  def customer
-    Customer.new(:data)
-  end
+  %w{ WORLD! sn friend meanie aud STRANGER }.each { |name|
+    eval <<-EOF, nil, __FILE__, __LINE__ + 1
+      def #{name} *args
+        Megauni_DSL.run @my_cache, :#{name}, args
+      end
+    EOF
+  }
 
   def less_than x
     lambda { |o| o < x }
@@ -303,7 +395,8 @@ class Bacon::Context
                        end
   end
 
-end # === Bacon::Context ==================================
+  end # === Context ==============================
+end # === Bacon ==================================
 
 
 
