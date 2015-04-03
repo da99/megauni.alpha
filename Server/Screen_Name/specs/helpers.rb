@@ -28,7 +28,7 @@ class Screen_Name
     end
 
     def is type
-      $o = @o.class.update(
+      @o = @o.class.update(
         id: @o.id,
         privacy: @o.class.const_get(type.to_s.upcase.to_sym)
       )
@@ -36,13 +36,13 @@ class Screen_Name
     end
 
     def blocks sn
-      Link.create owner_id: $o.id, type_id: Link::BLOCK_ACCESS_SCREEN_NAME, asker_id: sn.id, giver_id: $o.id
+      Link.create owner_id: o.id, type_id: Link::BLOCK_ACCESS_SCREEN_NAME, asker_id: sn.id, giver_id: @o.id
       self
     end
 
     def posts msg, *args
       @post = computer({:msg=>msg.to_s}, *args)
-      Link.create owner_id: @o.id, type_id: Link::POST_TO_SCREEN_NAME, asker_id: @post.o.id, giver_id: @o.id
+      Link.create owner_id: o.id, type_id: Link::POST_TO_SCREEN_NAME, asker_id: @post.o.id, giver_id: @o.id
       if block_given?
         @settings[:post] = @post
         @post.instance_eval(&Proc.new)
@@ -53,7 +53,7 @@ class Screen_Name
 
     def comments msg, *args
       @comment = computer({:msg=>msg.to_s}, *args)
-      Link.create owner_id: @o.id, type_id: Link::COMMENT, asker_id: @comment.o.id, giver_id: @settings[:post].o.id
+      Link.create owner_id: o.id, type_id: Link::COMMENT, asker_id: @comment.o.id, giver_id: @settings[:post].o.id
       @comment
     end
 
@@ -78,7 +78,7 @@ class Screen_Name
     end
 
     def of post
-      Link.read(@read_type, $o.id, post.respond_to?(:o) ? post.o.id : post)
+      Link.read(@read_type, o.id, post.respond_to?(:o) ? post.o.id : post)
     end
 
   end # === SN

@@ -137,7 +137,7 @@ class Link
         i.vars[:audience_id] = data[:audience_id]
 
         r = DB[i.to_sql, i.vars].first
-        throw(:not_found, {:type=>:READ_SCREEN_NAME, :id=>data[:target_id]}) unless r
+        throw(:not_found, {:type=>:SCREEN_NAME, :id=>data[:target_id]}) unless r
 
         r.delete :allow_id
         r.delete :block_id
