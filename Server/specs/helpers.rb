@@ -28,7 +28,7 @@ module Bacon
       @my_cache[:default_privacy] = :WORLD
     end
 
-    %w{ sn friend meanie aud STRANGER }.each { |name|
+    %w{ sn friend meanie aud sTRANGER }.each { |name|
       eval <<-EOF, nil, __FILE__, __LINE__ + 1
       def #{name} *args
         unless @my_cache.has_key?(:#{name})
@@ -317,7 +317,18 @@ class Screen_Name_Helper
       end
 
       @prefix = prefix
-      @record = Screen_Name.create vals
+      @record = if prefix.to_s.upcase['STRANGER']
+                  o = Object.new
+                  def o.id
+                    nil
+                  end
+                  def o.screen_name
+                    nil
+                  end
+                  o
+                else
+                  Screen_Name.create vals
+                end
     end
 
     def method_missing *args
@@ -383,7 +394,7 @@ class Screen_Name_Helper
 
     def of post
       target_id = case post
-                  when Screen_Name
+                  when Screen_Name, Screen_Name_Helper
                     post.screen_name
                   when String, Numeric
                     post

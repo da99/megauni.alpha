@@ -4,8 +4,8 @@ describe 'Link.read screen_name' do
   it "allows: STRANGER -> Screen_Name World Public" do
     WORLD!
 
-    link = Link.read(:SCREEN_NAME, nil, sn.screen_name)
-    link.screen_name.should == sn.screen_name
+    stranger.reads(:screen_name).of(sn).
+      screen_name.should == sn.screen_name
   end
 
   it "does not allow: Customer -> Screen_Name World Public, Blocked" do
@@ -21,13 +21,13 @@ describe 'Link.read screen_name' do
     sn.is :PROTECTED
     friend.is_allowed_to_read(sn)
 
-    friend.reads(:SCREEN_NAME).of(sn.screen_name).id.should == sn.id
+    friend.reads(:SCREEN_NAME).of(sn).id.should == sn.id
   end # === it allows: Customer -> Screen_Name Protected, Allowed
 
   it "allows: OWNER -> Screen_Name PROTECTED" do
     sn.is :protected
 
-    sn.reads(:SCREEN_NAME).of(sn.screen_name).id.should == sn.id
+    sn.reads(:SCREEN_NAME).of(sn).id.should == sn.id
   end # === it allows: OWNER -> Screen_Name PROTECTED
 
   it "does not show PRIVATE screen name to ALLOWed people" do
@@ -35,7 +35,7 @@ describe 'Link.read screen_name' do
     sn.is :PRIVATE
 
     catch(:not_found) {
-      friend.reads(:SCREEN_NAME).of(sn.screen_name)
+      friend.reads(:SCREEN_NAME).of(sn)
     }.should == {:type=>:SCREEN_NAME, :id=>sn.screen_name}
   end
 
