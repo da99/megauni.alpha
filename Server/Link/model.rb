@@ -40,53 +40,55 @@ class Link
   }
 
   SQL[:BLOCKED] = %^
-    SELECT asker_id
-    FROM link AS blocked
-    WHERE
-      type_id = :LINK_BLOCK
-      AND
-      asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAME_IDS}} )
-      AND
-      giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
+      SELECT asker_id
+      FROM link AS blocked
+      WHERE
+        type_id = :LINK_BLOCK
+        AND
+        asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAME_IDS}} )
+        AND
+        giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
   ^
 
   SQL[:ALLOWED] = %^
-    SELECT asker_id
-    FROM link AS allowed
-    WHERE
-      type_id = :LINK_ALLOW
-      AND
-      asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAME_IDS}} )
-      AND
-      giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
+      SELECT asker_id
+      FROM link AS allowed
+      WHERE
+        type_id = :LINK_ALLOW
+        AND
+        asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAME_IDS}} )
+        AND
+        giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
   ^
 
   SQL[:SCREEN_NAME_TO_ID] = %^
-    SELECT id
-    FROM screen_name
-    WHERE
-      screen_name = :screen_name
+      SELECT id
+      FROM screen_name
+      WHERE
+        screen_name = :screen_name
   ^
 
   SQL[:AUDIENCE_ID_TO_SCREEN_NAME_IDS] = %^
-    SELECT id
-    FROM screen_name
-    WHERE
-      owner_id = :audience_id
+      SELECT id
+      FROM screen_name
+      WHERE
+        owner_id = :audience_id
   ^
 
   SQL[:AUDIENCE_ID_TO_SCREEN_NAMES] = %^
-    SELECT screen_name
-    FROM screen_name
-    WHERE
-      owner_id = :audience_id
+      SELECT screen_name
+      FROM screen_name
+      WHERE
+        owner_id = :audience_id
   ^
 
   SQL[:SCREEN_NAME] = %^
     SELECT screen_name.id, screen_name.screen_name
     FROM screen_name
     WHERE
-      id = ({{ ! SCREEN_NAME_TO_ID }})
+      id = (
+        {{ ! SCREEN_NAME_TO_ID }}
+      )
       AND (
         owner_id = :audience_id
         OR (

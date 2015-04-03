@@ -17,17 +17,12 @@ class Screen_Name
         vals[:privacy] = Screen_Name.const_get settings[:default_privacy]
       end
 
+      @prefix = prefix
       @o = Screen_Name.create vals
     end
 
     def method_missing *args
-      target = if $o && $o.respond_to?(args.first)
-                 $o
-               else
-                 @settings[:context]
-               end
-
-      target.send(*args) {
+      @o.send(*args) {
         yield
       }
     end
@@ -74,7 +69,7 @@ class Screen_Name
           vals[:privacy] = Computer.const_get @settings[:default_privacy]
         end
       end
-      Megauni_DSL.new(@settings, Computer.create( vals ))
+      Computer.create( vals )
     end
 
     def reads type

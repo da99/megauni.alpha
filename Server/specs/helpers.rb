@@ -35,6 +35,7 @@ module Bacon
         unless @my_cache.has_key?(:#{name})
           @my_cache[:#{name}] = Screen_Name::Spec.new( @my_cache, :#{name} )
         end
+
         @my_cache[:#{name}]
       end
       EOF
