@@ -3,12 +3,12 @@
 require 'sequel'
 require 'datoki'
 require 'escape_escape_escape'
+require 'i_dig_sql'
+
 DB = Sequel.connect ENV['DATABASE_URL']
-DB.cache_schema = false
 Datoki.db DB
 
 module Megauni
-  
 end # === module Megauni
 
 

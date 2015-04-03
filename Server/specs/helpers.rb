@@ -4,6 +4,7 @@ require 'Bacon_Colored'
 require 'pry'
 
 require './Server/Megauni/model'
+DB.cache_schema = false
 
 PERM        = 301
 TEMP        = 302
@@ -85,6 +86,10 @@ class Megauni_DSL
     @post     = nil
     @settings = settings
     @o        = o
+  end
+
+  def id
+    @o.id
   end
 
   def is type
