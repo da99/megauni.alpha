@@ -45,7 +45,7 @@ class Link
     WHERE
       type_id = :LINK_BLOCK
       AND
-      asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAMES}} )
+      asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAME_IDS}} )
       AND
       giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
   ^
@@ -56,9 +56,30 @@ class Link
     WHERE
       type_id = :LINK_ALLOW
       AND
-      asker_id IN {{ ! AUDIENCE_ID_TO_SCREEN_NAMES}}
+      asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAME_IDS}} )
       AND
-      giver_id = {{ ! SCREEN_NAME_TO_ID}}
+      giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
+  ^
+
+  SQL[:SCREEN_NAME_TO_ID] = %^
+    SELECT id
+    FROM screen_name
+    WHERE
+      screen_name = :screen_name
+  ^
+
+  SQL[:AUDIENCE_ID_TO_SCREEN_NAME_IDS] = %^
+    SELECT id
+    FROM screen_name
+    WHERE
+      owner_id = :audience_id
+  ^
+
+  SQL[:AUDIENCE_ID_TO_SCREEN_NAMES] = %^
+    SELECT screen_name
+    FROM screen_name
+    WHERE
+      owner_id = :audience_id
   ^
 
   SQL[:SCREEN_NAME] = %^
@@ -112,8 +133,6 @@ class Link
         EOF
         i.vars[:screen_name] = data[:target_id]
         i.vars[:audience_id] = data[:audience_id]
-
-        binding.pry
 
         r = DB[i.to_sql, i.vars].first
         throw(:not_found, {:type=>:READ_SCREEN_NAME, :id=>data[:target_id]}) unless r

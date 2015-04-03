@@ -4,8 +4,8 @@ describe 'Link.read screen_name' do
   it "allows: STRANGER -> Screen_Name World Public" do
     WORLD!
 
-    link = Link.read(:SCREEN_NAME, nil, sn.id)
-    link.id.should == sn.id
+    link = Link.read(:SCREEN_NAME, nil, sn.o.data[:screen_name])
+    link.data[:screen_name].should == sn.o.data[:screen_name]
   end
 
   it "does not allow: Customer -> Screen_Name World Public, Blocked" do
