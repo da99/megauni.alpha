@@ -13,9 +13,9 @@ class Link
   # === Read Types
   READ_TREE        = 10_000
   READ_SCREEN_NAME = 10
-  READ_GROUP       = 11
   READ_POST        = 12
-  READ_COMMENTS    = 13
+  READ_POSTS       = 13
+  READ_COMMENTS    = 14
 
   SQL = I_Dig_Sql.new
 
@@ -108,8 +108,14 @@ class Link
   SQL.vars[:SCREEN_NAME_WORLD]     = Screen_Name::WORLD
   SQL.vars[:SCREEN_NAME_PRIVATE]   = Screen_Name::PRIVATE
   SQL.vars[:SCREEN_NAME_PROTECTED] = Screen_Name::PROTECTED
-  SQL.vars[:LINK_BLOCK]            = Link::BLOCK_ACCESS_SCREEN_NAME
-  SQL.vars[:LINK_ALLOW]            = Link::ALLOW_ACCESS_SCREEN_NAME
+
+  SQL.vars[:COMPUTER_WORLD]   = Computer::WORLD
+  SQL.vars[:COMPUTER_PRIVATE] = Computer::PRIVATE
+
+  SQL.vars[:LINK_BLOCK]               = Link::BLOCK_ACCESS_SCREEN_NAME
+  SQL.vars[:LINK_ALLOW]               = Link::ALLOW_ACCESS_SCREEN_NAME
+  SQL.vars[:LINK_POST_TO_SCREEN_NAME] = Link::POST_TO_SCREEN_NAME
+  SQL.vars[:ALLOW_TO_LINK]            = Link::ALLOW_TO_LINK
 
   class << self
 
@@ -143,7 +149,7 @@ class Link
         r.delete :block_id
         Screen_Name.new(r)
 
-      when READ_GROUP
+      when READ_POSTS
         # === Check to see if member is allowed to view screen name:
         sn = read(:type_id=> READ_SCREEN_NAME, :audience_id=>data[:audience_id], :target_id=>data[:target_id])
 
@@ -196,11 +202,6 @@ class Link
         EOF
         vals = {
           :SN_ID                    => sn.id,
-          :POST_TO_SCREEN_NAME      => Link::POST_TO_SCREEN_NAME,
-          :BLOCK_ACCESS_SCREEN_NAME => Link::BLOCK_ACCESS_SCREEN_NAME,
-          :ALLOW_TO_LINK            => Link::ALLOW_TO_LINK,
-          :COMPUTER_WORLD           => Computer::WORLD,
-          :COMPUTER_PRIVATE         => Computer::PRIVATE,
           :audience_id              => data[:audience_id]
         }
 
