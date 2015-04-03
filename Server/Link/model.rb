@@ -83,7 +83,7 @@ class Link
   ^
 
   SQL[:SCREEN_NAME] = %^
-    SELECT screen_name.screen_name
+    SELECT screen_name.id, screen_name.screen_name
     FROM screen_name
     WHERE
       id = ({{ ! SCREEN_NAME_TO_ID }})
