@@ -4,9 +4,8 @@ describe 'Link.read :posts' do
   it "allows: STRANGER -> post from WORLD Screen_Name" do
     WORLD!
 
-    computers = []
-    [1,2,3].each { |n|
-      computers << sn.posts({})
+    computers = [1,2,3].map { |n|
+      sn.posts({})
     }
 
     stranger.reads(:posts).of(sn)
@@ -14,7 +13,6 @@ describe 'Link.read :posts' do
   end
 
   it "disallows: STRANGER -> POST from PROTECTED SCREEN_NAME" do
-    sn = screen_name
     sn.is :PROTECTED
 
     sn.posts({}, :WORLD)
@@ -30,8 +28,8 @@ describe 'Link.read :posts' do
     WORLD!
     sn.posts({}, :WORLD)
 
-    meanie.is_allowed_to_link_to(sn)
-    meanie.to(sn).posts({})
+    meanie.is_allowed_to_post_to(sn)
+    (meanie>sn).posts({})
 
     meanie.is_blocked_from(sn)
 

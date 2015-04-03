@@ -158,7 +158,7 @@ class Screen_Name
     EOF
   end
 
-  def is_allowed_to_link_to sn
+  def is_allowed_to_post_to sn
     Link.create(
       :owner_id =>sn.data[:owner_id],
       :type_id   =>Link::ALLOW_TO_LINK,

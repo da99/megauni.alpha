@@ -28,7 +28,7 @@ module Bacon
       @my_cache[:default_privacy] = :WORLD
     end
 
-    %w{ sn friend meanie aud sTRANGER }.each { |name|
+    %w{ sn friend meanie aud stranger }.each { |name|
       eval <<-EOF, nil, __FILE__, __LINE__ + 1
       def #{name} *args
         unless @my_cache.has_key?(:#{name})
@@ -304,6 +304,7 @@ class Screen_Name_Helper
     def initialize settings, prefix, *args
       fail ArgumentError, "Unknown args: #{args}" unless args.empty?
 
+      @to       = nil
       @post     = nil
       @comment  = nil
       @settings = settings
@@ -332,9 +333,11 @@ class Screen_Name_Helper
     end
 
     def method_missing *args
-      record.send(*args) {
-        yield
-      }
+      if block_given?
+        record.send(*args, &(Proc.new))
+      else
+        record.send(*args)
+      end
     end
 
     def is type
@@ -357,7 +360,15 @@ class Screen_Name_Helper
 
     def posts msg, *args
       @post = computer({:msg=>msg.to_s}, *args)
-      Link.create owner_id: record.id, type_id: Link::POST_TO_SCREEN_NAME, asker_id: post.id, giver_id: record.id
+
+      giver = if @to
+                @to
+              else
+                record
+              end
+      @to = nil
+
+      Link.create owner_id: record.id, type_id: Link::POST_TO_SCREEN_NAME, asker_id: post.id, giver_id: giver.id
       if block_given?
         @settings[:post] = post
         yield
@@ -384,7 +395,8 @@ class Screen_Name_Helper
           vals[:privacy] = Computer.const_get @settings[:default_privacy]
         end
       end
-      Computer.create( vals )
+
+      Computer_Helper.new(@settings, Computer.create( vals ))
     end
 
     def reads type
@@ -407,12 +419,37 @@ class Screen_Name_Helper
       Link.read @read_type, record.id, target_id
     end
 
+    def > sn
+      @to = sn
+      self
+    end
+
 # ================================================
 end # === class Screen_Name_Helper
 # ================================================
 
 
+# ================================================
+class Computer_Helper
+# ================================================
 
+  attr_reader :settings, :record
+  def initialize settings, record
+    @record = record
+    @settings = settings
+  end
+
+  def method_missing *args
+    if block_given?
+      record.send(*args, &(Proc.new))
+    else
+      record.send(*args)
+    end
+  end
+
+# ================================================
+end # === class Computer_Helper
+# ================================================
 
 
 

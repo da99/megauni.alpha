@@ -2,10 +2,9 @@
 describe 'Link.read post' do
 
   it "disallows: STRANGER -> POST from PROTECTED SCREEN_NAME" do
-    sn = screen_name
     sn.is :PROTECTED
 
-    post = sn.posts({}, :WORLD)
+    sn.posts({}, :WORLD)
 
     catch(:not_found) {
       stranger.reads(:post).of(sn, post.id)
@@ -15,7 +14,7 @@ describe 'Link.read post' do
   it "disallows: Computer being listed if set to PRIVATE by owner who linked it, not SN owner." do
     sn     = screen_name "o"
     friend = screen_name "f"
-    friend.is_allowed_to_link_to(sn)
+    friend.is_allowed_to_post_to(sn)
 
     computer = Computer.create owner_id: friend.id, code: {}, privacy: Computer::WORLD
     computer.posted_to sn, friend
@@ -34,7 +33,7 @@ describe 'Link.read post' do
   it "disallows: listing computers if link is made by someone that has been removed from the ALLOW list" do
     friend = screen_name("removed")
     sn     = screen_name("remover")
-    link = friend.is_allowed_to_link_to(sn)
+    link = friend.is_allowed_to_post_to(sn)
     computer = Computer.create :owner_id=>friend.data[:owner_id], :code=>{}, :privacy=>Computer::WORLD
     computer.posted_to(sn, friend)
 
