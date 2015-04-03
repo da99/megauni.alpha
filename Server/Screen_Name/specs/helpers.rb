@@ -2,6 +2,10 @@
 class Screen_Name
   class Spec
 
+    CACHE = {
+      i: 0
+    }
+
     attr_reader :post, :comment, :o
     def initialize settings, prefix, *args
       fail ArgumentError, "Unknown args: #{args}" unless args.empty?
@@ -10,7 +14,7 @@ class Screen_Name
       @settings = settings
 
       vals = {
-        :screen_name => "#{prefix}_#{rand(10000)}"
+        :screen_name => "#{prefix}_#{CACHE[:i] += 1}_#{Time.now.utc.to_i}"
       }
 
       if settings.has_key?(:default_privacy)
@@ -35,14 +39,19 @@ class Screen_Name
       self
     end
 
+    def allows sn
+      Link.create owner_id: o.id, type_id: Link::ALLOW_ACCESS_SCREEN_NAME, asker_id: sn.id, giver_id: o.id
+      self
+    end
+
     def blocks sn
-      Link.create owner_id: o.id, type_id: Link::BLOCK_ACCESS_SCREEN_NAME, asker_id: sn.id, giver_id: @o.id
+      Link.create owner_id: o.id, type_id: Link::BLOCK_ACCESS_SCREEN_NAME, asker_id: sn.id, giver_id: o.id
       self
     end
 
     def posts msg, *args
       @post = computer({:msg=>msg.to_s}, *args)
-      Link.create owner_id: o.id, type_id: Link::POST_TO_SCREEN_NAME, asker_id: @post.o.id, giver_id: @o.id
+      Link.create owner_id: o.id, type_id: Link::POST_TO_SCREEN_NAME, asker_id: @post.o.id, giver_id: o.id
       if block_given?
         @settings[:post] = @post
         @post.instance_eval(&Proc.new)

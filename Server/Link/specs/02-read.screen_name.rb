@@ -30,4 +30,13 @@ describe 'Link.read screen_name' do
     sn.reads(:SCREEN_NAME).of(sn.data[:screen_name]).id.should == sn.id
   end # === it allows: OWNER -> Screen_Name PROTECTED
 
+  it "does not show PRIVATE screen name to ALLOWed people" do
+    sn.allows friend
+    sn.is :PRIVATE
+
+    catch(:not_found) {
+      friend.reads(:SCREEN_NAME).of(sn.data[:screen_name])
+    }.should == {:type=>:SCREEN_NAME, :id=>sn.data[:screen_name]}
+  end
+
 end # === describe 'Link.read screen_name'
