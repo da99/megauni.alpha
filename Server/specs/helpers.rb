@@ -378,7 +378,7 @@ class Screen_Name_Helper
         code:     code
       }
       if priv
-        vals[:privacy] = priv
+        vals[:privacy] = Computer.const_get priv
       else
         if @settings.has_key?(:default_privacy)
           vals[:privacy] = Computer.const_get @settings[:default_privacy]
