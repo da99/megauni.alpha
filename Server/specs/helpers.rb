@@ -4,7 +4,6 @@ require 'Bacon_Colored'
 require 'pry'
 
 require './Server/Megauni/model'
-require './Server/Screen_Name/specs/helpers'
 
 DB.cache_schema = false
 
@@ -33,7 +32,7 @@ module Bacon
       eval <<-EOF, nil, __FILE__, __LINE__ + 1
       def #{name} *args
         unless @my_cache.has_key?(:#{name})
-          @my_cache[:#{name}] = Screen_Name::Spec.new( @my_cache, :#{name} )
+          @my_cache[:#{name}] = Screen_Name_Helper.new( @my_cache, :#{name} )
         end
 
         @my_cache[:#{name}]
@@ -293,6 +292,113 @@ end # === Bacon ==================================
 
 
 
+# ================================================
+class Screen_Name_Helper
+# ================================================
+
+    CACHE = {
+      i: 0
+    }
+
+    attr_reader :post, :comment, :record, :prefix
+    def initialize settings, prefix, *args
+      fail ArgumentError, "Unknown args: #{args}" unless args.empty?
+
+      @post     = nil
+      @comment  = nil
+      @settings = settings
+
+      vals = {
+        :screen_name => "#{prefix}_#{CACHE[:i] += 1}_#{Time.now.utc.to_i}"
+      }
+
+      if settings.has_key?(:default_privacy)
+        vals[:privacy] = Screen_Name.const_get settings[:default_privacy]
+      end
+
+      @prefix = prefix
+      @record = Screen_Name.create vals
+    end
+
+    def method_missing *args
+      record.send(*args) {
+        yield
+      }
+    end
+
+    def is type
+      @record = record.class.update(
+        id: record.id,
+        privacy: record.class.const_get(type.to_s.upcase.to_sym)
+      )
+      self
+    end
+
+    def allows sn
+      Link.create owner_id: record.id, type_id: Link::ALLOW_ACCESS_SCREEN_NAME, asker_id: sn.id, giver_id: record.id
+      self
+    end
+
+    def blocks sn
+      Link.create owner_id: record.id, type_id: Link::BLOCK_ACCESS_SCREEN_NAME, asker_id: sn.id, giver_id: record.id
+      self
+    end
+
+    def posts msg, *args
+      @post = computer({:msg=>msg.to_s}, *args)
+      Link.create owner_id: record.id, type_id: Link::POST_TO_SCREEN_NAME, asker_id: post.id, giver_id: record.id
+      if block_given?
+        @settings[:post] = post
+        yield
+        @settings[:post] = nil
+      end
+      post
+    end
+
+    def comments msg, *args
+      @comment = computer({:msg=>msg.to_s}, *args)
+      Link.create owner_id: record.id, type_id: Link::COMMENT, asker_id: comment.id, giver_id: @settings[:post].id
+      comment
+    end
+
+    def computer code, priv = nil
+      vals = {
+        owner_id: record.id,
+        code:     code
+      }
+      if priv
+        vals[:privacy] = priv
+      else
+        if @settings.has_key?(:default_privacy)
+          vals[:privacy] = Computer.const_get @settings[:default_privacy]
+        end
+      end
+      Computer.create( vals )
+    end
+
+    def reads type
+      @read_type = type
+      self
+    end
+
+    def of post
+      target_id = case post
+                  when Screen_Name
+                    post.screen_name
+                  when String, Numeric
+                    post
+                  when Computer
+                    post.id
+                  else
+                    fail ArgumentError, "Unknown type for getting id: #{post.class}"
+                  end
+
+      Link.read @read_type, record.id, target_id
+    end
+
+# ================================================
+end # === class Screen_Name_Helper
+# ================================================
 
 
 

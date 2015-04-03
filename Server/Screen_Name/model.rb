@@ -150,6 +150,14 @@ class Screen_Name
   # Instance
   # =====================================================
 
+  %w{ screen_name privacy }.each do |name|
+    eval <<-EOF, nil, __FILE__, __LINE__ + 1
+      def #{name}
+        data[:#{name}]
+      end
+    EOF
+  end
+
   def is_allowed_to_link_to sn
     Link.create(
       :owner_id =>sn.data[:owner_id],
