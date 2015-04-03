@@ -17,6 +17,8 @@ class Link
   READ_POST        = 12
   READ_COMMENTS    = 13
 
+  SQL = I_Dig_Sql.new
+
   field(:id) {
     primary_key
   }
@@ -37,6 +39,55 @@ class Link
     integer
   }
 
+  SQL[:BLOCKED] = %^
+    SELECT asker_id
+    FROM link AS blocked
+    WHERE
+      type_id = :LINK_BLOCK
+      AND
+      asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAMES}} )
+      AND
+      giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
+  ^
+
+  SQL[:ALLOWED] = %^
+    SELECT asker_id
+    FROM link AS allowed
+    WHERE
+      type_id = :LINK_ALLOW
+      AND
+      asker_id IN {{ ! AUDIENCE_ID_TO_SCREEN_NAMES}}
+      AND
+      giver_id = {{ ! SCREEN_NAME_TO_ID}}
+  ^
+
+  SQL[:SCREEN_NAME] = %^
+    SELECT screen_name.screen_name
+    FROM screen_name
+    WHERE
+      id = ({{ ! SCREEN_NAME_TO_ID }})
+      AND (
+        owner_id = :audience_id
+        OR (
+          :audience_id NOT IN ( {{ ! BLOCKED }} )
+          AND (
+            privacy = :SCREEN_NAME_WORLD
+            OR (
+              privacy = :SCREEN_NAME_PROTECTED
+              AND
+              :audience_id IN ( {{ ! ALLOWED }} )
+            )
+          )
+        )
+      )
+  ^
+
+  SQL.vars[:SCREEN_NAME_WORLD]     = Screen_Name::WORLD
+  SQL.vars[:SCREEN_NAME_PRIVATE]   = Screen_Name::PRIVATE
+  SQL.vars[:SCREEN_NAME_PROTECTED] = Screen_Name::PROTECTED
+  SQL.vars[:LINK_BLOCK]            = Link::BLOCK_ACCESS_SCREEN_NAME
+  SQL.vars[:LINK_ALLOW]            = Link::ALLOW_ACCESS_SCREEN_NAME
+
   class << self
 
     def read *args
@@ -56,50 +107,15 @@ class Link
 
       case data[:type_id]
       when READ_SCREEN_NAME
-        sql = <<-EOF
-          SELECT screen_name.*, block.id AS block_id, allow.id AS allow_id
-          FROM screen_name
-             LEFT JOIN link AS block
-             ON
-               block.type_id = :LINK_BLOCK
-               AND
-               block.giver_id = screen_name.id
-               AND
-               block.asker_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id) 
-             LEFT JOIN link AS allow
-             ON
-               allow.type_id = :LINK_ALLOW
-               AND
-               allow.asker_id IN (SELECT id FROM screen_name WHERE owner_id = :audience_id)
-               AND
-               allow.giver_id = screen_name.id
-          WHERE
-            screen_name.id = :SCREEN_NAME_ID
-            AND
-            block.id IS NULL
-            AND (
-                screen_name.owner_id = :audience_id
-                OR (
-                  screen_name.privacy = :SCREEN_NAME_WORLD
-                  OR
-                  (screen_name.privacy = :SCREEN_NAME_PROTECTED AND allow.id IS NOT NULL)
-                )
-              )
-
-          LIMIT 1
+        i = I_Dig_Sql.new( SQL, <<-EOF )
+          {{ ! SCREEN_NAME }}
         EOF
+        i.vars[:screen_name] = data[:target_id]
+        i.vars[:audience_id] = data[:audience_id]
 
-        vals = {
-          SCREEN_NAME_ID:      data[:target_id],
-          SCREEN_NAME_WORLD:   Screen_Name::WORLD,
-          SCREEN_NAME_PRIVATE: Screen_Name::PRIVATE,
-          SCREEN_NAME_PROTECTED: Screen_Name::PROTECTED,
-          audience_id:         data[:audience_id],
-          LINK_BLOCK:          Link::BLOCK_ACCESS_SCREEN_NAME,
-          LINK_ALLOW:          Link::ALLOW_ACCESS_SCREEN_NAME
-        }
+        binding.pry
 
-        r = DB[sql, vals].first
+        r = DB[i.to_sql, i.vars].first
         throw(:not_found, {:type=>:READ_SCREEN_NAME, :id=>data[:target_id]}) unless r
 
         r.delete :allow_id

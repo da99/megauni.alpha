@@ -2,11 +2,9 @@
 describe 'Link.read screen_name' do
 
   it "allows: STRANGER -> Screen_Name World Public" do
-    sn = screen_name "world"
-    sn.is :WORLD
+    WORLD!
 
     link = Link.read(:SCREEN_NAME, nil, sn.id)
-
     link.id.should == sn.id
   end
 
