@@ -21,7 +21,7 @@ class Screen_Name
     end
 
     def method_missing *args
-      target = if $o && $o.responds_to?(args.first)
+      target = if $o && $o.respond_to?(args.first)
                  $o
                else
                  @settings[:context]
@@ -37,6 +37,11 @@ class Screen_Name
         id: @o.id,
         privacy: @o.class.const_get(type.to_s.upcase.to_sym)
       )
+      self
+    end
+
+    def blocks sn
+      Link.create owner_id: $o.id, type_id: Link::BLOCK_ACCESS_SCREEN_NAME, asker_id: sn.id, giver_id: $o.id
       self
     end
 
@@ -78,7 +83,7 @@ class Screen_Name
     end
 
     def of post
-      Link.read(@read_type, $o.id, post.o.id)
+      Link.read(@read_type, $o.id, post.respond_to?(:o) ? post.o.id : post)
     end
 
   end # === SN
