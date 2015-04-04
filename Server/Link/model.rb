@@ -45,9 +45,9 @@ class Link
       WHERE
         type_id = :LINK_BLOCK
         AND
-        asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAME_IDS}} )
+        asker_id IN ( << AUDIENCE_ID_TO_SCREEN_NAME_IDS >> )
         AND
-        giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
+        giver_id = ( << SCREEN_NAME_TO_ID >> )
   ^
 
   SQL[:ALLOWED] = %^
@@ -56,9 +56,9 @@ class Link
       WHERE
         type_id = :LINK_ALLOW
         AND
-        asker_id IN ( {{ ! AUDIENCE_ID_TO_SCREEN_NAME_IDS}} )
+        asker_id IN ( << AUDIENCE_ID_TO_SCREEN_NAME_IDS >> )
         AND
-        giver_id = ( {{ ! SCREEN_NAME_TO_ID}} )
+        giver_id = ( << SCREEN_NAME_TO_ID >> )
   ^
 
   SQL[:SCREEN_NAME_TO_ID] = %^
@@ -87,20 +87,77 @@ class Link
     FROM screen_name
     WHERE
       id = (
-        {{ ! SCREEN_NAME_TO_ID }}
+        << SCREEN_NAME_TO_ID >>
       )
       AND (
         owner_id = :audience_id
         OR (
-          :audience_id NOT IN ( {{ ! BLOCKED }} )
+          :audience_id NOT IN ( << BLOCKED >> )
           AND (
             privacy = :SCREEN_NAME_WORLD
             OR (
               privacy = :SCREEN_NAME_PROTECTED
               AND
-              :audience_id IN ( {{ ! ALLOWED }} )
+              :audience_id IN ( << ALLOWED >> )
             )
           )
+        )
+      )
+  ^
+
+  SQL[:RAW_POSTS] = %^
+    -- Unfiltered, COMPUTERS LINKed to SCREEN_NAME
+    --   as POST
+    SELECT id, code, created_at, updated_at
+    FROM computer
+    WHERE
+      id IN (
+        SELECT asker_id
+        WHERE
+          type_id = :LINK_POST_TO_SCREEN_NAME
+          AND
+          giver_id = ( << SCREEN_NAME_TO_ID >> )
+      )
+  ^
+
+  SQL[:POSTS] = %^
+    SELECT id, code, created_at, updated_at
+    FROM {{RAW_POSTS}}
+    WHERE
+
+      (
+        owner_id IN (
+          << AUDIENCE_ID_TO_SCREEN_NAME_IDS >>
+
+        ) OR ( -- SCREEN_NAME, OWNER, AUD --> BLOCKS, ALLOWS
+
+          owner_id NOT IN ( << BLOCKED_TO_POST >> )
+          AND
+          owner_id IN ( << ALLOWED_TO_POST >> )
+          AND
+          owner_id NOT IN ( << BLOCKED_BY_AUDIENCE_SCREEN_NAMES >> )
+          AND
+          :AUDIENCE_SCREEN_NAMES NOT IN ( << AUTHOR_BLOCK_AUDIENCE_SCREEN_NAMES >> )
+          AND
+          giver_id NOT IN ( << OWNER_BLOCK_SCREEN_NAME >> )
+
+        )
+
+      )
+
+      AND (
+        privacy = :COMPUTER_WORLD
+
+        OR (
+          privacy = :COMPUTER_PROTECTED
+          AND
+          :AUDIENCE_ID IN ( << SCREEN_NAME_IDS >> )
+        )
+
+        OR (
+          privacy = :COMPUTER_PRIVATE
+          AND
+          owner_id = :AUDIENCE_ID
         )
       )
   ^
@@ -137,7 +194,7 @@ class Link
       case data[:type_id]
       when READ_SCREEN_NAME
         i = I_Dig_Sql.new( SQL, <<-EOF )
-          {{ ! SCREEN_NAME }}
+          << SCREEN_NAME >>
         EOF
         i.vars[:screen_name] = data[:target_id]
         i.vars[:audience_id] = data[:audience_id]
