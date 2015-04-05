@@ -103,10 +103,6 @@ class Link
       )
   ^
 
-  SQL[:SCREEN_NAME_ID] = %^
-    SELECT id
-    FROM {{SCREEN_NAME_FOR_AUDIENCE}}
-  ^
 
   SQL[:POSTS] = %^
     -- Unfiltered, COMPUTERS LINKed to SCREEN_NAME
@@ -137,14 +133,14 @@ class Link
         post_link.owner_id = owner_post_link.owner_id
 
     WHERE
-      post_target_id = (<< SCREEN_NAME_ID >>)
+      post_target_id = (<< TARGET_ID >>)
 
       AND ( -- ALLOWED owner
         post_owner_id = :AUDIENCE_ID
         OR
         post_owner_id = (<<SCREEN_NAME_TO_ID>>)
 
-        OR ( -- Mutual BLOCKS:
+        OR ( -- Mutual BLOCKS + ALLOWED:
           post_owner_id NOT IN (
             SELECT blocked_owner_id
             FROM {{ALL_BLOCKED_IDS}}
@@ -162,7 +158,9 @@ class Link
               OR
               blocked_owner_id = :AUDIENCE_ID
           )
-        ) -- # Mutual BLOCKS
+          AND
+          post_owner_id IN (<<ALLOWED_TO_POST_TO_SCREEN_NAME>>)
+        ) -- # Mutual BLOCKS + ALLOWED
 
       ) -- # ALLOWED owner
 
@@ -208,7 +206,7 @@ class Link
         comment_owner_id = :AUDIENCE_ID
 
         OR
-        comment_owner_id = :SCREEN_NAME_TO_ID
+        comment_owner_id = (<<:SCREEN_NAME_TO_ID>>)
 
         OR ( -- mutual BLOCKS
           comment_owner_id NOT IN  (
@@ -230,7 +228,8 @@ class Link
           )
         ) -- # mutual BLOCKS
       ) -- # ALLOWED OWNER
-      AND (
+
+      AND ( -- PRIVACY
         computer.privacy = :COMPUTER_WORLD
         OR (
           computer.privacy = :COMPUTER_PRIVATE
@@ -247,7 +246,11 @@ class Link
             :AUDIENCE_ID = (<<post_owner_id POSTS>>)
           )
         )
-      )
+      ) -- # PRIVACY
+  ^
+
+  SQL[:FEED] = %^
+    
   ^
 
 
