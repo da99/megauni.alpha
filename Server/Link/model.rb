@@ -40,20 +40,26 @@ class Link
     integer
   }
 
-  SQL[:BLOCKS] = %^
-      SELECT
-        asker_id, asker_owners.owner_id AS asker_owner_id
-        giver_id, giver_owners.owner_id as giver_owner_id
-      FROM
-        link
-          LEFT JOIN screen_names AS asker_owners
-          ON asker_id = asker_owners.owner_id
-          LEFT JOIN screen_names AS giver_owners
-          ON giver_id = giver_owners.owner_id
-      WHERE
-        type_id = :LINK_BLOCK
-        OR
-        type_id = :LINK_BLOCK_ALL_SCREEN_NAMES
+  SQL[:block] = %^
+    SELECT
+      block.type_id       AS type_id,
+      blocked.screen_name AS blocked_screen_name,
+      blocked.id          AS blocked_id,
+      blocked.owner_id    AS blocked_owner_id,
+
+      victim.screen_name AS victim_screen_name,
+      victim.id          AS victim_id,
+      victim.owner_id    AS victim_owner_id
+    FROM
+      link AS block
+      LEFT JOIN screen_name AS blocked
+        ON asker_id = blocked_screen_name.id
+      LEFT JOIN screen_name AS victim
+        ON giver_id = victim.id
+    WHERE
+      type_id = :BLOCK_SCREEN_NAME_TYPE_ID
+      OR
+      type_id = :BLOCK_OWNER_TYPE_ID
   ^
 
   SQL[:ALLOWED_TO_POST_TO_SCREEN_NAME] = %^
@@ -103,73 +109,39 @@ class Link
       )
   ^
 
+    <<-EOF
+   ( f.out = blocked AND f.in.owner_id = victim.owner_id )
+                     OR
+   ( f.in = blocked AND f.out.owner_id = victim.owner_id )
+             ----------------------
+                BLOCK_OWNER_TYPE_ID
+( f.out.owner_id = blocked.owner_id AND f.in.owner_id  = victim.owner_id )
+                     OR
+( f.in.owner_id  = blocked.owner_id AND f.out.owner_id = victim.owner_id )
 
-  SQL[:POSTS] = %^
-    -- Unfiltered, COMPUTERS LINKed to SCREEN_NAME
-    --   as POST
-    SELECT
-      computer.id               AS computer_id,
-      computer.owner_id         AS computer_owner_id,
-      computer.code             AS computer_code,
-      computer.created_at       AS computer_created_at,
-      computer.updated_at       AS computer_updated_at,
+  fail "not ready: computer permit?" if comp
+  EOF
 
-      post_link.owner_id             AS post_author_id,
-      post_link.giver_id             AS post_target_id,
-
-      owner_post_link.owner_id       AS post_owner_id
-    FROM computer
-
-      INNER JOIN link AS post_link
-      ON
+   <<-EOF
         post_link.type_id = :LINK_POST_TO_SCREEN_NAME
         AND
         computer.id = post_link.asker_id
         AND
-        post_link.giver_id = (<<SCREEN_NAME_TO_ID>>)
+        post_link.giver_id = ( !! SCREEN_NAME_TO_ID !!)
 
-      LEFT JOIN screen_name AS owner_post_link
-      ON
-        post_link.owner_id = owner_post_link.owner_id
+        INNER JOIN link AS post_link
+        ON
 
-    WHERE
-      post_target_id = (<< TARGET_ID >>)
-
-      AND ( -- ALLOWED owner
-        post_owner_id = :AUDIENCE_ID
-        OR
-        post_owner_id = (<<SCREEN_NAME_TO_ID>>)
-
-        OR ( -- Mutual BLOCKS + ALLOWED:
-          post_owner_id NOT IN (
-            SELECT blocked_owner_id
-            FROM {{ALL_BLOCKED_IDS}}
-            WHERE
-              giver_owner_id = (<<OWNER_ID_OF_SCREEN_NAME>>)
-              OR
-              giver_owner_id = :AUDIENCE_ID
-          )
-          AND
-          post_owner_id NOT IN (
-            SELECT giver_owner_id
-            FROM {{ALL_BLOCKED_IDS}}
-            WHERE
-              blocked_owner_id = (<<OWNER_ID_OF_SCREEN_NAME>>)
-              OR
-              blocked_owner_id = :AUDIENCE_ID
-          )
-          AND
-          post_owner_id IN (<<ALLOWED_TO_POST_TO_SCREEN_NAME>>)
-        ) -- # Mutual BLOCKS + ALLOWED
-
-      ) -- # ALLOWED owner
+        LEFT JOIN screen_name AS owner_post_link
+        ON
+          post_link.owner_id = owner_post_link.owner_id
 
       AND (
         computer.privacy = :COMPUTER_WORLD
         OR (
           computer.privacy = :COMPUTER_PROTECTED
           AND
-          ( post_owner_id = :AUDIENCE_ID OR post_owner_id = (<<OWNER_ID_OF_SCREEN_NAME>>) )
+          ( post_owner_id = :AUDIENCE_ID OR post_owner_id = ( !! OWNER_ID_OF_SCREEN_NAME !! ) )
         )
         OR (
           computer.privacy = :COMPUTER_PRIVATE
@@ -177,7 +149,130 @@ class Link
           post_owner_id = :AUDIENCE_ID
         )
       )
-  ^
+
+
+   EOF
+
+  SQL[:privacy?] = lambda { |dig, *args|
+    "-- NOT READY ----"
+  }
+
+  SQL[:permit_screen_name?] = lambda { |dig, bad, good|
+    %^
+            block.type_id = :BLOCK_SCREEN_TYPE_ID
+            AND
+            block.blocked_owner_id = #{bad}.owner_id
+            AND
+            block.victim_id        = #{good}.id
+    ^
+  }
+
+  SQL[:permit_owner?] = lambda { |dig, bad, good|
+    %^
+            block.type_id = :BLOCK_OWNER_TYPE_ID
+            AND
+            block.blocked_owner_id = #{bad}.owner_id
+            AND
+            block.victim_owner_id  = #{good}.owner_id
+    ^
+  }
+
+  SQL[:link_screen_names] = lambda { |dig, *args|
+    left, right, comp = args.map(&:to_sym)
+    if comp
+      return(
+      %^
+        link.owner_id = #{left}.id
+        AND
+        link.asker_id = computer.id
+        AND
+        computer.owner_id = author.id
+        AND
+        link.giver_id = #{right}.id
+      ^
+      )
+    end
+
+    %^
+      link.asker_id = #{left}.id
+      AND
+      link.giver_id = #{right}.id
+    ^
+  }
+
+  SQL[:permit?] = lambda { |dig, *args|
+
+    bad, good, comp = args.map(&:to_sym)
+
+    if comp
+      return <<-EOF
+      << permit? #{bad} #{good} >>
+
+      AND
+      << permit? #{bad} author >>
+
+      AND
+      << permit? #{good} author >>
+      EOF
+    end
+
+    %^
+      NOT EXISTS (
+        SELECT 1
+        FROM {{block}}
+        WHERE
+          (
+            << permit_screen_name? #{bad} #{good} >>
+          )
+          OR
+          (
+            << permit_screen_name? #{good} #{bad} >>
+          )
+          OR
+          (
+            << permit_owner? #{good} #{bad} >>
+          )
+          OR
+          (
+            << permit_owner? #{bad} #{good} >>
+          )
+      ) -- NOT EXISTS
+    ^
+  } # === lambda
+
+  SQL[:post] = <<-EOF
+    -- POST
+    SELECT
+      computer.id               AS post_id,
+      computer.owner_id         AS author_owner_id,
+      computer.code             AS code,
+      computer.created_at       AS created_at,
+      computer.updated_at       AS updated_at,
+
+      link.owner_id             AS post_author_id,
+      pub.id                    AS pub_id,
+      pub.screen_name           AS pub_name
+
+    FROM
+
+      link,
+      screen_name AS pinner,
+      screen_name AS pub,
+      computer,
+      screen_name AS author
+
+    WHERE
+      << link_screen_names pinner pub computer >>
+
+      AND
+
+      << permit? pinner pub computer >>
+
+      AND
+      << privacy? computer >>
+
+    ORDER BY created_at DESC
+  EOF
 
   SQL[:COMMENTS] = %^
     SELECT
@@ -249,8 +344,68 @@ class Link
       ) -- # PRIVACY
   ^
 
+  SQL[:FOLLOWS_by_audience] = %^
+
+join authentic follows
+to contribs
+
+    SELECT fields
+      audience.owner_id AS asker_id
+    FROM
+      link AS follow
+
+      INNER JOIN screen_name AS audience
+      ON follow.asker_id = audience.id
+         AND DOES NOT BLOCK target
+         AND DOES NOT BLOCK owner
+
+      INNER JOIN screen_name AS target
+      ON follow.giver_id = target.id
+         AND DOES NOT BLOCK aud
+         AND DOES NOT BLOCK owner
+         AND WHEN PRIVACY PRIVATE
+         AND WHEN PRIVACY PROTECTED
+
+    WHERE
+      follow.type_id = :LINK_FEED
+      AND
+      follow.asker_id
+
+  ^
+
   SQL[:FEED] = %^
-    
+    SELECT
+      target.screen_name AS feed_name
+
+    FROM
+      link AS feed_link,
+      link AS post_link,
+      screen_name AS audience,
+      screen_name AS target,
+      screen_name AS poster
+
+
+
+
+      ON post_link.giver_id = feed_link.giver_id
+         AND
+         post_link.type_id = :LINK_POST_TO_SCREEN_NAME
+         AND
+         feed_link.type_id = :LINK_FEED
+
+      INNER JOIN 
+      ON audience.id = feed_link.owner_id
+         AND
+         audience.owner_id = :AUDIENCE_ID
+
+      LEFT JOIN 
+      ON post.id = post_link.asker_id
+
+      LEFT JOIN link AS blocks_by_target
+      ON blocks_by_target.giver_id = feed_link.giver_id
+      LEFT JOIN link AS blocks_by_post_link_owner
+      ON blocks_by_post_link_owner.giver_id = 
+
   ^
 
 

@@ -42,7 +42,7 @@ GEM
     htmlentities (4.3.3)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    i_dig_sql (2.0.0)
+    i_dig_sql (3.1.0)
     mechanize (2.7.3)
       domain_name (~> 0.5, >= 0.5.1)
       http-cookie (~> 1.0)
@@ -84,6 +84,7 @@ GEM
     rack_csrf (2.5.0)
       rack (>= 1.1.0)
     rake (10.4.2)
+    rouge (1.8.0)
     sanitize (3.1.2)
       crass (~> 1.0.1)
       nokogiri (>= 1.4.4)
@@ -107,6 +108,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.6)
+    unindent (1.0)
     warden (1.2.3)
       rack (>= 1.0)
     webrobots (0.1.1)
@@ -143,11 +145,13 @@ DEPENDENCIES
   pry
   rack-contrib
   rack_csrf
+  rouge
   sanitize
   sequel
   shotgun
   thin
   touch_up
+  unindent
   warden
   www_app
   yajl-ruby

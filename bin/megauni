@@ -267,6 +267,13 @@ case "$action" in
     model=""
     spec=""
     reset=""
+    watch=""
+
+    if [[ "$@" =~ 'watch' && "$1" == "watch" ]]; then
+      watch="true"
+      shift
+      echo "=== Watching: $@"
+    fi
 
     if [[ ! -z "$@" && "$1" == "reset" ]]; then
       reset="true"
@@ -321,10 +328,35 @@ case "$action" in
     fi
     # =======================================================
 
-    bundle exec bacon Server/specs/helpers.rb $files "$@"
+    cmd="bundle exec bacon Server/specs/helpers.rb $files"
+
+    if [[ -z "$watch" ]]; then
+      $cmd "$@"
+    else
+      echo "=== Running tests:"
+      $cmd "$@" || true
+      inotifywait -q -m -e close_write,close --exclude .git/ -r .  | while read CHANGE
+      do
+        dir=$(echo "$CHANGE" | cut -d' ' -f 1)
+        op=$(echo "$CHANGE" | cut -d' ' -f 2)
+        file=$(echo "$CHANGE" | cut -d' ' -f 3)
+        path="${dir}$file"
+
+        if [[ ! ( "$op" =~ "NOWRITE" ) && ( "$op" =~ "CLOSE" || "$op" =~ "WRITE" )  && ( "$file" =~ ".rb" || "$file" =~ ".lock") ]]; then
+        echo "=== Running tests: $op"
+        $cmd "$@" || true
+      fi
+
+      done # === inotifywait
+    fi
     ;;
 
   "watch")
+    if [[ "$@" == *test* ]]; then
+      shift
+      bin/megauni test watch "$@"
+    fi
+
     cleanup () {
       echo -e "\n\n=== Please wait... shutting down thin..."
       bin/megauni thin stop

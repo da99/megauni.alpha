@@ -21,6 +21,8 @@ group :development do
   gem 'pry'
   gem 'thin'
   gem 'shotgun'
+  gem 'rouge'
+  gem 'unindent'
 end
 
 gem 'foreman'
