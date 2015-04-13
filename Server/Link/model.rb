@@ -231,7 +231,7 @@ class Link
   SQL[:post] = <<-EOF
     -- POST
     SELECT
-      computer.id               AS post_id,
+      computer.id               AS id,
       computer.owner_id         AS author_owner_id,
       computer.code             AS code,
       computer.created_at       AS created_at,
@@ -239,25 +239,25 @@ class Link
 
       link.owner_id             AS post_author_id,
       pub.id                    AS pub_id,
-      pub.screen_name           AS pub_name
+      pub.screen_name           AS pub_name,
+      pub.owner_id              AS pub_owner_id
 
     FROM
 
       link,
       screen_name AS pinner,
       screen_name AS pub,
-      computer,
+      computer    AS post,
       screen_name AS author
 
     WHERE
-      << link_screen_names pinner pub computer >>
+      link.type_id = :POST_TYPE_ID
 
       AND
-
-      << permit? pinner pub computer >>
+      << link_screen_names pinner pub post >>
 
       AND
-      << privacy? computer >>
+      << read_computer? pinner pub computer >>
 
     ORDER BY created_at DESC
   EOF
@@ -273,44 +273,29 @@ class Link
 
     FROM
 
-      computer INNER JOIN link AS comment_link
-      ON computer.id = comment_link.asker_id
-         AND
-         comment_link.type_id = :LINK_COMMENT
-         AND
-         comment_link.giver_id = (<< computer_id POSTS>> WHERE computer_id = :POST_ID)
-
-      LEFT JOIN screen_name owner_comment_link
-      ON comment_link.owner_id = screen_name.owner_id
+      post,
+      link,
+      computer    AS comment,
+      screen_name AS author
 
 
     WHERE
-      ( -- ALLOWED OWNER
-        comment_owner_id = :AUDIENCE_ID
 
-        OR
-        comment_owner_id = (<<:SCREEN_NAME_TO_ID>>)
+      post.id = :POST_ID
+      AND link.type_id  = :COMMENT_TYPE_ID
+      AND link.owner_id = author.id
+      AND link.asker_id = computer.id
+      AND link.giver_id = post.computer_id
 
-        OR ( -- mutual BLOCKS
-          comment_owner_id NOT IN  (
-            SELECT blocked_owner_id
-            FROM {{ALL_BLOCKED_IDS}}
-            WHERE
-              giver_owner_id = (<<OWNER_ID_OF_SCREEN_NAME>>)
-              OR
-              giver_owner_id = :AUDIENCE_ID
-          )
-          AND
-          comment_owner_id NOT IN (
-            SELECT giver_owner_id
-            FROM {{ALL_BLOCKED_IDS}}
-            WHERE
-              blocked_owner_id = (<<OWNER_ID_OF_SCREEN_NAME>>)
-              OR
-              blocked_owner_id = :AUDIENCE_ID
-          )
-        ) -- # mutual BLOCKS
-      ) -- # ALLOWED OWNER
+      AND
+      << read? author post.pub_owner_id >>
+
+      AND
+      << read_computer? author post.id >>
+
+      AND
+      << read_computer? :AUDIENCE_ID comment >>
+
 
       AND ( -- PRIVACY
         computer.privacy = :COMPUTER_WORLD
