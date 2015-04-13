@@ -109,71 +109,44 @@ class Link
       )
   ^
 
-    <<-EOF
-   ( f.out = blocked AND f.in.owner_id = victim.owner_id )
-                     OR
-   ( f.in = blocked AND f.out.owner_id = victim.owner_id )
-             ----------------------
-                BLOCK_OWNER_TYPE_ID
-( f.out.owner_id = blocked.owner_id AND f.in.owner_id  = victim.owner_id )
-                     OR
-( f.in.owner_id  = blocked.owner_id AND f.out.owner_id = victim.owner_id )
-
-  fail "not ready: computer permit?" if comp
-  EOF
-
-   <<-EOF
-        post_link.type_id = :LINK_POST_TO_SCREEN_NAME
-        AND
-        computer.id = post_link.asker_id
-        AND
-        post_link.giver_id = ( !! SCREEN_NAME_TO_ID !!)
-
-        INNER JOIN link AS post_link
-        ON
-
-        LEFT JOIN screen_name AS owner_post_link
-        ON
-          post_link.owner_id = owner_post_link.owner_id
-
-      AND (
-        computer.privacy = :COMPUTER_WORLD
-        OR (
-          computer.privacy = :COMPUTER_PROTECTED
-          AND
-          ( post_owner_id = :AUDIENCE_ID OR post_owner_id = ( !! OWNER_ID_OF_SCREEN_NAME !! ) )
-        )
-        OR (
-          computer.privacy = :COMPUTER_PRIVATE
-          AND
-          post_owner_id = :AUDIENCE_ID
-        )
-      )
-
-
-   EOF
-
   SQL[:privacy?] = lambda { |dig, *args|
-    "-- NOT READY ----"
+    "-- NOT READY: privacy ----"
   }
 
   SQL[:permit_screen_name?] = lambda { |dig, bad, good|
-    %^
-            block.type_id = :BLOCK_SCREEN_TYPE_ID
+    %^(
+            block.type_id          = :BLOCK_SCREEN_TYPE_ID
             AND
             block.blocked_owner_id = #{bad}.owner_id
             AND
             block.victim_id        = #{good}.id
-    ^
+          )^
   }
 
   SQL[:permit_owner?] = lambda { |dig, bad, good|
-    %^
-            block.type_id = :BLOCK_OWNER_TYPE_ID
+    %^(
+            block.type_id          = :BLOCK_OWNER_TYPE_ID
             AND
             block.blocked_owner_id = #{bad}.owner_id
             AND
             block.victim_owner_id  = #{good}.owner_id
+
+            AND (
+              #{good}.privacy = :WORLD
+              OR (
+                #{good}.privacy = :PROTECTED
+                AND (
+                  #{bad}.owner_id = #{good}.owner_id
+                  OR
+                  #{bad}.owner_id IN (
+                    SELECT {{allowed}}.allowed_owner_id
+                    FROM {{allowed}}
+                    WHERE {{allowed}}.owner_id = #{good}.owner_id
+                  )
+                )
+              )
+            ) -- AND both have the right privacy settings
+          )
     ^
   }
 
@@ -200,6 +173,29 @@ class Link
     ^
   }
 
+  SQL[:computer_privacy] = lambda { |dig|
+    %^(
+        computer.privacy = :COMPUTER_WORLD
+        OR
+        computer.privacy = :COMPUTER_INHERIT
+        OR (
+          computer.privacy = :COMPUTER_PROTECTED
+          AND
+          (
+            :AUDIENCE_ID IS IN ALLOWED_LIST
+            OR
+            author.owner_id = :AUDIENCE_ID
+          )
+        )
+        OR (
+          computer.privacy = :COMPUTER_PRIVATE
+          AND
+          author.owner_id = :AUDIENCE_ID
+        )
+      ) -- computer privacy
+    ^
+  }
+
   SQL[:permit?] = lambda { |dig, *args|
 
     bad, good, comp = args.map(&:to_sym)
@@ -207,12 +203,12 @@ class Link
     if comp
       return <<-EOF
       << permit? #{bad} #{good} >>
-
       AND
       << permit? #{bad} author >>
-
       AND
       << permit? #{good} author >>
+      AND
+      << computer_privacy >>
       EOF
     end
 
@@ -221,21 +217,13 @@ class Link
         SELECT 1
         FROM {{block}}
         WHERE
-          (
-            << permit_screen_name? #{bad} #{good} >>
-          )
+          << permit_screen_name? #{bad} #{good} >>
           OR
-          (
-            << permit_screen_name? #{good} #{bad} >>
-          )
+          << permit_screen_name? #{good} #{bad} >>
           OR
-          (
-            << permit_owner? #{good} #{bad} >>
-          )
+          << permit_owner? #{good} #{bad} >>
           OR
-          (
-            << permit_owner? #{bad} #{good} >>
-          )
+          << permit_owner? #{bad} #{good} >>
       ) -- NOT EXISTS
     ^
   } # === lambda
