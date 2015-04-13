@@ -42,7 +42,7 @@ GEM
     htmlentities (4.3.3)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    i_dig_sql (3.1.0)
+    i_dig_sql (3.1.1)
     mechanize (2.7.3)
       domain_name (~> 0.5, >= 0.5.1)
       http-cookie (~> 1.0)
