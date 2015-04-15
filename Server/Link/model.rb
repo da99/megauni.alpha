@@ -40,6 +40,132 @@ class Link
     integer
   }
 
+  module Helpers
+    names = [:owner_id, :privacy, :id, :screen_name_id, :author_owner_id]
+
+    refine String do
+      def to_field_name name
+        "#{self}_#{name}"
+      end
+    end
+
+    refine Symbol do
+      def to_field_name name
+        if self == :AUDIENCE_ID
+          self
+        else
+          "#{self}.#{name}"
+        end
+      end
+    end
+
+    [Symbol, String].each { |c|
+      refine c do
+        names.each { |n|
+          eval <<-EOF, nil, __FILE__, __LINE__+1
+            def #{n}
+              to_field_name(:#{n})
+            end
+          EOF
+        }
+      end
+    }
+  end # === module Helpers
+
+  class << self
+
+    using Helpers
+
+    def allow_user? left, computer
+      "
+        ( -- Is #{left.inspect} allowed to see computer: #{computer.inspect} ?
+          #{left.owner_id} = #{computer.owner_id}
+          OR
+          #{computer.privacy} = :COMPUTER_WORLD
+        )
+      "
+    end
+
+    def allow_read? left, right
+      "
+        ( -- Is #{left.inspect} allowed to read #{right.inspect}?
+          #{left.owner_id} = #{right.owner_id}  -- is left/right the author?
+          OR
+          #{right.privacy} = :WORLD
+          OR
+          (
+            #{right.privacy} = :PROTECTED
+            AND
+            EXISTS ( -- is left on \"the list\"?
+              SELECT 1
+              FROM  {{allowed_reader}}
+              WHERE {{allowed_reader}}.pub    = #{right.screen_name_id}
+                AND {{allowed_reader}}.reader = #{left.screen_name_id}
+            ) -- EXISTS
+          ) -- OR
+        ) -- allow_read?
+      "
+    end
+
+    def readers? *people
+      computers = people.last.is_a?(Array) && people.pop
+      conds = []
+
+      people.each { |left|
+        people.each { |right|
+
+          next if left == right
+
+          # === If bth are strings, that means they were taken care of
+          # in an other CTE.
+          next if left.is_a?(String) && right.is_a?(String)
+
+          conds << allow_read?(left, right)
+
+        }
+
+        computers.each { |comp|
+          next if left.is_a?(String) && comp.is_a?(String)
+          conds << allow_user?(left, comp)
+        }
+      }
+
+      conds.compact.join "  AND   "
+    end
+
+    def talker? *args
+      "talker? NOT READY"
+    end
+
+    def poster? *args
+      "poster? not ready"
+    end
+
+  end # === class
+
+  SQL[:allowed_reader] = %^
+    SELECT
+      reader.id       AS reader_screen_name_id,
+      reader.owner_id AS reader_owner_id,
+      reader.privacy  AS reader_privacy,
+
+      pub.id          AS pub_screen_name_id,
+      pub.owner_id    AS pub_owner_id,
+      pub.privacy     AS pub_privacy
+
+    FROM
+      link AS allowed_reader,
+      screen_name AS reader,
+      screen_name AS pub
+
+    WHERE
+      allowed_reader.asker_id = reader.id
+      AND
+      allowed_reader.type_id = :ALLOW_TO_READ_TYPE_ID
+      AND
+      allowed_reader.giver_id = pub.id
+  ^
+
   SQL[:block] = %^
     SELECT
       block.type_id       AS type_id,
@@ -110,7 +236,26 @@ class Link
   ^
 
   SQL[:privacy?] = lambda { |dig, *args|
-    "-- NOT READY: privacy ----"
+    <<-EOF
+      AND ( -- PRIVACY
+        computer.privacy = :COMPUTER_WORLD
+        OR (
+          computer.privacy = :COMPUTER_PRIVATE
+          AND
+          comment_owner_id = :AUDIENCE_ID
+        )
+        OR (
+          computer.privacy = :PROTECTED
+          AND (
+            comment_owner_id = :AUDIENCE_ID
+            OR
+            :AUDIENCE_ID = (<<OWNER_ID_OF_SCREEN_NAME>>)
+            OR
+            :AUDIENCE_ID = (<<post_owner_id POSTS>>)
+          )
+        )
+      ) -- # PRIVACY
+    EOF
   }
 
   SQL[:permit_screen_name?] = lambda { |dig, bad, good|
@@ -173,24 +318,23 @@ class Link
     ^
   }
 
-  SQL[:computer_privacy] = lambda { |dig|
+  SQL[:read_able_computer?] = lambda { |dig, person, computer|
+
     %^(
-        computer.privacy = :COMPUTER_WORLD
+        #{computer.privacy} = :COMPUTER_WORLD
         OR
-        computer.privacy = :COMPUTER_INHERIT
+        #{computer.privacy} = :COMPUTER_INHERIT
         OR (
-          computer.privacy = :COMPUTER_PROTECTED
+          #{computer.privacy} = :COMPUTER_PROTECTED
           AND
           (
-            :AUDIENCE_ID IS IN ALLOWED_LIST
-            OR
-            author.owner_id = :AUDIENCE_ID
+            #{person.owner_id} = :AUDIENCE_ID
           )
         )
         OR (
-          computer.privacy = :COMPUTER_PRIVATE
+          #{computer.privacy} = :COMPUTER_PRIVATE
           AND
-          author.owner_id = :AUDIENCE_ID
+          #{computer.author_owner_id} = :AUDIENCE_ID
         )
       ) -- computer privacy
     ^
@@ -231,11 +375,10 @@ class Link
   SQL[:post] = <<-EOF
     -- POST
     SELECT
-      computer.id               AS id,
-      computer.owner_id         AS author_owner_id,
-      computer.code             AS code,
-      computer.created_at       AS created_at,
-      computer.updated_at       AS updated_at,
+      computer.id               AS post_id,
+      computer.owner_id         AS post_author_owner_id,
+      computer.code             AS post_code,
+      link.created_at           AS posted_at
 
       link.owner_id             AS post_author_id,
       pub.id                    AS pub_id,
@@ -252,22 +395,27 @@ class Link
 
     WHERE
       link.type_id = :POST_TYPE_ID
+      AND
+      link.owner_id = pinner.id AND link.owner_id = post.owner_id
+      AND
+      link.asker_id = post.id
+      AND
+      link.giver_id = pub.id
 
       AND
-      << link_screen_names pinner pub post >>
+      ( PINNER IS IN allowed pinner rows)
 
       AND
-      << read_computer? pinner pub computer >>
 
     ORDER BY created_at DESC
   EOF
 
-  SQL[:COMMENTS] = %^
+  SQL[:comment] = %^
     SELECT
-      computer.id         AS comment_id,
-      computer.code       AS comment_code,
-      computer.created_at AS comment_created_at,
-      computer.updated_at AS comment_updated_at,
+      computer.id                 AS comment_id,
+      computer.code               AS comment_code,
+      computer.created_at         AS comment_created_at,
+      computer.updated_at         AS comment_updated_at,
 
       owner_comment_link.owner_id AS comment_owner_id
 
@@ -276,73 +424,23 @@ class Link
       post,
       link,
       computer    AS comment,
-      screen_name AS author
+      screen_name AS talker
 
 
     WHERE
 
+      -- SET UP THE FULL TABLE -----------------
       post.id = :POST_ID
       AND link.type_id  = :COMMENT_TYPE_ID
-      AND link.owner_id = author.id
-      AND link.asker_id = computer.id
+      AND link.owner_id = talker.id AND link.owner_id = comment.owner_id
+      AND link.asker_id = comment.id
       AND link.giver_id = post.computer_id
+      -- ---------------------------------------
 
       AND
-      << read? author post.pub_owner_id >>
-
+      #{ readers? 'post.pub' , 'post.pinner', :talker, ['post.computer', :comment] }
       AND
-      << read_computer? author post.id >>
-
-      AND
-      << read_computer? :AUDIENCE_ID comment >>
-
-
-      AND ( -- PRIVACY
-        computer.privacy = :COMPUTER_WORLD
-        OR (
-          computer.privacy = :COMPUTER_PRIVATE
-          AND
-          comment_owner_id = :AUDIENCE_ID
-        )
-        OR (
-          computer.privacy = :PROTECTED
-          AND (
-            comment_owner_id = :AUDIENCE_ID
-            OR
-            :AUDIENCE_ID = (<<OWNER_ID_OF_SCREEN_NAME>>)
-            OR
-            :AUDIENCE_ID = (<<post_owner_id POSTS>>)
-          )
-        )
-      ) -- # PRIVACY
-  ^
-
-  SQL[:FOLLOWS_by_audience] = %^
-
-join authentic follows
-to contribs
-
-    SELECT fields
-      audience.owner_id AS asker_id
-    FROM
-      link AS follow
-
-      INNER JOIN screen_name AS audience
-      ON follow.asker_id = audience.id
-         AND DOES NOT BLOCK target
-         AND DOES NOT BLOCK owner
-
-      INNER JOIN screen_name AS target
-      ON follow.giver_id = target.id
-         AND DOES NOT BLOCK aud
-         AND DOES NOT BLOCK owner
-         AND WHEN PRIVACY PRIVATE
-         AND WHEN PRIVACY PROTECTED
-
-    WHERE
-      follow.type_id = :LINK_FEED
-      AND
-      follow.asker_id
+      #{ talker?  :talker, :comment }
 
   ^
 
