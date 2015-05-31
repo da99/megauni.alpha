@@ -143,7 +143,7 @@ class Link
 
   end # === class
 
-  SQL[:allowed_reader] = %^
+  SQL.sql :allowed_reader, %^
     SELECT
       reader.id       AS reader_screen_name_id,
       reader.owner_id AS reader_owner_id,
@@ -166,7 +166,7 @@ class Link
       allowed_reader.giver_id = pub.id
   ^
 
-  SQL[:block] = %^
+  SQL.sql :block, %^
     SELECT
       block.type_id       AS type_id,
       blocked.screen_name AS blocked_screen_name,
@@ -188,7 +188,7 @@ class Link
       type_id = :BLOCK_OWNER_TYPE_ID
   ^
 
-  SQL[:ALLOWED_TO_POST_TO_SCREEN_NAME] = %^
+  SQL.sql :ALLOWED_TO_POST_TO_SCREEN_NAME, %^
       SELECT
         link.asker_id,
         screen_name.owner_id AS asker_owner_id
@@ -200,21 +200,23 @@ class Link
         type_id = :LINK_ALLOW
   ^
 
-  SQL[:AUDIENCE_ID_TO_SCREEN_NAME_IDS] = %^
+  SQL.sql :AUDIENCE_ID_TO_SCREEN_NAME_IDS, %^
       SELECT id
       FROM screen_name
       WHERE
         owner_id = :audience_id
   ^
 
-  SQL[:AUDIENCE_ID_TO_SCREEN_NAMES] = %^
+  SQL.sql :AUDIENCE_ID_TO_SCREEN_NAMES, %^
       SELECT screen_name
       FROM screen_name
       WHERE
         owner_id = :audience_id
   ^
 
-  SQL[:SCREEN_NAME_FOR_AUDIENCE] = %^
+  SQL.sql :RAW_BLOCKS, "Not-known"
+
+  SQL.sql :SCREEN_NAME_FOR_AUDIENCE, %^
     SELECT screen_name.id, screen_name.screen_name
     FROM screen_name
     WHERE
@@ -235,7 +237,7 @@ class Link
       )
   ^
 
-  SQL[:privacy?] = lambda { |dig, *args|
+  privacy = lambda { |dig, *args|
     <<-EOF
       AND ( -- PRIVACY
         computer.privacy = :COMPUTER_WORLD
@@ -258,7 +260,7 @@ class Link
     EOF
   }
 
-  SQL[:permit_screen_name?] = lambda { |dig, bad, good|
+  permit_screen_name = lambda { |dig, bad, good|
     %^(
             block.type_id          = :BLOCK_SCREEN_TYPE_ID
             AND
@@ -268,7 +270,7 @@ class Link
           )^
   }
 
-  SQL[:permit_owner?] = lambda { |dig, bad, good|
+  permit_owner = lambda { |dig, bad, good|
     %^(
             block.type_id          = :BLOCK_OWNER_TYPE_ID
             AND
@@ -295,7 +297,7 @@ class Link
     ^
   }
 
-  SQL[:link_screen_names] = lambda { |dig, *args|
+  link_screen_names = lambda { |dig, *args|
     left, right, comp = args.map(&:to_sym)
     if comp
       return(
@@ -318,7 +320,7 @@ class Link
     ^
   }
 
-  SQL[:read_able_computer?] = lambda { |dig, person, computer|
+  read_able_computer = lambda { |dig, person, computer|
 
     %^(
         #{computer.privacy} = :COMPUTER_WORLD
@@ -340,7 +342,7 @@ class Link
     ^
   }
 
-  SQL[:permit?] = lambda { |dig, *args|
+  permit = lambda { |dig, *args|
 
     bad, good, comp = args.map(&:to_sym)
 
@@ -372,9 +374,9 @@ class Link
     ^
   } # === lambda
 
-  SQL[:post] = File.read(File.expand_path './Server/Link/sql/posts.sql')
+  SQL.sql :post, File.read(File.expand_path './Server/Link/sql/posts.sql')
 
-  SQL[:comment] = %^
+  SQL.sql :comment, %^
     SELECT
       computer.id                 AS comment_id,
       computer.code               AS comment_code,
@@ -408,7 +410,7 @@ class Link
 
   ^
 
-  SQL[:FEED] = %^
+  SQL.sql :FEED, %^
     SELECT
       target.screen_name AS feed_name
 
