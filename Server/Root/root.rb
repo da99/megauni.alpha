@@ -1,27 +1,29 @@
 
-use(
+
+new_middleware(
 
   Cuba.new {
 
-    on get, root do
-      res.write mu(:ROOT).to_html(YEAR: Time.now.utc.year, auth_token: 'TEMP')
-    end
+    on('raise-error-for-test') { something } if ENV['IS_DEV']
 
-    if ENV['IS_DEV']
-      on('raise-error-for-test') { something }
-    end
+    on(get, root) {
+      res.write(
+        var(:ROOT).to_html(
+          YEAR: Time.now.utc.year,
+          auth_token: 'TEMP'
+        )
+      )
+    } # === on get root
 
   } # === Cuba.new
 
-) # === use
+) # === new_middleware
 
-mu(:ROOT) {
+new_var(:ROOT) {
 
-  mue = mu!(:MUE)
+  Megauni::WWW_App.new {
 
-  WWW_App.new {
-
-    use mue
+    use constant(:MUE)
 
     style {
 

@@ -1,10 +1,10 @@
 
-use(
+new_middleware(
 
   Cuba.new {
 
     on get, '@:raw_name' do |raw_name|
-      res.write mu(:@SCREEN_NAME).to_html(
+      res.write var(:@SCREEN_NAME).to_html(
         :screen_name => raw_name
       )
     end # === on get
@@ -14,14 +14,12 @@ use(
 ); # === use
 
 
-mu(:@SCREEN_NAME) {
+new_var(:@SCREEN_NAME) {
 
-  mue = mu! :MUE
-  nav_bar = mu! :NAV_BAR
 
-  WWW_App.new {
+  Megauni::WWW_App.new {
 
-    use mue
+    use constant(:MUE)
 
     style {
 
@@ -49,7 +47,7 @@ mu(:@SCREEN_NAME) {
      '{{{html.screen_name}}}'
     }
 
-    use nav_bar
+    use constant(:NAV_BAR)
 
     div.^(:block) {
 

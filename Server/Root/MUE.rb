@@ -1,5 +1,5 @@
 
-
+# === CUSTOMIZATIONS ===============
 class WWW_App # === CUSTOMIZATIONS ===============
 
   module CSS
@@ -12,34 +12,48 @@ class WWW_App # === CUSTOMIZATIONS ===============
     PROPERTIES.concat BORDER_RADIUS
   end
 
-  def var *args
-    @vars ||= begin
-                v = {}
-                v.default_proc = lambda { |h,k|
-                  fail ArgumentError, "Key not found: #{k.inspect}"
-                }
-                v
-              end
-    return @vars[args.first] if args.size == 1
-    name, val  = args
-    var!(name, val) unless @vars.has_key?(name)
-    val
-  end # === def var
+end # === class WWW_App
 
-  def var! name, val
-    @vars[name] = val 
-    eval <<-EOF, nil, __FILE__, __LINE__ + 1
-          def #{name}
-            @vars[:#{name}]
-          end
-          EOF
-    var name
-  end
+class Megauni
+  class WWW_App < ::WWW_App
 
-end # === class WWW_App =========================
+    OUTER_MOST_MAIN = ::Object::TOPLEVEL_BINDING.eval('self')
 
-mu!(:MUE) {
-  WWW_App.new {
+    include ::Megauni::Server::Constant
+
+    def var *args
+      @vars ||= begin
+                  v = {}
+                  v.default_proc = lambda { |h,k|
+                    fail ArgumentError, "Key not found: #{k.inspect}"
+                  }
+                  v
+                end
+      return @vars[args.first] if args.size == 1
+      name, val  = args
+      var!(name, val) unless @vars.has_key?(name)
+      val
+    end # === def var
+
+    def var! name, val
+      @vars[name] = val 
+      eval <<-EOF, nil, __FILE__, __LINE__ + 1
+            def #{name}
+              @vars[:#{name}]
+            end
+            EOF
+      var name
+    end
+
+    def main!
+      OUTER_MOST_MAIN
+    end
+
+  end # === class WWW_App =========================
+end # === Megauni
+
+new_constant(:MUE) {
+  Megauni::WWW_App.new {
     link.href('/css/vanilla.reset.css')./
     link.href('/css/fonts.css')./
     link.href('/css/otfpoc.css')./
@@ -134,9 +148,9 @@ mu!(:MUE) {
 } # === mu :MUE
 
 
-mu!(:NAV_BAR) {
+new_constant(:NAV_BAR) {
 
-  WWW_App.new {
+  Megauni::WWW_App.new {
 
     style {
 

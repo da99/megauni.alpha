@@ -7,8 +7,6 @@ FILE_404   = File.read("Public/404.html")
 FILE_500   = File.read("Public/500.html")
 
 
-
-
 class Megauni
 
   FILE_VALS = {}
@@ -19,41 +17,64 @@ class Megauni
 
   module Server
 
+    module Constant
+      def new_constant name, arg = :undefined
+        fail "Already defined: #{name.inspect}" if VALS.has_key?(name)
+
+        VALS[name] = if block_given?
+                       yield
+                     else
+                       arg.first
+                     end
+      end # === def new_constant
+
+      def constant name
+        fail "Key not found: #{name.inspect}" unless VALS.has_key?(name)
+        VALS[name]
+      end
+
+    end # === module Constant
+
     module Plugin
 
-      def mu! name, *arg
-        if !arg.empty?
-          VALS[name] = arg.first
-        end
+      include Constant
 
-        if block_given?
-          VALS[name] = yield
-        end
+      def new_constant name, arg = :undefined
+        fail "Already defined: #{name.inspect}" if VALS.has_key?(name)
 
+        VALS[name] = if block_given?
+                       yield
+                     else
+                       arg.first
+                     end
+      end # === def new_constant
+
+      def constant name
+        fail "Key not found: #{name.inspect}" unless VALS.has_key?(name)
         VALS[name]
-      end # === def mu!
+      end
 
-      def mu name, *args
-
+      def new_var name, v = :undefined
         file = caller(1,1).first.split(':').first
         FILE_VALS[file] ||= {}
 
-        case
-        when FILE_VALS[file].has_key?(name)
-          FILE_VALS[file][name]
-        when args.empty? && block_given?
-          FILE_VALS[file][name] = yield
-        when args.size == 1
-          FILE_VALS[file][name] = args.first
-        when args.size > 0 && block_given?
-          fail "Too many arguments: arg and block"
-        when args.size > 1
-          fail "Unknown args: #{args.inspect}"
-        else
+        FILE_VALS[file][name] = if block_given?
+                                  yield
+                                else
+                                  v
+                                end
+      end # === def new_var
+
+      def var name
+        file = caller(1,1).first.split(':').first
+
+        if !FILE_VALS[file] || !FILE_VALS[file].has_key?(name)
           fail "Key not found: #{name.inspect}"
         end
 
-      end # === def mu
+        FILE_VALS[file][name]
+      end # === def var
+
     end # === Plugin
 
     module DSL
@@ -87,14 +108,17 @@ class Megauni
       end
 
       def use app, *args
-        if !app.respond_to?(:call) || !args.empty? || block_given?
-          if block_given?
-            return Cuba.use(app, *args, &(Proc.new))
-          else
-            return Cuba.use(app, *args)
-          end
+        if block_given?
+          return Cuba.use(app, *args, &(Proc.new))
+        else
+          return Cuba.use(app, *args)
         end
+      end # === def use
 
+
+      def new_middleware app
+        # if it's not middleware, we turn it into middleware
+        #   and use it.
         Cuba.use(Class.new {
           const_set :APP, app
 
@@ -117,7 +141,7 @@ class Megauni
             end
           end
         })
-      end # === def use
+      end # === def new_middleware
 
     end # === module DSL
 

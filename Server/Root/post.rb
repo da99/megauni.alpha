@@ -1,10 +1,10 @@
 
-use(
+new_middleware(
 
   Cuba.new {
     on get do
       on '!:raw_id' do |raw_id|
-        res.write mu(:POST).to_html(
+        res.write var(:POST).to_html(
           id: raw_id,
           title: "Who invaded: what? when? where?"
         )
@@ -15,12 +15,10 @@ use(
 ); # === use
 
 
-mu(:POST) {
-  mue = mu! :MUE
-  nav_bar = mu! :NAV_BAR
+new_var(:POST) {
+  Megauni::WWW_App.new {
 
-  WWW_App.new {
-    use mue
+    use constant(:MUE)
 
     style {
       body {
@@ -34,7 +32,7 @@ mu(:POST) {
       }
     } # === style
 
-    use nav_bar
+    use constant(:NAV_BAR)
     title '{{{html.title}}}'
 
     h1.^(:title) { '{{{html.title}}}' }

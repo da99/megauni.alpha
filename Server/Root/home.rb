@@ -10,23 +10,22 @@ class Da99_Rack_Protect
   end
 end
 
-use(
+new_middleware(
 
   Cuba.new {
     on get do
       on 'home' do
-        res.write mu(:HOME).to_html(auth_token: 'TEMP')
+        res.write var(:HOME).to_html(auth_token: 'TEMP')
       end # === home
     end # === on
   } # === Cuba.new
 
 ); # === use
 
-mu(:HOME) {
+new_var(:HOME) {
 
-  mue = mu!(:MUE)
-  WWW_App.new {
-    use mue
+  Megauni::WWW_App.new {
+    use constant(:MUE)
 
     style {
       div.^(:block) {
