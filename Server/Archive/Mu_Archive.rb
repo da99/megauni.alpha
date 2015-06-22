@@ -10,7 +10,7 @@ end
 class Mu_Archive
 
   Perma = 301
-  Public_Dir = 'Public/busy-noise'
+  Public_Dir = 'Public/archive'
 
   def initialize new_app
     @app = new_app

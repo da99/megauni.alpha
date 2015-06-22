@@ -15,44 +15,28 @@ class Megauni
     fail ArgumentError, "Key not found: #{k.inspect}"
   }
 
+  class << self
+
+    def constant name
+      VALS[name]
+    end
+
+    def new_constant name, arg = :undefined
+      fail "Already defined: #{name.inspect}" if VALS.has_key?(name)
+
+      VALS[name] = if block_given?
+                     yield
+                   else
+                     arg.first
+                   end
+    end # === def new_constant
+
+  end # === class << self
+
   module Server
 
-    module Constant
-      def new_constant name, arg = :undefined
-        fail "Already defined: #{name.inspect}" if VALS.has_key?(name)
-
-        VALS[name] = if block_given?
-                       yield
-                     else
-                       arg.first
-                     end
-      end # === def new_constant
-
-      def constant name
-        fail "Key not found: #{name.inspect}" unless VALS.has_key?(name)
-        VALS[name]
-      end
-
-    end # === module Constant
 
     module Plugin
-
-      include Constant
-
-      def new_constant name, arg = :undefined
-        fail "Already defined: #{name.inspect}" if VALS.has_key?(name)
-
-        VALS[name] = if block_given?
-                       yield
-                     else
-                       arg.first
-                     end
-      end # === def new_constant
-
-      def constant name
-        fail "Key not found: #{name.inspect}" unless VALS.has_key?(name)
-        VALS[name]
-      end
 
       def new_var name, v = :undefined
         file = caller(1,1).first.split(':').first
@@ -116,33 +100,6 @@ class Megauni
       end # === def use
 
 
-      def new_middleware app
-        # if it's not middleware, we turn it into middleware
-        #   and use it.
-        Cuba.use(Class.new {
-          const_set :APP, app
-
-          def initialize app, *args
-            @app = app
-          end
-
-          def call env
-            dup._call env
-          end
-
-          def _call env
-            status, headers, body = (result = self::class::APP.call env)
-
-            is_empty = status == 404 && (!body || body.empty?)
-            if is_empty
-              @app.call env
-            else
-              result
-            end
-          end
-        })
-      end # === def new_middleware
-
     end # === module DSL
 
   end # === module Server
@@ -150,6 +107,54 @@ end # === Megauni
 
 extend      Megauni::Server::DSL
 Cuba.plugin Megauni::Server::Plugin
+
+def bloks
+  []
+end
+
+def shift &blok
+  bloks.unshift blok
+end
+
+def push &blok
+  bloks.push blok
+end
+
+def new_constant *args, &blok
+  Megauni.new_constant *args, &blok
+end # === def new_constant
+
+def constant *args
+  Megauni.constant *args
+end # === def new_constant
+
+def new_middleware app
+  # if it's not middleware, we turn it into middleware
+  #   and use it.
+  Cuba.use(Class.new {
+    const_set :APP, app
+
+    def initialize app, *args
+      @app = app
+    end
+
+    def call env
+      dup._call env
+    end
+
+    def _call env
+      status, headers, body = (result = self::class::APP.call env)
+
+      is_empty = status == 404 && (!body || body.empty?)
+      if is_empty
+        @app.call env
+      else
+        result
+      end
+    end
+  })
+end # === def new_middleware
+
 
 use Rack::CommonLogger
 
@@ -186,13 +191,13 @@ end
     end
   })
 
-%w{
-  Timer_Public_Files
-  My_Egg_Timer_Redirect
-  Surfer_Hearts_Archive
-  Mu_Archive_Redirect
-  Mu_Archive
-}.each { |name|
+[
+  'Timer_Public_Files',
+  'My_Egg_Timer_Redirect',
+  'Surfer_Hearts_Archive',
+  'Mu_Archive_Redirect',
+  'Mu_Archive'
+].each { |name|
 
  require "./Server/Archive/#{name}"
  use Object.const_get(name)
@@ -215,6 +220,7 @@ Cuba.define do
   # 404 errors ===================
   on default do
     res.status = 404
+    res.headers["Content-Type"] = 'text/html'
     res.write FILE_404
   end # on get
 

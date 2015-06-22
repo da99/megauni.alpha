@@ -19,7 +19,9 @@ class Megauni
 
     OUTER_MOST_MAIN = ::Object::TOPLEVEL_BINDING.eval('self')
 
-    include ::Megauni::Server::Constant
+    def mu
+      ::Megauni
+    end
 
     def var *args
       @vars ||= begin
@@ -43,10 +45,6 @@ class Megauni
             end
             EOF
       var name
-    end
-
-    def main!
-      OUTER_MOST_MAIN
     end
 
   end # === class WWW_App =========================

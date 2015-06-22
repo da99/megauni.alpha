@@ -1,29 +1,25 @@
 
 
-new_middleware(
+shift {
 
-  Cuba.new {
+  on('raise-error-for-test') { something } if ENV['IS_DEV']
 
-    on('raise-error-for-test') { something } if ENV['IS_DEV']
-
-    on(get, root) {
-      res.write(
-        var(:ROOT).to_html(
-          YEAR: Time.now.utc.year,
-          auth_token: 'TEMP'
-        )
+  on(get, root) {
+    res.write(
+      var(:ROOT).to_html(
+        YEAR: Time.now.utc.year,
+        auth_token: 'TEMP'
       )
-    } # === on get root
+    )
+  } # === on get root
 
-  } # === Cuba.new
-
-) # === new_middleware
+} # === new_middleware
 
 new_var(:ROOT) {
 
   Megauni::WWW_App.new {
 
-    use constant(:MUE)
+    use mu.constant(:MUE)
 
     style {
 
