@@ -1,5 +1,6 @@
 
 require 'cuba'
+require 'roda'
 require 'www_app'
 
 FILE_403   = File.read("Public/403.html")
@@ -10,33 +11,6 @@ FILE_500   = File.read("Public/500.html")
 module Megauni
 
   class << self
-
-    def new_middleware app = nil
-      app ||= Cuba.new(&Proc.new)
-      Class.new {
-        const_set :APP, app
-
-        def initialize app, *args
-          @app = app
-        end
-
-        def call env
-          dup._call env
-        end
-
-        def _call env
-          status, headers, body = (result = self::class::APP.call env)
-
-          is_empty = status == 404 && (!body || body.empty?)
-          if is_empty
-            @app.call env
-          else
-            result
-          end
-        end
-      }
-    end # === def new_middleware
-
   end # === class << self
 
   module Rack_Helpers
@@ -44,12 +18,6 @@ module Megauni
     def use app, *args, &blok
       Cuba.use(app, *args, &blok)
     end # === def use
-
-    def new_middleware *args, &blok
-      use(
-        Megauni.new_middleware *args, &blok
-      )
-    end # === def new_middleware
 
   end # === module Server
 end # === Megauni
