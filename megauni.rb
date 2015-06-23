@@ -85,7 +85,7 @@ use(
     rescue Object => ex
       if ENV['IS_DEV']
         puts ex.message
-        ex.backtrace.map { |b| puts b }
+        ex.backtrace.each { |b| puts(b.strip) unless b['ruby/gems'] }
       end
       [500, {'Content-Type'=>'text/html'}, [FILE_500]]
     end
@@ -115,13 +115,6 @@ require './Server/Root/root'
 require './Server/Root/home' if ENV['IS_DEV']
 require './Server/Root/@screen_name'
 require './Server/Root/post'
-
-new_middleware {
-  puts ::Megauni.ons.inspect
-  ::Megauni.ons.each { |b|
-    instance_eval(&b)
-  }
-}
 
 Cuba.define do
 
