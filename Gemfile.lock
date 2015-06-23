@@ -86,6 +86,8 @@ GEM
     rack_csrf (2.5.0)
       rack (>= 1.1.0)
     rake (10.4.2)
+    roda (2.4.0)
+      rack
     rouge (1.9.0)
     sanitize (4.0.0)
       crass (~> 1.0.2)
@@ -147,6 +149,7 @@ DEPENDENCIES
   pry
   rack-contrib
   rack_csrf
+  roda
   rouge
   sanitize
   sequel

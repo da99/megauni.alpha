@@ -10,14 +10,17 @@ class Da99_Rack_Protect
   end
 end
 
-new_middleware {
-  on get, 'home' do
-    res.write HOME_HTML.to_html(auth_token: 'TEMP')
-  end # === on
-} # === Cuba.new
+class HOME < Roda
 
+  plugin :middleware
 
-HOME_HTML = Megauni::WWW_App.new {
+  route do |r|
+    r.get 'home' do
+      HTML.to_html(auth_token: 'TEMP')
+    end
+  end
+
+  HTML = Megauni::WWW_App.new {
     use ::MUE
 
     style {
@@ -45,6 +48,10 @@ HOME_HTML = Megauni::WWW_App.new {
 
   } # === WWW_App
 
+end # === HOME < Roda
+
+use HOME
+
 __END__
 # if logged_in?
 # html 'Customer/lifes', {
@@ -55,5 +62,6 @@ __END__
 # :is_owner     => logged_in?
 # }
 # end
+
 
 

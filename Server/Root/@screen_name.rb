@@ -1,16 +1,17 @@
 
-new_middleware {
+class SCREEN_NAME < Roda
 
-  on get, '@:raw_name' do |raw_name|
-    res.write SCREEN_NAME_HTML.to_html(
-      :screen_name => raw_name
-    )
-  end # === on get
+  plugin :middleware
 
-} # === Cuba.new
+  route do |r|
 
+    r.get '@:raw_name' do |raw_name|
+      HTML.to_html( :screen_name => raw_name )
+    end # === on get
 
-SCREEN_NAME_HTML = Megauni::WWW_App.new {
+  end # === route
+
+  HTML = Megauni::WWW_App.new {
 
     use ::MUE
 
@@ -37,7 +38,7 @@ SCREEN_NAME_HTML = Megauni::WWW_App.new {
       margin_top       '0'
       margin_bottom    '0'
       padding          '0.5em'
-     '{{{html.screen_name}}}'
+      '{{{html.screen_name}}}'
     }
 
     use ::NAV_BAR
@@ -54,3 +55,8 @@ SCREEN_NAME_HTML = Megauni::WWW_App.new {
     } # === div.block
 
   } # === WWW_App.new
+
+end # === class SCREEN_NAME
+
+use SCREEN_NAME
+

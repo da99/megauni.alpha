@@ -1,21 +1,27 @@
 
 
-new_middleware {
+class ROOT < Roda
 
-  on('raise-error-for-test') { something } if ENV['IS_DEV']
+  plugin :middleware
 
-  on(get, root) {
-    res.write(
-      ::ROOT_HTML.to_html(
+  route do |r|
+
+    if ENV['IS_DEV']
+      r.on('raise-error-for-test') {
+        something
+      }
+    end
+
+    r.root do
+      ::ROOT::HTML.to_html(
         YEAR: Time.now.utc.year,
         auth_token: 'TEMP'
       )
-    )
-  } # === on get root
+    end
 
-} # === Megauni.on
+  end
 
-ROOT_HTML = Megauni::WWW_App.new {
+  HTML = Megauni::WWW_App.new {
 
     use ::MUE
 
@@ -143,4 +149,9 @@ ROOT_HTML = Megauni::WWW_App.new {
     } # div block
 
   } # === WWW_App.new
-# } # === mu :FILE_INDEX
+  # } # === mu :FILE_INDEX
+
+end # === class ROOT
+
+use( ROOT ) # === use
+

@@ -27,6 +27,7 @@ end
 
 gem 'foreman'
 gem 'cuba'
+gem 'roda'
 gem 'passenger'
 gem 'mustache'
 gem 'da99_rack_protect', '> 2.2.2'
@@ -45,4 +46,5 @@ gem 'www_app'
 gem 'moron_text'
 gem 'touch_up'
 gem 'duck_duck_duck'
+
 
