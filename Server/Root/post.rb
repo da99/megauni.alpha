@@ -1,13 +1,11 @@
 
 new_middleware {
-    on get do
-      on '!:raw_id' do |raw_id|
-        res.write POST_HTML.to_html(
-          id: raw_id,
-          title: "Who invaded: what? when? where?"
-        )
-      end
-    end # === on get
+  on(get, '!:raw_id') do |raw_id|
+    res.write POST_HTML.to_html(
+      id: raw_id,
+      title: "Who invaded: what? when? where?"
+    )
+  end # === on get
 } # === Cuba.new
 
 

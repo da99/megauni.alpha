@@ -9,21 +9,7 @@ FILE_500   = File.read("Public/500.html")
 
 module Megauni
 
-  FILE_VALS = {}
-  VALS      = {:BLOCKS=>[]}
-  VALS.default_proc = lambda {|h,k|
-    fail ArgumentError, "Key not found: #{k.inspect}"
-  }
-
   class << self
-
-    def ons
-      VALS[:BLOCKS] ||= []
-    end
-
-    def on &blok
-      ons << blok
-    end
 
     def new_middleware app = nil
       app ||= Cuba.new(&Proc.new)
@@ -131,6 +117,7 @@ require './Server/Root/@screen_name'
 require './Server/Root/post'
 
 new_middleware {
+  puts ::Megauni.ons.inspect
   ::Megauni.ons.each { |b|
     instance_eval(&b)
   }

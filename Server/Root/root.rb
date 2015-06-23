@@ -1,6 +1,6 @@
 
 
-Megauni.on {
+new_middleware {
 
   on('raise-error-for-test') { something } if ENV['IS_DEV']
 

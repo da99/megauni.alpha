@@ -11,11 +11,9 @@ class Da99_Rack_Protect
 end
 
 new_middleware {
-    on get do
-      on 'home' do
-        res.write HOME_HTML.to_html(auth_token: 'TEMP')
-      end # === home
-    end # === on
+  on get, 'home' do
+    res.write HOME_HTML.to_html(auth_token: 'TEMP')
+  end # === on
 } # === Cuba.new
 
 
