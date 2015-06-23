@@ -20,7 +20,7 @@ new_middleware {
 
 
 HOME_HTML = Megauni::WWW_App.new {
-    use constant(:MUE)
+    use ::MUE
 
     style {
       div.^(:block) {

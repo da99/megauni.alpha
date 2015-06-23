@@ -12,7 +12,7 @@ new_middleware {
 
 SCREEN_NAME_HTML = Megauni::WWW_App.new {
 
-    use constant(:MUE)
+    use ::MUE
 
     style {
 
@@ -40,7 +40,7 @@ SCREEN_NAME_HTML = Megauni::WWW_App.new {
      '{{{html.screen_name}}}'
     }
 
-    use constant(:NAV_BAR)
+    use ::NAV_BAR
 
     div.^(:block) {
 

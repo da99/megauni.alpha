@@ -14,7 +14,7 @@ new_middleware {
 
 POST_HTML = Megauni::WWW_App.new {
 
-    use constant(:MUE)
+    use ::MUE
 
     style {
       body {
@@ -28,7 +28,7 @@ POST_HTML = Megauni::WWW_App.new {
       }
     } # === style
 
-    use constant(:NAV_BAR)
+    use ::NAV_BAR
     title '{{{html.title}}}'
 
     h1.^(:title) { '{{{html.title}}}' }
