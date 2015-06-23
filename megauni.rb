@@ -3,10 +3,11 @@ require 'cuba'
 require 'roda'
 require 'www_app'
 
-FILE_403   = File.read("Public/403.html")
-FILE_404   = File.read("Public/404.html")
 
 module Megauni
+
+  FILE_403   = File.read("Public/403.html")
+  FILE_404   = File.read("Public/404.html")
 
   class << self
   end # === class << self
@@ -94,7 +95,7 @@ Cuba.define do
   on default do
     res.status = 404
     res.headers["Content-Type"] = 'text/html'
-    res.write FILE_404
+    res.write ::Megauni::FILE_404
   end # on get
 
 end # === Cuba.define
