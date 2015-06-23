@@ -14,14 +14,8 @@ class WWW_App # === CUSTOMIZATIONS ===============
 
 end # === class WWW_App
 
-class Megauni
+module Megauni
   class WWW_App < ::WWW_App
-
-    OUTER_MOST_MAIN = ::Object::TOPLEVEL_BINDING.eval('self')
-
-    def mu
-      ::Megauni
-    end
 
     def var *args
       @vars ||= begin
@@ -50,8 +44,7 @@ class Megauni
   end # === class WWW_App =========================
 end # === Megauni
 
-new_constant(:MUE) {
-  Megauni::WWW_App.new {
+MUE = Megauni::WWW_App.new {
     link.href('/css/vanilla.reset.css')./
     link.href('/css/fonts.css')./
     link.href('/css/otfpoc.css')./
@@ -142,13 +135,11 @@ new_constant(:MUE) {
 
 
     } # === style
-  }
-} # === mu :MUE
+  } # === Megauni::WWW_App
+# } # === mu :MUE
 
 
-new_constant(:NAV_BAR) {
-
-  Megauni::WWW_App.new {
+NAV_BAR = Megauni::WWW_App.new {
 
     style {
 
@@ -191,7 +182,7 @@ new_constant(:NAV_BAR) {
     }
   } # === WWW_App.new
 
-} # === mu! :NAV_BAR
+# } # === mu! :NAV_BAR
 
 
 

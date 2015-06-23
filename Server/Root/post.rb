@@ -1,22 +1,18 @@
 
-new_middleware(
-
-  Cuba.new {
+new_middleware {
     on get do
       on '!:raw_id' do |raw_id|
-        res.write var(:POST).to_html(
+        res.write POST_HTML.to_html(
           id: raw_id,
           title: "Who invaded: what? when? where?"
         )
       end
     end # === on get
-  } # === Cuba.new
-
-); # === use
+} # === Cuba.new
 
 
-new_var(:POST) {
-  Megauni::WWW_App.new {
+
+POST_HTML = Megauni::WWW_App.new {
 
     use constant(:MUE)
 
@@ -44,4 +40,3 @@ new_var(:POST) {
     }
 
   } # === WWW_App
-} # === mu :POST

@@ -10,21 +10,16 @@ class Da99_Rack_Protect
   end
 end
 
-new_middleware(
-
-  Cuba.new {
+new_middleware {
     on get do
       on 'home' do
-        res.write var(:HOME).to_html(auth_token: 'TEMP')
+        res.write HOME_HTML.to_html(auth_token: 'TEMP')
       end # === home
     end # === on
-  } # === Cuba.new
+} # === Cuba.new
 
-); # === use
 
-new_var(:HOME) {
-
-  Megauni::WWW_App.new {
+HOME_HTML = Megauni::WWW_App.new {
     use constant(:MUE)
 
     style {
@@ -51,7 +46,7 @@ new_var(:HOME) {
     title 'Latest'
 
   } # === WWW_App
-} # === mu :HOME_STACHE
+
 __END__
 # if logged_in?
 # html 'Customer/lifes', {

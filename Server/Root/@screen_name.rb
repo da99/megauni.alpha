@@ -1,23 +1,16 @@
 
-new_middleware(
+new_middleware {
 
-  Cuba.new {
+  on get, '@:raw_name' do |raw_name|
+    res.write SCREEN_NAME_HTML.to_html(
+      :screen_name => raw_name
+    )
+  end # === on get
 
-    on get, '@:raw_name' do |raw_name|
-      res.write var(:@SCREEN_NAME).to_html(
-        :screen_name => raw_name
-      )
-    end # === on get
-
-  } # === Cuba.new
-
-); # === use
+} # === Cuba.new
 
 
-new_var(:@SCREEN_NAME) {
-
-
-  Megauni::WWW_App.new {
+SCREEN_NAME_HTML = Megauni::WWW_App.new {
 
     use constant(:MUE)
 
@@ -61,4 +54,3 @@ new_var(:@SCREEN_NAME) {
     } # === div.block
 
   } # === WWW_App.new
-} # === mu :@SCREEN_NAME

@@ -1,25 +1,23 @@
 
 
-shift {
+Megauni.on {
 
   on('raise-error-for-test') { something } if ENV['IS_DEV']
 
   on(get, root) {
     res.write(
-      var(:ROOT).to_html(
+      ::ROOT_HTML.to_html(
         YEAR: Time.now.utc.year,
         auth_token: 'TEMP'
       )
     )
   } # === on get root
 
-} # === new_middleware
+} # === Megauni.on
 
-new_var(:ROOT) {
+ROOT_HTML = Megauni::WWW_App.new {
 
-  Megauni::WWW_App.new {
-
-    use mu.constant(:MUE)
+    use ::MUE
 
     style {
 
@@ -145,4 +143,4 @@ new_var(:ROOT) {
     } # div block
 
   } # === WWW_App.new
-} # === mu :FILE_INDEX
+# } # === mu :FILE_INDEX
