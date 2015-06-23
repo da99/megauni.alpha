@@ -6,8 +6,9 @@ require 'www_app'
 
 module Megauni
 
-  FILE_403   = File.read("Public/403.html")
-  FILE_404   = File.read("Public/404.html")
+  FILE_403 = File.read("Public/403.html")
+  FILE_404 = File.read("Public/404.html")
+  FILE_500 = File.read("Public/500.html")
 
   class << self
   end # === class << self
@@ -19,6 +20,29 @@ module Megauni
     end # === def use
 
   end # === module Server
+
+  class Error_500
+
+    def initialize app
+      @app = app
+    end
+
+    def call env
+      dup._call env
+    end
+
+    def _call env
+      @app.call env
+    rescue Object => ex
+      if ENV['IS_DEV']
+        puts ex.message
+        ex.backtrace.each { |b| puts(b.strip) unless b['ruby/gems'] }
+      end
+      [500, {'Content-Type'=>'text/html'}, [::Megauni::FILE_500]]
+    end
+
+  end # === class Error_500
+
 end # === Megauni
 
 extend Megauni::Rack_Helpers
@@ -37,33 +61,7 @@ end
 # We place this at the top level
 # to catch any server app errors
 # (aka 500).
-module Megauni
-  class Error_500
-
-    FILE = File.read("Public/500.html")
-
-    def initialize app
-      @app = app
-    end
-
-    def call env
-      dup._call env
-    end
-
-    def _call env
-      @app.call env
-    rescue Object => ex
-      if ENV['IS_DEV']
-        puts ex.message
-        ex.backtrace.each { |b| puts(b.strip) unless b['ruby/gems'] }
-      end
-      [500, {'Content-Type'=>'text/html'}, [FILE]]
-    end
-
-  end # === class
-end # === module Megauni
-
-use(Megauni::Error_500) # === use
+use(Megauni::Error_500)
 
 [
   'Timer_Public_Files',
