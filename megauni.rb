@@ -5,8 +5,6 @@ require 'www_app'
 
 FILE_403   = File.read("Public/403.html")
 FILE_404   = File.read("Public/404.html")
-FILE_500   = File.read("Public/500.html")
-
 
 module Megauni
 
@@ -38,8 +36,11 @@ end
 # We place this at the top level
 # to catch any server app errors
 # (aka 500).
-use(
-  Class.new {
+module Megauni
+  class Error_500
+
+    FILE = File.read("Public/500.html")
+
     def initialize app
       @app = app
     end
@@ -55,10 +56,13 @@ use(
         puts ex.message
         ex.backtrace.each { |b| puts(b.strip) unless b['ruby/gems'] }
       end
-      [500, {'Content-Type'=>'text/html'}, [FILE_500]]
+      [500, {'Content-Type'=>'text/html'}, [FILE]]
     end
-  } # === Class.new
-) # === use
+
+  end # === class
+end # === module Megauni
+
+use(Megauni::Error_500) # === use
 
 [
   'Timer_Public_Files',
