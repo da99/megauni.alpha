@@ -1,6 +1,6 @@
 require './megauni'
 
 # === Finally, start the app.
-run Cuba
+run Megauni::Rack_App.app
 
 

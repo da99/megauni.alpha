@@ -1,47 +1,38 @@
 
-require 'cuba'
 require 'roda'
 require 'www_app'
 
 
 module Megauni
 
-  FILE_403 = File.read("Public/403.html")
-  FILE_404 = File.read("Public/404.html")
-  FILE_500 = File.read("Public/500.html")
-
-  class << self
-  end # === class << self
-
   module Rack_Helpers
 
-    def use app, *args, &blok
-      Cuba.use(app, *args, &blok)
+    def use *args, &blok
+      Megauni::Rack_App.send :use, *args, &blok
     end # === def use
 
   end # === module Server
 
-  class Error_500
+  class Rack_App < Roda
 
-    def initialize app
-      @app = app
-    end
+    plugin :default_headers,
+      'Content-Type'=>'text/html',
+      'Content-Security-Policy'=>"default-src 'self'",
+      'Strict-Transport-Security'=>'max-age=16070400;',
+      'X-Frame-Options'=>'deny',
+      'X-Content-Type-Options'=>'nosniff',
+      'X-XSS-Protection'=>'1; mode=block'
 
-    def call env
-      dup._call env
-    end
+    # 404 errors ===================
+    route { |r|
+      r.on true do
+        response.status = 404
+        response.headers["Content-Type"] = 'text/html'
+        response.body ::Megauni::FILE_404
+      end # on get
+    }
+  end # === class Rack_App
 
-    def _call env
-      @app.call env
-    rescue Object => ex
-      if ENV['IS_DEV']
-        puts ex.message
-        ex.backtrace.each { |b| puts(b.strip) unless b['ruby/gems'] }
-      end
-      [500, {'Content-Type'=>'text/html'}, [::Megauni::FILE_500]]
-    end
-
-  end # === class Error_500
 
 end # === Megauni
 
@@ -61,6 +52,7 @@ end
 # We place this at the top level
 # to catch any server app errors
 # (aka 500).
+require "./Server/Megauni/Error_500"
 use(Megauni::Error_500)
 
 [
@@ -87,19 +79,7 @@ require './Server/Root/home' if ENV['IS_DEV']
 require './Server/Root/@screen_name'
 require './Server/Root/post'
 
-Cuba.define do
-
-  # 404 errors ===================
-  on default do
-    res.status = 404
-    res.headers["Content-Type"] = 'text/html'
-    res.write ::Megauni::FILE_404
-  end # on get
-
-end # === Cuba.define
-
-
-
+Megauni::Rack_App.freeze
 
 
 
