@@ -497,6 +497,12 @@ case "$action" in
     echo "$new_file"
     ;;
 
+  "deploy")
+    bin/megauni npm install
+    ruby_setup bundle
+    node_modules/bower/bin/bower install
+    ;;
+
   *)
     echo "Unknown action: $action" 1>&2
     exit 1
