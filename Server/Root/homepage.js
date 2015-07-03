@@ -1,6 +1,5 @@
 
 var fs          = require('fs');
-var streamifier = require('streamifier');
 var koa         = require('koa');
 var app         = koa();
 var router      = require('koa-router')();

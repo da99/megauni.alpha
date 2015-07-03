@@ -459,6 +459,10 @@ case "$action" in
     NODE_PATH="./node_modules" iojs "$@"
     ;;
 
+  "npm")
+    NODE_PATH="./node_modules" npm "$@"
+    ;;
+
   "install")
     NODE_PATH="./node_modules" npm install --save "$@"
     ;;
