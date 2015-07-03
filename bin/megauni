@@ -466,7 +466,14 @@ case "$action" in
   "render")
     name="$1"
     shift
-    dir="./Public/applets/$name"
+
+    if [[ -f "$name" ]]; then
+      dir="$(dirname "$name")"
+      name="$(basename "$dir")"
+    else
+      dir="./Public/applets/$name"
+    fi
+
     new_file="$dir/markup.html"
     if [[ ! -d "$dir" ]]; then
       echo "Not found: $dir" 1>&2
