@@ -1,4 +1,6 @@
 
+require "www_app"
+
 # === CUSTOMIZATIONS ===============
 class WWW_App # === CUSTOMIZATIONS ===============
 

@@ -6,9 +6,13 @@ action="$1"
 shift
 
 dev="$IS_DEV"
+
+if [[ -z "$PORT" ]]; then
+  export PORT=4567
+fi
+
 if [[ ! -z "$IS_DEV" ]]; then
   dir="$(pwd)"
-  export PORT=4567
   export JAR="$dir/tmp/cookies.txt"
   export PID="$dir/tmp/{$PORT}.pid"
   export LOG="$dir/tmp/log.txt"
@@ -110,6 +114,9 @@ case "$action" in
     ;;
 
   "start")
+    PORT=$PORT NODE_PATH="./node_modules" iojs server.js
+    exit 0
+
     dir="$(pwd)/tmp"
     args=""
     if [[ ! -z "$dev" ]]; then
@@ -446,6 +453,28 @@ case "$action" in
   "POST")
     curl -k -X POST --header "Content-Type:application/json" -d "$1" https://localhost$2
     echo ""
+    ;;
+
+  "iojs")
+    NODE_PATH="./node_modules" iojs "$@"
+    ;;
+
+  "install")
+    NODE_PATH="./node_modules" npm install --save "$@"
+    ;;
+
+  "render")
+    name="$1"
+    shift
+    dir="./Public/applets/$name"
+    new_file="$dir/markup.html"
+    if [[ ! -d "$dir" ]]; then
+      echo "Not found: $dir" 1>&2
+      exit 1
+    fi
+
+    ruby -r"./Public/applets/base/MUE" -r"${dir}/markup.rb" -e "puts OUTPUT" > "$new_file"
+    echo "$new_file"
     ;;
 
   *)

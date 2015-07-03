@@ -1,0 +1,32 @@
+{
+  "name": "megauni",
+  "version": "0.0.1",
+  "description": "io.js version of megauni.com",
+  "main": "server.js",
+  "scripts": {
+    "test": "bin/megauni test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github:da99/megauni.git"
+  },
+  "keywords": [
+    "caveman",
+    "universe"
+  ],
+  "author": "da99",
+  "license": "MIT",
+  "engines": {
+    "iojs": "^2.3.0"
+  },
+  "dependencies": {
+    "co": "^4.5.4",
+    "co-fs": "^1.2.0",
+    "koa": "^0.21.0",
+    "koa-helmet": "^0.1.0",
+    "koa-mount": "^1.3.0",
+    "koa-router": "^5.1.2",
+    "koa-static": "^1.4.9",
+    "streamifier": "^0.1.1"
+  }
+}
