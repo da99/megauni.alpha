@@ -14,8 +14,7 @@ app.use(helmet.defaults());
 // === Finally, the routes:
 app.use(koa_static('./Public'));
 
-app.use(mount(homepage.routes()));
-app.use(mount(homepage.allowedMethods()));
+app.use(mount(homepage));
 
 // app.use(mount(members));
 // app.use(mount(www_apps));

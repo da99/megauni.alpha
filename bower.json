@@ -1,0 +1,22 @@
+{
+  "name": "megauni",
+  "version": "0.0.1",
+  "authors": [
+    "da99 <i-hate-spam-1234567@mailinator.com>"
+  ],
+  "description": "io.js version of megauni.com",
+  "main": "server.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "Public/scripts/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "underscore": "~1.8.3"
+  }
+}
