@@ -37,6 +37,7 @@ mods=(
   Screen_Name
   Computer
   Link
+  Session
 )
   # File_Name
   # Label
@@ -74,6 +75,14 @@ case "$action" in
     echo "  $  test"
     echo "  $  test reset"
     echo "  $  test Model spec"
+    echo ""
+    echo "  $  iojs"
+    echo "  $  iojs ...."
+    echo "  $  npm  ...."
+    echo "  $  npm  --save ...."
+    echo ""
+    echo "  $  render name"
+    echo "  $  render file_name"
     echo ""
     exit 0
     ;;
@@ -178,8 +187,8 @@ case "$action" in
     case "$sub_action" in
       "create")
         model="$1"
-        shift
         name="$2"
+        shift
         shift
         cd Server
         bundle exec duck_duck_duck create $model $name
@@ -464,7 +473,7 @@ case "$action" in
     ;;
 
   "install")
-    NODE_PATH="./node_modules" npm install --save "$@"
+    NODE_PATH="./node_modules" npm install "$@"
     ;;
 
   "render")
