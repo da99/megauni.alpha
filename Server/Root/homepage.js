@@ -10,7 +10,7 @@ var html        = fs.readFileSync(process.cwd() + '/Public/applets/homepage_stra
 router.get('/', function *homepage(next) {
   yield next;
   this.set('Content-Type', 'text/html');
-  this.body = streamifier.createReadStream(html);
+  this.body = html;
 });
 
 
