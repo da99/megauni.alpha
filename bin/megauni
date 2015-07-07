@@ -423,14 +423,14 @@ case "$action" in
     old_log="$(cat tmp/log.log || echo "")"
 
     echo "=== Watching:"
-    inotifywait --quiet --monitor --event modify --exclude "/.git/|/Public/|/node_modules/" -r ./ | while read CHANGE
+    inotifywait --quiet --monitor --event close_write --exclude "/.git/|/Public/|/node_modules/" -r ./ | while read CHANGE
     do
       dir=$(echo "$CHANGE" | cut -d' ' -f 1)
       op=$(echo "$CHANGE" | cut -d' ' -f 2)
       file=$(echo "$CHANGE" | cut -d' ' -f 3)
       path="${dir}$file"
 
-      echo "=== $CHANGE path: $path"
+      echo "=== $CHANGE ($path)"
 
       if [[ "$op" == "MODIFY" && "$file" == "log.log" ]]; then
           new_log="$(cat tmp/log.log)"
