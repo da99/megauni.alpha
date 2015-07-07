@@ -1,3 +1,6 @@
+
+/bin/jq
+
 # Ignore sensitive info. in /config dir.
 config/secret*
 secret*
