@@ -24,7 +24,7 @@ app.keys = [process.env.SESSION_SECRET, process.env.SESSION_SECRET + Math.random
 
 app.use(KOA_GENERIC_SESSION({
   store: new KOA_PG_SESSION(process.env.DATABASE_URL),
-  {
+  cookie: {
     path: "/",
     secureProxy: !!process.env.IS_DEV
   }

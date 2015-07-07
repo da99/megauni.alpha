@@ -400,11 +400,12 @@ case "$action" in
     fi
 
     cleanup () {
+      echo -e "\n\n=== Please wait... shutting down server..."
       if bin/megauni running? ; then
-        echo -e "\n\n=== Please wait... shutting down server..."
         bin/megauni stop
         echo -e "=== Done.\n"
       fi
+      exit 0
     }
     trap cleanup SIGINT SIGTERM
 
@@ -422,14 +423,14 @@ case "$action" in
     old_log="$(cat tmp/log.log || echo "")"
 
     echo "=== Watching:"
-    inotifywait -q -m -e close_write,close --exclude .git/ --exclude ./Public/archive/ --exclude ./node_modules/ -r . | while read CHANGE
+    inotifywait --quiet --monitor --event modify --exclude "/.git/|/Public/|/node_modules/" -r ./ | while read CHANGE
     do
       dir=$(echo "$CHANGE" | cut -d' ' -f 1)
       op=$(echo "$CHANGE" | cut -d' ' -f 2)
       file=$(echo "$CHANGE" | cut -d' ' -f 3)
       path="${dir}$file"
 
-      echo "=== $CHANGE"
+      echo "=== $CHANGE path: $path"
 
       if [[ "$op" == "MODIFY" && "$file" == "log.log" ]]; then
           new_log="$(cat tmp/log.log)"
@@ -465,14 +466,13 @@ case "$action" in
           old_log="$new_log"
       fi # === if MODIFY log
 
-      if [[ ( ! "$op" =~ "NOWRITE" ) && ( "$op" =~ "CLOSE" || "$op" =~ "WRITE" )  && ! -z "$file" ]]; then
+      if [[ ! -z "$file" ]]; then
 
         echo ""
-        echo "=== $CHANGE"
 
         if [[ "$path" == *bin/megauni* ]]; then
-          echo "=== Restarting this script"
-          exec bin/megauni watch
+          echo "=== Stopping this script"
+          kill -SIGINT -$$
         fi
 
         # if [[ "$file" =~ ".rb" || "$file" =~ ".lock" ]]; then
