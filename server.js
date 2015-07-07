@@ -1,4 +1,7 @@
 
+var KOA_GENERIC_SESSION = require('koa-generic-session');
+var KOA_PG_SESSION      = require('koa-pg-session');
+
 var koa_static = require('koa-static');
 var helmet     = require('koa-helmet');
 var mount      = require('koa-mount');
@@ -18,6 +21,16 @@ app.use(helmet.csp({
 app.use(koa_static('./Public'));
 
 app.keys = [process.env.SESSION_SECRET, process.env.SESSION_SECRET + Math.random().toString()];
+
+app.use(KOA_GENERIC_SESSION({
+  store: new KOA_PG_SESSION(process.env.DATABASE_URL),
+  {
+    path: "/",
+    secureProxy: !!process.env.IS_DEV
+  }
+}));
+
+
 app.use(mount(homepage));
 
 // app.use(mount(members));

@@ -3,8 +3,6 @@ var app    = require('koa')();
 var router = require('koa-router')();
 var koa_pg = require('koa-pg')
 
-var KOA_GENERIC_SESSION = require('koa-generic-session');
-var KOA_PG_SESSION      = require('koa-pg-session');
 
 var fs                = require('fs');
 var homepage_stranger = fs.readFileSync(process.cwd() + '/Public/applets/homepage_stranger/markup.html');
@@ -36,13 +34,6 @@ router.get('/count', function *count() {
   this.body = session.count.toString();
 });
 
-app.use(KOA_GENERIC_SESSION({
-  store: new KOA_PG_SESSION(process.env.DATABASE_URL),
-  cookie: {
-    path: "/count",
-    secureProxy: true
-  }
-}));
 
 app.use(koa_pg(process.env.DATABASE_URL));
 app.use(router.routes());
