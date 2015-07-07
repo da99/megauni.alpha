@@ -10,10 +10,14 @@ var homepage = require('./Server/Root/homepage')
 
 // === Set security before routes:
 app.use(helmet.defaults());
+app.use(helmet.csp({
+  'default-src': ["'self'"]
+}));
 
 // === Finally, the routes:
 app.use(koa_static('./Public'));
 
+app.keys = [process.env.SESSION_SECRET, process.env.SESSION_SECRET + Math.random().toString()];
 app.use(mount(homepage));
 
 // app.use(mount(members));

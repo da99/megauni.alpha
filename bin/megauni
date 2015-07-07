@@ -2,6 +2,7 @@
 # -*- bash -*-
 #
 #
+pm2="node_modules/pm2/bin/pm2"
 action="$1"
 shift
 
@@ -58,6 +59,7 @@ case "$action" in
     echo ""
     echo "  $  start"
     echo "  $  stop"
+    echo "  $  restart"
     echo "  $  watch"
     echo ""
     echo "  $  migrate"
@@ -122,8 +124,16 @@ case "$action" in
       $@
     ;;
 
+  "stop")
+    $pm2 stop megauni
+    ;;
+
+  "restart")
+    $pm2 restart megauni
+    ;;
+
   "start")
-    PORT=$PORT NODE_PATH="./node_modules" iojs server.js
+    PORT=$PORT $pm2 start server.js --name "megauni"
     exit 0
 
     dir="$(pwd)/tmp"
@@ -170,10 +180,6 @@ case "$action" in
       --port 4567                                     \
       --rackup configs/config.ru                      \
       --static-files-dir      $dir/../Public
-    ;;
-
-  "stop")
-    echo "not done yet" 1>&2
     ;;
 
   "migrate")
@@ -367,6 +373,15 @@ case "$action" in
     fi
     ;;
 
+  "running?")
+    stat="$(bin/megauni pm2 jlist | bin/jq '.[0] | .pm2_env | .status ' --monochrome-output)"
+    if [[ "$stat" == '"online"' ]]; then
+      exit 0
+    else
+      exit 1
+    fi
+    ;;
+
   "watch")
     if [[ "$@" == *test* ]]; then
       shift
@@ -374,12 +389,15 @@ case "$action" in
     fi
 
     cleanup () {
-      echo -e "\n\n=== Please wait... shutting down thin..."
-      bin/megauni thin stop
-      echo -e "=== Done.\n"
+      if bin/megauni running? ; then
+        echo -e "\n\n=== Please wait... shutting down server..."
+        bin/megauni stop
+        echo -e "=== Done.\n"
+      fi
     }
     trap cleanup SIGINT SIGTERM
 
+    bin/megauni start
     IFS=$'\n'
     re='^[0-9]+$'
 
@@ -444,15 +462,19 @@ case "$action" in
           exec bin/megauni watch
         fi
 
-        if [[ "$file" =~ ".rb" || "$file" =~ ".lock" ]]; then
-          echo "=== Touching: tmp/restart.txt"
-          touch tmp/restart.txt
-          bin/megauni thin -d restart
-        fi
+        # if [[ "$file" =~ ".rb" || "$file" =~ ".lock" ]]; then
+          # echo "=== Touching: tmp/restart.txt"
+          # touch tmp/restart.txt
+          # bin/megauni thin -d restart
+        # fi
 
         if [[ "$file" =~ ".js" ]]; then
-          echo "=== Running jshint:"
-          jshint $path || js_failed=""
+          if [[ "$file" =~ "Public/"  ]]; then
+            echo "=== Running jshint:"
+            bin/megauni jshint $path || js_failed=""
+          else
+            bin/megauni restart
+          fi
         fi
 
       fi
@@ -504,6 +526,12 @@ case "$action" in
     ;;
 
   *)
+    file="$( echo node_modules/*/bin/$action )"
+    if [[ -f "$file"  ]]; then
+      $file "$@"
+      exit 0
+    fi
+
     echo "Unknown action: $action" 1>&2
     exit 1
     ;;
