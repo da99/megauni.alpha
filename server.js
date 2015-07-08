@@ -17,6 +17,10 @@ app.use(helmet.csp({
   'default-src': ["'self'"]
 }));
 
+if (!process.env.IS_DEV) {
+  app.use(helmet.hsts(31536000, true, true));
+}
+
 // === Static files before session:
 app.use(koa_static('./Public'));
 
@@ -26,10 +30,9 @@ app.use(KOA_GENERIC_SESSION({
   store: new KOA_PG_SESSION(process.env.DATABASE_URL),
   cookie: {
     path: "/",
-    secureProxy: !!process.env.IS_DEV
+    secureProxy: !process.env.IS_DEV
   }
 }));
-
 
 // === Finally, the routes:
 app.use(mount(homepage));
