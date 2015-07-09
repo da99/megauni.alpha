@@ -400,26 +400,32 @@ case "$action" in
     fi
 
     # === Render all markup.rb:
-    for f in Public/applets/*/markup.rb
+    for f in ./Public/applets/*/markup.rb
     do
-      echo $f
+      bin/megauni render $f
     done
-    exit 0
+
+    # === Start server, shut it down at end.
+    bin/megauni start
 
     cleanup () {
       echo -e "\n\n=== Please wait... shutting down server..."
       if bin/megauni running? ; then
         bin/megauni stop
         echo -e "=== Done.\n"
+      else
+        echo "Nevermind. It's already shutdown."
       fi
       exit 0
     }
     trap cleanup SIGINT SIGTERM
 
-    # bin/megauni start
+
+    # === Regular expression:
     IFS=$'\n'
     re='^[0-9]+$'
 
+    # === Color codes:
     # From: http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
     Color_Off='\e[0m'
     BRed='\e[1;31m'
@@ -427,6 +433,7 @@ case "$action" in
     Green='\e[0;32m'
     Orange='\e[0;33m'
 
+    # === Other stuff:
     old_log="$(cat tmp/log.log || echo "")"
 
     echo "=== Watching:"
@@ -538,14 +545,31 @@ case "$action" in
       dir="./Public/applets/$name"
     fi
 
-    new_file="$dir/markup.html"
+    markup="$dir/markup.html"
+    style="$dir/style.css"
+
     if [[ ! -d "$dir" ]]; then
       echo "Not found: $dir" 1>&2
       exit 1
     fi
 
-    ruby -r"./Public/applets/base/MUE" -r"${dir}/markup.rb" -e "puts OUTPUT" > "$new_file"
-    echo "$new_file"
+    ruby -r"./Public/applets/base/MUE" -r"${dir}/markup.rb" -e "
+      raw = OUTPUT;
+      final = raw.sub(
+        /<style type=\"text\/css\">([^\<]+)<\/style>/,
+        %^<link type=\"text/css\" rel=\"stylesheet\" href=\"&#47;applets&#47;$name&#47;style.css\" />^
+      );
+      File.write(\"$style\",  \$1) unless final == raw;
+      File.write(\"$markup\", final);
+    "
+
+    if [[ -f "$markup" ]]; then
+      echo "$markup"
+    fi
+
+    if [[ -f "$style" ]]; then
+      echo "$style"
+    fi
     ;;
 
   "deploy")
