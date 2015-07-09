@@ -104,8 +104,9 @@ OUTPUT = Megauni::WWW_App.new {
 
     div.^(:disclaimer) {
       p  {
-        raw_text "&copy;"
-        text  " 2012-{$num.YEAR$} megauni.com. Some rights reserved."
+        raw_text %^
+          &copy; 2012-<span id="copyright_year_today">2015</span> megauni.com. Some rights reserved.
+        ^
       }
 
       p { "All other copyrights belong to their respective owners, who have no association to this site:" }
