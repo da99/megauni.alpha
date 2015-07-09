@@ -399,6 +399,13 @@ case "$action" in
       bin/megauni test watch "$@"
     fi
 
+    # === Render all markup.rb:
+    for f in Public/applets/*/markup.rb
+    do
+      echo $f
+    done
+    exit 0
+
     cleanup () {
       echo -e "\n\n=== Please wait... shutting down server..."
       if bin/megauni running? ; then
@@ -409,7 +416,7 @@ case "$action" in
     }
     trap cleanup SIGINT SIGTERM
 
-    bin/megauni start
+    # bin/megauni start
     IFS=$'\n'
     re='^[0-9]+$'
 
@@ -423,7 +430,7 @@ case "$action" in
     old_log="$(cat tmp/log.log || echo "")"
 
     echo "=== Watching:"
-    inotifywait --quiet --monitor --event close_write --exclude "/.git/|/Public/|/node_modules/" -r ./ | while read CHANGE
+    inotifywait --quiet --monitor --event close_write --exclude "/.git/|/Public/(\?\!applets)/|/node_modules/" -r ./ -r ./Public/applets | while read CHANGE
     do
       dir=$(echo "$CHANGE" | cut -d' ' -f 1)
       op=$(echo "$CHANGE" | cut -d' ' -f 2)
@@ -481,6 +488,10 @@ case "$action" in
           # bin/megauni thin -d restart
         # fi
 
+        if [[ "$file" =~ "markup.rb" ]]; then
+          bin/megauni render "$path" || rb_failed="$path"
+        fi
+
         if [[ "$file" =~ ".js" ]]; then
           if [[ "$file" =~ "Public/"  ]]; then
             echo "=== Running jshint:"
@@ -488,6 +499,10 @@ case "$action" in
           else
             bin/megauni restart
           fi
+        fi
+
+        if [[ "$file" =~ "markup.html" ]]; then
+          bin/megauni restart
         fi
 
       fi
@@ -512,6 +527,7 @@ case "$action" in
     ;;
 
   "render")
+    echo "Rendering: $1"
     name="$1"
     shift
 
