@@ -133,7 +133,11 @@ case "$action" in
     ;;
 
   "start")
-    PORT=$PORT $pm2 start server.js --name "megauni"
+    PORT=$PORT $pm2 start server.js \
+      --name "megauni"              \
+      --log    ./logs/megauni.log      \
+      --output ./logs/megauni.out.log  \
+      --error  ./logs/megauni.error.log
     exit 0
 
     dir="$(pwd)/tmp"

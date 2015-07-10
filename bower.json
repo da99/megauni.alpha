@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "jquery": "~2.1.4",
-    "lodash": "~3.10.0"
+    "lodash": "~3.10.0",
+    "turu": "https://github.com/da99/turu"
   }
 }
