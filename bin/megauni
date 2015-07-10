@@ -377,20 +377,14 @@ case "$action" in
     fi
     ;;
 
-  "jq")
-    if [[ ! -f "bin/jq" ]]; then
-      echo "=== Downloading jq..."
-      cd bin
-      wget "http://stedolan.github.io/jq/download/linux64/jq"
-      chmod +x jq
-      cd ..
-    fi
-    exec bin/jq "$@"
+
+  "json")
+    node_modules/json/lib/json.js "$@"
     ;;
 
   "running?")
-    stat="$(bin/megauni pm2 jlist | bin/megauni jq '.[0] | .pm2_env | .status ' --monochrome-output)"
-    if [[ "$stat" == '"online"' ]]; then
+    stat="$(bin/megauni pm2 jlist | bin/megauni json '[0].pm2_env.status')"
+    if [[ "$stat" == 'online' ]]; then
       exit 0
     else
       exit 1
@@ -438,7 +432,8 @@ case "$action" in
     Orange='\e[0;33m'
 
     # === Other stuff:
-    old_log="$(cat tmp/log.log || echo "")"
+    exit 2
+    old_log="$(cat /logs//log.log || echo "")"
 
     echo "=== Watching:"
     inotifywait --quiet --monitor --event close_write --exclude "/.git/|/Public/(\?\!applets)/|/node_modules/" -r ./  | while read CHANGE
@@ -450,8 +445,8 @@ case "$action" in
 
       echo "=== $CHANGE ($path)"
 
-      if [[ "$op" == "MODIFY" && "$file" == "log.log" ]]; then
-          new_log="$(cat tmp/log.log)"
+      if [[ "$file" =~ ".log" ]]; then
+          new_log="$(cat $file)"
           output=${new_log/"$old_log"}
           for i in $output; do
             code="$(echo "$i" | cut -d' ' -f9 || echo '')"
@@ -583,7 +578,9 @@ case "$action" in
     ;;
 
   *)
+
     file="$( echo node_modules/*/bin/$action )"
+
     if [[ -f "$file"  ]]; then
       $file "$@"
       exit 0
