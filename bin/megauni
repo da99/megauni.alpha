@@ -133,11 +133,12 @@ case "$action" in
     ;;
 
   "start")
-    PORT=$PORT $pm2 start server.js \
-      --name "megauni"              \
-      --log    ./logs/megauni.log      \
-      --output ./logs/megauni.out.log  \
-      --error  ./logs/megauni.error.log
+    PORT=$PORT $pm2 start server.js     \
+      --name "megauni"                  \
+      --log    ./logs/megauni.log       \
+      --output ./logs/megauni.out.log   \
+      --error  ./logs/megauni.error.log \
+      "$@"
     exit 0
 
     dir="$(pwd)/tmp"
@@ -435,16 +436,8 @@ case "$action" in
       bin/megauni render $f
     done
 
-    # === Start server, shut it down at end.
-    bin/megauni start
-    err_log="$(bin/megauni pm2 jlist | bin/megauni json '[0].pm2_env.pm_err_log_path')"
-    old_err_log="$(cat $err_log || echo "")"
-
-    log="$(bin/megauni pm2 jlist | bin/megauni json '[0].pm2_env.pm_log_path')"
-    old_log="$(cat $log || echo "")"
-
     cleanup () {
-      echo -e "\n\n=== Please wait... shutting down server..."
+      echo -e "\n=== Please wait... shutting down server..."
       if bin/megauni running? ; then
         bin/megauni stop
         echo -e "=== Done.\n"
@@ -469,26 +462,26 @@ case "$action" in
     Orange='\e[0;33m'
 
 
-    ( inotifywait --quiet --monitor --event MODIFY -r ./logs  | while read CHANGE
-    do
-      dir=$(echo "$CHANGE" | cut -d' ' -f 1)
-      op=$(echo "$CHANGE" | cut -d' ' -f 2)
-      file=$(echo "$CHANGE" | cut -d' ' -f 3)
-      path="${dir}$file"
+    # ( inotifywait --quiet --monitor --event MODIFY -r ./logs  | while read CHANGE
+    # do
+      # dir=$(echo "$CHANGE" | cut -d' ' -f 1)
+      # op=$(echo "$CHANGE" | cut -d' ' -f 2)
+      # file=$(echo "$CHANGE" | cut -d' ' -f 3)
+      # path="${dir}$file"
 
-      # echo "=== $CHANGE ($path)"
+      # # echo "=== $CHANGE ($path)"
 
-      if [[ "$(basename $file)" == "$(basename $log)" ]]; then
-        new_log="$(cat $path)"
-        output=${new_log/"$old_log"}
-        old_log="$new_log"
-        echo -e -n "$output"
-      fi
+      # if [[ "$(basename $file)" == "$(basename $log)" ]]; then
+        # new_log="$(cat $path)"
+        # output=${new_log/"$old_log"}
+        # old_log="$new_log"
+        # echo -e -n "$output"
+      # fi
 
-    done ) &
+    # done ) &
 
     echo "=== Watching:"
-    inotifywait --quiet --monitor --event close_write --exclude "/.git/|/Public/(\?\!applets)/|/node_modules/" -r ./  | while read CHANGE
+    ( inotifywait --quiet --monitor --event close_write --exclude "/.git/|/logs/|/Public/(\?\!applets)/|/node_modules/" -r ./  | while read CHANGE
     do
       dir=$(echo "$CHANGE" | cut -d' ' -f 1)
       op=$(echo "$CHANGE" | cut -d' ' -f 2)
@@ -496,20 +489,6 @@ case "$action" in
       path="${dir}$file"
 
       echo "=== $CHANGE ($path)"
-
-      if [[ "$(basename $file)" == "$(basename $err_log)" ]]; then
-          new_err_log="$(cat $file)"
-          output=${new_log/"$old_err_log"}
-          old_err_log="$new_err_log"
-          echo -e $output
-      fi
-
-      if [[ "$(basename $file)" == "$(basename $log)" ]]; then
-          new_log="$(cat $file)"
-          output=${new_log/"$old_log"}
-          old_log="$new_log"
-          echo -e $output
-      fi
 
       if [[ ! -z "$file" ]]; then
 
@@ -544,7 +523,15 @@ case "$action" in
         fi
 
       fi
-    done
+    done ) &
+
+    # === Start server:
+
+    if bin/megauni running? ; then
+      bin/megauni stop
+    fi
+    bin/megauni start --no-daemon
+
     ;;
 
   "POST")
