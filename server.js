@@ -7,9 +7,14 @@ var helmet     = require('koa-helmet');
 var mount      = require('koa-mount');
 var koa        = require('koa');
 var port       = process.env.PORT;
+var logger     = require('koa-logger');
 
 var app    = koa();
 var homepage = require('./Server/Root/homepage')
+
+if (process.env.IS_DEV) {
+  app.use(logger());
+}
 
 // === Set security before routes:
 app.use(helmet.defaults());
