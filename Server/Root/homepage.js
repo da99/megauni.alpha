@@ -8,11 +8,11 @@ var fs                = require('fs');
 var homepage_stranger = fs.readFileSync(process.cwd() + '/Public/applets/homepage/markup.html');
 
 
-router.get('/', function *homepage(next) {
-  yield next;
-  this.set('Content-Type', 'text/html');
-  this.body = homepage_stranger;
-});
+// router.get('/', function *homepage(next) {
+  // yield next;
+  // this.set('Content-Type', 'text/html');
+  // this.body = homepage_stranger;
+// });
 
 router.get('/time', function *homepage_time(next) {
   yield next;

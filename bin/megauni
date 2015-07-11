@@ -431,19 +431,25 @@ case "$action" in
     fi
 
     # === Render all markup.rb:
-    for f in ./Public/applets/*/markup.rb
-    do
-      bin/megauni render $f
-    done
+    render_all () {
+      touch logs/rendering
+      for f in ./Public/applets/*/markup.rb
+      do
+        bin/megauni render $f
+      done
+      rm -f logs/rendering
+    }
+    render_all
 
     cleanup () {
-      echo -e "\n=== Please wait... shutting down server..."
-      if bin/megauni running? ; then
-        bin/megauni stop
-        echo -e "=== Done.\n"
-      else
-        echo "Nevermind. It's already shutdown."
-      fi
+      bin/megauni stop
+      # echo -e "\n=== Please wait... shutting down server..."
+      # if bin/megauni running? ; then
+        # bin/megauni stop
+        # echo -e "=== Done.\n"
+      # else
+        # echo "Nevermind. It's already shutdown."
+      # fi
       exit 0
     }
     trap cleanup SIGINT SIGTERM
@@ -505,9 +511,20 @@ case "$action" in
           # bin/megauni thin -d restart
         # fi
 
-        if [[ "$file" =~ "markup.rb" ]]; then
-          bin/megauni render "$path" || rb_failed="$path"
-        fi
+        if [[ ! -f logs/rendering ]]; then
+          if [[ "$file" =~ "markup.rb" ]]; then
+            bin/megauni render "$path" || rb_failed="$path"
+          fi
+
+          if [[ "$path" =~ "applets" && "$path" =~ ".rb" ]]; then
+            render_all
+          fi
+
+          if [[ "$file" =~ "markup.html" ]]; then
+            bin/megauni restart
+          fi
+
+        fi # if ! -f logs/rendering
 
         if [[ "$file" =~ ".js" ]]; then
           if [[ "$file" =~ "Public/"  ]]; then
@@ -516,10 +533,6 @@ case "$action" in
           else
             bin/megauni restart
           fi
-        fi
-
-        if [[ "$file" =~ "markup.html" ]]; then
-          bin/megauni restart
         fi
 
       fi
@@ -571,6 +584,7 @@ case "$action" in
       exit 1
     fi
 
+    err=""
     ruby -r"./Public/applets/base/MUE" -r"${dir}/markup.rb" -e "
       raw = OUTPUT;
       final = raw.sub(
@@ -579,15 +593,18 @@ case "$action" in
       );
       File.write(\"$style\",  \$1) unless final == raw;
       File.write(\"$markup\", final);
-    "
+    " || err="true"
 
-    if [[ -f "$markup" ]]; then
-      echo "$markup"
+    if [[ -z "$err" ]]; then
+      if [[ -f "$markup" ]]; then
+        echo "$markup"
+      fi
+
+      if [[ -f "$style" ]]; then
+        echo "$style"
+      fi
     fi
 
-    if [[ -f "$style" ]]; then
-      echo "$style"
-    fi
     ;;
 
   "deploy")

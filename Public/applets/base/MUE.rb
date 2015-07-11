@@ -137,6 +137,8 @@ MUE = Megauni::WWW_App.new {
 
 
     } # === style
+
+    script('/scripts/turu/turu.js')
   } # === Megauni::WWW_App
 # } # === mu :MUE
 
