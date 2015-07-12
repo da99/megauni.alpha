@@ -595,7 +595,6 @@ case "$action" in
     fi
 
     markup="$dir/markup.html"
-    style="$dir/style.css"
 
     if [[ ! -d "$dir" ]]; then
       echo "Not found: $dir" 1>&2
@@ -603,14 +602,8 @@ case "$action" in
     fi
 
     err=""
-    ruby -r"./Public/applets/base/MUE" -r"${dir}/markup.rb" -e "
-      raw = OUTPUT;
-      final = raw.sub(
-        /<style type=\"text\/css\">([^\<]+)<\/style>/,
-        %^<link type=\"text/css\" rel=\"stylesheet\" href=\"&#47;applets&#47;$name&#47;style.css\" />^
-      );
-      File.write(\"$style\",  \$1) unless final == raw;
-      File.write(\"$markup\", final);
+    ruby -r"./Public/applets/MUE/markup" -r"${dir}/markup.rb" -e "
+      File.write(\"$markup\", HTML);
     " || err="true"
 
     if [[ -z "$err" ]]; then
@@ -618,9 +611,10 @@ case "$action" in
         echo "$markup"
       fi
 
-      if [[ -f "$style" ]]; then
-        echo "$style"
-      fi
+    fi
+
+    if [[ "$@" =~ "print" ]]; then
+      cat "$markup"
     fi
 
     ;;

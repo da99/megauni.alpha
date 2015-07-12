@@ -4,9 +4,6 @@ require "erector"
 module Megauni
   module WWW_App
 
-    BORDER_RADIUS = %w{
-    }.map(&:to_sym)
-
     def var *args
       @vars ||= begin
                   v = {}
@@ -41,8 +38,8 @@ module Megauni
 
     def nav_bar
       div.nav_bar! {
-        a.href('/') { 'megauni home' }
-        a.href('/log-out') { 'Log-Out' }
+        a('megauni home', href: '/')
+        a('Log-Out',      href: '/log-out')
       }
     end
 
@@ -50,19 +47,54 @@ module Megauni
       html {
 
         head {
-          link.href('/css/vanilla.reset.css')./
-          link.href('/css/fonts.css')./
-          link.href('/css/otfpoc.css')./
-          title(@title || 'no title' )
+          megauni :head do
+
+            link media: 'all', rel: 'stylesheet', type: 'text/css', href: '/css/vanilla.reset.css'
+            link media: 'all', rel: 'stylesheet', type: 'text/css', href: '/css/fonts.css'
+            link media: 'all', rel: 'stylesheet', type: 'text/css', href: '/css/otfpoc.css'
+
+          end
+
+          title('No title') unless @megauni[:title_used]
         } # === head
 
         body {
-
+          megauni :body
         }
 
-        script('/scripts/turu/turu.js')
+        megauni :tail do
+          script('/scripts/turu/turu.js')
+        end
       } # === html
     end # === def content
+
+    def initialize *args
+      @megauni = {
+        :head_top=>[], :head_bottom=>[],
+        :body_top=>[], :body_bottom=>[],
+        :tail_top=>[], :tail_bottom=>[]
+      }
+      super
+    end
+
+    def title *args
+      @megauni[:title_used] = true
+      super
+    end
+
+    def megauni name
+      @megauni[:"#{name}_top"].each { |b| b.call }
+      yield if block_given?
+      @megauni[:"#{name}_bottom"].each { |b| b.call }
+    end
+
+    def prepend name, &blok
+      @megauni[:"#{name}_top"] << blok
+    end
+
+    def append name, &blok
+      @megauni[:"#{name}_bottom"] << blok
+    end
 
   end # === class MUE
 

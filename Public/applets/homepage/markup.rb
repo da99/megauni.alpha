@@ -1,4 +1,14 @@
 
+HTML = Megauni::MUE.new.instance_eval {
+  append(:head) { title 'The Ttle' }
+  append(:body) {
+    p 'hello'
+  }
+
+  to_html(:prettyprint=>true)
+}
+
+__END__
 OUTPUT = Megauni::WWW_App.new {
   use ::MUE
 
