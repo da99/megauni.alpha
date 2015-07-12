@@ -424,6 +424,15 @@ case "$action" in
     fi
     ;;
 
+  "render_stylus")
+    for f in ./Public/applets/*/*.styl
+    do
+      if [[ ! "$f" =~ "vars.styl" ]] ; then
+        bin/megauni stylus $f
+      fi
+    done
+    ;;
+
   "watch")
     if [[ "$@" == *test* ]]; then
       shift
@@ -440,6 +449,9 @@ case "$action" in
       rm -f logs/rendering
     }
     render_all
+
+    # === Render all stylus files:
+    bin/megauni render_stylus
 
     cleanup () {
       bin/megauni stop
@@ -511,14 +523,20 @@ case "$action" in
           # bin/megauni thin -d restart
         # fi
 
+        if [[ "$file" =~ ".styl" ]]; then
+          bin/megauni stylus "$path"
+        fi
+
         if [[ ! -f logs/rendering ]]; then
           if [[ "$file" =~ "markup.rb" ]]; then
             bin/megauni render "$path" || rb_failed="$path"
+          else
+            # Most likely a base file, so all files have to be re-rendered:
+            if [[ "$path" =~ "applets" && "$path" =~ ".rb" ]]; then
+              render_all
+            fi
           fi
 
-          if [[ "$path" =~ "applets" && "$path" =~ ".rb" ]]; then
-            render_all
-          fi
 
           if [[ "$file" =~ "markup.html" ]]; then
             bin/megauni restart

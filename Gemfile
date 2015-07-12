@@ -42,7 +42,7 @@ gem 'pg'
 
 gem 'i_dig_sql'
 # gem 'datoki'
-gem 'www_app'
+gem 'erector'
 gem 'moron_text'
 gem 'touch_up'
 gem 'duck_duck_duck'

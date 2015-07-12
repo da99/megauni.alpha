@@ -62,11 +62,6 @@ GEM
       unf_ext
     unf_ext (0.0.7.1)
     unindent (1.0)
-    www_app (2.3.0)
-      escape_escape_escape (>= 1.4.2)
-      mustache (>= 0.99)
-      yajl-ruby (>= 1.2)
-    yajl-ruby (1.2.1)
 
 PLATFORMS
   ruby
@@ -76,6 +71,7 @@ DEPENDENCIES
   bacon
   dot_why
   duck_duck_duck
+  erector
   escape_utils
   htmlentities
   i_dig_sql
@@ -88,4 +84,3 @@ DEPENDENCIES
   sequel
   touch_up
   unindent
-  www_app
