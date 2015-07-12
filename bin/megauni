@@ -602,7 +602,7 @@ case "$action" in
     fi
 
     err=""
-    ruby -r"./Public/applets/MUE/markup" -r"${dir}/markup.rb" -e "
+    ruby -r"./Public/applets/MUE/layout" -r"${dir}/markup.rb" -e "
       File.write(\"$markup\", HTML);
     " || err="true"
 
@@ -611,11 +611,10 @@ case "$action" in
         echo "$markup"
       fi
 
-    fi
-
-    if [[ "$@" =~ "print" ]]; then
-      cat "$markup"
-    fi
+      if [[ "$@" =~ "print" ]]; then
+        cat "$markup"
+      fi
+    fi # === if no err
 
     ;;
 

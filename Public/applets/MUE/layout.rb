@@ -52,7 +52,10 @@ module Megauni
             link media: 'all', rel: 'stylesheet', type: 'text/css', href: '/css/vanilla.reset.css'
             link media: 'all', rel: 'stylesheet', type: 'text/css', href: '/css/fonts.css'
             link media: 'all', rel: 'stylesheet', type: 'text/css', href: '/css/otfpoc.css'
-
+            link media: 'all', rel: 'stylesheet', type: 'text/css', href: '/applets/MUE/style.css'
+            if @file
+              link media: 'all', rel: 'stylesheet', type: 'text/css', href: "/applets/#{File.basename File.dirname(@file)}/style.css"
+            end
           end
 
           title('No title') unless @megauni[:title_used]
@@ -63,7 +66,7 @@ module Megauni
         }
 
         megauni :tail do
-          script('/scripts/turu/turu.js')
+          script(src: '/scripts/turu/turu.js')
         end
       } # === html
     end # === def content
