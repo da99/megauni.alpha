@@ -5,8 +5,14 @@ HTML = Megauni::MUE.new(file: __FILE__, auth_token: '{$str.auth_token$}').instan
 
   append(:body) {
 
-    script.New_Session!(type: 'applet/megauni') {
+    script.Welcome!(type: 'applet/megauni') {
       div.block(show_if: 'logged_in?') {
+        p 'You are logged in.'
+      }
+    } # --- Welcome!
+
+    script.New_Session!(type: 'applet/megauni') {
+      div.block(show_if: '!logged_in?') {
 
         h3 "Log-In"
 
@@ -37,7 +43,7 @@ HTML = Megauni::MUE.new(file: __FILE__, auth_token: '{$str.auth_token$}').instan
     } # --- script
 
     script.New_Customer!(type: 'applet/megauni') {
-      div.block(show_if: 'logged_in?') {
+      div.block(show_if: '!logged_in?') {
 
         h3 "Create a New Account"
         div.content {
@@ -119,6 +125,9 @@ HTML = Megauni::MUE.new(file: __FILE__, auth_token: '{$str.auth_token$}').instan
     } # div block
   } # === append :body
 
+  append(:tail) {
+    script(src: '/applets/applets/script.js')
+  }
 
   to_html(:prettyprint=>true)
 }

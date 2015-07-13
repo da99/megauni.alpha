@@ -6,7 +6,11 @@
     <link href="/applets/homepage/style.css" media="all" rel="stylesheet" type="text/css" />
     <title>megaUNI Homepage</title>
   </head>
-  <body>    <script id="New_Session" type="applet/megauni">      <div class="block" show_if="logged_in?">
+  <body>    <script id="Welcome" type="applet/megauni">      <div class="block" show_if="logged_in?">
+        <p>You are logged in.</p>
+      </div>
+    </script>
+    <script id="New_Session" type="applet/megauni">      <div class="block" show_if="!logged_in?">
         <h3>Log-In</h3>
         <div class="content">          <form action="/sign-in" id="sign_in" method="post">            <div class="fields">              <div class="field screen_name"><label for="LOGIN_SCREEN_NAME">Screen name:</label><input name="screen_name" type="text" value="" /></div>
               <div class="field passphrase"><label for="LOGIN_PASS_PHRASE">Pass phrase:</label><input name="pswd" type="password" value="" /></div>
@@ -16,7 +20,7 @@
         </div>
       </div>
     </script>
-    <script id="New_Customer" type="applet/megauni">      <div class="block" show_if="logged_in?">
+    <script id="New_Customer" type="applet/megauni">      <div class="block" show_if="!logged_in?">
         <h3>Create a New Account</h3>
         <div class="content">          <form action="/user" id="create_account" method="post">            <div class="fields">              <div class="field screen_name"><label for="NEW_CUSTOMER_SCREEN_NAME">Screen name:</label><input name="screen_name" type="text" value="" /></div>
               <div class="field pswd"><label for="NEW_CUSTOMER_PASS_PHRASE"><span class="main">Pass phrase</span><span class="sub"> (for better security, use spaces and words)</span><span class="main">:</span></label><input name="pswd" type="password" value="" /></div>
@@ -44,4 +48,6 @@
   </body>
   <script src="/scripts/turu/turu.js"></script>
   <script src="/scripts/jquery/dist/jquery.min.js"></script>
+  <script src="/scripts/lodash/lodash.min.js"></script>
+  <script src="/applets/applets/script.js"></script>
 </html>
