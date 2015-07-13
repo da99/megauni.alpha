@@ -67,6 +67,7 @@ module Megauni
 
         megauni :tail do
           script(src: '/scripts/turu/turu.js')
+          script(src: '/scripts/jquery/dist/jquery.min.js')
         end
       } # === html
     end # === def content

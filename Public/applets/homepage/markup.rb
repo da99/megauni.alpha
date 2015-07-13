@@ -4,77 +4,82 @@ HTML = Megauni::MUE.new(file: __FILE__, auth_token: '{$str.auth_token$}').instan
   append(:head) { title "megaUNI Homepage" }
 
   append(:body) {
-    div.block.New_Session! {
 
-      h3 "Log-In"
+    script.New_Session!(type: 'applet/megauni') {
+      div.block(show_if: 'logged_in?') {
 
-      div.content {
+        h3 "Log-In"
 
-        form.sign_in!(action: '/sign-in', method: 'post') {
+        div.content {
 
-          div.fields {
+          form.sign_in!(action: '/sign-in', method: 'post') {
 
-            div.field.screen_name {
-              label("Screen name:", for: "LOGIN_SCREEN_NAME")
-              input(type: 'text', name: "screen_name", value: "")
-            }
+            div.fields {
 
-            div.field.passphrase {
-              label("Pass phrase:", for: "LOGIN_PASS_PHRASE")
-              input(type: 'password', name: "pswd", value: "")
-            }
-
-            div.field.buttons {
-              button.submit "Log-In"
-            }
-
-          } # --- div.fields
-        } # --- form
-      } # --- div.content
-    } # --- div.box
-
-    div.New_Customer!.block {
-
-      h3 "Create a New Account"
-      div.content {
-
-        form.create_account!(action: '/user', method: 'post') {
-
-          div.fields {
-
-            div.field.screen_name {
-              label("Screen name:", for: 'NEW_CUSTOMER_SCREEN_NAME')
-              input(type: :text, name: "screen_name", value: "")
-            }
-
-            div.field.pswd {
-              label(for: :NEW_CUSTOMER_PASS_PHRASE) {
-                span.main "Pass phrase"
-                span.sub  " (for better security, use spaces and words)"
-                span.main ":"
+              div.field.screen_name {
+                label("Screen name:", for: "LOGIN_SCREEN_NAME")
+                input(type: 'text', name: "screen_name", value: "")
               }
-              input(type: :password, name: :pswd, value: "")
-            }
 
-            div.field.confirm_pass_phrase {
-              label(for: :NEW_CUSTOMER_CONFIRM_PASS_PHRASE) {
-                span.main "Re-type the pass phrase:"
+              div.field.passphrase {
+                label("Pass phrase:", for: "LOGIN_PASS_PHRASE")
+                input(type: 'password', name: "pswd", value: "")
               }
-              input(type: :password, name: :confirm_pass_word, value: "")
-            }
+
+              div.field.buttons {
+                button.submit "Log-In"
+              }
+
+            } # --- div.fields
+          } # --- form
+        } # --- div.content
+      } # --- div.block
+    } # --- script
+
+    script.New_Customer!(type: 'applet/megauni') {
+      div.block(show_if: 'logged_in?') {
+
+        h3 "Create a New Account"
+        div.content {
+
+          form.create_account!(action: '/user', method: 'post') {
+
+            div.fields {
+
+              div.field.screen_name {
+                label("Screen name:", for: 'NEW_CUSTOMER_SCREEN_NAME')
+                input(type: :text, name: "screen_name", value: "")
+              }
+
+              div.field.pswd {
+                label(:for => :NEW_CUSTOMER_PASS_PHRASE) {
+                  span.main "Pass phrase"
+                  span.sub  " (for better security, use spaces and words)"
+                  span.main ":"
+                }
+                input(type: :password, name: :pswd, value: "")
+              }
+
+              div.field.confirm_pass_phrase {
+                label(:for => :NEW_CUSTOMER_CONFIRM_PASS_PHRASE) {
+                  span.main "Re-type the pass phrase:"
+                }
+                input(type: :password, name: :confirm_pass_word, value: "")
+              }
 
 
-            div.buttons {
-              # input(type: 'hidden', name: "_csrf", value: "{{_csrf}}")
-              button.submit "Create Account"
-            }
+              div.buttons {
+                input(type: 'hidden', name: "_csrf", value: "{{_csrf}}")
+                button.submit "Create Account"
+              }
 
-          } # --- div.fields
+            } # --- div.fields
 
-        } # --- form
+          } # --- form
 
-      } # --- div.content
-    } # === div block
+        } # --- div.content
+      } # === div block
+    } # --- script
 
     div.block.intro! {
 
