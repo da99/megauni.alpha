@@ -6,6 +6,24 @@ var Applet = {
     default: null
   },
 
+  bool : function () {
+    var key, o;
+    var arr = _.toArray(arguments);
+
+    if (arr.length === 1) {
+      o = Applet.data.default;
+      key = arr[0];
+    } else {
+      o = arr[0];
+      key = arr[1];
+    }
+
+    if (!_.has(o, key))
+      throw new Error('Key not found: ' + key);
+
+    return !!o[key];
+  },
+
   nodes : [
   ],
 
@@ -58,13 +76,13 @@ var Applet = {
 
         switch (name) {
           case 'show_if':
-            if (Applet.data.default[val])
+            if (Applet.bool( val ))
               child.show();
             else
               child.hide();
             break;
           case 'hide_if':
-            if (Applet.data.default[val])
+            if (Applet.bool( val ))
               child.hide();
             else
               child.show();
@@ -81,17 +99,41 @@ var Applet = {
   }, // === compile_script
 
   run: function (raw_data) {
-    if (!Applet.data.default) {
-      var data = {};
-      _.each(raw_data, function (v, k) {
-        data[k] = v;
-        if (!_.startsWith(k, '!') && !_.has(raw_data, '!' + k))
-          data['!'+k] = !v;
-      });
+    var data = {};
+    _.each(raw_data, function (v, k) {
+      data[k] = v;
+      if (!_.startsWith(k, '!') && !_.has(raw_data, '!' + k))
+        data['!'+k] = !v;
+    });
 
+    if (!Applet.data.default) {
       Applet.data.default = data;
       $('script[type="applet/megauni"]').each(function (i, o) {
         Applet.compile_script_tag(o);
+      });
+    } else {
+      _.each(Applet.nodes, function (o) {
+        if (!_.has(data, o.value))
+          return;
+
+        switch (o.action) {
+          case 'show_if':
+            if (data[o.value])
+              $('#' + o.id).show();
+            else
+              $('#' + o.id).hide();
+          break;
+
+          case 'hide_if':
+            if (data[o.value])
+              $('#' + o.id).hide();
+            else
+              $('#' + o.id).show();
+          break;
+
+          default:
+            throw new Error('I don\'t know about: ' + o.action);
+        }; // === case
       });
     }
   }
