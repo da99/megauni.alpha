@@ -2,22 +2,33 @@
 
 var Applet = {
 
-  data : {
-    default: null
+  attrs : {
+    show_if : function (env) {
+      console.log(env);
+    },
+
+    hide_if : function (env) {
+      console.log(env);
+    },
+
+    template_for : function (env) {
+      console.log(env);
+    },
+
+    "var": function (env) {
+      console.log(env);
+    },
+
+    prepend : function (env) {
+      console.log(env);
+    },
+
+    append : function (env) {
+      console.log(env);
+    }
   },
 
-  bool : function () {
-    var key, o;
-    var arr = _.toArray(arguments);
-
-    if (arr.length === 1) {
-      o = Applet.data.default;
-      key = arr[0];
-    } else {
-      o = arr[0];
-      key = arr[1];
-    }
-
+  bool : function (o, key) {
     if (!_.has(o, key))
       throw new Error('Key not found: ' + key);
 
@@ -48,10 +59,34 @@ var Applet = {
     return new_id;
   },
 
-  actions: [
-    'show_if',
-    'hide_if'
-  ],
+  compile : function () {
+
+    var attr_names = _.keys(Applet.attrs);
+    var any_with_attrs   = _.map(attr_names, function (name) {
+      return '*[' + name + ']';
+    }).join(',');
+
+    $('script[type="applet/megauni"]').each(function (ignore, raw_script) {
+      var script = $(raw_script);
+      var script_id = Applet.id(raw_script);
+
+      $(script.html()).find(any_with_attrs).addBack(any_with_attrs).each(function (ignore, raw) {
+        var dom = $(raw);
+        _.each(attr_names, function (attr) {
+          if (!dom.attr(attr))
+            return;
+          Applet.attrs[attr]({
+            script : script,
+            raw    : raw,
+            dom    : dom,
+            val    : dom.attr(attr)
+          });
+        }); // === each attr_names
+      });
+
+    }); // === each script applet
+
+  }, // === compile
 
   compile_script_tag : function (raw_script) {
 
@@ -60,7 +95,7 @@ var Applet = {
     $(script.html()).each(function (i, raw_child) {
 
       var child = $(raw_child);
-      _.each(Applet.actions, function (name) {
+      _.each(_.keys(Applet.attrs), function (name) {
 
         var val = child.attr(name);
         if (!val)
@@ -75,18 +110,21 @@ var Applet = {
         child.removeAttr(name);
 
         switch (name) {
+
           case 'show_if':
             if (Applet.bool( val ))
               child.show();
             else
               child.hide();
             break;
+
           case 'hide_if':
             if (Applet.bool( val ))
               child.hide();
             else
               child.show();
             break;
+
           default:
             Applet.log('I do not know what to do on: ' + name);
         } // === switch
@@ -99,6 +137,9 @@ var Applet = {
   }, // === compile_script
 
   run: function (raw_data) {
+    // === first data
+    // === after first data
+    //
     var data = {};
     _.each(raw_data, function (v, k) {
       data[k] = v;
@@ -133,12 +174,16 @@ var Applet = {
 
           default:
             throw new Error('I don\'t know about: ' + o.action);
-        }; // === case
+        } // === case
       });
     }
   }
 };
 
 $(function () {
-  Applet.run({"logged_in?": false});
+  Applet.compile();
+  // Applet.run({"logged_in?": false});
 });
+
+
+

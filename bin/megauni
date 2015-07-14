@@ -513,11 +513,9 @@ case "$action" in
       file=$(echo "$CHANGE" | cut -d' ' -f 3)
       path="${dir}$file"
 
-      echo "=== $CHANGE ($path)"
+      echo -e "=== $CHANGE ($path)"
 
       if [[ ! -z "$file" ]]; then
-
-        echo ""
 
         if [[ "$path" == *bin/megauni* ]]; then
           echo "=== Stopping this script"
@@ -561,6 +559,8 @@ case "$action" in
         fi
 
       fi
+
+      echo ""
     done ) &
 
     # === Start server:
