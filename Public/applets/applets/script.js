@@ -2,29 +2,54 @@
 
 var Applet = {
 
+  stacks : {
+    funcs : []
+  },
+
+  append : function (func) {
+    return Applet.stacks.funcs.push(func);
+  },
+
   attrs : {
     show_if : function (env) {
-      console.log(env);
+      env.$.hide();
+
+      // === Add to dom:
+      if (env.is_parent)
+        env.script.after(env.$);
+
+      var val = env.val;
+      var id = Applet.id(env.$);
+      env.append(function (e) {
+        if (!_.has(e.data, val))
+          return;
+
+        Applet.log(e.data, val);
+        if (e.data[val])
+          $('#' + id).show();
+        else
+          $('#' + id).hide();
+      });
     },
 
     hide_if : function (env) {
-      console.log(env);
+      return new Error('Not done');
     },
 
     template_for : function (env) {
-      console.log(env);
+      return new Error('Not done');
     },
 
     "var": function (env) {
-      console.log(env);
+      return new Error('Not done');
     },
 
     prepend : function (env) {
-      console.log(env);
+      return new Error('Not done');
     },
 
     append : function (env) {
-      console.log(env);
+      return new Error('Not done');
     }
   },
 
@@ -66,7 +91,7 @@ var Applet = {
       return '*[' + name + ']';
     }).join(',');
 
-    $('script[type="applet/megauni"]').each(function (ignore, raw_script) {
+    $('script[type="text/applet"]').each(function (ignore, raw_script) {
       var script = $(raw_script);
       var script_id = Applet.id(raw_script);
 
@@ -75,11 +100,16 @@ var Applet = {
         _.each(attr_names, function (attr) {
           if (!dom.attr(attr))
             return;
+          var parent = dom.parent();
           Applet.attrs[attr]({
-            script : script,
-            raw    : raw,
-            dom    : dom,
-            val    : dom.attr(attr)
+            script     : script,
+            raw_script : raw_script,
+            raw        : raw,
+            $          : dom,
+            val        : dom.attr(attr),
+            is_child   : parent.length > 0,
+            is_parent  : parent.length === 0,
+            append     : Applet.append
           });
         }); // === each attr_names
       });
@@ -147,42 +177,16 @@ var Applet = {
         data['!'+k] = !v;
     });
 
-    if (!Applet.data.default) {
-      Applet.data.default = data;
-      $('script[type="applet/megauni"]').each(function (i, o) {
-        Applet.compile_script_tag(o);
-      });
-    } else {
-      _.each(Applet.nodes, function (o) {
-        if (!_.has(data, o.value))
-          return;
+    _.each(Applet.stacks.funcs, function (f) {
+      f({data: data});
+    });
 
-        switch (o.action) {
-          case 'show_if':
-            if (data[o.value])
-              $('#' + o.id).show();
-            else
-              $('#' + o.id).hide();
-          break;
-
-          case 'hide_if':
-            if (data[o.value])
-              $('#' + o.id).hide();
-            else
-              $('#' + o.id).show();
-          break;
-
-          default:
-            throw new Error('I don\'t know about: ' + o.action);
-        } // === case
-      });
-    }
   }
 };
 
 $(function () {
   Applet.compile();
-  // Applet.run({"logged_in?": false});
+  Applet.run({"logged_in?": false});
 });
 
 
