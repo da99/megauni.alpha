@@ -3,6 +3,11 @@ HTML = Megauni::MUE.new(file: __FILE__, auth_token: '{$str.auth_token$}').instan
 
   append(:head) { title "megaUNI Homepage" }
 
+  append(:tail) {
+    script(src: '/scripts/da99.applet.js/applet.js')
+    script(src: '/applets/homepage/script.js')
+  }
+
   append(:body) {
 
     script.Welcome!(type: 'text/applet') {
@@ -124,10 +129,6 @@ HTML = Megauni::MUE.new(file: __FILE__, auth_token: '{$str.auth_token$}').instan
 
     } # div block
   } # === append :body
-
-  append(:tail) {
-    script(src: '/applets/applets/script.js')
-  }
 
   to_html(:prettyprint=>true)
 }
