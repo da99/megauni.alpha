@@ -5,7 +5,7 @@ var koa_pg = require('koa-pg')
 
 
 var fs                = require('fs');
-var homepage_stranger = fs.readFileSync(process.cwd() + '/Public/applets/homepage/markup.html');
+// var homepage_stranger = fs.readFileSync(process.cwd() + '/Public/applets/homepage/markup.html');
 
 
 // router.get('/', function *homepage(next) {

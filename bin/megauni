@@ -431,26 +431,6 @@ case "$action" in
       bin/megauni test watch "$@"
     fi
 
-    # === Render all markup.rb:
-    render_all () {
-      touch logs/rendering
-      for f in ./Public/applets/*/markup.rb
-      do
-        bin/megauni render $f
-      done
-      rm -f logs/rendering
-    }
-    render_all
-
-    # === Render all stylus files:
-    bin/megauni render_stylus
-
-    for f in ./Public/applets/*/script.js
-    do
-      echo "=== JSHint: $f"
-      bin/megauni jshint "$f"
-    done
-
     cleanup () {
       bin/megauni stop
       # echo -e "\n=== Please wait... shutting down server..."
