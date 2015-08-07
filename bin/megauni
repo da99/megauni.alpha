@@ -2,7 +2,7 @@
 # -*- bash -*-
 #
 #
-pm2="node_modules/pm2/bin/pm2"
+script_args=("$@")
 action="$1"
 shift
 
@@ -32,6 +32,14 @@ bold_white_on_green=$(tput bold)${white}${green_bg}
 bold_white=$(tput bold)${white}
 reset_color=$(tput sgr0)
 # ==============================================================
+
+# === Color codes:
+# From: http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
+Color_Off='\e[0m'
+BRed='\e[1;31m'
+Red='\e[0;31m'
+Green='\e[0;32m'
+Orange='\e[0;33m'
 
 # ===============================================
 mods=(
@@ -126,20 +134,15 @@ case "$action" in
     ;;
 
   "stop")
-    $pm2 stop megauni
+    $0 pm2 stop megauni.pm2.json5 "$@"
     ;;
 
   "restart")
-    $pm2 restart megauni
+    $0 pm2 restart megauni.pm2.json5 "$@"
     ;;
 
   "start")
-    PORT=$PORT $pm2 start server.js     \
-      --name "megauni"                  \
-      --log    ./logs/megauni.log       \
-      --output ./logs/megauni.out.log   \
-      --error  ./logs/megauni.error.log \
-      "$@"
+    PORT=$PORT $0 pm2 start megauni.pm2.json5 "$@"
     exit 0
 
     dir="$(pwd)/tmp"
@@ -425,121 +428,89 @@ case "$action" in
     fi
     ;;
 
+  "watch_files")
+    echo "=== Watching:"
+      while read CHANGE
+      do
+        dir=$(echo "$CHANGE" | cut -d' ' -f 1)
+        op=$(echo "$CHANGE" | cut -d' ' -f 2)
+        file=$(echo "$CHANGE" | cut -d' ' -f 3)
+        path="${dir}$file"
+
+        echo -e "=== $CHANGE ($path)"
+
+        if [[ ! -z "$file" ]]; then
+
+          if [[ "$path" == *bin/megauni* ]]; then
+            echo "=== Reloading this script: $0 ${script_args[@]}"
+            exec $0 ${script_args[@]}
+          fi
+
+          if [[ "$file" =~ ".styl" ]]; then
+            bin/megauni stylus "$path"
+          fi
+
+          if [[ ! -f logs/rendering ]]; then # ========
+            if [[ "$file" =~ "markup.rb" ]]; then
+              bin/megauni render "$path" || rb_failed="$path"
+            else
+              # Most likely a base file, so all files have to be re-rendered:
+              if [[ "$path" =~ "applets" && "$path" =~ ".rb" ]]; then
+                render_all
+              fi
+            fi
+
+
+            if [[ "$file" =~ "markup.html" ]]; then
+              bin/megauni restart
+            fi
+
+          fi # if ! -f logs/rendering =================
+
+          if [[ "$file" =~ ".js" ]]; then
+            if [[ "$path" =~ "Public/"  ]]; then
+              echo -n "=== Running jshint: "
+              ( bin/megauni jshint $path && echo -e "${green}Passed${reset_color}" ) || js_failed=""
+            else
+              bin/megauni restart
+            fi
+          fi
+
+        fi
+
+        echo ""
+      done < <(inotifywait --quiet --monitor --event close_write --exclude "/.git/|/logs/|/Public/(\?\!applets)/|/node_modules/" -r ./)
+    ;;
+
   "watch")
+
+    kill_all () {
+      code="$1"
+      echo "" 1>&2
+      echo  "=== Exit Code: $code" 1>&2
+      $0 stop
+      echo  "=== Sending SIGINT process group: -$$" 1>&2
+      kill -SIGINT -$$
+      return $code
+    }
+    trap 'kill_all $?' EXIT
+
     if [[ "$@" == *test* ]]; then
       shift
       bin/megauni test watch "$@"
     fi
 
-    cleanup () {
-      bin/megauni stop
-      # echo -e "\n=== Please wait... shutting down server..."
-      # if bin/megauni running? ; then
-        # bin/megauni stop
-        # echo -e "=== Done.\n"
-      # else
-        # echo "Nevermind. It's already shutdown."
-      # fi
-      exit 0
-    }
-    trap cleanup SIGINT SIGTERM
-
-
     # === Regular expression:
     IFS=$'\n'
     re='^[0-9]+$'
-
-    # === Color codes:
-    # From: http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
-    Color_Off='\e[0m'
-    BRed='\e[1;31m'
-    Red='\e[0;31m'
-    Green='\e[0;32m'
-    Orange='\e[0;33m'
-
-
-    # ( inotifywait --quiet --monitor --event MODIFY -r ./logs  | while read CHANGE
-    # do
-      # dir=$(echo "$CHANGE" | cut -d' ' -f 1)
-      # op=$(echo "$CHANGE" | cut -d' ' -f 2)
-      # file=$(echo "$CHANGE" | cut -d' ' -f 3)
-      # path="${dir}$file"
-
-      # # echo "=== $CHANGE ($path)"
-
-      # if [[ "$(basename $file)" == "$(basename $log)" ]]; then
-        # new_log="$(cat $path)"
-        # output=${new_log/"$old_log"}
-        # old_log="$new_log"
-        # echo -e -n "$output"
-      # fi
-
-    # done ) &
-
-    echo "=== Watching:"
-    ( inotifywait --quiet --monitor --event close_write --exclude "/.git/|/logs/|/Public/(\?\!applets)/|/node_modules/" -r ./  | while read CHANGE
-    do
-      dir=$(echo "$CHANGE" | cut -d' ' -f 1)
-      op=$(echo "$CHANGE" | cut -d' ' -f 2)
-      file=$(echo "$CHANGE" | cut -d' ' -f 3)
-      path="${dir}$file"
-
-      echo -e "=== $CHANGE ($path)"
-
-      if [[ ! -z "$file" ]]; then
-
-        if [[ "$path" == *bin/megauni* ]]; then
-          echo "=== Stopping this script"
-          kill -SIGINT -$$
-        fi
-
-        # if [[ "$file" =~ ".rb" || "$file" =~ ".lock" ]]; then
-          # echo "=== Touching: tmp/restart.txt"
-          # touch tmp/restart.txt
-          # bin/megauni thin -d restart
-        # fi
-
-        if [[ "$file" =~ ".styl" ]]; then
-          bin/megauni stylus "$path"
-        fi
-
-        if [[ ! -f logs/rendering ]]; then # ========
-          if [[ "$file" =~ "markup.rb" ]]; then
-            bin/megauni render "$path" || rb_failed="$path"
-          else
-            # Most likely a base file, so all files have to be re-rendered:
-            if [[ "$path" =~ "applets" && "$path" =~ ".rb" ]]; then
-              render_all
-            fi
-          fi
-
-
-          if [[ "$file" =~ "markup.html" ]]; then
-            bin/megauni restart
-          fi
-
-        fi # if ! -f logs/rendering =================
-
-        if [[ "$file" =~ ".js" ]]; then
-          if [[ "$path" =~ "Public/"  ]]; then
-            echo -n "=== Running jshint: "
-            ( bin/megauni jshint $path && echo -e "${green}Passed${reset_color}" ) || js_failed=""
-          else
-            bin/megauni restart
-          fi
-        fi
-
-      fi
-
-      echo ""
-    done ) &
-
     # === Start server:
 
-    if bin/megauni running? ; then
-      bin/megauni stop
+    if [[ ("$@" =~ "no_server") ]]; then
+      bin/megauni watch_files
+    else
+      ( bin/megauni watch_files ) &
+      bin/megauni restart --no-daemon
     fi
-    bin/megauni start --no-daemon
 
     ;;
 
