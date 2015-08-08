@@ -24,24 +24,17 @@ set -u -e -o pipefail
 export RACK_ENV="production"
 
 # ==============================================================
-# http://www.ibm.com/developerworks/aix/library/au-learningtput/
-green=$(tput setaf 2)
-green_bg=$(tput setb 2)
-white=$(tput setaf 7)
-bold_white_on_green=$(tput bold)${white}${green_bg}
-bold_white=$(tput bold)${white}
-reset_color=$(tput sgr0)
-# ==============================================================
-
-# === Color codes:
-# From: http://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux
-Color_Off='\e[0m'
-BRed='\e[1;31m'
-Red='\e[0;31m'
-Green='\e[0;32m'
-Orange='\e[0;33m'
-
+GREEN=$(tput setaf 2)
+GREEN_BG=$(tput setb 2)
+WHITE=$(tput setaf 7)
+BOLD_WHITE_ON_GREEN=$(tput bold)${WHITE}${GREEN_BG}
+BOLD_WHITE=$(tput bold)${WHITE}
+RESET_COLOR=$(tput sgr0)
+ORANGE='\e[0;33m'
+RED='\e[0;31m'
+BG_RED='\e[1;31m'
 # ===============================================
+
 mods=(
   Customer
   Screen_Name
@@ -61,15 +54,6 @@ do
   rev_mods+=( "${mods[idx]}" )
 done
 # ===============================================
-
-kill_all () {
-  exit_code="$1"
-  $0 stop
-  [[ "$exit_code" -eq "0" ]] || echo "=== MEGAUNI exit code: ${exit_code}" 1>&2
-  [[ -z "$(jobs -p)" ]]      || echo "=== MEGAUNI childs: $(jobs -p)" 1>&2
-  wait
-  return ${exit_code}
-}
 
 case "$action" in
 
@@ -313,23 +297,23 @@ case "$action" in
       path="$(echo "$i" | cut -d' ' -f7 || echo '')"
       if [[ ! -z "$code" && "$code" =~ $re ]]; then
         if [[ "$code" -gt 199 && "$code" -lt 300 ]]; then
-          color="$Green"
+          color="$GREEN"
         fi
         if [[ "$code" -gt 299 && "$code" -lt 400 ]]; then
-          color="$Orange"
+          color="$ORANGE"
         fi
         if [[ "$code" -gt 399 && "$code" -lt 500 ]]; then
-          color="$Red"
+          color="$RED"
         fi
         if [[ "$code" -gt 499 ]]; then
-          color="$BRed"
+          color="$BRED"
         fi
-        color_code="${i/" $code "/"${color} ${code} ${Color_Off}"}"
-        echo -e "${color_code/"$path "/"${color}$path ${Color_Off}"}"
+        color_code="${i/" $code "/"${color} ${code} ${RESET_COLOR}"}"
+        echo -e "${color_code/"$path "/"${color}$path ${RESET_COLOR}"}"
       else
         if [[ ! ( "$i" == *ruby* ) ]]; then
           if [[ "$i" =~ ':in ' ]]; then
-            echo -e "${Red}$i${Color_Off}"
+            echo -e "${RED}$i${RESET_COLOR}"
           else
             echo -e "$i"
           fi
@@ -348,7 +332,7 @@ case "$action" in
     if [[ "$@" =~ 'watch' && "$1" == "watch" ]]; then
       watch="true"
       shift
-      echo "=== Watching: $@"
+      echo "=== Watching $(basename $0) (proc group $$): $@"
     fi
 
     if [[ ! -z "$@" && "$1" == "reset" ]]; then
@@ -442,7 +426,7 @@ case "$action" in
     ;;
 
   "watch_files")
-    echo "=== Watching:"
+    echo -e "=== Watching ${BOLD_WHITE}$(basename $0)${RESET_COLOR}    (proc group $$)..."
       while read CHANGE
       do
         dir=$(echo "$CHANGE" | cut -d' ' -f 1)
@@ -455,7 +439,8 @@ case "$action" in
         if [[ ! -z "$file" ]]; then
 
           if [[ "$path" == *bin/megauni* ]]; then
-            echo "=== Reloading this script: $0 ${script_args[@]}"
+            echo ""
+            echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 ${script_args[@]}"
             exec $0 ${script_args[@]}
           fi
 
@@ -483,7 +468,7 @@ case "$action" in
           if [[ "$file" =~ ".js" ]]; then
             if [[ "$path" =~ "Public/"  ]]; then
               echo -n "=== Running jshint: "
-              ( bin/megauni jshint $path && echo -e "${green}Passed${reset_color}" ) || js_failed=""
+              ( bin/megauni jshint $path && echo -e "${GREEN}Passed${reset_color}" ) || js_failed=""
             else
               bin/megauni restart
             fi
@@ -496,7 +481,22 @@ case "$action" in
     ;;
 
   "watch")
-    trap 'kill_all $?' EXIT
+
+    use_server="$([[ "$@" =~ "no_server" ]] && echo "" || echo "yes" )"
+
+    on_exit () {
+      echo ""
+      if [[ -n "$use_server" ]] ; then
+        echo "=== ${GREEN}Waiting${RESET_COLOR} for proc group: ${$}..."
+        $0 stop
+        wait
+        echo "=== ${GREEN}Done${RESET_COLOR} ($(basename $0) $$)"
+      else
+        wait
+      fi
+    }
+
+    trap 'on_exit' EXIT
 
     if [[ "$@" == *test* ]]; then
       shift
@@ -508,11 +508,11 @@ case "$action" in
     re='^[0-9]+$'
     # === Start server:
 
-    if [[ ("$@" =~ "no_server") ]]; then
-      bin/megauni watch_files
-    else
+    if [[ -n "$use_server" ]]; then
       ( bin/megauni watch_files ) &
       bin/megauni restart --no-daemon
+    else
+      bin/megauni watch_files
     fi
 
     ;;
