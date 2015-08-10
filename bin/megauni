@@ -503,7 +503,7 @@ case "$action" in
     echo -e "=== $(basename $0): Proc: $$ Proc Group: $(bash_setup proc_group $$)"
     if [[ -n "$use_server" ]]; then
       ( bin/megauni __watch ) &
-      bin/megauni restart --no-daemon
+      bin/megauni start --no-daemon
     else
       bin/megauni __watch
     fi
