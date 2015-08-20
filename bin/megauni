@@ -7,7 +7,7 @@ action="$1"
 
 shift
 
-js_files="$(echo -e ./*.js Server/Root/*/*.js)"
+js_files="$(echo -e ./*.js Server/Root/*.js)"
 dev="$IS_DEV"
 
 if [[ -z "$PORT" ]]; then

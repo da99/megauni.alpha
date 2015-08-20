@@ -1,9 +1,12 @@
+"use strict";
+/* jshint esnext: true, undef: true, unused: true */
+/* global require, module  */
 
 var app    = require('koa')();
 var router = require('koa-router')();
 
 
-var fs                = require('fs');
+// var fs                = require('fs');
 // var homepage_stranger = fs.readFileSync(process.cwd() + '/Public/applets/homepage/markup.html');
 
 
@@ -21,12 +24,14 @@ router.get('/time', function *homepage_time(next) {
   this.body = result.rows[0].now.toISOString() + "| | ---";
 });
 
-router.get('/script', function *count() {
+router.get('/script', function *count(next) {
+  if (next) yield next;
   this.type = 'html';
   this.body = "<html><head><script src='http://script.com/'></script></head><body>Script</body></html>";
 });
 
-router.get('/count', function *count() {
+router.get('/count', function *count(next) {
+  if (next) yield next;
   var session = this.session;
   session.count = session.count || 0;
   session.count++;

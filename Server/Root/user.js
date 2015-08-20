@@ -1,7 +1,9 @@
+"use strict";
+/* jshint esnext: true, undef: true, unused: true */
+/* global require, module  */
 
 var app    = require('koa')();
 var router = require('koa-router')();
-var koa_pg = require('koa-pg')
 
 
 router.post('/create-user', function *(next) {
