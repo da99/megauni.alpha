@@ -443,8 +443,6 @@ case "$action" in
     eval "$(bash_setup setup_traps)"
     setup_traps
 
-    $0 jshint
-
     echo -e "=== Watching ${BOLD_WHITE}$(basename $0)${RESET_COLOR}    (proc $$)..."
     while read CHANGE
     do
@@ -518,8 +516,8 @@ case "$action" in
 
     echo -e "=== $(basename $0): Proc: $$ Proc Group: $(bash_setup proc_group $$)"
     if [[ -n "$use_server" ]]; then
+      $0 jshint
       ( bin/megauni __watch ) &
-      sleep 2.5
       bin/megauni start --no-daemon
     else
       bin/megauni __watch
