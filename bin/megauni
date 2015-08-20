@@ -4,8 +4,10 @@
 #
 script_args=("$@")
 action="$1"
+
 shift
 
+js_files="$(echo -e ./*.js Server/Root/*/*.js)"
 dev="$IS_DEV"
 
 if [[ -z "$PORT" ]]; then
@@ -425,9 +427,21 @@ case "$action" in
     fi
     ;;
 
+  jshint)
+    IFS=$' '
+    for file in $js_files
+    do
+      if [[ -f $file ]]; then
+        js_setup jshint $file
+      fi
+    done
+    ;;
+
   "__watch")
     eval "$(bash_setup setup_traps)"
     setup_traps
+
+    $0 jshint
 
     echo -e "=== Watching ${BOLD_WHITE}$(basename $0)${RESET_COLOR}    (proc $$)..."
     while read CHANGE
@@ -471,7 +485,7 @@ case "$action" in
         if [[ "$file" =~ ".js" ]]; then
           if [[ "$path" =~ "Public/"  ]]; then
             echo -n "=== Running jshint: "
-            ( bin/megauni jshint $path && echo -e "${GREEN}Passed${reset_color}" ) || js_failed=""
+            js_setup jshint $path || js_failed=""
           else
             bin/megauni restart
           fi

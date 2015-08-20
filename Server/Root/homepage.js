@@ -1,7 +1,6 @@
 
 var app    = require('koa')();
 var router = require('koa-router')();
-var koa_pg = require('koa-pg')
 
 
 var fs                = require('fs');
@@ -17,6 +16,7 @@ var fs                = require('fs');
 router.get('/time', function *homepage_time(next) {
   yield next;
   this.set('Content-Type', 'text/plaintext');
+
   var result = yield this.pg.db.client.query_('SELECT now()');
   this.body = result.rows[0].now.toISOString() + "| | ---";
 });
@@ -35,7 +35,6 @@ router.get('/count', function *count() {
 });
 
 
-app.use(koa_pg(process.env.DATABASE_URL));
 app.use(router.routes());
 app.use(router.allowedMethods());
 

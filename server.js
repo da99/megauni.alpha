@@ -1,16 +1,22 @@
+"use strict";
+/* jshint esnext: true, undef: true, unused: true */
+/* global process, require  */
+
 
 var KOA_GENERIC_SESSION = require('koa-generic-session');
 var KOA_PG_SESSION      = require('koa-pg-session');
 
+var koa        = require('koa');
 var koa_static = require('koa-static');
 var helmet     = require('koa-helmet');
 var mount      = require('koa-mount');
-var koa        = require('koa');
-var port       = process.env.PORT;
 var logger     = require('koa-logger');
+var koa_pg     = require('koa-pg');
 
-var app    = koa();
-var homepage = require('./Server/Root/homepage')
+var port     = process.env.PORT;
+var app      = koa();
+var homepage = require('./Server/Root/homepage');
+var user     = require('./Server/Root/user');
 
 if (process.env.IS_DEV) {
   app.use(logger());
@@ -39,8 +45,12 @@ app.use(KOA_GENERIC_SESSION({
   }
 }));
 
+// === Setup db:
+app.use(koa_pg(process.env.DATABASE_URL));
+
 // === Finally, the routes:
 app.use(mount(homepage));
+app.use(mount(user));
 // app.use(mount(members));
 // app.use(mount(www_apps));
 
