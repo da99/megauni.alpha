@@ -90,6 +90,8 @@ case "$action" in
     echo "  $  render name"
     echo "  $  render file_name"
     echo ""
+    echo "  $  POST  \"{.. JSON .. }\"  /path"
+    echo ""
     exit 0
     ;;
 
@@ -517,6 +519,7 @@ case "$action" in
     echo -e "=== $(basename $0): Proc: $$ Proc Group: $(bash_setup proc_group $$)"
     if [[ -n "$use_server" ]]; then
       ( bin/megauni __watch ) &
+      sleep 2.5
       bin/megauni start --no-daemon
     else
       bin/megauni __watch
@@ -525,7 +528,7 @@ case "$action" in
     ;;
 
   "POST")
-    curl -k -X POST --header "Content-Type:application/json" -d "$1" https://localhost$2
+    curl -k -X POST --header "Content-Type:application/json" -d "$1" http://localhost:4567$2
     echo ""
     ;;
 

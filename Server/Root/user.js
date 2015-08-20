@@ -8,9 +8,10 @@ var router = require('koa-router')();
 
 router.post('/create-user', function *(next) {
   yield next;
-  this.set('Content-Type', 'text/plaintext');
-  var result = yield this.pg.db.client.query_('SELECT now()');
-  this.body = result.rows[0].now.toISOString() + "| | ---";
+  this.set('Content-Type', 'application/json');
+  this.body = JSON.stringify({
+    error: {username: "Already taken."}
+  });
 });
 
 
