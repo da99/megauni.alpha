@@ -33,7 +33,9 @@ if (!process.env.IS_DEV) {
 }
 
 // === Static files before session:
-app.use(koa_static('../megauni.js/Public'));
+if (process.env.IS_DEV) {
+  app.use(koa_static('../megauni.html/Public'));
+}
 
 app.keys = [process.env.SESSION_SECRET, process.env.SESSION_SECRET + Math.random().toString()];
 
