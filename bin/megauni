@@ -442,6 +442,7 @@ case "$action" in
   "__watch")
     eval "$(bash_setup setup_traps)"
     setup_traps
+    use_server="$([[ "$@" =~ "no_server" ]] && echo "" || echo "yes" )"
 
     echo -e "=== Watching ${BOLD_WHITE}$(basename $0)${RESET_COLOR}    (proc $$)..."
     while read CHANGE
@@ -475,7 +476,6 @@ case "$action" in
             fi
           fi
 
-
           if [[ "$file" =~ "markup.html" ]]; then
             bin/megauni restart
           fi
@@ -485,7 +485,7 @@ case "$action" in
         if [[ "$file" =~ ".js" ]]; then
           js_pass="true"
           js_setup jshint $path || js_pass=""
-          if [[ -n $js_pass ]]; then
+          if [[ -n $js_pass && -n "$use_server" ]]; then
             bin/megauni restart
           fi
         fi
@@ -519,7 +519,7 @@ case "$action" in
       ( bin/megauni __watch ) &
       bin/megauni start --no-daemon
     else
-      bin/megauni __watch
+      bin/megauni __watch "$@"
     fi
 
     ;;
