@@ -484,7 +484,7 @@ case "$action" in
 
         if [[ "$file" =~ ".js" ]]; then
           js_pass="true"
-          js_setup jshint $path || js_pass=""
+          js_setup jshint! $path || js_pass=""
           if [[ -n $js_pass && -n "$use_server" ]]; then
             bin/megauni restart
           fi

@@ -37,13 +37,18 @@ if (process.env.IS_DEV) {
   app.use(koa_static('../megauni.html/Public'));
 }
 
-app.keys = [process.env.SESSION_SECRET, process.env.SESSION_SECRET + Math.random().toString()];
+app.keys = [
+  process.env.SESSION_SECRET,
+  process.env.SESSION_SECRET + Math.random().toString()
+];
 
 app.use(KOA_GENERIC_SESSION({
   store: new KOA_PG_SESSION(process.env.DATABASE_URL),
   cookie: {
+    httpOnly: true,
     path: "/",
-    secureProxy: !process.env.IS_DEV
+    secureProxy: !process.env.IS_DEV,
+    maxage: null
   }
 }));
 
