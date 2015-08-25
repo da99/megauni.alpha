@@ -3,7 +3,7 @@
 
 CREATE TABLE session (
     id TEXT NOT NULL PRIMARY KEY,
-    expiry timestamp NOT NULL,
+    expiry timestamp,
     session JSON
 );
 

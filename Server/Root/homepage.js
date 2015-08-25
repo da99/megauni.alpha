@@ -17,26 +17,28 @@ var router = require('koa-router')();
 // });
 
 router.get('/time', function *homepage_time(next) {
-  yield next;
   this.set('Content-Type', 'text/plaintext');
 
   var result = yield this.pg.db.client.query_('SELECT now()');
   this.body = result.rows[0].now.toISOString() + "| | ---";
+  yield next;
 });
 
 router.get('/script', function *count(next) {
-  if (next) yield next;
   this.type = 'html';
   this.body = "<html><head><script src='http://script.com/'></script></head><body>Script</body></html>";
+
+  if (next) yield next;
 });
 
 router.get('/count', function *count(next) {
-  if (next) yield next;
   var session = this.session;
   session.count = session.count || 0;
   session.count++;
   this.type = 'text';
   this.body = session.count.toString();
+
+  if (next) yield next;
 });
 
 

@@ -207,7 +207,7 @@ case "$action" in
         shift
         shift
         cd Server
-        bundle exec duck_duck_duck create $model $name
+        duck_duck_duck create $model $name
         ;;
 
       "reset")
@@ -257,7 +257,7 @@ case "$action" in
         else
           cd Server
           echo ""
-          bundle exec duck_duck_duck up $model
+          duck_duck_duck up $model
         fi
         ;;
 
@@ -277,13 +277,13 @@ case "$action" in
           # === Reverse list
           for m in ${rev_mods[@]}
           do
-            bundle exec bin/megauni migrate down $m
+            bin/megauni migrate down $m
           done
 
         else
           cd Server
           echo ""
-          bundle exec duck_duck_duck down $model
+          duck_duck_duck down $model
         fi
         ;;
 

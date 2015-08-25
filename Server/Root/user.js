@@ -1,10 +1,16 @@
 "use strict";
-/* jshint esnext: true, undef: true, unused: true */
-/* global require, module  */
+/* jshint -W079, esnext: true, undef: true, unused: true */
+/* global require, module, process  */
+
+var log;
+log = function () {
+  return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null;
+};
 
 var app    = require('koa')();
 var router = require('koa-router')();
 var _      = require('lodash');
+var User   = require('../User/model');
 
 function invalid_data(fields) {
   return {
@@ -19,31 +25,18 @@ function success_msg(msg, data) {
   return {success: _.extend({msg: msg}, data || {})};
 }
 
-var User = function (data) {
-};
-
-User.prototype.is_new = function () {
-  return _.isNumber(this.data.id) && !_.isNaN(this.data.id);
-}; // === func
-
-User.prototype.save = function () {
-  if (this.is_new())
-    this._save_new();
-  else
-    this._save_update();
-}; // === func
-
-User.prototype._save_new = function () {
-  
-}; // === func
-
 router.post('/user', function *(next) {
+  this.set('Content-Type', 'application/json');
+  log(this.request.body);
+  this.body = JSON.stringify(invalid_data({screen_name: 'Already taken.'}));
+  yield next;
+  return;
 
   var msg;
 
   // === Save data to DB:
-  var new_user = new User(DATA);
-  yield new_user.save();
+  var new_user = new User(this.request.body);
+  yield new_user.save(this);
 
   // if error:
   if (new_user.has_errors())
@@ -55,11 +48,9 @@ router.post('/user', function *(next) {
   }
 
 
-  this.set('Content-Type', 'application/json');
   this.body = JSON.stringify(msg);
   yield next;
 });
-
 
 app.use(router.routes());
 app.use(router.allowedMethods());
