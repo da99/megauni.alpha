@@ -1,12 +1,15 @@
 "use strict";
 /* jshint -W079, esnext: true, undef: true, unused: true */
-/* global module, require  */
+/* global module, require */
+
+/* global process */
+var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null; };
 
 var _         = require('lodash');
 var SQL       = require('named_sql');
 var multiline = require('multiline');
 
-module.exports = {
+var funcs = {
 
   'class' : {
     create : function* (app, new_data) {
@@ -18,12 +21,12 @@ module.exports = {
 
   instance: {
 
-    init : function (app, name) {
+    _init : function (app, name) {
       this.errors     = {};
       this.data       = {};
       this.new_data   = {};
       this.clean_data = {};
-      this.origin     = app;
+      this.app        = app;
       this.table_name = (name || 'unknown').toLowerCase();
     },
 
@@ -33,7 +36,7 @@ module.exports = {
       var i = 0;
       var f;
 
-      while (this.cleaners[i]) {
+      while (this.constructor.cleaners[i]) {
         f = this.cleaners[i];
         ++i;
         if (f.constructor.name === 'GeneratorFunction')
@@ -47,6 +50,10 @@ module.exports = {
 
       var fin = _.extend(this.clean_data, this.secret_data || {});
       this.secret_data = null;
+
+      if (_.isEmpty(this.clean_data)) {
+        this.invalid('all', 'No valid data provided.');
+      }
       return fin;
     },
 
@@ -61,6 +68,9 @@ module.exports = {
     invalid : function (col, msg) {
       if (!this.errors.fields)
         this.errors.fields = {};
+      if (!this.errors.tags)
+        this.errors.tags = [];
+      this.errors.tags.push('invalid data');
       this.errors.fields[col] = msg;
       return this;
     },
@@ -70,8 +80,12 @@ module.exports = {
       this.new_data = new_data;
       var secret = yield this.clean();
 
-      if (this.is_valid())
-        return this;
+      if (!this.is_valid()) {
+        var e = new Error(_.values(this.errors.fields).join(' '));
+        e.megauni_record = this;
+        throw e;
+      }
+
 
       sql = sql || SQL(
         secret,
@@ -83,7 +97,7 @@ module.exports = {
         */})
       );
 
-      var result = yield this.app.pg.db.query_(sql.sql, sql.vals);
+      var result = yield this.app.pg.db.client.query_(sql.sql, sql.vals);
       this.merge(result.rows[0] || {});
 
       return this;
@@ -111,3 +125,17 @@ module.exports = {
   } // === instance
 
 }; // === module.exports
+
+
+module.exports = function (name) {
+  var constructor = function (app) {
+    this._init(app, name);
+    if (this.init)
+      this.init.apply(this, arguments);
+  };
+  _.extend(constructor.prototype, funcs.instance);
+  constructor.cleaners = [];
+  _.extend(constructor, funcs.class);
+  return constructor;
+};
+

@@ -7,7 +7,7 @@ action="$1"
 
 shift
 
-js_files="$(echo -e ./*.js Server/Megauni/*.js Server/Screen_Name/*.js Server/User/*.js Server/Root/*.js)"
+js_files="$(echo -e ./*.js Server/*/specs/*.js Server/Megauni/*.js Server/Screen_Name/*.js Server/User/*.js Server/Root/*.js)"
 dev="$IS_DEV"
 
 if [[ -z "$PORT" ]]; then
@@ -440,6 +440,8 @@ case "$action" in
     ;;
 
   "__watch")
+    last_opt=$(echo $@ | tr -s ' ' | rev | cut -d' ' -f 1 | rev)
+
     eval "$(bash_setup setup_traps)"
     setup_traps
     use_server="$([[ "$@" =~ "no_server" ]] && echo "" || echo "yes" )"
@@ -486,6 +488,25 @@ case "$action" in
         if [[ "$file" == *.js ]]; then
           js_pass="true"
           js_setup jshint! $path || js_pass=""
+
+          if [[ -n "$js_pass" && -n "$last_opt" ]]; then
+
+            spec_file=""
+            if [[ "$path" == */specs/*  ]]; then
+              spec_file="$path"
+            else
+              spec_file=$(echo $(dirname $path)/specs/*-${last_opt}.js)
+              if [[ ! -f "$(echo $spec_file | cut -d' ' -f 1)" ]]; then
+                spec_file=""
+              fi
+            fi
+
+            if [[ -n "$spec_file" ]]; then
+              $0 mocha $spec_file || echo -e "=== ${RED}FAIL${RESET_COLOR} ==="
+            fi
+
+          fi
+
           if [[ -n $js_pass && -n "$use_server" ]]; then
             bin/megauni restart
           fi
@@ -494,7 +515,7 @@ case "$action" in
       fi
 
       echo ""
-    done < <(inotifywait --quiet --monitor --event close_write  $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
+    done < <(inotifywait --quiet --monitor --event close_write  $js_files $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
     ;;
 
   "watch")
@@ -541,9 +562,18 @@ case "$action" in
   *)
 
     file="$( echo node_modules/*/bin/$action )"
+    args="$@"
 
     if [[ -f "$file"  ]]; then
-      $file "$@"
+
+      if [[ "$action" == "mocha" ]]; then
+        args="--require co-mocha"
+        echo "=== ${BOLD_WHITE}$action${RESET_COLOR} $args "$@""
+        $file $args "$@"
+      else
+        $file "$@"
+      fi
+
       exit 0
     fi
 
