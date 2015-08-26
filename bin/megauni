@@ -7,7 +7,7 @@ action="$1"
 
 shift
 
-js_files="$(echo -e ./*.js Server/Root/*.js)"
+js_files="$(echo -e ./*.js Server/User/*.js Server/Root/*.js)"
 dev="$IS_DEV"
 
 if [[ -z "$PORT" ]]; then
@@ -514,8 +514,8 @@ case "$action" in
     # === Start server:
 
     echo -e "=== $(basename $0): Proc: $$ Proc Group: $(bash_setup proc_group $$)"
+    $0 jshint
     if [[ -n "$use_server" ]]; then
-      $0 jshint
       ( bin/megauni __watch ) &
       bin/megauni start --no-daemon
     else
@@ -530,7 +530,11 @@ case "$action" in
     ;;
 
   "deploy")
-    bin/megauni npm install
+    apt-cache show libpg-dev 1>/dev/null || (
+      echo "=== Installing libpg-dev..."
+      sudo apt-get install libpq-dev
+    )
+    npm install
     ;;
 
   *)
