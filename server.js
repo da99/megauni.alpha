@@ -16,13 +16,13 @@ var koa_bodyparser   = require('koa-bodyparser');
 var koa_csrf         = require('koa-csrf');
 var koa_errorhandler = require('koa-errorhandler');
 
-var port     = process.env.PORT;
-var app      = koa();
-var homepage = require('./Server/Root/homepage');
-var user     = require('./Server/Root/user');
-var csrf     = require('./Server/Root/csrf');
-var he       = require('he');
-var multiline = require('multiline');
+var port        = process.env.PORT;
+var app         = koa();
+var homepage    = require('./Server/Root/homepage');
+var user_routes = require('./Server/User/routes');
+var csrf_routes = require('./Server/Session/csrf_routes');
+var he          = require('he');
+var multiline   = require('multiline');
 
 var fs = require('fs');
 var error_pages = {
@@ -92,7 +92,7 @@ app.use(koa_errorhandler({
 // === Setup CSRF:
 koa_csrf(app);
 app.use(koa_csrf.middleware);
-app.use(mount(csrf));
+app.use(mount(csrf_routes));
 
 // === Setup db:
 app.use(koa_pg(process.env.DATABASE_URL));
@@ -101,7 +101,7 @@ app.use(koa_bodyparser({jsonLimit: '250kb'}));
 
 // === Finally, the routes:
 app.use(mount(homepage));
-app.use(mount(user));
+app.use(mount(user_routes));
 // app.use(mount(members));
 // app.use(mount(www_apps));
 

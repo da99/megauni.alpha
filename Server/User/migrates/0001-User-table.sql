@@ -1,5 +1,5 @@
 
-CREATE TABLE customer (
+CREATE TABLE "user" (
   id                   serial PRIMARY KEY,
   perm_level           smallint     NOT NULL DEFAULT 0,
   pswd_hash            varchar(100) NOT NULL,
@@ -11,4 +11,4 @@ CREATE TABLE customer (
 
 -- DOWN
 
-DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS "user";

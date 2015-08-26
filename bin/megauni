@@ -38,7 +38,7 @@ BG_RED='\e[1;31m'
 # ===============================================
 
 mods=(
-  Customer
+  User
   Screen_Name
   Computer
   Link
