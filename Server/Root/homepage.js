@@ -5,22 +5,17 @@
 var app    = require('koa')();
 var router = require('koa-router')();
 
-
-// var fs                = require('fs');
-// var homepage_stranger = fs.readFileSync(process.cwd() + '/Public/applets/homepage/markup.html');
-
-
-// router.get('/', function *homepage(next) {
-  // yield next;
-  // this.set('Content-Type', 'text/html');
-  // this.body = homepage_stranger;
-// });
-
 router.get('/time', function *homepage_time(next) {
   this.set('Content-Type', 'text/plaintext');
 
-  var result = yield this.pg.db.client.query_('SELECT now()');
-  this.body = result.rows[0].now.toISOString() + "| | ---";
+  try {
+    var result = yield this.pg.db.client.query_('SELECT now()');
+    this.body = result.rows[0].now.toISOString() + "| | ---";
+    console.log('result:', result);
+  } catch (err) {
+    this.body = err.message;
+    console.log('error:', err.hint);
+  }
   yield next;
 });
 

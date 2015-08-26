@@ -1,59 +1,49 @@
 "use strict";
-/* jshint esnext: true, undef: true, unused: true */
+/* jshint -W079, esnext: true, undef: true, unused: true */
 /* global require, module  */
 
-var SQL = require('named_sql');
+var _     = require('lodash');
+var Model = require('../Megauni/model');
 
-var User = function (data) {
-  this.errors = [];
-
-  if (_.has(data, 'id'))
-    this.data = data;
-  else
-    this.new_data = data;
+var User = function () {
+  _.extend(this, Model.instance);
+  this.init();
+  this.table_name = 'user';
 };
 
 User.cleaners = [];
 User.cleaners.push(
+
+  function () { /* pass_word */
+    // pseudo
+    if (this.is_new() || !_.has(this.new_data, 'pass_word'))
+      return;
+
+    var min = 10, max = 300;
+    this.clean_data.pass_word = _.trim(this.new_data.pass_word || '');
+
+    if (this.clean_data.pass_word.length < min) {
+      this.invalid('pass_word', 'Pass phrase is not long enough: at least ' + 10 + ' characters.');
+    }
+
+    if (this.clean_data.pass_word.length > max) {
+      this.invalid('pass_word', 'Pass phrase is too big.');
+    }
+
+    if (this.clean_data.pass_word.split < 3) {
+      this.invalid('pass_word', 'Pass phrase must be three words or more... with spaces.');
+    }
+  },
+
   function () {
     if (!this.is_new())
       return;
+
   }
 );
 
-User.prototype.clean = function () {
-  var o = this;
-  _.detect(User.cleaners, function (f) {
-    f();
 
-    return !o.is_valid();
-  });
 
-  return this;
-}; // === func
-
-User.prototype.is_valid = function () {
-  return _.isEmpty(this.errors);
-}; // === func
-
-User.prototype.is_new = function () {
-  return _.has(this.data, 'id');
-}; // === func
-
-User.prototype.save = function *(app) {
-  if (this.is_new())
-    yield this._save_new(app);
-  else
-    yield this._save_update(app);
-
-  return this;
-}; // === func
-
-User.prototype._save_new = function *(app) {
-  yield app.pg.db.query_(SQL());
-
-  return this;
-}; // === func
 
 module.exports = User;
 

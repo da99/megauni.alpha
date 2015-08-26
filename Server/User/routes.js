@@ -27,10 +27,11 @@ function success_msg(msg, data) {
 
 router.post('/user', function *(next) {
   this.set('Content-Type', 'application/json');
-  log(this.request.body);
-  this.body = JSON.stringify(invalid_data({screen_name: 'Already taken.'}));
-  yield next;
-  return;
+
+  // log(this.request.body);
+  // this.body = JSON.stringify(invalid_data({screen_name: 'Already taken.'}));
+  // yield next;
+  // return;
 
   var msg;
 

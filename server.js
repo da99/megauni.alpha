@@ -21,7 +21,7 @@ var app         = koa();
 var homepage    = require('./Server/Root/homepage');
 var user_routes = require('./Server/User/routes');
 var csrf_routes = require('./Server/Session/csrf_routes');
-var he          = require('he');
+// var he          = require('he');
 var multiline   = require('multiline');
 
 var fs = require('fs');
@@ -76,16 +76,18 @@ app.use(KOA_GENERIC_SESSION({
 }));
 
 // === Setup error handling:
+// === Send a generic message to client in case 'err.message'
+//     contains sensitive data.
 app.use(koa_errorhandler({
   debug: !process.env.IS_DEV,
   html : function () {
     this.body = error_pages[this.status] || error_pages.any;
   },
-  json : function (err) {
-    this.body = JSON.stringify({error: {tags: ['server', this.status], msg: err.message}});
+  json : function () {
+    this.body = JSON.stringify({error: {tags: ['server', this.status], msg: "Unknown error."}});
   },
-  text : function (err) {
-    this.body = he.encode(err.message || 'Unknown error.');
+  text : function () {
+    this.body = 'Unknown error.';
   }
 }));
 

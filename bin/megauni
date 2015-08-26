@@ -493,7 +493,7 @@ case "$action" in
       fi
 
       echo ""
-    done < <(inotifywait --quiet --monitor --event close_write --exclude "/.git/|/logs/|/Public/(\?\!applets)/|/node_modules/" -r ./)
+    done < <(inotifywait --quiet --monitor --event close_write  $(git ls-files | grep -E "\.js$" | tr '\n' ' '))
     ;;
 
   "watch")
