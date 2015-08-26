@@ -6,20 +6,40 @@
 var KOA_GENERIC_SESSION = require('koa-generic-session');
 var KOA_PG_SESSION      = require('koa-pg-session');
 
-var koa        = require('koa');
-var koa_static = require('koa-static');
-var helmet     = require('koa-helmet');
-var mount      = require('koa-mount');
-var logger     = require('koa-logger');
-var koa_pg     = require('koa-pg');
-var koa_bodyparser = require('koa-bodyparser');
-var koa_csrf   = require('koa-csrf');
+var koa              = require('koa');
+var koa_static       = require('koa-static');
+var helmet           = require('koa-helmet');
+var mount            = require('koa-mount');
+var logger           = require('koa-logger');
+var koa_pg           = require('koa-pg');
+var koa_bodyparser   = require('koa-bodyparser');
+var koa_csrf         = require('koa-csrf');
+var koa_errorhandler = require('koa-errorhandler');
 
 var port     = process.env.PORT;
 var app      = koa();
 var homepage = require('./Server/Root/homepage');
 var user     = require('./Server/Root/user');
 var csrf     = require('./Server/Root/csrf');
+var he       = require('he');
+var multiline = require('multiline');
+
+var fs = require('fs');
+var error_pages = {
+  403: fs.readFileSync('../megauni.html/Public/403.html').toString(),
+  404: fs.readFileSync('../megauni.html/Public/404.html').toString(),
+  500: fs.readFileSync('../megauni.html/Public/500.html').toString(),
+  any: multiline.stripIndent(function () { /*
+      <html>
+        <head>
+          <title>Error</title>
+        </head>
+        <body>
+          Unknown Error.  Try again later.
+        </body>
+      </html>
+    */})
+};
 
 if (process.env.IS_DEV) {
   app.use(logger());
@@ -56,16 +76,18 @@ app.use(KOA_GENERIC_SESSION({
 }));
 
 // === Setup error handling:
-app.use(function* (next) {
-  try {
-    yield next;
-  } catch (err) {
-    this.status = err.status || 500;
-    this.set('Content-Type', 'application/json');
+app.use(koa_errorhandler({
+  debug: !process.env.IS_DEV,
+  html : function () {
+    this.body = error_pages[this.status] || error_pages.any;
+  },
+  json : function (err) {
     this.body = JSON.stringify({error: {tags: ['server', this.status], msg: err.message}});
-    this.app.emit('error', err, this);
+  },
+  text : function (err) {
+    this.body = he.encode(err.message || 'Unknown error.');
   }
-});
+}));
 
 // === Setup CSRF:
 koa_csrf(app);
