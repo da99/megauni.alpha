@@ -7,7 +7,7 @@ action="$1"
 
 shift
 
-js_files="$(echo -e ./*.js Server/User/*.js Server/Root/*.js)"
+js_files="$(echo -e ./*.js Server/Megauni/*.js Server/Screen_Name/*.js Server/User/*.js Server/Root/*.js)"
 dev="$IS_DEV"
 
 if [[ -z "$PORT" ]]; then
@@ -451,6 +451,7 @@ case "$action" in
       op=$(echo "$CHANGE" | cut -d' ' -f 2)
       file=$(echo "$CHANGE" | cut -d' ' -f 3)
       path="${dir}$file"
+      file=$(basename $path)
 
       echo -e "=== $CHANGE ($path)"
 
@@ -482,7 +483,7 @@ case "$action" in
 
         fi # if ! -f logs/rendering =================
 
-        if [[ "$file" =~ ".js" ]]; then
+        if [[ "$file" == *.js ]]; then
           js_pass="true"
           js_setup jshint! $path || js_pass=""
           if [[ -n $js_pass && -n "$use_server" ]]; then
@@ -493,7 +494,7 @@ case "$action" in
       fi
 
       echo ""
-    done < <(inotifywait --quiet --monitor --event close_write  $(git ls-files | grep -E "\.js$" | tr '\n' ' '))
+    done < <(inotifywait --quiet --monitor --event close_write  $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
     ;;
 
   "watch")
