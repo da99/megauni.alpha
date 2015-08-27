@@ -55,13 +55,16 @@ describe("Screen Name: create", function () {
     assert.equal(row.screen_name, name.toUpperCase());
   });
 
-  // it("raises Invalid if screen name is empty", function () {
-    // catch(:invalid) {
-      // Screen_Name.create({:screen_name=>""})
-    // }.
-    // error[:msg].
-    // should.match(/Screen name must be between /)
-  // });
+  it("raises Invalid if screen name is empty", function* () {
+    var err = {};
+    try {
+      yield Screen_Name.create(app, {screen_name: ''});
+    } catch (e) {
+      err = e;
+    }
+
+    assert(/Screen name must be/.test(err.megauni_record.errors.fields.screen_name));
+  });
 
   // it("megauni is not allowed (despite case)", function () {
     // catch(:invalid) {

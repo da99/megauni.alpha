@@ -14,7 +14,10 @@ var funcs = {
   'class' : {
     create : function* (app, new_data) {
       var o = new this(app);
-      yield o.db_insert(new_data);
+      var rows = yield o.db_insert(new_data);
+      if (rows.length !== 1)
+        throw new Error('Unknown error: row length != 1');
+      o.data = rows[0];
       return o;
     }
   },
@@ -45,10 +48,10 @@ var funcs = {
           f.apply(this);
 
         if(!this.is_valid())
-          i = this.cleaners.length;
+          i = cleaners.length;
       }
 
-      var fin = _.extend(this.clean_data, this.secret_data || {});
+      var fin = _.extend({}, this.clean_data, this.secret_data || {});
       this.secret_data = null;
 
       if (_.isEmpty(this.clean_data)) {
@@ -96,9 +99,15 @@ var funcs = {
       );
 
       var result = yield this.app.pg.db.client.query_(sql.sql, sql.vals);
-      this.merge(result.rows[0] || {});
+      var keys = _.keys(this.clean_data);
+      var rows = (result.rows) ? _.map(result.rows, function (r) {
+        return _.reduce(keys, function (memo, k) {
+          memo[k] = r[k];
+          return memo;
+        }, {});
+      }) : [];
 
-      return this;
+      return rows;
     }, // === func save
 
     // === This is to ensure no secret data is
