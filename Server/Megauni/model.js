@@ -86,7 +86,6 @@ var funcs = {
         throw e;
       }
 
-
       sql = sql || SQL(
         secret,
         {TABLE : this.table_name},

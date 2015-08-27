@@ -441,6 +441,7 @@ case "$action" in
 
   "__watch")
     last_opt=$(echo $@ | tr -s ' ' | rev | cut -d' ' -f 1 | rev)
+    next_to_last_opt=$(echo $@ | tr -s ' ' | rev | cut -d' ' -f 2 | rev)
 
     eval "$(bash_setup setup_traps)"
     setup_traps
@@ -497,7 +498,10 @@ case "$action" in
             else
               spec_file=$(echo $(dirname $path)/specs/*-${last_opt}.js)
               if [[ ! -f "$(echo $spec_file | cut -d' ' -f 1)" ]]; then
-                spec_file=""
+                spec_file=$(echo Server/${next_to_last_opt}/specs/*-${last_opt}.js);
+                if [[ ! -f "$(echo $spec_file | cut -d' ' -f 1)" ]]; then
+                  spec_file=''
+                fi
               fi
             fi
 
