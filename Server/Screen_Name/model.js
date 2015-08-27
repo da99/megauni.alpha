@@ -37,7 +37,7 @@ _.extend(Screen_Name, {
 });
 
 
-Screen_Name.cleaners.push(
+Screen_Name.on_data_clean.push(
   function () {
     if (!this.is_new()) {
       return;
@@ -48,19 +48,19 @@ Screen_Name.cleaners.push(
     var val = _.trim((this.new_data.screen_name || '').toString()).toUpperCase();
 
     if (!(Screen_Name.VALID.test(val)))
-      return this.invalid(KEY, Screen_Name.VALID_ENGLISH);
+      return this.error_msg(KEY, Screen_Name.VALID_ENGLISH);
 
     if (_.detect(Screen_Name.BANNED_SCREEN_NAMES, function (regexp) { return regexp.test(val); })) {
-      return this.invalid(KEY, 'Screen name is taken.');
+      return this.error_msg(KEY, 'Screen name is taken.');
     }
 
-    this.clean_data[KEY] = val;
-    this.clean_data.display_name = val;
+    this.clean[KEY] = val;
+    this.clean.display_name = val;
     // unique_index 'screen_name_unique_idx', "Screen name already taken: {{val}}"
   },
 
   function () {
-    if (!(this.is_new() && !this.clean_data.owner_id))
+    if (!(this.is_new() && !this.clean.owner_id))
       return;
 
     this.db_insert_sql = multiline(function () {/*
@@ -75,12 +75,12 @@ Screen_Name.cleaners.push(
 );
 
 
-Screen_Name.on_db_errors.push(
+Screen_Name.on_db_error.push(
 
   function (e) {
     if (!(this.is_new() && /screen_name_unique_idx/.test(e.message)))
       return;
-    return this.invalid('screen_name', 'Screen name is taken.');
+    return this.error_msg('screen_name', 'Screen name is taken.');
   }
 
 );
