@@ -36,6 +36,17 @@ _.extend(Screen_Name, {
   ]
 });
 
+Screen_Name.error_cleaners.push(
+
+  function (e) {
+    if (!(this.is_new() && /screen_name_unique_idx/.test(e.message)))
+      return;
+    return this.invalid('screen_name', 'Screen name is taken.');
+  }
+
+);
+
+
 Screen_Name.cleaners.push(
   function () {
     if (!this.is_new()) {
@@ -50,7 +61,7 @@ Screen_Name.cleaners.push(
       return this.invalid(KEY, Screen_Name.VALID_ENGLISH);
 
     if (_.detect(Screen_Name.BANNED_SCREEN_NAMES, function (regexp) { return regexp.test(val); })) {
-      return this.invalid(KEY, 'Screen name already taken.');
+      return this.invalid(KEY, 'Screen name is taken.');
     }
 
     this.clean_data[KEY] = val;

@@ -66,23 +66,30 @@ describe("Screen Name: create", function () {
     assert(/Screen name must be/.test(err.megauni_record.errors.fields.screen_name));
   });
 
-  // it("megauni is not allowed (despite case)", function () {
-    // catch(:invalid) {
-      // Screen_Name.create(screen_name: 'meGauNi')
-    // }.
-    // error[:msg].
-    // should.match(/Screen name not allowed: /)
-  // });
+  it("megauni is not allowed (despite case)", function* () {
+    var err = {};
+    try {
+      yield Screen_Name.create(app, {screen_name: 'meGauNi'});
+    } catch (e) {
+      err = e;
+    }
+    var msg = err.megauni_record.errors.fields.screen_name;
+    assert(/Screen name is taken./.test(msg), 'Expected: ' + msg);
+  });
 
-  // it("raises Invalid for duplicate name", function () {
-    // name = "name_invalid_#{rand(10000)}"
-    // catch(:invalid) {
-      // Screen_Name.create(:screen_name=>name)
-      // Screen_Name.create(:screen_name=>name)
-    // }.
-    // error[:msg].
-    // should.match(/Screen name already taken: #{name}/i)
-  // });
+  it("raises Invalid for duplicate name", function* () {
+    var name = "name_invalid_" + (Date.now());
+    var err = {};
+    try {
+      yield Screen_Name.create(app, {screen_name: name});
+      yield Screen_Name.create(app, {screen_name: name});
+    } catch (e) {
+      err = e;
+    }
+
+    var msg = err.megauni_record.errors.fields.screen_name;
+    assert(/Screen name is taken/i.test(msg), 'Expected: ' + msg);
+  });
 
   // it("updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id", function () {
     // name = "name_name_#{rand(10000)}"

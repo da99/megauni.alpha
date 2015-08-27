@@ -78,12 +78,33 @@ var funcs = {
       return this;
     },
 
+    error_msg : function () {
+      return (
+        (this.errors.fields && _.values(this.errors.fields)) ||
+          this.errors.tags ||
+          ['Unknown error.']
+      ).join(' ');
+    },
+
+    clean_error : function (err) {
+      var this_record = this;
+      _.each(
+        this.constructor.error_cleaners,
+        function (f) {
+          f.apply(this_record, [err]);
+        }
+      );
+      return this;
+    },
+
     db_insert : function* (new_data) {
 
-      var secret = yield this.clean(new_data);
+      var secret      = yield this.clean(new_data);
+      var this_record = this;
+      var e;
 
       if (!this.is_valid()) {
-        var e = new Error(_.values(this.errors.fields).join(' '));
+        e = new Error(this_record.error_msg());
         e.megauni_record = this;
         throw e;
       }
@@ -98,7 +119,18 @@ var funcs = {
         */})
       );
 
-      var result = yield this.app.pg.db.client.query_(sql.sql, sql.vals);
+      var result;
+      try {
+        result = yield this.app.pg.db.client.query_(sql.sql, sql.vals);
+      } catch (db_e) {
+        this_record.clean_error(db_e);
+        if (this_record.is_valid())
+          throw db_e;
+        e = new Error(this_record.error_msg());
+        e.megauni_record = this;
+        throw e;
+      } // === try/catch
+
       var keys = _.keys(this.clean_data);
       var rows = (result.rows) ? _.map(result.rows, function (r) {
         return _.reduce(keys, function (memo, k) {
@@ -143,6 +175,7 @@ module.exports = function (name) {
   _.extend(constructor.prototype, funcs.instance);
   _.extend(constructor, funcs.class);
   constructor.cleaners    = [];
+  constructor.error_cleaners = [];
   constructor.primary_key = 'id';
   constructor.table_name = (name || 'unknown').toLowerCase();
   return constructor;
