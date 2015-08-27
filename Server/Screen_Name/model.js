@@ -5,9 +5,11 @@
 /* global process */
 var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null; };
 
-// var _     = require('lodash');
-var Model = require('../Megauni/model');
+var _           = require('lodash');
+var Model       = require('../Megauni/model');
 var Screen_Name = new Model('Screen_Name');
+var multiline   = require('multiline');
+
 module.exports = Screen_Name;
 
 _.extend(Screen_Name, {
@@ -44,15 +46,37 @@ Screen_Name.cleaners.push(
 
     var val = _.trim((this.new_data.screen_name || '').toString()).toUpperCase();
 
-    if (!(Screen_Name.VALID.text(val)))
+    if (!(Screen_Name.VALID.test(val)))
       return this.invalid(KEY, Screen_Name.VALID_ENGLISH);
 
-    if (_.detect(Screen_Name.BANNED_SCREEN_NAMES, function (regexp) { return regexp.text(val); })) {
+    if (_.detect(Screen_Name.BANNED_SCREEN_NAMES, function (regexp) { return regexp.test(val); })) {
       return this.invalid(KEY, 'Screen name already taken.');
     }
 
     this.clean_data[KEY] = val;
+    this.clean_data.display_name = val;
     // unique_index 'screen_name_unique_idx', "Screen name already taken: {{val}}"
-  }
+  },
+
+  function () {
+    if (!(this.is_new() && !this.clean_data.owner_id))
+      return;
+
+    this.db_insert_sql = multiline(function () {/*
+      -- Inspired from: http://www.neilconway.org/docs/sequences/
+      INSERT INTO :TABLE ( :COLS! , owner_id )
+      VALUES ( :VALS! , CURRVAL(PG_GET_SERIAL_SEQUENCE( ':TABLE', 'id' )) )
+      RETURNING *;
+    */});
+
+  } // === set owner_id = id
 
 );
+
+
+
+
+
+
+
+

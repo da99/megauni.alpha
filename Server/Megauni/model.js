@@ -21,23 +21,23 @@ var funcs = {
 
   instance: {
 
-    _init : function (app, name) {
+    _init : function (app) {
       this.errors     = {};
       this.data       = {};
       this.new_data   = {};
       this.clean_data = {};
       this.app        = app;
-      this.table_name = (name || 'unknown').toLowerCase();
     },
 
     clean : function* (new_data) {
       this.new_data   = new_data;
       this.clean_data = {};
+      var cleaners = this.constructor.cleaners;
       var i = 0;
       var f;
 
-      while (this.constructor.cleaners[i]) {
-        f = this.cleaners[i];
+      while (cleaners[i]) {
+        f = cleaners[i];
         ++i;
         if (f.constructor.name === 'GeneratorFunction')
           yield f.apply(this);
@@ -62,7 +62,7 @@ var funcs = {
     },
 
     is_new : function () {
-      return _.has(this.data, 'id');
+      return !_.has(this.data, this.constructor.primary_key);
     }, // === func is_new
 
     invalid : function (col, msg) {
@@ -75,10 +75,9 @@ var funcs = {
       return this;
     },
 
-    db_insert : function* (new_data, sql) {
+    db_insert : function* (new_data) {
 
-      this.new_data = new_data;
-      var secret = yield this.clean();
+      var secret = yield this.clean(new_data);
 
       if (!this.is_valid()) {
         var e = new Error(_.values(this.errors.fields).join(' '));
@@ -86,12 +85,12 @@ var funcs = {
         throw e;
       }
 
-      sql = sql || SQL(
+      var sql = SQL(
         secret,
-        {TABLE : this.table_name},
-        multiline(function () {/*
-          INSERT INTO :TABLE ( :COLS )
-          VALUES ( :VALS )
+        {TABLE : this.constructor.table_name},
+        this.db_insert_sql || multiline(function () {/*
+          INSERT INTO :TABLE ( :COLS! )
+          VALUES ( :VALS! )
           RETURNING * ;
         */})
       );
@@ -133,8 +132,12 @@ module.exports = function (name) {
       this.init.apply(this, arguments);
   };
   _.extend(constructor.prototype, funcs.instance);
-  constructor.cleaners = [];
   _.extend(constructor, funcs.class);
+  constructor.cleaners    = [];
+  constructor.primary_key = 'id';
+  constructor.table_name = (name || 'unknown').toLowerCase();
   return constructor;
 };
+
+_.extend(module.exports, funcs);
 

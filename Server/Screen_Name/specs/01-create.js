@@ -51,7 +51,7 @@ describe("Screen Name: create", function () {
   it("creates record if data validates", function* () {
     var name = "name_valid_" + Date.now();
     var sn   = yield Screen_Name.create(app, {screen_name:name});
-    var row  = yield Q.first('SELECT id FROM screen_name WHERE screen_name = :screen_name', sn.data);
+    var row  = yield Q.first('SELECT id, screen_name FROM screen_name WHERE screen_name = :screen_name', sn.data);
     assert.equal(row.screen_name, name.toUpperCase());
   });
 
