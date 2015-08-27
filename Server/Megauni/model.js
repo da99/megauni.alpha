@@ -89,7 +89,7 @@ var funcs = {
     clean_error : function (err) {
       var this_record = this;
       _.each(
-        this.constructor.error_cleaners,
+        this.constructor.on_db_errors,
         function (f) {
           f.apply(this_record, [err]);
         }
@@ -172,12 +172,14 @@ module.exports = function (name) {
     if (this.init)
       this.init.apply(this, arguments);
   };
+
   _.extend(constructor.prototype, funcs.instance);
   _.extend(constructor, funcs.class);
-  constructor.cleaners    = [];
-  constructor.error_cleaners = [];
-  constructor.primary_key = 'id';
-  constructor.table_name = (name || 'unknown').toLowerCase();
+
+  constructor.cleaners     = [];
+  constructor.on_db_errors = [];
+  constructor.primary_key  = 'id';
+  constructor.table_name   = (name || 'unknown').toLowerCase();
   return constructor;
 };
 

@@ -1,23 +1,17 @@
 "use strict";
 /* jshint -W079, esnext: true, undef: true, unused: true */
 /* global require, module  */
+/* global process */
+var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null; };
 
 var _           = require('lodash');
 var Model       = require('../Megauni/model');
 var Screen_Name = require('../Screen_Name/model');
+var to_string   = function (u) { return (u && u.toString()) || ''; };
 
-var User = function (app) {
-  _.extend(this, Model.instance);
-  this.init(app, 'User');
-};
 
-_.extend(User, Model.class);
+var User = new Model('User');
 
-function to_string(u) {
-  return (u && u.toString()) || '';
-}
-
-User.cleaners = [];
 User.cleaners.push(
 
   // # field(:ip) {

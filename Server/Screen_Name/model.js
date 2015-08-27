@@ -7,9 +7,9 @@ var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(con
 
 var _           = require('lodash');
 var Model       = require('../Megauni/model');
-var Screen_Name = new Model('Screen_Name');
 var multiline   = require('multiline');
 
+var Screen_Name = new Model('Screen_Name');
 module.exports = Screen_Name;
 
 _.extend(Screen_Name, {
@@ -35,16 +35,6 @@ _.extend(Screen_Name, {
     /^[.]+-COLA\z/i
   ]
 });
-
-Screen_Name.error_cleaners.push(
-
-  function (e) {
-    if (!(this.is_new() && /screen_name_unique_idx/.test(e.message)))
-      return;
-    return this.invalid('screen_name', 'Screen name is taken.');
-  }
-
-);
 
 
 Screen_Name.cleaners.push(
@@ -84,6 +74,16 @@ Screen_Name.cleaners.push(
 
 );
 
+
+Screen_Name.on_db_errors.push(
+
+  function (e) {
+    if (!(this.is_new() && /screen_name_unique_idx/.test(e.message)))
+      return;
+    return this.invalid('screen_name', 'Screen name is taken.');
+  }
+
+);
 
 
 

@@ -1,25 +1,14 @@
 "use strict";
 /* jshint -W079, esnext: true, undef: true, unused: true */
 /* global before, after, require, describe, it, process */
-var assert      = require('assert');
-var SQL         = require('named_sql');
-// var multiline   = require('multiline');
+var assert   = require('assert');
+var SQL      = require('named_sql');
+var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null; };
 // var _           = require('lodash');
-// var co          = require('co');
+
 var Screen_Name = require('../model');
 var pg = require('co-pg')(require('pg'));
-
-var conn_done, client, app;
-
-var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null; };
-
-// function throw_err(done) {
-  // return function (err) {
-    // console.error(err.stack);
-    // if (done) done();
-  // };
-// }
-
+var conn_done , client , app;
 
 var Q = {
   first : function* (raw_sql, raw_vals) {
@@ -44,9 +33,7 @@ describe("Screen Name: create", function () {
     app = {pg: {db: {client: client}}};
   });
 
-  after(function () {
-    conn_done();
-  });
+  after(function () { conn_done(); });
 
   it("creates record if data validates", function* () {
     var name = "name_valid_" + Date.now();
@@ -91,13 +78,13 @@ describe("Screen Name: create", function () {
     assert(/Screen name is taken/i.test(msg), 'Expected: ' + msg);
   });
 
-  // it("updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id", function () {
-    // name = "name_name_#{rand(10000)}"
-    // sn = Screen_Name.create(:screen_name=>name)
-    // sn.data[:id].should == sn.data[:owner_id]
-  // });
+  it("updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id", function* () {
+    var name = "name_name_#{rand(10000)}";
+    var sn = yield Screen_Name.create(app, {screen_name : name});
+    assert.equal(sn.data.id, sn.data.owner_id);
+  });
 
-  // it("uses Customer :id as it's :owner_id", function () {
+  // it("uses Customer :id as it's :owner_id", function* () {
     // o = Customer.create(
       // screen_name: "sn_1235_#{rand(10000)}",
       // pass_word: "this is my weak password",
