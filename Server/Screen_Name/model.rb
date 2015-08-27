@@ -1,27 +1,5 @@
 
-class Screen_Name
 
-  include Datoki
-
-  WORLD     = 1
-  PROTECTED = 2
-  PRIVATE   = 3
-
-  field(:id) {
-    integer
-    primary_key
-  }
-
-  field(:screen_name) {
-    varchar 4, 30
-    upcase
-    matches do |r, val|
-      r.fail!("Invalid screen name. #{VALID_ENGLISH}") if val !~ VALID
-      r.fail!('Screen name not allowed: {{val}}') if BANNED_SCREEN_NAMES.detect { |reg| val =~ reg }
-      true
-    end
-    unique_index 'screen_name_unique_idx', "Screen name already taken: {{val}}"
-  }
 
   field(:privacy) {
     smallint 1, 3
@@ -56,25 +34,6 @@ class Screen_Name
   Not_Read_Id     = 3
 
   SCREEN_NAME_KEYS    = [:screen_name_id, :publisher_id, :owner_id, :author_id, :follower_id]
-  BEGIN_AT_OR_HASH    = /\A(\@|\#)/
-  ALL_WHITE_SPACE     = /\s+/
-  VALID_CHARS         = "a-zA-Z0-9\\-\\_\\."
-  VALID               = /\A[#{VALID_CHARS}]{4,20}\z/i
-  VALID_ENGLISH       = "Screen name must be: 4-20 valid chars: 0-9 a-z A-Z _ - ."
-  INVALID             = /[^#{VALID_CHARS}]/
-  BANNED_SCREEN_NAMES = [
-    /^MEGAUNI/i,
-    /^MINIUNI/i,
-    /^OKDOKI/i,
-    /\A(ME|MINE|MY|MI|i)\z/i,
-    /^PET-/i,
-    /^BOT-/i,
-    /^okjak/i,
-    /^okjon/i,
-    /^(ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)\z/i,
-    /^(UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY)\z/i,
-    /^[.]+-COLA\z/i
-  ]
   # =====================================================
 
   # === Helpers =========================================
