@@ -32,13 +32,13 @@ class Model {
   }
 
   static on(raw_name, ...args) {
-    var name = `_#{raw_name}`;
-    var f;
+    var name = `_${raw_name}`;
     if (!this.hasOwnProperty(name))
-      f = this[name] = [];
+      this[name] = [];
+
     if (args.length)
-      f = this[name] = f.concat(args);
-    return f;
+      this[name] = this[name].concat(args);
+    return this[name];
   }
 
   static * create(app, new_data) {
@@ -46,7 +46,7 @@ class Model {
     let rows = (yield o.db_insert(new_data)).rows;
     if (rows.length !== 1)
       throw new Error('Unknown error: row length != 1');
-    o.data = rows[0];
+    o.data = _.extend({}, rows[0]);
     return o;
   }
 
@@ -61,7 +61,7 @@ class Model {
     this.new_data = new_data;
     this.clean    = {};
     this.secret   = {};
-    let cleaners  = this.constructor.on_data_clean;
+    let cleaners  = this.constructor.on('data_clean');
 
     for (let f of cleaners) {
       if (f.constructor.name === 'GeneratorFunction')
@@ -69,8 +69,8 @@ class Model {
       else
         f.apply(this);
 
-      if (!this.is_valid())
-        break;
+      if (!this.has_error())
+        return;
     }
 
     let fin = {
@@ -87,9 +87,12 @@ class Model {
   } // === func clean_the_new_data
 
   is_new () {
-    return !_.has(this.data, this.constructor.primary_key);
+    return !_.has(this.data, this.constructor.primary_key());
   } // === func is_new
 
+  has_error () {
+    return !this.error;
+  }
 
   error_msg (col, msg) {
     // === Set error msg:
@@ -98,7 +101,7 @@ class Model {
         throw new Error('Error already set: ' + this.error_msg());
       this.error = {_tags: ['invalid data']};
       this.error[col] = msg;
-      return this;
+      throw new Invalid_Data(this);
     }
 
     // === Return an error message for debugging purposes:
@@ -112,13 +115,9 @@ class Model {
   }
 
   clean_the_error (err) {
-    var this_record = this;
-    _.each(
-      this.constructor.on_db_error,
-      function (f) {
-        f.apply(this_record, [err]);
-      }
-    );
+    for (let f of this.constructor.on('db_error')) {
+      f.apply(this, [err]);
+    }
     return this;
   }
 
@@ -126,11 +125,8 @@ class Model {
 
     var fin_data = yield this.clean_the_new_data(new_data);
 
-    if (!this.is_valid()) {
-      throw new Invalid_Data(this);
-    }
+    fin_data.idents = {TABLE : this.constructor.table_name()};
 
-    fin_data.idents = {TABLE : this.constructor.table_name};
     var sql = SQL(
       fin_data,
       this.db_insert_sql || `
@@ -145,7 +141,7 @@ class Model {
       db_result = yield this.app.pg.db.client.query_(sql.sql, sql.vals);
     } catch (db_e) {
       this.clean_the_error(db_e);
-      if (this.is_valid())
+      if (this.has_error())
         throw db_e;
       throw new Invalid_Data(this);
     } // === try/catch

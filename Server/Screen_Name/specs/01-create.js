@@ -1,12 +1,13 @@
 "use strict";
 /* jshint -W079, esnext: true, undef: true, unused: true */
 /* global before, after, require, describe, it, process */
+// var _           = require('lodash');
+var log; log = function (...args) { return (process.env.IS_DEV) ? console.log.apply(console, args) : null; };
 var assert   = require('assert');
 var SQL      = require('named_sql');
-var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null; };
-// var _           = require('lodash');
 
 var Screen_Name = require('../model');
+var User        = require('../../User/model');
 var pg = require('co-pg')(require('pg'));
 var conn_done , client , app;
 
@@ -29,6 +30,7 @@ describe("Screen Name: create", function () {
   before(function* () {
     var conn  = yield pg.connectPromise(process.env.DATABASE_URL);
     client    = conn[0];
+
     conn_done = conn[1];
     app = {pg: {db: {client: client}}};
   });
@@ -50,7 +52,7 @@ describe("Screen Name: create", function () {
       err = e;
     }
 
-    assert(/Screen name must be/.test(err.megauni_record.errors.fields.screen_name));
+    assert(/Screen name must be/.test(err.megauni.record.error.screen_name));
   });
 
   it("megauni is not allowed (despite case)", function* () {
@@ -60,7 +62,7 @@ describe("Screen Name: create", function () {
     } catch (e) {
       err = e;
     }
-    var msg = err.megauni_record.errors.fields.screen_name;
+    var msg = err.megauni.record.error.screen_name;
     assert(/Screen name is taken./.test(msg), 'Expected: ' + msg);
   });
 
@@ -74,25 +76,28 @@ describe("Screen Name: create", function () {
       err = e;
     }
 
-    var msg = err.megauni_record.errors.fields.screen_name;
+    var msg = err.megauni.record.error.screen_name;
     assert(/Screen name is taken/i.test(msg), 'Expected: ' + msg);
   });
 
   it("updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id", function* () {
-    var name = "name_name_#{rand(10000)}";
+    var name = `name_name_${Date.now()}`;
     var sn = yield Screen_Name.create(app, {screen_name : name});
+    assert.equal(typeof sn.data.id, 'number');
     assert.equal(sn.data.id, sn.data.owner_id);
   });
 
-  // it("uses Customer :id as it's :owner_id", function* () {
-    // o = Customer.create(
-      // screen_name: "sn_1235_#{rand(10000)}",
-      // pass_word: "this is my weak password",
-      // confirm_pass_word: "this is my weak password",
-      // ip: '00.000.000'
-    // )
-    // Screen_Name::TABLE.where(owner_id: o.data[:id]).first[:owner_id].should == o.data[:id]
-  // });
+  it("uses Customer :id as it's :owner_id", function* () {
+    var sn = yield User.create(
+      app,
+      { screen_name: `sn_1235_${Date.now()}}`,
+      pass_word: "this is my weak password",
+      confirm_pass_word: "this is my weak password",
+      ip: '00.000.000' }
+    );
+    var row  = yield Q.first('SELECT owner_id FROM "user" WHERE owner_id = :id', sn.data);
+    assert.equal( row.owner_id.should, sn.id);
+  });
 
 }); // === describe
 

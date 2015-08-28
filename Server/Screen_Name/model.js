@@ -64,9 +64,9 @@ Screen_Name.on(
 
     this.db_insert_sql = `
       -- Inspired from: http://www.neilconway.org/docs/sequences/
-      INSERT INTO :TABLE ( :COLS! , owner_id )
-      VALUES ( :VALS! , CURRVAL(PG_GET_SERIAL_SEQUENCE( ':TABLE', 'id' )) )
-      RETURNING *;
+      INSERT INTO :idents.TABLE ( :clean.COLS! , owner_id )
+      VALUES ( :clean.VALS! , CURRVAL(PG_GET_SERIAL_SEQUENCE( ':idents.TABLE', 'id' )) )
+      RETURNING :clean.COLS! , id , owner_id ;
     `;
 
   } // === set owner_id = id

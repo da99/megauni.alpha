@@ -110,6 +110,10 @@ case "$action" in
     ;;
 
 
+  "iojs")
+    iojs --es_staging "$@"
+    ;;
+
   "shotgun")
     bundle exec shotgun \
       --server      thin                 \
@@ -543,21 +547,17 @@ case "$action" in
     npm install
     ;;
 
+  "mocha")
+    js_setup mocha --require co-mocha "$@"
+    ;;
+
   *)
 
     file="$( echo node_modules/*/bin/$action )"
     args="$@"
 
     if [[ -f "$file"  ]]; then
-
-      if [[ "$action" == "mocha" ]]; then
-        args="--require co-mocha"
-        echo "=== ${BOLD_WHITE}$action${RESET_COLOR} $args "$@""
-        $file $args "$@"
-      else
-        $file "$@"
-      fi
-
+      $file "$@"
       exit 0
     fi
 
