@@ -8,12 +8,14 @@ var _           = require('lodash');
 var Model       = require('../Megauni/model');
 var Screen_Name = require('../Screen_Name/model');
 var to_string   = function (u) { return (u && u.toString()) || ''; };
-var multiline   = require('multiline');
 
 
-var User = new Model('User');
 
-User.on_data_clean.push(
+class User extends Model {
+} // === class User
+
+User.on(
+  'data_clean',
 
   // # field(:ip) {
     // # string_ish 7, 50, /\A[0-9\.\:]+\Z/.freeze
@@ -21,17 +23,16 @@ User.on_data_clean.push(
   // # }
 
   function () { /* pass_word */
-    // pseudo
     if (this.is_new() || !_.has(this.new_data, 'pass_word'))
       return;
 
 
     var min = 10, max = 300;
-    var confirm   = _.trim(to_string(this.new_data.confirm_pass_word));
-    var pass_word = _.trim(to_string(this.new_data.pass_word));
+    var confirm   = to_string(this.new_data.confirm_pass_word).trim();
+    var pass_word = to_string(this.new_data.pass_word).trim();
 
     if (pass_word.length < min) {
-      return this.error_msg('pass_word', 'Pass phrase is not long enough: at least ' + 10 + ' characters.');
+      return this.error_msg('pass_word', `Pass phrase is not long enough: at least ${min} characters.`);
     }
 
     if (pass_word.length > max) {
@@ -47,13 +48,13 @@ User.on_data_clean.push(
     }
 
     // decode "crypt( ?, pswd_hash)", val
-    this.db_insert_sql = multiline(function () {/*
+    this.db_insert_sql = `
       -- Inspired from: http://www.neilconway.org/docs/sequences/
       INSERT INTO
         :idents.TABLE ( :clean.COLS! , pswd_hash )
         VALUES ( :clean.VALS! , crypt( :secret.PASS_WORD  , gen_salt('bf', 13)) )
       RETURNING :COLS! ;
-    */});
+    `;
 
     this.secret.PASS_WORD = pass_word;
   },
@@ -67,9 +68,7 @@ User.on_data_clean.push(
     if (this.is_valid())
       this.clean.id = sn.data.id;
   }
-);
-
-
+); // == on data_clean
 
 
 module.exports = User;

@@ -44,7 +44,7 @@ router.post('/user', function *(next) {
     msg = invalid_data(new_user.errors);
   else {
     this.regenerateSession();
-    log_in_user();
+    // log_in_user();
     msg = success_msg('User created.', {screen_name: new_user.screen_name});
   }
 
