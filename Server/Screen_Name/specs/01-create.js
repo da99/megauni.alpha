@@ -90,7 +90,7 @@ describe("Screen Name: create", function () {
   it("uses Customer :id as it's :owner_id", function* () {
     var sn = yield User.create(
       app,
-      { screen_name: `sn_1235_${Date.now()}}`,
+      { screen_name: `sn_1235_${Date.now()}`,
       pass_word: "this is my weak password",
       confirm_pass_word: "this is my weak password",
       ip: '00.000.000' }
