@@ -1003,29 +1003,10 @@
       "from": "lodash@>=3.10.1",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
     },
-    "multiline": {
-      "version": "1.0.2",
-      "from": "multiline@*",
-      "resolved": "https://registry.npmjs.org/multiline/-/multiline-1.0.2.tgz",
-      "dependencies": {
-        "strip-indent": {
-          "version": "1.0.1",
-          "from": "strip-indent@>=1.0.0 <2.0.0",
-          "resolved": "https://registry.npmjs.org/strip-indent/-/strip-indent-1.0.1.tgz",
-          "dependencies": {
-            "get-stdin": {
-              "version": "4.0.1",
-              "from": "get-stdin@>=4.0.1 <5.0.0",
-              "resolved": "https://registry.npmjs.org/get-stdin/-/get-stdin-4.0.1.tgz"
-            }
-          }
-        }
-      }
-    },
     "named_sql": {
-      "version": "1.0.0",
+      "version": "2.0.0",
       "from": "git+https://github.com/da99/named_sql.js.git",
-      "resolved": "git+https://github.com/da99/named_sql.js.git#ec6a9c0a678117f6f8f355501324e2bdd4ed41a0",
+      "resolved": "git+https://github.com/da99/named_sql.js.git#89a87875f0546f0c8fcc6cdf20251f86662a2c96",
       "dependencies": {
         "pg-escape": {
           "version": "0.1.0",
