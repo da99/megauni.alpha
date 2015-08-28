@@ -3,14 +3,23 @@
 /* global before, after, require, describe, it, process */
 
 // var multiline   = require('multiline');
-// var _           = require('lodash');
-var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null; };
+var _        = require('lodash');
+var log; log = function (...args) { return (process.env.IS_DEV) ? console.log.apply(console, args) : null; };
 var assert   = require('assert');
-var pg = require('co-pg')(require('pg'));
+var User     = require('../model');
+var pg       = require('co-pg')(require('pg'));
 var conn_done , client , app;
-var User = require('../model');
 
 var PASS_WORD="this_is_my pass word";
+
+if (!assert.regexp)
+  assert.regexp = function (r, txt) { assert( r.test(txt), `"${r}" !~ "${txt}"`); };
+
+function col(err, col_name) {
+  if (!err.megauni || !err.megauni.record || !err.megauni.record.error)
+    return err.message;
+  return err.megauni.record.error[col_name];
+}
 
 describe('create:', function () {
 
@@ -38,16 +47,16 @@ describe('create:', function () {
       err = e;
     }
 
-    var msg = err.megauni_record.errors.fields.screen_name;
+    var msg = err.megauni.record.error.screen_name;
     assert(
-      /Screen name must be between [0-9]/.text(msg),
+      /Screen name must be [0-9] to [0-9]+/.test(msg),
       'Expected: ' + msg
     );
 
   }); // === it
 
   it('checks max length of screen_name', function* () {
-    var screen_name = "123456789012345678901234567";
+    var screen_name = `abcd56789012345678901234567${Date.now()}`;
     var err = {};
     try {
       yield User.create(
@@ -60,15 +69,16 @@ describe('create:', function () {
     } catch (e) {
       err = e;
     }
-    var msg = err.megauni_record.errors.fields.screen_name;
+    var msg = err.megauni.record.error.screen_name;
+    var r   = /Screen name must be \d to \d\d/;
     assert(
-      /Screen name must be: 4-\d\d/.test(msg),
-      'Expected: ' + msg
+      r.test(msg),
+      `"${r}" != "${msg}"`
     );
   });
 
   it('checks min length of pass_word', function* () {
-    var new_name = "1234567";
+    var new_name = `1234567${Date.now()}` ;
     var err = {};
     try {
       yield User.create( app, {
@@ -80,10 +90,10 @@ describe('create:', function () {
     } catch (e) {
       err = e;
     }
-    var msg = err.megauni_record.errors.fields.screen_name;
-    assert(
-      /Pass phrase is not long enough/.test(msg),
-      'Expected: ' + msg
+
+    assert.regexp(
+      /Pass phrase is not long enough/,
+      col(err, 'pass_word')
     );
   }); // === it
 
@@ -103,11 +113,7 @@ describe('create:', function () {
     } catch (e) {
       err = e;
     }
-    var msg = err.megauni_record.errors.fields.screen_name;
-    assert(
-      /Pass phrase is too big/.test(msg),
-      'Expected: ' + msg
-    );
+    assert.regexp( /Pass phrase is too big/, col(err, 'pass_word'));
   });
 
   it('checks pass_phrase and confirm_pass_phrase match', function* () {
@@ -123,16 +129,15 @@ describe('create:', function () {
     } catch (e) {
       err = e;
     }
-    var msg = err.megauni_record.errors.fields.screen_name;
     assert(
-      /Pass phrase confirmation does not match/.test(msg),
-      'Expected: ' + msg
+      /Pass phrase confirmation does not match/,
+      col(err, 'pass_word')
     );
   });
 
   it('saves Customer id to Customer object', function* () {
     var o = yield User.create(app, {
-      screen_name: "sn_1235_#{rand(10000)}",
+      screen_name: `sn_1235_${Date.now()}`,
       pass_word: PASS_WORD,
       confirm_pass_word: PASS_WORD,
       ip: '00.000.000'
@@ -142,7 +147,7 @@ describe('create:', function () {
 
   it("does not return :pswd_hash", function* () {
     var o = yield User.create( app, {
-      screen_name: "sn_hash_#{rand(10000)}",
+      screen_name: `sn_hash_${Date.now()}`,
       pass_word: PASS_WORD,
       confirm_pass_word: PASS_WORD,
       ip: '00.000.000'

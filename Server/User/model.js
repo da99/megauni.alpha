@@ -23,9 +23,9 @@ User.on(
   // # }
 
   function () { /* pass_word */
-    if (this.is_new() || !_.has(this.new_data, 'pass_word'))
-      return;
 
+    if (!this.is_new() || !_.has(this.new_data, 'pass_word'))
+      return;
 
     var min = 10, max = 300;
     var confirm   = to_string(this.new_data.confirm_pass_word).trim();
@@ -52,8 +52,9 @@ User.on(
       -- Inspired from: http://www.neilconway.org/docs/sequences/
       INSERT INTO
         :idents.TABLE ( :clean.COLS! , pswd_hash )
-        VALUES ( :clean.VALS! , crypt( :secret.PASS_WORD  , gen_salt('bf', 13)) )
-      RETURNING :COLS! ;
+        VALUES        ( :clean.VALS! , crypt( :secret.PASS_WORD  , gen_salt('bf', 13)) )
+      RETURNING
+        :clean.COLS! ;
     `;
 
     this.secret.PASS_WORD = pass_word;
@@ -63,9 +64,9 @@ User.on(
     if (!this.is_new())
       return;
 
-    var sn = yield Screen_Name.create(this.new_data);
+    var sn = yield Screen_Name.create(this.app, this.new_data);
     this.error = sn.error;
-    if (this.is_valid())
+    if (!this.error)
       this.clean.id = sn.data.id;
   }
 ); // == on data_clean

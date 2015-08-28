@@ -111,7 +111,7 @@ class Model {
     if (_.isEmpty(msgs))
       msgs = ['Unknown error.'];
 
-    return msgs.join(' ');
+    return msgs.join(' ').trim();
   }
 
   clean_the_error (err) {

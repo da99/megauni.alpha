@@ -15,7 +15,7 @@ var Model = require('../Megauni/model');
 // const  BEGIN_AT_OR_HASH    = /\A(\@|\#)/ ;
 // const  ALL_WHITE_SPACE     = /\s+/ ;
 const  VALID               = /^[a-zA-Z0-9\-\_\.]{4,30}$/i ;
-const  VALID_ENGLISH       = "Screen name must be: 4-30 characters: numbers, letters, underscores, dash, or periods.";
+const  VALID_ENGLISH       = "Screen name must be 4 to 30 characters: numbers, letters, underscores, dash, or periods.";
 const  BANNED_SCREEN_NAMES = [
   /^MEGAUNI/i,
   /^MINIUNI/i,

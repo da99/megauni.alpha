@@ -2,28 +2,89 @@
 # -*- bash -*-
 #
 #
-script_args=("$@")
-action="$1"
-
-shift
-
-js_files="$(echo -e ./*.js Server/*/specs/*.js Server/Megauni/*.js Server/Screen_Name/*.js Server/User/*.js Server/Root/*.js)"
 dev="$IS_DEV"
+action="$1"
+shift
 
 if [[ -z "$PORT" ]]; then
   export PORT=4567
 fi
 
-if [[ ! -z "$IS_DEV" ]]; then
+if [[ -n "$IS_DEV" ]]; then
   dir="$(pwd)"
   export JAR="$dir/tmp/cookies.txt"
   export PID="$dir/tmp/{$PORT}.pid"
   export LOG="$dir/tmp/log.txt"
 fi
 
+export MODEL="$MODEL"
+export USE_SERVER="${USE_SERVER:+"yes"}"
+export MOCHA="${MOCHA}"
+export SPECS="$SPECS"
+export RUN_FAST="${RUN_FAST}"
+
 set -u -e -o pipefail
 
-export RACK_ENV="production"
+while [[ -n "$@" ]] ; do
+  current_loop="$@"
+  case $1 in
+    --mocha)
+      shift
+      mocha=""
+      while [[ -n "$@"  ]]; do
+        if [[ "$1" == '--' ]]; then
+          shift
+          break;
+        fi
+        if [[ "$1" == *\ * ]]; then
+          mocha="$mocha \"$1\""
+        else
+          mocha="$mocha $1"
+        fi
+        shift
+      done
+      export MOCHA="$mocha"
+      ;;
+
+    fast)
+      shift
+      export RUN_FAST="yes"
+      ;;
+
+    no_server)
+      shift
+      export USE_SERVER=""
+      ;;
+
+    use_server)
+      shift
+      export USE_SERVER="yes"
+      ;;
+
+    *)
+      if [[ -d Server/$1 ]]; then
+        export MODEL="$1"
+        shift
+      fi
+      if [[ -n "$MODEL" && -n "$@" ]]; then
+        specs=(Server/$MODEL/specs/*-$1.js)
+        if [[ ! -f "${specs[0]}" ]]; then
+          specs=()
+        else
+          shift
+          export SPECS="${specs[@]}"
+        fi
+      fi
+
+      ;;
+  esac
+
+  if [[ "$@" == "$current_loop" ]]; then
+    break;
+  fi
+done # === while
+
+js_files="$(echo -e ./*.js Server/*/specs/*.js Server/Megauni/*.js Server/Screen_Name/*.js Server/User/*.js Server/Root/*.js)"
 
 # ==============================================================
 GREEN=$(tput setaf 2)
@@ -59,7 +120,7 @@ done
 
 case "$action" in
 
-  "help")
+  help|--help)
     echo ""
     echo "  $  start"
     echo "  $  stop"
@@ -139,6 +200,9 @@ case "$action" in
     ;;
 
   "restart")
+    if [[ -n "$dev" && -z "$USE_SERVER" ]]; then
+      exit 0
+    fi
     $0 pm2 restart megauni.pm2.json5 "$@"
     ;;
 
@@ -147,6 +211,9 @@ case "$action" in
     ;;
 
   "start")
+    if [[ -n "$dev" && -z "$USE_SERVER" ]]; then
+      exit 0
+    fi
     PORT=$PORT $0 pm2 startOrGracefulReload megauni.pm2.json5 "$@"
     exit 0
 
@@ -443,28 +510,27 @@ case "$action" in
     done
     ;;
 
-  "spec_file")
-    last_opt=$(echo $@ | tr -s ' ' | rev | cut -d' ' -f 1 | rev)
-    next_to_last_opt=$(echo $@ | tr -s ' ' | rev | cut -d' ' -f 2 | rev)
-    spec_file=''
-    if [[ -n "$next_to_last_opt" && -n "$last_opt" ]]; then
-      spec_file=$(echo Server/$next_to_last_opt/specs/*-${last_opt}.js)
-      if [[ ! -f "$(echo $spec_file | cut -d' ' -f 1)" ]]; then
-        spec_file=''
-      fi
+  "run_specs")
+    if [[ -z "$dev" ]]; then
+      exit 0
     fi
-    echo $spec_file
+
+    if [[ -z "$@" ]]; then
+      args="$SPECS"
+    else
+      args="$@"
+    fi
+
+    if [[ -n "$args" ]]; then
+      eval $0 mocha "$MOCHA" "$args" || echo -e "=== ${RED}FAIL${RESET_COLOR} ==="
+    fi
     ;;
 
   "__watch")
-    spec_file="$($0 spec_file $@)"
-    if [[ -n "$spec_file" ]]; then
-      $0 mocha $spec_file || echo -e "=== ${RED}FAIL${RESET_COLOR} ==="
-    fi
+    $0 run_specs || :
 
     eval "$(bash_setup setup_traps)"
     setup_traps
-    use_server="$([[ "$@" =~ "no_server" ]] && echo "" || echo "yes" )"
 
     echo -e "=== Watching ${BOLD_WHITE}$(basename $0)${RESET_COLOR}    (proc $$)..."
     while read CHANGE
@@ -481,8 +547,8 @@ case "$action" in
 
         if [[ "$path" == *bin/megauni* ]]; then
           echo ""
-          echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 ${script_args[@]}"
-          exec $0 ${script_args[@]}
+          echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 $action"
+          exec $0 $action
         fi
 
         if [[ "$file" == *.js ]]; then
@@ -490,12 +556,8 @@ case "$action" in
           js_setup jshint! $path || js_pass=""
 
           if [[ -n "$js_pass" ]]; then
-            if [[  -n "$spec_file" ]]; then
-              $0 mocha $spec_file || echo -e "=== ${RED}FAIL${RESET_COLOR} ==="
-            fi
-            if [[ -n "$use_server" ]]; then
-              bin/megauni restart
-            fi
+            $0 run_specs $@ || :
+            bin/megauni restart
           fi # === if $js_pass
 
         fi # === if $file == *.js
@@ -511,21 +573,16 @@ case "$action" in
     eval "$(bash_setup setup_traps)"
     setup_traps
 
-    use_server="$([[ "$@" =~ "no_server" ]] && echo "" || echo "yes" )"
-
-    if [[ "$@" == *test* ]]; then
-      shift
-      bin/megauni test watch "$@"
-    fi
-
     # === Regular expression:
     IFS=$'\n'
     re='^[0-9]+$'
     # === Start server:
 
     echo -e "=== $(basename $0): Proc: $$ Proc Group: $(bash_setup proc_group $$)"
-    $0 jshint
-    if [[ -n "$use_server" ]]; then
+    if [[ -z "$RUN_FAST" ]] ; then
+      $0 jshint
+    fi
+    if [[ -n "$USE_SERVER" ]]; then
       ( bin/megauni __watch ) &
       bin/megauni start --no-daemon
     else
