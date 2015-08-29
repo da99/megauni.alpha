@@ -1,18 +1,20 @@
 "use strict";
 /* jshint -W079, esnext: true, undef: true, unused: true */
 /* global require, module  */
-/* global process */
-var log; log = function () { return (process.env.IS_DEV) ? console.log.apply(console, arguments) : null; };
+var log; log = require('../Megauni/console').log;
 
 var _           = require('lodash');
 var Model       = require('../Megauni/model');
 var Screen_Name = require('../Screen_Name/model');
 var to_string   = function (u) { return (u && u.toString()) || ''; };
+var bcrypt      = require('co-bcrypt');
 
 
 
 class User extends Model {
 } // === class User
+
+User.Blowfish = 13;
 
 User.on(
   'data_clean',
@@ -47,17 +49,7 @@ User.on(
       return this.error_msg('confirm_pass_word', 'Pass phrase confirmation does not match with pass phrase.');
     }
 
-    // decode "crypt( ?, pswd_hash)", val
-    this.db_insert_sql = `
-      -- Inspired from: http://www.neilconway.org/docs/sequences/
-      INSERT INTO
-        :idents.TABLE ( :clean.COLS! , pswd_hash )
-        VALUES        ( :clean.VALS! , crypt( :secret.PASS_WORD  , gen_salt('bf', 13)) )
-      RETURNING
-        :clean.COLS! ;
-    `;
-
-    this.secret.PASS_WORD = pass_word;
+    this.secret.take( 'pass_word', 'confirm_pass_word' );
   },
 
   function* () {
@@ -68,6 +60,24 @@ User.on(
     this.error = sn.error;
     if (!this.error)
       this.clean.id = sn.data.id;
+
+    this.secret.set(
+      'pswd_hash',
+      yield bcrypt.hash(
+        this.secret.delete('pass_word'),
+        yield bcrypt.genSalt(User.Blowfish)
+      )
+    );
+
+    this.db_insert_sql = `
+      -- Inspired from: http://www.neilconway.org/docs/sequences/
+      INSERT INTO
+        :idents.TABLE ( :clean.COLS! , pswd_hash         )
+        VALUES        ( :clean.VALS! , :secret.pswd_hash )
+      RETURNING
+        :clean.COLS! ;
+    `;
+
   }
 ); // == on data_clean
 

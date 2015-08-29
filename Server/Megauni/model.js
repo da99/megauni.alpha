@@ -19,6 +19,50 @@ class Invalid_Data extends Error {
 
 } // === class Invalid_Data
 
+class Secret {
+
+  constructor (RECORD) {
+    Object.defineProperty(this, '__RECORD__', {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: RECORD
+    });
+  }
+
+  take (...args) {
+    let last_val;
+    for (let k of args) {
+      last_val = this[k] = this.__RECORD__.new_data[k];
+      this.__RECORD__.new_data[k] = undefined;
+    }
+    return last_val;
+  }
+
+  set (key, val) {
+    this[key] = val;
+    return val;
+  }
+
+  delete (...args) {
+    let last_val;
+    for (let k of args) {
+      last_val = this[k];
+      this[k] = this.__RECORD__.new_data[k] = undefined;
+    }
+    return last_val;
+  }
+
+  valueOf () {
+    return this.toString();
+  }
+
+  toString () {
+    return `${this.constructor.name} ${_.keys(this)}`;
+  }
+
+} // === class Secret
+
 class Model {
 
   static primary_key(name) {
@@ -58,9 +102,10 @@ class Model {
 
 
   * clean_the_new_data (new_data) {
+    let RECORD = this;
     this.new_data = new_data;
     this.clean    = {};
-    this.secret   = {};
+    this.secret   = new Secret(RECORD);
     let cleaners  = this.constructor.on('data_clean');
 
     for (let f of cleaners) {
