@@ -1,0 +1,17 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    duck_duck_duck (3.0.0)
+    pg (0.18.2)
+    sequel (4.25.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  duck_duck_duck
+  pg
+  sequel
+
+BUNDLED WITH
+   1.10.6
