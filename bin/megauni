@@ -84,7 +84,7 @@ while [[ -n "$@" ]] ; do
   fi
 done # === while
 
-js_files="$(echo -e ./*.js Server/*/specs/*.js Server/Megauni/*.js Server/Screen_Name/*.js Server/User/*.js Server/Root/*.js)"
+js_files="$(echo -e ./*.js Server/*/specs/*.js Server/Megauni/*.js Server/Card/*.js Server/Screen_Name/*.js Server/User/*.js Server/Root/*.js)"
 
 # ==============================================================
 GREEN=$(tput setaf 2)
@@ -100,6 +100,7 @@ BG_RED='\e[1;31m'
 
 mods=(
   User
+  Card
   Screen_Name
   Link
   Session
@@ -138,8 +139,6 @@ case "$action" in
     echo "  $  test reset"
     echo "  $  test Model spec"
     echo ""
-    echo "  $  iojs"
-    echo "  $  iojs ...."
     echo "  $  npm  ...."
     echo "  $  npm  --save ...."
     echo ""
@@ -148,6 +147,7 @@ case "$action" in
     echo ""
     echo "  $  POST  \"{.. JSON .. }\"  /path"
     echo ""
+    bash_setup print_help $0
     exit 0
     ;;
 
@@ -167,6 +167,9 @@ case "$action" in
 
 
   "iojs")
+    # === $ bin/megauni iojs
+    # === $ bin/megauni iojs  ....
+
     iojs --es_staging "$@"
     ;;
 

@@ -1,5 +1,5 @@
 
-CREATE TABLE computer (
+CREATE TABLE card (
 
   id                SERIAL                PRIMARY KEY,
   owner_id          integer               NOT NULL,
@@ -15,9 +15,5 @@ CREATE TABLE computer (
 -- DOWN
 
 
-DROP TABLE IF EXISTS computer CASCADE;
-
-
-
-
+DROP TABLE IF EXISTS card CASCADE;
 
