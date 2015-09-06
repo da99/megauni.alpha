@@ -36,58 +36,68 @@ Card.on(
       return;
     let val = this.new_data[KEY].toString();
 
+    if (!_.isString(val))
+      return this.error_msg(KEY, 'Invalid type for :code.');
     if (val.length < MIN_CODE_BYTES)
       return this.error_msg(KEY, 'No value set for :code.');
     if (val.length > MAX_CODE_BYTES)
       return this.error_msg(KEY, 'Too large. Use less code.');
 
     try {
-      this.clean_data[KEY] = JSON.stringify(val);
+      this.clean_data[KEY] = JSON.parse(val);
+
     } catch (e) {
-      this.error_msg(KEY, 'Invalid format for :code.');
+      this.error_msg(KEY, 'Invalid format for :code: ' + e.message);
     }
-  }
+  },
+
+  function () { // === clean .code.path
+    if (!this.clean_data.code || !this.clean_data.code.path)
+      return;
+
+    let raw = this.clean_data.code.path.trim().toLowerCase();
+    const VALID_PATH_CHARS = /\A[a-z0-9\_\-\/]+?\Z/;
+
+    if (raw.length < 1) {
+      delete this.clean_data.path;
+      return;
+    }
+
+    if (
+
+    if (!raw.match(VALID_PATH_CHARS))
+      return this.error_msg('code', `Invalid chars in path: ${raw}`)
+
+      if raw == "/*"
+        raise Invalid.new(self, "Not allowed, /*, because it will grab all pages.")
+      end
+
+      hash[:path] = raw
+      hash
+  },
+
 
 ); // === on data_clean
 
 
 
+const posted_to = function (sn, by) {
+    Link.create(
+      owner_id: by.data[:owner_id],
+      type_id: Link::POST_TO_SCREEN_NAME,
+      asker_id: id,
+      giver_id: sn.id
+    )
+};
 
-// const validate_path = function (hash) {
-    // if !hash.has_key?(:path)
-      // raise Invalid.new(self, "Path is required.")
-    // end
-    // raw = hash[:path].strip.downcase
-
-    // if raw.length > 0 && raw !~ /\A[a-z0-9\_\-\/]+\*?\Z/
-      // raise Invalid.new(self, "Invalid chars in path: #{raw}")
-    // end
-
-    // if raw == "/*"
-      // raise Invalid.new(self, "Not allowed, /*, because it will grab all pages.")
-    // end
-
-    // hash[:path] = raw
-    // hash
-// }; // === validate_path
-
-// const posted_to = function (sn, by) {
-    // Link.create(
-      // owner_id: by.data[:owner_id],
-      // type_id: Link::POST_TO_SCREEN_NAME,
-      // asker_id: id,
-      // giver_id: sn.id
-    // )
-// };
-
-// const is type = function () {
-    // new_computer = Computer.update(
-      // id: id,
-      // privacy: self.class.const_get(type.to_s.upcase.to_sym)
-    // )
-    // @data = @data.merge new_computer.data
-    // self
-// }
+const is type = function () {
+    new_computer = Computer.update(
+      id: id,
+      privacy: self.class.const_get(type.to_s.upcase.to_sym)
+    )
+    @data = @data.merge new_computer.data
+    self
+}
 
 
 module.exports = Card;
