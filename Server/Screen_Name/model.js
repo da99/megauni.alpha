@@ -8,9 +8,9 @@ var log; log = function (...args) { return (process.env.IS_DEV) ? console.log.ap
 // var _     = require('lodash');
 var Model = require('../Megauni/model');
 
-// const WORLD     = 1;
-// const PROTECTED = 2;
-// const PRIVATE   = 3;
+// const ME_ONLY   = 1;
+// const LIST      = 2;
+// const PUBLIC    = 3;
 
 // const  BEGIN_AT_OR_HASH    = /\A(\@|\#)/ ;
 // const  ALL_WHITE_SPACE     = /\s+/ ;

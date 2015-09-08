@@ -1,12 +1,17 @@
 
 CREATE TABLE screen_name (
   id             serial   NOT NULL,
-  owner_id       integer  NOT NULL,            -- Refers to "user" id
-  parent_id      integer  NOT NULL DEFAULT 0,  -- Refers to "screen_name" id
-  privacy        smallint NOT NULL DEFAULT 2,
+
+  -- Refers to "user" id
+  owner_id       integer  NOT NULL,
+
+  -- Refers to "screen_name" id. 0 == top level
+  parent_id      integer  NOT NULL DEFAULT 0,
+
+  privacy        smallint NOT NULL DEFAULT 1,
   screen_name    character varying(30) NOT NULL,
   display_name   character varying(30) NOT NULL,
-  nick_name      character varying(30) DEFAULT NULL::character varying,
+  nick_name      character varying(30) DEFAULT NULL,
   created_at     timestamp with time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
   trashed_at     timestamp with time zone,
 

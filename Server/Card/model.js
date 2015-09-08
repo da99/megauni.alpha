@@ -6,9 +6,9 @@ var log; log = require('../Megauni/console').log;
 const _           = require('lodash');
 const Model       = require('../Megauni/model');
 
-const WORLD     = 1;
-const PROTECTED = 2;
-const PRIVATE   = 3;
+const ME_ONLY   = 1;
+const LIST      = 2;
+const PUBLIC    = 3;
 
 const MIN_CODE_BYTES = 1;
 const MAX_CODE_BYTES = 2500;
