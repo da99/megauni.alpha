@@ -9,5 +9,5 @@ CREATE TABLE user_bad_log_in_by_ip (
 
 -- DOWN
 
-DROP TABLE IF EXISTS user_bad_log_in_by_ip;
+DROP TABLE IF EXISTS user_bad_log_in_by_ip CASCADE;
 
