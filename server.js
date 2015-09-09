@@ -22,23 +22,21 @@ var homepage    = require('./Server/Root/homepage');
 var user_routes = require('./Server/User/routes');
 var csrf_routes = require('./Server/Session/csrf_routes');
 // var he          = require('he');
-var multiline   = require('multiline');
 
 var fs = require('fs');
 var error_pages = {
   403: fs.readFileSync('../megauni.html/Public/403.html').toString(),
   404: fs.readFileSync('../megauni.html/Public/404.html').toString(),
   500: fs.readFileSync('../megauni.html/Public/500.html').toString(),
-  any: multiline.stripIndent(function () { /*
-      <html>
-        <head>
-          <title>Error</title>
-        </head>
-        <body>
-          Unknown Error.  Try again later.
-        </body>
-      </html>
-    */})
+  any: `
+<html>
+  <head>
+    <title>Error</title>
+  </head>
+  <body>
+    Unknown Error.  Try again later.
+  </body>
+</html>`.trim()
 };
 
 if (process.env.IS_DEV) {

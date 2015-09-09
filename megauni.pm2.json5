@@ -1,9 +1,5 @@
 {
   /**
-   * This is a sample configuration file for PM2
-   */
-
-  /**
    * Here we declare the apps that must be managed by PM2
    * All options are listed here:
    * https://github.com/Unitech/PM2/blob/master/ADVANCED_README.md#json-app-declaration
@@ -15,6 +11,7 @@
     {
       name      : "megauni",
       script    : "server.js",
+      node_args : ['--es_staging'],
       env: {
       },
       env_production : {

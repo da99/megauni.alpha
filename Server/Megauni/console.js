@@ -4,9 +4,9 @@
 
 if (process.env.IS_DEV) {
   module.exports = {
-    log : function (...args) {
+    log : function () {
       var fin = [];
-      for (let v of args) {
+      for (let v of arguments) {
         fin.push(v.toString());
       }
       return console.log.apply(console, fin);

@@ -18,7 +18,7 @@ if [[ -n "$IS_DEV" ]]; then
 fi
 
 export MODEL="$MODEL"
-export USE_SERVER="${USE_SERVER:+"yes"}"
+export USE_SERVER="${USE_SERVER:-yes}"
 export MOCHA="${MOCHA}"
 export SPECS="$SPECS"
 export RUN_FAST="${RUN_FAST}"
@@ -224,6 +224,7 @@ case "$action" in
 
   "start")
     if [[ -n "$dev" && -z "$USE_SERVER" ]]; then
+      echo "=== Not starting server."
       exit 0
     fi
     PORT=$PORT $0 pm2 startOrGracefulReload megauni.pm2.json5 "$@"
@@ -626,7 +627,7 @@ case "$action" in
     args="$@"
 
     if [[ -f "$file"  ]]; then
-      $file "$@"
+      $0 iojs $file "$@"
       exit 0
     fi
 
