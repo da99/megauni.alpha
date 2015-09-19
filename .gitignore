@@ -1,6 +1,12 @@
 
 /bin/jq
 
+# === Elixir, Erlang
+/_build
+/deps
+erl_crash.dump
+*.ez
+
 # Ignore sensitive info. in /config dir.
 config/secret*
 secret*
