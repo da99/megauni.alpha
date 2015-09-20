@@ -3,76 +3,14 @@
 
 defmodule Megauni.File.Static do
   @moduledoc """
-  A plug for serving static assets.
+  A plug for serving static assets, customized from Plug.Static.
+  This is meant to be used only for :dev environment.
+  In :prod (production), you would use NGINX to serve ALL static
+  files.
 
-  It requires two options on initialization:
-
-    * `:at` - the request path to reach for static assets.
-      It must be a string.
-
-    * `:from` - the filesystem path to read static assets from.
-      It must be a string, containing a file system path, an
-      atom representing the application name, where assets will
-      be served from the priv/static, or a tuple containing the
-      application name and directory to serve them besides
-      priv/static.
-
-  The preferred form is to use `:from` with an atom or tuple,
-  since it will make your application independent from the
-  starting directory.
-
-  If a static asset cannot be found, `Plug.Static` simply forwards
-  the connection to the rest of the pipeline.
-
-  ## Cache mechanisms
-
-  `Plug.Static` uses etags for HTTP caching. This means browsers/clients
-  should cache assets on the first request and validate the cache on
-  following requests, not downloading the static asset once again if it
-  has not changed. The cache-control for etags is specified by the
-  `cache_control_for_etags` option and defaults to "public".
-
-  However, `Plug.Static` also supports direct cache control by using
-  versioned query strings. If the request query string starts with
-  "?vsn=", `Plug.Static` assumes the application is versioning assets
-  and does not set the `ETag` header, meaning the cache behaviour will
-  be specified solely by the `cache_control_for_vsn_requests` config,
-  which defaults to "public, max-age=31536000".
-
-  ## Options
-
-    * `:gzip` - given a request for `FILE`, serves `FILE.gz` if it exists
-      in the static directory and if the `accept-encoding` header is set
-      to allow gzipped content (defaults to `false`).
-
-    * `:cache_control_for_etags` - sets the cache header for requests
-      that use etags. Defaults to `"public"`.
-
-    * `:cache_control_for_vsn_requests` - sets the cache header for
-      requests starting with "?vsn=" in the query string. Defaults to
-      `"public, max-age=31536000"`.
-
-    * `:only` - filters which paths to look up. This is useful to avoid
-      file system traversals on every request when this plug is mounted
-      at `"/"`. Defaults to `nil` (no filtering).
-
-    * `:headers` - other headers to be set when serving static assets.
-
-  ## Examples
-
-  This plug can be mounted in a `Plug.Builder` pipeline as follows:
-
-      defmodule MyPlug do
-        use Plug.Builder
-
-        plug Plug.Static, at: "/public", from: :my_app
-        plug :not_found
-
-        def not_found(conn, _) do
-          send_resp(conn, 404, "not found")
-        end
-      end
-
+  Do a `diff` to see the changes I made. Basically:
+     /          -> /index.html
+     /path/path -> /path/path/index.html (if /path/path is not a file.)
   """
 
   @behaviour Plug
@@ -121,15 +59,26 @@ defmodule Megauni.File.Static do
     # segments at the beginning that are shared with `at`.
     segments = subset(at, conn.path_info) |> Enum.map(&URI.decode/1)
 
+    if 0 === length(segments) do
+      segments = ["index.html"]
+    end
+
     cond do
       not allowed?(only, segments) ->
-        IO.puts "#{only} #{segments}"
         conn
       invalid_path?(segments) ->
         raise InvalidPathError
       true ->
         path = path(from, segments)
-        serve_static(file_encoding(conn, path, gzip), segments, gzip, qs_cache, et_cache, headers)
+
+        results = file_encoding(conn, path, gzip)
+        if tuple_size(results) === 2 do
+          segments = List.insert_at(segments, -1, 'index.html')
+          path = path(from, segments)
+          results = file_encoding(conn, path, gzip)
+        end
+
+        serve_static(results, segments, gzip, qs_cache, et_cache, headers)
     end
   end
 
