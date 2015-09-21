@@ -220,89 +220,40 @@ defmodule Screen_Name do
     bots.map(&val)
   end
 
-  def is? o
-    return true if data[:screen_name] == Screen_Name.canonize(o)
-    o.is_a?(Screen_Name) && owner_id == o.owner_id
+  def href sn do
+    "/@#{sn.screen_name}"
   end
 
-  def href do
-    "/@#{screen_name}"
-  end
 
-  def to_public
-    {
-      :screen_name => screen_name,
-      :href => href
-    }
-  end
+  def clean meta do
+    if (meta.is_new) do
+      var KEY = 'screen_name';
 
-  def owner_id do
-    data[:owner_id]
-  end
+      var val = (this.new_data.screen_name || '').toString().trim().toUpperCase();
 
-  def screen_name
-    data[:screen_name]
-  end
+      if (!(VALID.test(val)))
+      return this.error_msg(KEY, VALID_ENGLISH);
 
-  def find_screen_name_keys arr do
-    rec     = arr[0] || {:screen_name_id=>nil}
-    key     = SCREEN_NAME_KEYS.detect { |k| rec.has_key? k }
-    key     = key || :screen_name_id
-    new_key = key.to_s.sub('_id', '_screen_name').to_sym
-    [key, new_key]
-  end
+      for (let regexp of BANNED_SCREEN_NAMES) {
+        if (regexp.test(val))
+        return this.error_msg(KEY, 'Screen name is taken.');
+      }
 
+      this.clean[KEY] = val;
+      this.clean.display_name = val;
+      # unique_index 'screen_name_unique_idx', "Screen name already taken: {{val}}"
+    end # === meta.is_new
+
+  end # === def clean
+
+  def on_error e do
+    if (this.is_new() && /screen_name_unique_idx/.test(e.message))) do
+      this.error_msg('screen_name', 'Screen name is taken.')
+    end
+  end
 
 
 end # === defmodule Screen_Name
-
-
-Screen_Name.on(
-  'data_clean',
-  function () {
-    if (!this.is_new()) {
-      return;
-    }
-
-    var KEY = 'screen_name';
-
-    var val = (this.new_data.screen_name || '').toString().trim().toUpperCase();
-
-    if (!(VALID.test(val)))
-      return this.error_msg(KEY, VALID_ENGLISH);
-
-    for (let regexp of BANNED_SCREEN_NAMES) {
-      if (regexp.test(val))
-        return this.error_msg(KEY, 'Screen name is taken.');
-    }
-
-    this.clean[KEY] = val;
-    this.clean.display_name = val;
-    // unique_index 'screen_name_unique_idx', "Screen name already taken: {{val}}"
-  },
-
-  function () {
-    if (!(this.is_new() && !this.clean.owner_id))
-      return;
-
-    this.db_insert_sql = `
-      -- Inspired from: http://www.neilconway.org/docs/sequences/
-      INSERT INTO :idents.TABLE ( :clean.COLS! , owner_id )
-      VALUES ( :clean.VALS! , CURRVAL(PG_GET_SERIAL_SEQUENCE( ':idents.TABLE', 'id' )) )
-      RETURNING :clean.COLS! , id , owner_id ;
-    `;
-
-  } // === set owner_id = id
-); // === on data_clean
-
-Screen_Name.on(
-  'db_error',
-  function (e) {
-    if (!(this.is_new() && /screen_name_unique_idx/.test(e.message)))
-      return;
-    return this.error_msg('screen_name', 'Screen name is taken.');
-  }
-); // === on db_error
 
 
 
