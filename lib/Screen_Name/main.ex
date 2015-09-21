@@ -1,136 +1,53 @@
 
 
-defmodule Megauni.Cleaner do
-
-  def smallint(data, min, max) do
-    if (is_tuple(data)) do
-      data
-    else
-    end
-  end
-
-end # === defmodule Megauni.Cleaner do
 
 defmodule Screen_Name do
+  @World_Read_Id   1
+  @Private_Read_Id 2
+  @Not_Read_Id     3
+  @SCREEN_NAME_KEYS [
+    :screen_name_id, :publisher_id, :owner_id, :author_id, :follower_id
+  ]
+  @BEGIN_AT_OR_HASH  ~r/\A(\@|\#)/
+  @ALL_WHITE_SPACE   ~r/\s+/
 
-  import Megauni.Cleaner
-  def clean_privacy(data) do
-    data[:privacy]
-    |> included_in [1,2,3], "Allowed values: #{WORLD} (world) #{PROTECTED} (protected) #{PRIVATE} (private, no one)"
-  end # === def clean_privacy
+  @ME_ONLY    1
+  @LIST       2
+  @PUBLIC     3
 
-end # === defmodule Screen_Name
+  @VALID                ~r/^[a-zA-Z0-9\-\_\.]{4,30}$/
+  @VALID_ENGLISH        "Screen name must be 4 to 30 characters: numbers, letters, underscores, dash, or periods."
+  @BANNED_SCREEN_NAMES  [
+    ~r/^MEGAUNI/i,
+    ~r/^MINIUNI/i,
+    ~r/^OKDOKI/i,
+    ~r/\A(ME|MINE|MY|MI|i)\z/i,
+    ~r/^PET-/i,
+    ~r/^BOT-/i,
+    ~r/^okjak/i,
+    ~r/^okjon/i,
+    ~r/^(ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)\z/i,
+    ~r/^(UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY)\z/i,
+    ~r/^[.]+-COLA\z/i
+  ]
 
-  field(:privacy) {
-  }
 
-  field(:display_name) {
-    varchar 4, 30
-    set_to { |r, val|
-      r.clean[:screen_name]
-    }
-  }
+  def canonize str do
 
-  field(:owner_id) {
-    integer
-    matches do |r, v|
-      v > 0
-    end
-  }
-  field(:nick_name) {
-    varchar nil, 1, 30
-  }
-
-  # === Settings ========================================
-  World_Read_Id   = 1
-  Private_Read_Id = 2
-  Not_Read_Id     = 3
-
-  SCREEN_NAME_KEYS    = [:screen_name_id, :publisher_id, :owner_id, :author_id, :follower_id]
-  # =====================================================
-
-  # === Helpers =========================================
-
-  class << self
-
-    def filter sn
-      sn.gsub(INVALID, "")
+    cond do
+      is_list(str) ->
+        Enum.map(str, fn (v) -> canonize(v) end)
+      is_binary(str) ->
+        str = str
+        |> String.strip
+        |> String.upcase
+        |> (&Regex.replace(@BEGIN_AT_OR_HASH, &1, '')).()
+        |> (&Regex.replace(@ALL_WHITE_SPACE, &1, '-')).()
     end
 
-    def canonize str
-      return str unless str
-      return str.map {|s| canonize s } if str.is_a?(Array)
+  end # === def canonize_screen_name
 
-      str = str.screen_name if str.is_a?(Screen_Name)
-
-      sn = str.strip.upcase.gsub(BEGIN_AT_OR_HASH, '').gsub(ALL_WHITE_SPACE, '-');
-
-      if sn.index('@')
-        temp = sn.split('@');
-        sn = temp.pop.upcase
-
-        while not temp.empty?
-          sn = temp.pop.downcase + '@' + sn
-        end
-      end
-
-      sn
-    end # === def canonize_screen_name
-
-    def delete_by_owner_ids ids
-      return if ids.empty?
-      TABLE.
-        where(TABLE.literal [[ :owner_id, ids]]).
-        delete
-    end # === def delete
-
-    def read *args
-      case args.size
-      when 1
-        case args.first
-        when Customer
-          return read_list_by_customer args.first
-        end
-      end
-      raise "Go back and correct your args."
-    end
-
-    def read_by_id id
-      new TABLE.limit(1)[:id=>id], "Screen name not found."
-    end
-
-    def read_by_screen_names arr
-      new TABLE.where(screen_name: Screen_Name.canonize(arr)).all
-    end
-
-    def read_by_screen_name raw_sn
-      new TABLE[:screen_name=>Screen_Name.canonize(raw_sn)], "Screen name not found: #{raw_sn}"
-    end
-
-    def read_first_by_customer customer
-      new TABLE.where(:owner_id=>customer.id).limit(1).first
-    end
-
-    def read_list_by_customer c
-      new TABLE.where(owner_id: c.data[:id]).all
-    end
-
-  end # === class self ==================================
-
-
-  # =====================================================
-  # Instance
-  # =====================================================
-
-  %w{ screen_name privacy }.each do |name|
-    eval <<-EOF, nil, __FILE__, __LINE__ + 1
-      def #{name}
-        data[:#{name}]
-      end
-    EOF
-  end
-
-  def is_allowed_to_post_to sn
+  def is_allowed_to_post_to sn do
     Link.create(
       :owner_id =>sn.data[:owner_id],
       :type_id   =>Link::ALLOW_TO_LINK,
@@ -139,7 +56,7 @@ end # === defmodule Screen_Name
     )
   end
 
-  def is_allowed_to_read sn
+  def is_allowed_to_read sn do
     Link.create(
       owner_id: sn.id,
       type_id: Link::ALLOW_ACCESS_SCREEN_NAME,
@@ -157,7 +74,7 @@ end # === defmodule Screen_Name
     )
   end
 
-  def comments_on computer, msg
+  def comments_on computer, msg do
     comment = self.computer({:msg=>msg})
     Link.create(
       owner_id: id,
@@ -177,7 +94,7 @@ end # === defmodule Screen_Name
   # except it also removes related screen name id
   # key. Useful for sending records to an audience.
   #
-  def replace_screen_names arr
+  def replace_screen_names arr do
     keys    = find_screen_name_keys(arr)
     key     = keys[0]
 
@@ -208,7 +125,7 @@ end # === defmodule Screen_Name
     arr
   end
 
-  def create
+  def create do
     @raw[:display_name] = @raw[:screen_name]
     clean! :screen_name
     clean :display_name, :privacy
@@ -227,7 +144,7 @@ end # === defmodule Screen_Name
     if clean[:screen_name]
       clean[:display_name] = clean[:screen_name]
     end
-  end # === def update
+  end # === def update do
 
   # === READ ==================================================================
 
@@ -235,7 +152,7 @@ end # === defmodule Screen_Name
     @owner ||= Customer.read_by_id(data[:owner_id])
   end
 
-  def bot cmd = nil
+  def bot cmd = nil do
     if !@bot_read
       @bot_read = true
       @bot = Bot.read_by_screen_name(self) rescue nil
@@ -276,7 +193,7 @@ end # === defmodule Screen_Name
     return @bot_uses unless cmd
 
     @bot_uses.map(&cmd)
-  end # === def bot_uses
+  end # === def bot_uses do
 
   def read type, *args
     case type
@@ -287,7 +204,7 @@ end # === defmodule Screen_Name
     end
   end
 
-  def read_bot_menu val = nil
+  def read_bot_menu val = nil do
     sql = %^
       SELECT bot.*, screen_name.screen_name, bot_use_select.is_on
       FROM (bot Left JOIN screen_name
@@ -308,7 +225,7 @@ end # === defmodule Screen_Name
     o.is_a?(Screen_Name) && owner_id == o.owner_id
   end
 
-  def href
+  def href do
     "/@#{screen_name}"
   end
 
@@ -319,7 +236,7 @@ end # === defmodule Screen_Name
     }
   end
 
-  def owner_id
+  def owner_id do
     data[:owner_id]
   end
 
@@ -327,7 +244,7 @@ end # === defmodule Screen_Name
     data[:screen_name]
   end
 
-  def find_screen_name_keys arr
+  def find_screen_name_keys arr do
     rec     = arr[0] || {:screen_name_id=>nil}
     key     = SCREEN_NAME_KEYS.detect { |k| rec.has_key? k }
     key     = key || :screen_name_id
@@ -335,54 +252,10 @@ end # === defmodule Screen_Name
     [key, new_key]
   end
 
-end # === Screen_Name ========================================
 
 
+end # === defmodule Screen_Name
 
-
-
-
-
-
-
-
-
-
-"use strict";
-/* jshint -W079, esnext: true, undef: true, unused: true */
-/* global require, module  */
-
-/* global process */
-var log; log = function (...args) { return (process.env.IS_DEV) ? console.log.apply(console, args) : null; };
-
-// var _     = require('lodash');
-var Model = require('../Megauni/model');
-
-// const ME_ONLY   = 1;
-// const LIST      = 2;
-// const PUBLIC    = 3;
-
-// const  BEGIN_AT_OR_HASH    = /\A(\@|\#)/ ;
-// const  ALL_WHITE_SPACE     = /\s+/ ;
-const  VALID               = /^[a-zA-Z0-9\-\_\.]{4,30}$/i ;
-const  VALID_ENGLISH       = "Screen name must be 4 to 30 characters: numbers, letters, underscores, dash, or periods.";
-const  BANNED_SCREEN_NAMES = [
-  /^MEGAUNI/i,
-  /^MINIUNI/i,
-  /^OKDOKI/i,
-  /\A(ME|MINE|MY|MI|i)\z/i,
-  /^PET-/i,
-  /^BOT-/i,
-  /^okjak/i,
-  /^okjon/i,
-  /^(ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)\z/i,
-  /^(UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY)\z/i,
-  /^[.]+-COLA\z/i
-];
-
-class Screen_Name extends Model{
-
-} // === class Screen_Name
 
 Screen_Name.on(
   'data_clean',
@@ -431,7 +304,6 @@ Screen_Name.on(
   }
 ); // === on db_error
 
-module.exports = Screen_Name;
 
 
 

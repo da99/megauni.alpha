@@ -106,6 +106,10 @@ mods=(
   Session
 )
 
+mods=(
+  Screen_Name
+)
+
 # === Create a reverse of the list.
 rev_mods=()
 for (( idx=${#mods[@]}-1 ; idx >= 0 ; idx-- ))
@@ -290,7 +294,7 @@ case "$action" in
         name="$2"
         shift
         shift
-        cd Server
+        cd lib
         duck_duck_duck create $model $name
         ;;
 
@@ -339,7 +343,7 @@ case "$action" in
           done
           echo -e "\n=== Done.\n"
         else
-          cd Server
+          cd lib
           echo ""
           duck_duck_duck up $model
         fi
@@ -365,7 +369,7 @@ case "$action" in
           done
 
         else
-          cd Server
+          cd lib
           echo ""
           duck_duck_duck down $model
         fi
