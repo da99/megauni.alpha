@@ -41,8 +41,12 @@ RETURNS trigger AS $$
 
     -- nick_name
     IF NEW.nick_name IS NOT NULL THEN
+      -- Replace all control chars into spaces:
       NEW.nick_name := regexp_replace(NEW.nick_name, '[[:cntrl:]]+', ' ', 'ig');
-      NEW.nick_name := regexp_replace(NEW.nick_name, '[\s]+', ' ', 'ig');
+      -- Replace all multiple spaces into single space:
+      NEW.nick_name := regexp_replace(NEW.nick_name, '[\s]+',        ' ', 'ig');
+      -- Trim both sides:
+      NEW.nick_name := trim(both ' ' from NEW.nick_name);
 
       IF NEW.nick_name == '' THEN
         NEW.nick_name := NULL;
