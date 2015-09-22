@@ -1,0 +1,48 @@
+
+[
+
+  [ "it", ["creates record if data validates"],
+    "Screen_name.create", ["! create rand screen_name"],
+    "assert ===", ["! rand screen_name", "! sn.data.screen_name"]
+  ],
+
+  [ "it", ["raises Invalid if screen name is empty"],
+    "catch err", [ "Screen_Name.create", [""] ],
+    "assert substring -i", [ "At least ", "! err.msg" ]
+  ],
+
+  [ "it", ["megauni is not allowed (despite case)"],
+    "catch err", [
+      "Screen_Name.create", [{"screen_name": "meGauNi"}]
+    ],
+    "assert substring -i", ["Screen name not allowed", "! err.msg"]
+  ],
+
+  ["it", ["raises Invalid for duplicate name"],
+    "catch err", [
+      "Screen_Name.create", [{"screen_name" : "! create rand screen_name"}],
+      "Screen_Name.create", [{"screen_name" : "! rand screen_name"}]
+    ],
+    "assert substring -i", ["! err.msg", "Screen name already taken: #{rand screen_name}"]
+  ],
+
+  ["it", [ "updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id"],
+    "Screen_Name.create", [{"screen_name": "! create rand screen_name"}],
+    "assert ===", ["! sn.data.id", "! sn.data.owner_id"]
+  ],
+
+  ["it",  ["uses User :id as it's :owner_id"],
+    "User.create", [{
+      "screen_name"       : "! create rand screen_name",
+      "pass_word"         : "this is my weak password",
+      "confirm_pass_word" : "this is my weak password",
+      "ip"                : "00.000.0.00"
+    }],
+    "assert ===", [
+      "query one", ["SELECT * FROM screen_name WHERE owner_id = $1", "! user.data.id"],
+      "! .owner_id",
+      "! user.data.id"
+    ]
+  ]
+
+]
