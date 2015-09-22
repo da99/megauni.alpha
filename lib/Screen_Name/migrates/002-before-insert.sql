@@ -23,12 +23,12 @@ RETURNS trigger AS $$
     END IF;
 
     IF NEW.screen_name !~ '^[A-Z\d\-\_\.]+$' THEN
-      raise EXCEPTION 'screen_name_valid_chars: numbers, letters, underscores, dash, or periods.';
+      raise EXCEPTION 'screen_name_invalid_chars: %', regexp_replace(NEW.screen_name, '[A-Z\d\-\_\.]+', '', 'ig');
     END IF;
 
     -- Banned screen names:
-    IF NEW.screen_name !~* '[^A-Z](MEGAUNI|MINIUNI|OKDOKI|BOT-|okjak|okjon)' OR
-       NEW.screen_name !~* '^(ME|MINE|MY|MI|[.]+-COLA|UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY|ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)$'
+    IF NEW.screen_name ~* '[^A-Z](MEGAUNI|MINIUNI|OKDOKI|BOT-|okjak|okjon)' OR
+       NEW.screen_name ~* '^(ME|MINE|MY|MI|[.]+-COLA|UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY|ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)$'
     THEN
       RAISE EXCEPTION 'screen_name_not_available: Screen name not available.';
     END IF;
@@ -41,9 +41,8 @@ RETURNS trigger AS $$
 
     -- nick_name
     IF NEW.nick_name IS NOT NULL THEN
-      NEW.nick_name := regexp_replace(NEW.nick_name, '[[:cntrl:]]+', ' ');
-      NEW.nick_name := regexp_replace(NEW.nick_name, '[\s]+', ' ');
-      NEW.nick_name := trim(both ' ' from NEW.nick_name);
+      NEW.nick_name := regexp_replace(NEW.nick_name, '[[:cntrl:]]+', ' ', 'ig');
+      NEW.nick_name := regexp_replace(NEW.nick_name, '[\s]+', ' ', 'ig');
 
       IF NEW.nick_name == '' THEN
         NEW.nick_name := NULL;

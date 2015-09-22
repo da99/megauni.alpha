@@ -4,7 +4,7 @@ AS $$
   BEGIN
     -- screen_name
     sn := upper(sn);
-    sn := regexp_replace(sn, '^\@|[\s[:cntrl:]]+', '');
+    sn := regexp_replace(sn, '^\@|[\s[:cntrl:]]+', '', 'ig');
   END
 $$
 LANGUAGE plpgsql
