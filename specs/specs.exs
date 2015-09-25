@@ -13,8 +13,8 @@ defmodule JSON_Spec do
 
     Enum.reduce(json, Enum.into(%{:it_count=>1}, env), fn(task, env) ->
       case task do
-        %{"desc"=>desc} -> run_desc(task, env)
-        %{"it"  =>it}   -> run_it(task, env)
+        %{"desc"=>_desc} -> run_desc(task, env)
+        %{"it"  =>_it}   -> run_it(task, env)
         _               -> raise "Don't know what to do with: #{inspect task}"
       end # === cond
     end)
@@ -64,7 +64,7 @@ defmodule JSON_Spec do
           Map.has_key?(env, name) && !is_function(env[name]) ->
             {env[name], env}
           Map.has_key?(env, name) ->
-            {val, new_env} = env[name].(env)
+            {_val, _new_env} = env[name].(env)
           true -> # === send the original, instead of the canonized
             {x, env}
         end
@@ -96,7 +96,7 @@ models       = raw |> String.strip |> String.split |> Enum.join ","
 files = Path.wildcard("lib/{#{models}}/specs/*.json")
 env = %{
   "create: rand.screen_name" => fn(env) ->
-    {mega, sec, micro} = :erlang.timestamp
+    {_mega, sec, micro} = :erlang.timestamp
     sn = "sn_#{sec}_#{micro}"
     { sn, Map.put(env, "screen_name", sn) }
   end,
