@@ -2,12 +2,12 @@
 
   {
     "it":  "uses User :id as it's :owner_id",
-    "input" : ["User.create", {
+    "input" : {
       "screen_name"       : "create rand: screen_name",
       "pass_word"         : "this is my weak password",
       "confirm_pass_word" : "this is my weak password",
       "ip"                : "00.000.0.00"
-    }],
+    },
     "output": [
       "Screen_Name.read", { "screen_name": "screen_name" },
       {"owner_id" : "user.data.id"}

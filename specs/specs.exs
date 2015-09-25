@@ -1,49 +1,111 @@
 
-format_num = fn(num) ->
-  space = String.duplicate(" ", 2 - String.length to_string(num))
-  "#{space}#{num}"
-end
+defmodule JSON_Spec do
 
-run_desc = fn(task, meta) ->
-  %{"desc"=>desc} = task
-  IO.puts "\n#{IO.ANSI.yellow}#{desc}#{IO.ANSI.reset}"
-  %{:func=>desc, :it_count => meta.it_count}
-end
-
-compile = fn(x, funcs) ->
-  cond do
-    is_binary(x) ->
-    is_map(x) ->
-    is_list(x) ->
+  def format_num(num) do
+    space = String.duplicate " ", 2 - String.length(to_string(num))
+    "#{space}#{num}"
   end
-end # === compile
 
-run_it = fn(task, meta) ->
-  %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
-  input = compile.(raw_input, funcs)
-  IO.puts "#{format_num.(meta.it_count)}) #{it}#{IO.ANSI.reset}"
-  %{:func=>meta.func, :it_count => meta.it_count + 1, :stack => [], :vars => %{}, }
-end
+  def run_file(path, env) do
+    json = File.read!(path) |> Poison.decode!
 
-run_file = fn(path) ->
-  IO.puts ""
-  IO.puts "file: #{IO.ANSI.bright}#{path}#{IO.ANSI.reset}"
-  json = File.read!(path)
-          |> Poison.decode!
-  Enum.reduce(json, %{it_count: 1, func: nil}, fn(task, meta) ->
-    case task do
-      %{"desc"=>desc} -> run_desc.(task, meta)
-      %{"it"  =>it}   -> run_it.(task, meta)
-      _               -> raise "Don't know what to do with: #{inspect task}"
+    IO.puts "\nfile: #{IO.ANSI.bright}#{path}#{IO.ANSI.reset}"
+
+    Enum.reduce(json, Enum.into(%{:it_count=>1}, env), fn(task, env) ->
+      case task do
+        %{"desc"=>desc} -> run_desc(task, env)
+        %{"it"  =>it}   -> run_it(task, env)
+        _               -> raise "Don't know what to do with: #{inspect task}"
+      end # === cond
+    end)
+  end # === run_file
+
+  def run_desc(task, env) do
+    %{"desc"=>desc} = task
+    IO.puts "\n#{IO.ANSI.yellow}#{desc}#{IO.ANSI.reset}"
+    Enum.into %{ :func=>desc }, env
+  end
+
+  def run_it(task, env) do
+    %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
+    {input, env}  = compile(raw_input, env)
+    {output, env} = compile(raw_output, env)
+
+    num    = "#{format_num(env.it_count)})"
+    bright = IO.ANSI.bright
+    reset  = IO.ANSI.reset
+    red    = "#{bright}#{IO.ANSI.red}"
+
+    if input == output do
+      IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{it}"
+    else
+      IO.puts "#{bright}"
+      IO.puts "#{red}#{num}#{reset}#{bright} #{it}"
+      IO.puts "#{red}#{inspect input} !== #{reset}#{bright}#{inspect output}"
+    end
+    IO.puts reset
+    Enum.into %{ :it_count => env.it_count + 1 }, env
+    Process.exit(self, "temp done")
+  end
+
+  def run_list(x, env) do
+    [true]
+  end
+
+  def canon_key(x) do
+    x |> String.strip |> (&(Regex.replace(~r/\s+/, &1," "))).()
+  end
+
+  def compile(x, env) do
+    cond do
+      is_binary(x) ->
+        name = canon_key(x)
+        cond do
+          Map.has_key?(env, name) && !is_function(env[name]) ->
+            {env[name], env}
+          Map.has_key?(env, name) ->
+            {val, new_env} = env[name].(env)
+          true -> # === send the original, instead of the canonized
+            {x, env}
+        end
+
+      is_map(x) ->
+        result = Enum.reduce x, %{:map=>%{}, :env=>env}, fn({k,v}, pair) ->
+          {new_v, new_e} = compile(v, env)
+          Enum.into(
+            %{:map=>Map.put(pair.map, k, new_v), :env=>new_e},
+            pair
+          )
+        end
+        {result.map, result.env}
+
+      is_list(x) ->
+        run_list(x, env) |> List.last
+
+      true ->
+        raise "Don't know what to do with: #{inspect x}"
     end # === cond
-  end)
-end # === run_file
+  end # === compile
+
+end # === defmodule JSON_Spec
+
 
 {raw, _exit} = System.cmd Path.expand("bin/megauni"), ["model_list"]
 models       = raw |> String.strip |> String.split |> Enum.join ","
 
 files = Path.wildcard("lib/{#{models}}/specs/*.json")
-Enum.each(files, &(run_file.(&1)))
+env = %{
+  "create: rand.screen_name" => fn(env) ->
+    {mega, sec, micro} = :erlang.timestamp
+    sn = "sn_#{sec}_#{micro}"
+    { sn, Map.put(env, "screen_name", sn) }
+  end,
+  "Screen_Name.create" => fn(data) ->
+    %{"error" => "Not done"}
+  end
+}
+
+Enum.each(files, &(JSON_Spec.run_file(&1, env)))
 
 
 
