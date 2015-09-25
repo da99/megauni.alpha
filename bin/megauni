@@ -84,7 +84,7 @@ while [[ -n "$@" ]] ; do
   fi
 done # === while
 
-js_files="$(echo -e ./*.js Server/*/specs/*.js Server/Megauni/*.js Server/Card/*.js Server/Screen_Name/*.js Server/User/*.js Server/Root/*.js)"
+js_files="$(echo -e Server/*/specs/*.js Server/Megauni/*.js Server/Card/*.js Server/User/*.js Server/Root/*.js)"
 
 # ==============================================================
 GREEN=$(tput setaf 2)
@@ -567,6 +567,8 @@ case "$action" in
 
       if [[ ! -z "$file" ]]; then
 
+        $0 specs || :
+
         if [[ "$path" == *bin/megauni* ]]; then
           echo ""
           echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 $action"
@@ -587,10 +589,12 @@ case "$action" in
       fi
 
       echo ""
-    done < <(inotifywait --quiet --monitor --event close_write  $js_files $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
+    done < <(inotifywait --quiet --monitor --event close_write -r lib/ -r specs/ $js_files $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
     ;;
 
   "watch")
+    # === watch
+    # === watch no_server
 
     eval "$(bash_setup setup_traps)"
     setup_traps
@@ -601,9 +605,11 @@ case "$action" in
     # === Start server:
 
     echo -e "=== $(basename $0): Proc: $$ Proc Group: $(bash_setup proc_group $$)"
+
     if [[ -z "$RUN_FAST" ]] ; then
       $0 jshint
     fi
+
     if [[ -n "$USE_SERVER" ]]; then
       ( bin/megauni __watch ) &
       bin/megauni start --no-daemon

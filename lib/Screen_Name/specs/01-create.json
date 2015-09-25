@@ -4,48 +4,35 @@
 
   {
     "it"     : "creates record if data validates",
-    "input"  : {"screen_name": "^ create.rand.screen_name"},
-    "output" : {"screen_name": "^ rand.screen_name"}
+    "input"  : {"screen_name": "create: rand.screen_name"},
+    "output" : {"screen_name": "screen_name"}
   },
 
   {
     "it"     : "raises Invalid if screen name is empty",
     "input"  : {"screen_name": ""},
-    "output" : {"error" : "At least 4 chars..."}
+    "output" : {"error" : "screen_name: min 4"}
   },
 
-  [ "it", ["megauni is not allowed (despite case)"],
-    "catch err", [
-      "Screen_Name.create", [{"screen_name": "meGauNi"}]
+  {
+    "it": "megauni is not allowed (despite case)",
+    "input": {"screen_name": "meGauNi"},
+    "output": {"error" : "screen_name: already taken"}
+  },
+
+  {
+    "it": "raises Invalid for duplicate name",
+    "input": [
+      {"screen_name" : "create rand: screen_name"},
+      {"screen_name" : "screen_name"}
     ],
-    "assert substring -i", ["Screen name not allowed", "! err.msg"]
-  ],
+    "output": {"error": "screen_name: already taken"}
+  },
 
-  ["it", ["raises Invalid for duplicate name"],
-    "catch err", [
-      "Screen_Name.create", [{"screen_name" : "! create rand screen_name"}],
-      "Screen_Name.create", [{"screen_name" : "! rand screen_name"}]
-    ],
-    "assert substring -i", ["! err.msg", "Screen name already taken: #{rand screen_name}"]
-  ],
-
-  ["it", [ "updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id"],
-    "Screen_Name.create", [{"screen_name": "! create rand screen_name"}],
-    "assert ===", ["! sn.data.id", "! sn.data.owner_id"]
-  ],
-
-  ["it",  ["uses User :id as it's :owner_id"],
-    "User.create", [{
-      "screen_name"       : "! create rand screen_name",
-      "pass_word"         : "this is my weak password",
-      "confirm_pass_word" : "this is my weak password",
-      "ip"                : "00.000.0.00"
-    }],
-    "assert ===", [
-      "query one", ["SELECT * FROM screen_name WHERE owner_id = $1", "! user.data.id"],
-      "! .owner_id",
-      "! user.data.id"
-    ]
-  ]
+  {
+    "it": "updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id",
+    "input": {"screen_name": "create rand: screen_name"},
+    "output": {"data" : {"id" : "sn.data.id", "owner_id" : "sn.data.id"}}
+  }
 
 ]
