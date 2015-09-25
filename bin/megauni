@@ -414,6 +414,11 @@ case "$action" in
     done # === while read output
     ;;
 
+  "specs")
+    # === Run all the specs of the projects.
+    mix run specs/specs.exs
+    ;;
+
   "test")
     files=""
     model=""
