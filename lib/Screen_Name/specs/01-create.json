@@ -1,15 +1,18 @@
 
 [
+  {"desc": "Screen_Name.create"},
 
-  [ "it", ["creates record if data validates"],
-    "Screen_name.create", ["! create rand screen_name"],
-    "assert ===", ["! rand screen_name", "! sn.data.screen_name"]
-  ],
+  {
+    "it"     : "creates record if data validates",
+    "input"  : {"screen_name": "^ create.rand.screen_name"},
+    "output" : {"screen_name": "^ rand.screen_name"}
+  },
 
-  [ "it", ["raises Invalid if screen name is empty"],
-    "catch err", [ "Screen_Name.create", [""] ],
-    "assert substring -i", [ "At least ", "! err.msg" ]
-  ],
+  {
+    "it"     : "raises Invalid if screen name is empty",
+    "input"  : {"screen_name": ""},
+    "output" : {"error" : "At least 4 chars..."}
+  },
 
   [ "it", ["megauni is not allowed (despite case)"],
     "catch err", [
