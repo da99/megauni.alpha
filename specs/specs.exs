@@ -6,6 +6,22 @@ defmodule JSON_Spec do
     "#{space}#{num}"
   end
 
+  def all_maps? list do
+    !Enum.find list, fn(v) ->
+      !is_map(v)
+    end
+  end
+
+  def maps_match? actual, expected do
+    if Enum.count(actual) < 1 do
+      false
+    else
+      !Enum.find expected, fn({k,v}) ->
+        actual[k] !== v
+      end
+    end
+  end # === maps_match?
+
   def run_file(path, env) do
     json = File.read!(path) |> Poison.decode!
 
@@ -39,15 +55,7 @@ defmodule JSON_Spec do
     # === Run the input:
     {actual, env} = env[env[:desc]].(input, env)
 
-    is_match = Enum.reduce(actual, true, fn({k,v}, acc) ->
-      if v do
-        expected[k] == v
-      else
-        v
-      end
-    end)
-
-    if is_match do
+    if maps_match?(actual, expected) do
       IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{it}"
     else
       IO.puts "#{bright}"
@@ -126,7 +134,7 @@ env = %{
     case result do
       %{"error" => msg} ->
         {%{"error"=>msg}, Map.put(env, "error", msg)}
-      %{"screen_name"=>sn} ->
+      %{"screen_name"=>_sn} ->
         {result, Map.put(env, "sn", result)}
     end
   end
