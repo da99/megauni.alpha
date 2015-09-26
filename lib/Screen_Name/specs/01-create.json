@@ -11,13 +11,13 @@
   {
     "it"     : "raises Invalid if screen name is empty",
     "input"  : {"screen_name": ""},
-    "output" : {"error" : "screen_name: min 4"}
+    "output" : {"error" : "screen_name: min: 4"}
   },
 
   {
     "it": "megauni is not allowed (despite case)",
     "input": {"screen_name": "meGauNi"},
-    "output": {"error" : "screen_name: already taken"}
+    "output": {"error" : "screen_name: not available"}
   },
 
   {

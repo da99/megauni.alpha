@@ -56,7 +56,6 @@ defmodule JSON_Spec do
     end
     IO.puts reset
     Enum.into %{ :it_count => env.it_count + 1 }, env
-    Process.exit(self, "temp done")
   end
 
   def run_list(_x, _env) do
@@ -125,7 +124,7 @@ env = %{
   "Screen_Name.create" => fn(data, env) ->
     result = Screen_Name.create data
     case result do
-      {:error, msg} ->
+      %{"error" => msg} ->
         {%{"error"=>msg}, Map.put(env, "error", msg)}
       %{"screen_name"=>sn} ->
         {result, Map.put(env, "sn", result)}

@@ -51,7 +51,7 @@ defmodule Screen_Name do
         end
 
       {:error, e} ->
-        %{"error"=> Exception.message(e)}
+        %{"error"=> Regex.replace(~r/ERROR \(raise_exception\): /, Exception.message(e), "")}
 
     end # === case
   end
