@@ -25,6 +25,37 @@ defmodule Screen_Name do
 
   end # === def canonize_screen_name
 
+  def create data do
+    vals = Enum.into(%{"owner_id"=>nil}, data)
+    result = Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      "INSERT INTO screen_name (owner_id, screen_name)
+      VALUES($1, $2)
+      RETURNING owner_id, screen_name;",
+      [vals["owner_id"], vals["screen_name"]]
+    )
+
+    case result do
+
+      {:ok, meta} ->
+        maps = Enum.map(meta.rows, fn(r) ->
+          Enum.reduce(Enum.zip(meta.columns, r), %{}, fn({col, val}, map) ->
+            Map.put(map, col, val)
+          end)
+        end)
+
+        if Enum.count(maps) == 1 do
+          List.first(maps)
+        else
+          maps
+        end
+
+      {:error, e} ->
+        %{"error"=> Exception.message(e)}
+
+    end # === case
+  end
+
   def is_allowed_to_post_to sn do
     Link.create([
       owner_id: sn.data[:owner_id],

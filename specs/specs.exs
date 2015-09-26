@@ -23,25 +23,36 @@ defmodule JSON_Spec do
   def run_desc(task, env) do
     %{"desc"=>desc} = task
     IO.puts "\n#{IO.ANSI.yellow}#{desc}#{IO.ANSI.reset}"
-    Enum.into %{ :func=>desc }, env
+    Enum.into %{ :desc=>desc }, env
   end
 
   def run_it(task, env) do
     %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
     {input, env}  = compile(raw_input, env)
-    {output, env} = compile(raw_output, env)
+    {expected, env} = compile(raw_output, env)
 
     num    = "#{format_num(env.it_count)})"
     bright = IO.ANSI.bright
     reset  = IO.ANSI.reset
     red    = "#{bright}#{IO.ANSI.red}"
 
-    if input == output do
+    # === Run the input:
+    {actual, env} = env[env[:desc]].(input, env)
+
+    is_match = Enum.reduce(actual, true, fn({k,v}, acc) ->
+      if v do
+        expected[k] == v
+      else
+        v
+      end
+    end)
+
+    if is_match do
       IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{it}"
     else
       IO.puts "#{bright}"
       IO.puts "#{red}#{num}#{reset}#{bright} #{it}"
-      IO.puts "#{red}#{inspect input} !== #{reset}#{bright}#{inspect output}"
+      IO.puts "#{red}#{inspect actual} !== #{reset}#{bright}#{inspect expected}"
     end
     IO.puts reset
     Enum.into %{ :it_count => env.it_count + 1 }, env
@@ -57,8 +68,9 @@ defmodule JSON_Spec do
   end
 
   def compile(x, env) do
+
     cond do
-      is_binary(x) ->
+      is_binary(x) -> # === See if string is a var or func call.
         name = canon_key(x)
         cond do
           Map.has_key?(env, name) && !is_function(env[name]) ->
@@ -103,13 +115,21 @@ models       = raw |> String.strip |> String.split |> Enum.join ","
 
 files = Path.wildcard("lib/{#{models}}/specs/*.json")
 env = %{
+
   "create: rand.screen_name" => fn(env) ->
     {_mega, sec, micro} = :erlang.timestamp
-    sn = "sn_#{sec}_#{micro}"
+    sn = "SN_#{sec}_#{micro}"
     { sn, Map.put(env, "screen_name", sn) }
   end,
-  "Screen_Name.create" => fn(_data) ->
-    %{"error" => "Not done"}
+
+  "Screen_Name.create" => fn(data, env) ->
+    result = Screen_Name.create data
+    case result do
+      {:error, msg} ->
+        {%{"error"=>msg}, Map.put(env, "error", msg)}
+      %{"screen_name"=>sn} ->
+        {result, Map.put(env, "sn", result)}
+    end
   end
 }
 
