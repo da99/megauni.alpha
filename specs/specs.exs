@@ -48,8 +48,8 @@ defmodule JSON_Spec do
     Process.exit(self, "temp done")
   end
 
-  def run_list(x, env) do
-    [true]
+  def run_list(_x, _env) do
+    raise "run_list: need to be implemented"
   end
 
   def canon_key(x) do
@@ -65,9 +65,17 @@ defmodule JSON_Spec do
             {env[name], env}
           Map.has_key?(env, name) ->
             {_val, _new_env} = env[name].(env)
-          true -> # === send the original, instead of the canonized
-            {x, env}
-        end
+          true -> # === Check for "key.key.key"
+            [ key | pieces ] = String.split(name, ".")
+            if Map.has_key?(env, key) do
+              fin = Enum.reduce(pieces, env[key], fn(v, acc) ->
+                acc[v]
+              end)
+              {fin, env}
+            else # === send the original, instead of the canonized
+              {x, env}
+            end
+        end # === cond
 
       is_map(x) ->
         result = Enum.reduce x, %{:map=>%{}, :env=>env}, fn({k,v}, pair) ->
@@ -100,7 +108,7 @@ env = %{
     sn = "sn_#{sec}_#{micro}"
     { sn, Map.put(env, "screen_name", sn) }
   end,
-  "Screen_Name.create" => fn(data) ->
+  "Screen_Name.create" => fn(_data) ->
     %{"error" => "Not done"}
   end
 }
