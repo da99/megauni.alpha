@@ -51,7 +51,18 @@ defmodule Screen_Name do
         end
 
       {:error, e} ->
-        %{"error"=> Regex.replace(~r/ERROR \(raise_exception\): /, Exception.message(e), "")}
+        msg            = Exception.message(e)
+        err_unique_idx = ~r/violates.+"screen_name_unique_idx"/
+        err_exception  = ~r/^ERROR \(raise_exception\): /
+
+        cond do
+          msg =~ err_unique_idx ->
+            %{"error"=> "screen_name: already taken"}
+          msg =~ err_exception ->
+            %{"error"=> Regex.replace(err_exception, msg, "")}
+          true ->
+            %{"error"=> "screen_name: programmer error"}
+        end # === cond
 
     end # === case
   end

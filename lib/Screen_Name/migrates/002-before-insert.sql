@@ -27,7 +27,7 @@ RETURNS trigger AS $$
     END IF;
 
     -- Banned screen names:
-    IF NEW.screen_name ~* '(MEGAUNI|MINIUNI|OKDOKI|okjak|okjon)' OR
+    IF NEW.screen_name ~* '(SCREEN[\_\.\-\+]+NAME|MEGAUNI|MINIUNI|OKDOKI|okjak|okjon)' OR
        NEW.screen_name ~* '^(BOT-|ME|MINE|MY|MI|[.]+-COLA|UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY|ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)$'
     THEN
       RAISE EXCEPTION 'screen_name: not available';

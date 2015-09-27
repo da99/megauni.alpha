@@ -4,7 +4,7 @@
 
   {
     "it"     : "creates record if data validates",
-    "input"  : {"screen_name": "create: rand.screen_name"},
+    "input"  : {"screen_name": "rand screen_name"},
     "output" : {"screen_name": "screen_name"}
   },
 
@@ -21,9 +21,15 @@
   },
 
   {
+    "it": "\"screen_name\" is not allowed (despite case)",
+    "input": {"screen_name": "sCreen_NamE"},
+    "output": {"error" : "screen_name: not available"}
+  },
+
+  {
     "it": "raises Invalid for duplicate name",
     "input": [
-      {"screen_name" : "create rand: screen_name"},
+      {"screen_name" : "rand screen_name"},
       {"screen_name" : "screen_name"}
     ],
     "output": {"error": "screen_name: already taken"}
@@ -31,8 +37,8 @@
 
   {
     "it": "updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id",
-    "input": {"screen_name": "create rand: screen_name"},
-    "output": {"data" : {"id" : "sn.data.id", "owner_id" : "sn.data.id"}}
+    "input": {"screen_name": "rand screen_name"},
+    "output": {"id" : "sn.data.id", "owner_id" : "sn.data.id"}
   }
 
 ]
