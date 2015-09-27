@@ -25,16 +25,20 @@ defmodule Screen_Name do
 
   end # === def canonize_screen_name
 
-  def create data do
-    vals = Enum.into(%{"owner_id"=>nil}, data)
-    result = Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main,
-      "INSERT INTO screen_name (owner_id, screen_name)
-      VALUES($1, $2)
-      RETURNING owner_id, screen_name;",
-      [vals["owner_id"], vals["screen_name"]]
-    )
+  def read data do
+    result = if System.get_env("IS_DEV") do
+      Ecto.Adapters.SQL.query(
+        Megauni.Repos.Main,
+        "SELECT * FROM screen_name WHERE screen_name = screen_name_canonize($1);",
+        [data["screen_name"]]
+      )
+    else
+      raise "NOT DONE"
+    end
+    applet_results(result, "screen_name")
+  end
 
+  def applet_results result, prefix \\ "unknown" do
     case result do
 
       {:ok, meta} ->
@@ -52,19 +56,33 @@ defmodule Screen_Name do
 
       {:error, e} ->
         msg            = Exception.message(e)
-        err_unique_idx = ~r/violates.+"screen_name_unique_idx"/
+        err_unique_idx = ~r/violates.+"#{prefix}_unique_idx"/
         err_exception  = ~r/^ERROR \(raise_exception\): /
 
         cond do
           msg =~ err_unique_idx ->
-            %{"error"=> "screen_name: already taken"}
+            %{"error"=> "#{prefix}: already taken"}
           msg =~ err_exception ->
             %{"error"=> Regex.replace(err_exception, msg, "")}
           true ->
-            %{"error"=> "screen_name: programmer error"}
+            In.spect e
+            %{"error"=> "#{prefix}: programmer error"}
         end # === cond
 
     end # === case
+  end
+
+  def create data do
+    vals = Enum.into(%{"owner_id"=>nil}, data)
+    result = Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      "INSERT INTO screen_name (owner_id, screen_name)
+      VALUES($1, $2)
+      RETURNING screen_name;",
+      [vals["owner_id"], vals["screen_name"]]
+    )
+
+    applet_results(result, "screen_name")
   end
 
   def is_allowed_to_post_to sn do

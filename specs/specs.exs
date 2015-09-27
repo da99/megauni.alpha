@@ -8,6 +8,11 @@ defmodule JSON_Spec do
      REASON: "some variables are evaluated during/after IT run"
   4) Keys that partially exist evaluate to their original form:
      sn.data.id => sn.data => if sn exists, but not keys: data or id
+  5) Compiles args when running list of commands:
+     [ "func", {"key": "must be compiled"} ]
+  6) Compiles non-arg tokens:
+     [ ..., {"key": "this must be compiled"}]
+  7) Adds counted var to map env: .put(env, key, val)
   """
 
   def canon_key(x) do
@@ -49,7 +54,7 @@ defmodule JSON_Spec do
     env
     |> Map.put(counter_key, counter)
     |> Map.put(name, val)
-    |> Map.put("#{name}_#{env[counter]}", val)
+    |> Map.put("#{name}_#{counter}", val)
   end
 
   def maps_match? actual, expected do
@@ -85,18 +90,13 @@ defmodule JSON_Spec do
   def run_it(task, desc_env) do
     env = desc_env
     %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
-    {input, env}    = compile(raw_input, env)
+    {actual, env}   = run_input(raw_input, env)
+    {expected, env} = run_output(raw_output, env)
 
     num    = "#{format_num(env.it_count)})"
     bright = IO.ANSI.bright
     reset  = IO.ANSI.reset
     red    = "#{bright}#{IO.ANSI.red}"
-
-    # === Run the input:
-    {actual, env} = run_input(input, env)
-
-    # === Run the expected output:
-    {expected, env} = compile(raw_output, env)
 
     if maps_match?(actual, expected) do
       IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{it}"
@@ -113,20 +113,59 @@ defmodule JSON_Spec do
     cond do
 
       is_map(input) ->
+        {input, env} = compile(input, env)
         env[env[:desc]].(input, env)
 
-      is_list(input) ->
-        Enum.reduce input, {nil, env}, fn(x, {_last, env}) ->
-          env[env[:desc]].(x, env)
+      is_list(input) && all_maps?(input) ->
+        Enum.reduce input, {nil, env}, fn(args, {_prev, env}) ->
+          {args, env} = compile(args, env)
+          env[env[:desc]].(args, env)
         end
+
+      is_list(input) ->
+        run_list(input, env)
 
       true -> raise "Don't know how to run: #{inspect input}"
 
     end # === cond
   end # === run_input
 
-  def run_list(_x, _env) do
-    raise "run_list: need to be implemented"
+  def run_output output, env do
+    cond do
+      is_map(output) ->
+        compile(output, env)
+
+      is_list(output) && !all_maps?(output) ->
+        run_list(output, env)
+
+      true ->
+        raise "Don't know what to do with input/output: #{inspect output}"
+    end
+  end # === def run_output
+
+  @doc """
+    Returns: { val, env }
+  """
+  def run_list(list, env) do
+    [val, _func, env] = Enum.reduce list, [nil, nil, env], fn(token, [_prev, func, env]) ->
+      cond do
+        Map.has_key?(env, token) && !is_function(env[token])->
+          [token, nil, env]
+
+        Map.has_key?(env, token) && is_function(env[token])->
+          [token, token, env]
+
+        func -> # === run function
+          {token, env} = compile(token, env)
+          {token, env} = env[func].(token, env)
+          [token, nil, env]
+
+        true ->
+          {token, env} = compile(token, env)
+          [token, nil, env]
+      end
+    end
+    {val, env}
   end
 
   @doc """
@@ -143,15 +182,21 @@ defmodule JSON_Spec do
         cond do
           Map.has_key?(env, name) && !is_function(env[name]) ->
             {env[name], env}
+
           Map.has_key?(env, name) ->
             {_val, _new_env} = env[name].(env)
+
           true -> # === Check for "key.key.key"
-            [ key | pieces ] = String.split(name, ".")
-            if Map.has_key?(env, key) do
-              fin = Enum.reduce(pieces, env[key], fn(v, acc) ->
-                acc[v]
-              end)
-              {fin, env}
+            {is_key, val} = Enum.reduce String.split(name, "."), {true, env}, fn(key, {is_key, data}) ->
+              if is_key && Map.has_key?(data, key) do
+                {true, data[key]}
+              else
+                {nil, nil}
+              end
+            end
+
+            if is_key do
+              {val, env}
             else # === send the original, instead of the canonized
               {x, env}
             end
@@ -166,16 +211,6 @@ defmodule JSON_Spec do
           )
         end
         {result.map, result.env}
-
-      is_list(x) ->
-        if all_maps?(x) do
-          Enum.reduce x, {[], env}, fn(map, {list, env}) ->
-            {map, env} = compile(map, env)
-            {Enum.into([map], list), env}
-          end
-        else
-          run_list(x, env)
-        end
 
       true ->
         raise "Don't know what to do with: #{inspect x}"
@@ -198,6 +233,9 @@ env = %{
   end,
 
   "Screen_Name.create" => fn(data, env) ->
+    if Map.has_key?(data, "error") do
+      raise "#{inspect data}"
+    end
     result = Screen_Name.create data
     case result do
       %{"error" => msg} ->
@@ -205,7 +243,20 @@ env = %{
       %{"screen_name"=>_sn} ->
         {result, JSON_Spec.put(env, "sn", result)}
     end
+  end,
+
+  "Screen_Name.read" => fn(data, env) ->
+    result = Screen_Name.read data
+    case result do
+      %{"error" => msg} ->
+        {%{"error"=>msg}, Map.put(env, "error", msg)}
+      %{"screen_name"=>_sn} ->
+        {result, JSON_Spec.put(env, "sn", result)}
+      _ ->
+        raise "Not found: #{inspect data} result: #{inspect result}"
+    end
   end
+
 }
 
 Enum.each(files, &(JSON_Spec.run_file(&1, env)))

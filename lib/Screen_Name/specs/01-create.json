@@ -37,8 +37,11 @@
 
   {
     "it": "updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id",
-    "input": {"screen_name": "rand screen_name"},
-    "output": {"id" : "sn.data.id", "owner_id" : "sn.data.id"}
+    "input": [
+      "Screen_Name.create", {"screen_name": "rand screen_name"},
+      "Screen_Name.read", {"screen_name":"screen_name"}
+    ],
+    "output": {"screen_name": "sn_1.screen_name", "owner_id": "sn.id", "id": "sn.id"}
   }
 
 ]
