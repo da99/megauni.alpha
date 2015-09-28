@@ -1,4 +1,6 @@
-,
+[
+
+  {"desc": "User.create"},
 
   {
     "it":  "uses User :id as it's :owner_id",
@@ -12,54 +14,19 @@
       "Screen_Name.read", { "screen_name": "screen_name" },
       {"owner_id" : "user.data.id"}
     ]
+  },
+
+  {
+    "it" : "checks min length of screen_name",
+    "input": {
+      "screen_name": "a",
+      "pass_word": "this is my password",
+      "confirm_pass_word": "this is my password"
+    }
   }
 
-
-"use strict";
-/* jshint -W079, esnext: true, undef: true, unused: true */
-/* global before, after, require, describe, it, process */
-
-// var multiline   = require('multiline');
-var _        = require('lodash');
-var log; log = function (...args) { return (process.env.IS_DEV) ? console.log.apply(console, args) : null; };
-var assert   = require('assert');
-var User     = require('../model');
-var pg       = require('co-pg')(require('pg'));
-var conn_done , client , app;
-
-var PASS_WORD="this_is_my pass word";
-
-if (!assert.regexp)
-  assert.regexp = function (r, txt) { assert( r.test(txt), `"${r}" !~ "${txt}"`); };
-
-function col(err, col_name) {
-  if (!err.megauni || !err.megauni.record || !err.megauni.record.error)
-    return err.message;
-  return err.megauni.record.error[col_name];
-}
-
-describe('create:', function () {
-
-  before(function* () {
-    var conn  = yield pg.connectPromise(process.env.DATABASE_URL);
-    client    = conn[0];
-    conn_done = conn[1];
-    app = {pg: {db: {client: client}}};
-  });
-
-  after(function () { conn_done(); });
-
-
-  it('checks min length of screen_name', function* () {
-
-    var err = {};
     try {
-      yield User.create(app, {
-        screen_name: "a",
-        pass_word: "this is my password",
-        confirm_pass_word: "this is my password",
-        ip: '000.00.00'
-      });
+      yield User.create(app, );
     } catch (e) {
       err = e;
     }
@@ -175,6 +142,7 @@ describe('create:', function () {
     assert.equal( _.has(o.clean_data, 'pswd_hash'), false);
   }); // === it does not return :pswd_hash
 
-}); // === desc create
 
+
+]
 

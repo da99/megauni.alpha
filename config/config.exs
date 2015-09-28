@@ -10,4 +10,8 @@ config :megauni, Megauni.Repos.Main,
   password: System.get_env("DB_PASSWORD"),
   hostname: "localhost"
 
-
+if System.get_env("IS_DEV") do
+  config :comeonin, :bcrypt_log_rounds, 4
+else
+  config :comeonin, :bcrypt_log_rounds, 13
+end

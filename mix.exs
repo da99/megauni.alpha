@@ -15,7 +15,12 @@ defmodule Megauni.Mixfile do
 
   def application do
     [
-      applications: [:logger, :postgrex, :ecto, :cowboy, :plug, :poison],
+      applications: [
+        :logger, :postgrex,
+        :ecto, :cowboy,
+        :plug, :poison,
+        :comeonin
+      ],
       mod: {Megauni, []}
     ]
   end
@@ -26,7 +31,8 @@ defmodule Megauni.Mixfile do
       {:plug     , "~> 1.0.0"},
       {:poison   , "~> 1.5.0"},
       {:postgrex , ">= 0.9.0"},
-      {:ecto     , "~> 1.0"}
+      {:ecto     , "~> 1.0"},
+      {:comeonin , "> 1.1.0"}
     ]
   end
 
