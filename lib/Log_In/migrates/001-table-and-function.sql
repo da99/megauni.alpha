@@ -28,7 +28,7 @@ CREATE INDEX log_in_screen_name_id_idx
 ON log_in (screen_name_id)
 WHERE screen_name_id > 0;
 
-CREATE OR REPLACE FUNCTION log_in_upsert(
+CREATE OR REPLACE FUNCTION log_in_attemp(
   IN  raw_ip          inet,
   IN  raw_screen_name varchar,
   IN  raw_pswd_hash   bytea,
@@ -126,7 +126,7 @@ $$ LANGUAGE plpgsql;
 
 -- DOWN
 
-DROP FUNCTION log_in_upsert (inet, varchar, bytea) CASCADE;
+DROP FUNCTION log_in_attempt (inet, varchar, bytea) CASCADE;
 DROP INDEX    log_in_screen_name_id_idx CASCADE;
 DROP TABLE    log_in CASCADE;
 
