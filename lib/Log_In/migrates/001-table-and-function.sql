@@ -7,7 +7,7 @@
 -- Solution:
 --   It's mediocre but should lessened the disaster:
 --     1) Lock out any IP address w/4 lock outed screen names.
---     2) Lock out any Screen_Name w/ 4 failed log-in attempts.
+--     2) Lock out any Screen_Name w/ 6+ failed log-in attempts.
 --
 -- Reasoning:
 --     1) Screen_Name is used because people might mis-type
@@ -40,7 +40,12 @@ AS $$
     sn_record      RECORD;
     sn_id          int;
     ip_locked_out  boolean;
+    start_date     timestamp;
+    end_date       timestamp;
   BEGIN
+
+    start_date := (current_date - make_interval( days := 1));
+    end_date   := (current_date + make_interval( days := 1));
 
     -- SEE IF ip is locked out
     SELECT sum(ip) AS locked_out_screen_names
@@ -50,7 +55,7 @@ AS $$
       AND
       fail_count > 3
       AND
-      at > TODAY_0 AND at TODAY_1
+      at > start_date AND at < end_date
     HAVING locked_out_screen_names > 3
     ;
 
@@ -63,24 +68,25 @@ AS $$
     INTO sn_record
     FROM screen_name
     WHERE
-      screen_name = screen_name_canonize(raw_screen_name);
+      screen_name = screen_name_canonize(raw_screen_name)
+    ;
 
     IF NOT FOUND THEN
       raise 'log_in: screen name not found';
     END IF;
 
     -- SEE IF screen_name is locked out
-    SELECT *
+    SELECT sum(fail_count) AS total_fail_count
     FROM log_in
     WHERE
       screen_name_id = sn_record.id
       AND
-      fail_count > 3
-      AND
-      at > TODAY_0 && at < TODAY_1;
+      at > start_date AND at < end_date
+    HAVING total_fail_count > 5
+    ;
 
     IF FOUND THEN
-      raise 'log_in: screen name is locked out';
+      raise 'log_in: screen name locked out';
     END IF;
 
 
@@ -88,11 +94,12 @@ AS $$
     SELECT id
     FROM "user"
     WHERE
-      pswd_hash = raw_pswd_hash;
+      pswd_hash = raw_pswd_hash
+    ;
 
     IF FOUND THEN
       user_id := sn_record.owner_id;
-      RETURN user_id;
+      RETURN;
     END IF;
 
     -- Log failed log in attempt:
@@ -109,9 +116,10 @@ AS $$
 
     IF NOT FOUND THEN
       INSERT INTO log_in (ip,     screen_name_id)
-      VALUES             (raw_ip, sn_record.id)
-    END IF
-    ;
+      VALUES             (raw_ip, sn_record.id);
+    END IF;
+
+    raise 'log_in: password no match';
 
   END
 $$ LANGUAGE plpgsql;
@@ -119,6 +127,6 @@ $$ LANGUAGE plpgsql;
 -- DOWN
 
 DROP FUNCTION log_in_upsert (inet, varchar, bytea) CASCADE;
-DROP INDEX IF log_in_screen_name_id_idx CASCADE;
-DROP TABLE IF log_in CASCADE;
+DROP INDEX    log_in_screen_name_id_idx CASCADE;
+DROP TABLE    log_in CASCADE;
 
