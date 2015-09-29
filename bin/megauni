@@ -100,7 +100,6 @@ BG_RED='\e[1;31m'
 
 mods=(
   Card
-  Screen_Name
   Link
   Session
 )
@@ -108,6 +107,7 @@ mods=(
 mods=(
   Screen_Name
   User
+  Log_In
 )
 
 # === Create a reverse of the list.

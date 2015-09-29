@@ -1,6 +1,13 @@
 
+CREATE TABLE "user" (
+  id                   serial PRIMARY KEY,
+  pswd_hash            bytea        NOT NULL,
+  created_at           timestamp with time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
+  trashed_at           timestamp with time zone
+);
+
 CREATE OR REPLACE FUNCTION user_insert(
-  IN  sn_name     VARCHAR,
+  IN  sn_name     varchar,
   IN  pswd_hash   bytea,
   OUT id          int,
   OUT screen_name text
@@ -31,12 +38,11 @@ AS $$
   END
 $$ LANGUAGE plpgsql;
 
+
 -- DOWN
 
-DROP FUNCTION user_insert (
-  VARCHAR,
-  bytea
-)
-  CASCADE;
+
+DROP FUNCTION user_insert ( varchar, bytea ) CASCADE;
+DROP TABLE    "user"                         CASCADE;
 
 
