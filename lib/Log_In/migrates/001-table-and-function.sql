@@ -44,8 +44,8 @@ AS $$
     end_date       timestamp;
   BEGIN
 
-    start_date := (current_date - make_interval( days := 1));
-    end_date   := (current_date + make_interval( days := 1));
+    start_date := (current_date - '1 day'::interval);
+    end_date   := (current_date + '1 day'::interval);
 
     -- SEE IF ip is locked out
     SELECT sum(ip) AS locked_out_screen_names
