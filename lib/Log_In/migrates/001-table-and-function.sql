@@ -18,7 +18,7 @@
 
 CREATE TABLE log_in (
   ip                   inet         NOT NULL primary key,
-  log_in_at            timestamp    NOT NULL DEFAULT timezone('UTC'::text, now()),
+  at                   timestamp    NOT NULL DEFAULT timezone('UTC'::text, now()),
   fail_count           smallint     NOT NULL DEFAULT 1,
   screen_name_id       int          NOT NULL,
   CONSTRAINT           "log_in_unique_idx" UNIQUE (ip, screen_name_id)
@@ -46,7 +46,7 @@ AS $$
       AND
       fail_count > 3
       AND
-      log_in_at > TODAY_0 AND log_in_at TODAY_1
+      at > TODAY_0 AND at TODAY_1
     HAVING locked_out_screen_names > 3
     ;
 
@@ -73,7 +73,7 @@ AS $$
       AND
       fail_count > 3
       AND
-      log_in_at > TODAY_0 && log_in_at < TODAY_1;
+      at > TODAY_0 && at < TODAY_1;
 
     IF FOUND THEN
       raise 'log_in: screen name is locked out';
@@ -95,7 +95,7 @@ AS $$
     UPDATE log_in
     SET
       fail_count = fail_count + 1,
-      log_in_at  = timezone('UTC'::text, now())
+      at         = timezone('UTC'::text, now())
     WHERE
       ip = raw_ip
       AND
