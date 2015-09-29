@@ -24,6 +24,10 @@ CREATE TABLE log_in (
   CONSTRAINT           "log_in_unique_idx" UNIQUE (ip, screen_name_id)
 );
 
+CREATE INDEX log_in_screen_name_id_idx
+ON log_in (screen_name_id)
+WHERE screen_name_id > 0;
+
 CREATE OR REPLACE FUNCTION log_in_upsert(
   IN  raw_ip          inet,
   IN  raw_screen_name varchar,
@@ -115,5 +119,6 @@ $$ LANGUAGE plpgsql;
 -- DOWN
 
 DROP FUNCTION log_in_upsert (inet, varchar, bytea) CASCADE;
-DROP TABLE IF EXISTS log_in CASCADE;
+DROP INDEX IF log_in_screen_name_id_idx CASCADE;
+DROP TABLE IF log_in CASCADE;
 
