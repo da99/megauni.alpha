@@ -247,6 +247,7 @@ env = %{
         {%{"error"=>msg}, Map.put(env, "error", msg)}
       %{"screen_name"=>_sn} ->
         {result, JSON_Spec.put(env, "sn", result)}
+      _ -> raise "Unknown error: #{inspect result}"
     end
   end,
 
@@ -258,7 +259,22 @@ env = %{
       %{"screen_name"=>_sn} ->
         {result, JSON_Spec.put(env, "sn", result)}
       _ ->
-        raise "Not found: #{inspect data} result: #{inspect result}"
+        {result, JSON_Spec.put(env, "sn", result)}
+        # raise "Not found: #{inspect data} result: #{inspect result}"
+    end
+  end,
+
+  "User.create" => fn(data, env) ->
+    if Map.has_key?(data, "error") do
+      raise "#{inspect data}"
+    end
+    result = User.create data
+    case result do
+      %{"error" => msg} ->
+        {%{"error"=>msg}, Map.put(env, "error", msg)}
+      %{"id"=>user_id} ->
+        {result, JSON_Spec.put(env, "user", result)}
+      _ -> raise "Unknown error: #{inspect result}"
     end
   end
 

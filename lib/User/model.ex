@@ -40,9 +40,8 @@ defmodule User do
         Ecto.Adapters.SQL.query(
           Megauni.Repos.Main,
           """
-            INSERT INTO user ( screen_name , pswd_hash )
-            VALUES           ( $1 , $2        )
-            RETURNING        id ;
+            SELECT id, screen_name
+            FROM user_insert( $1 , $2 );
           """,
           [raw_data["screen_name"], pswd_hash]
         )

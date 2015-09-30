@@ -3,48 +3,44 @@
   {"desc": "User.create"},
 
   {
-    "it":  "uses User :id as it's :owner_id",
+    "it":  "creates a Screen_Name",
     "input" : {
-      "screen_name"       : "create rand: screen_name",
-      "pass_word"         : "this is my weak password",
-      "confirm_pass_word" : "this is my weak password"
+      "screen_name"  : "rand screen_name",
+      "pass"         : "this is my weak password",
+      "confirm_pass" : "this is my weak password"
     },
     "output": [
       "Screen_Name.read", { "screen_name": "screen_name" },
-      {"owner_id" : "user.data.id"}
+      {"id" : "sn.owner_id", "screen_name" : "sn.screen_name"}
     ]
   },
 
   {
     "it" : "checks min length of screen_name",
     "input": {
-      "screen_name": "a",
-      "pass_word": "this is my password",
-      "confirm_pass_word": "this is my password"
+      "screen_name"  :  "a",
+      "pass"         :         "this is my password",
+      "confirm_pass" : "this is my password"
     },
-    "output": {
-      "error": "screen_name: min 3"
-    }
+    "output": { "error": "screen_name: min 4" }
   },
 
   {
     "it": "checks max length of screen_name",
     "input": {
-      "screen_name": "abcd5678901234567890123456712245647890234546578",
-      "pass_word": "this is my password",
-      "confirm_pass_word": "this is my password"
+      "screen_name"  : "abcd5678901234567890123456712245647890234546578",
+      "pass"         : "this is my password",
+      "confirm_pass" : "this is my password"
     },
-    "output": {
-      "error": "screen_name: max 30"
-    }
+    "output": { "error": "screen_name: max 30" }
   },
 
   {
     "it": "checks min length of pass_word",
     "input": {
-      "screen_name": "1234567",
-      "pass_word": "t",
-      "confirm_pass_word": "t"
+      "screen_name"  : "1234567",
+      "pass"         : "t",
+      "confirm_pass" : "t"
     },
     "output": {
       "error": "pass_word: min 3 words"
@@ -55,9 +51,9 @@
   {
     "it": "checks max length of pass_word",
     "input": {
-      "screen_name": "rand screen_name",
-      "pass_word": "long_pass_word",
-      "confirm_pass_word": "pass_word"
+      "screen_name"  : "rand screen_name",
+      "pass"         : "long_pass_word",
+      "confirm_pass" : "pass_word"
     },
     "output": {
       "error" : "pass_word: max 300"
@@ -67,9 +63,9 @@
   {
     "it": "checks pass_phrase and confirm_pass_phrase match",
     "input": {
-      "screen_name": "123456789",
-      "pass_word": "this is my pass word",
-      "confirm_pass_word": "this is my pass word too"
+      "screen_name"  : "123456789",
+      "pass"         : "this is my pass word",
+      "confirm_pass" : "this is my pass word too"
     },
     "output": {
       "error": "pass_word: no match"
@@ -79,9 +75,9 @@
   {
     "it": "saves Customer id to Customer object",
     "input": {
-      "screen_name"       : "rand screen_name",
-      "pass_word"         : "valid pass",
-      "confirm_pass_word" : "valid pass"
+      "screen_name"  : "rand screen_name",
+      "pass"         : "valid pass",
+      "confirm_pass" : "valid pass"
     },
     "output": { "id": "user.id" }
   }
