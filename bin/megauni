@@ -591,10 +591,12 @@ case "$action" in
           fi # === if $js_pass
         fi # === if $file == *.js
 
-        if [[ "$file" == *.json ]]; then
+        if [[ "$path" == *.json ]]; then
           ( $0 jshint $path && $0 specs $@ ) || :
         else
-          $0 specs $@ || :
+          if [[ ! "$path" == *.sql ]]; then
+            $0 specs $@ || :
+          fi
         fi
 
       fi # === if $file
