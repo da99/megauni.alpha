@@ -1,4 +1,5 @@
 
+
 defmodule JSON_Spec do
   @docmodule """
   Specs to be written:
@@ -220,10 +221,14 @@ defmodule JSON_Spec do
 end # === defmodule JSON_Spec
 
 
-{raw, _exit} = System.cmd Path.expand("bin/megauni"), ["model_list"]
-models       = raw |> String.strip |> String.split |> Enum.join ","
+models = if Enum.empty?(System.argv) do
+  {raw, _exit} = System.cmd Path.expand("bin/megauni"), ["model_list"]
+  raw |> String.strip |> String.split
+else
+  System.argv
+end
 
-files = Path.wildcard("lib/{#{models}}/specs/*.json")
+files = Path.wildcard("lib/{#{models |> Enum.join ","}}/specs/*.json")
 env = %{
 
   "rand screen_name" => fn(env) ->

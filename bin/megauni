@@ -84,7 +84,7 @@ while [[ -n "$@" ]] ; do
   fi
 done # === while
 
-js_files="$(echo -e Server/*/specs/*.js Server/Megauni/*.js Server/Card/*.js Server/User/*.js Server/Root/*.js)"
+js_files="$(echo -e lib/*/specs/*.json Server/Megauni/*.js Server/Card/*.js Server/Root/*.js)"
 
 # ==============================================================
 GREEN=$(tput setaf 2)
@@ -420,7 +420,7 @@ case "$action" in
 
   "specs")
     # === Run all the specs of the projects.
-    mix run specs/specs.exs
+    mix run specs/specs.exs $@
     ;;
 
   "test")
@@ -553,7 +553,7 @@ case "$action" in
     ;;
 
   "__watch")
-    $0 run_specs || :
+    $0 specs $@ || :
 
     eval "$(bash_setup setup_traps)"
     setup_traps
@@ -571,7 +571,7 @@ case "$action" in
 
       if [[ ! -z "$file" ]]; then
 
-        $0 specs || :
+        $0 specs $@ || :
 
         if [[ "$path" == *bin/megauni* ]]; then
           echo ""
