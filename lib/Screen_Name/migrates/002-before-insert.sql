@@ -18,10 +18,6 @@ RETURNS trigger AS $$
       RAISE EXCEPTION 'screen_name: min 4';
     END IF;
 
-    IF char_length(NEW.screen_name) > 30 THEN
-      RAISE EXCEPTION 'screen_name: max 30';
-    END IF;
-
     IF NEW.screen_name !~ '^[A-Z\d\-\_\.]+$' THEN
       raise EXCEPTION 'screen_name: invalid_chars %', regexp_replace(NEW.screen_name, '[A-Z\d\-\_\.]+', '', 'ig');
     END IF;
