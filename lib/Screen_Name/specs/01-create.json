@@ -15,6 +15,12 @@
   },
 
   {
+    "it"     : "raises Invalid if screen name is over 30",
+    "input"  : {"screen_name": "abcd5678901234567890123456712245647890234546578"},
+    "output": { "error": "screen_name: max 30" }
+  },
+
+  {
     "it": "megauni is not allowed (despite case)",
     "input": {"screen_name": "meGauNi"},
     "output": {"error" : "screen_name: not available"}

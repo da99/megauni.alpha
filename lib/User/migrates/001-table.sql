@@ -24,14 +24,15 @@ AS $$
       RAISE EXCEPTION 'programmer_error: pswd_hash';
     END IF;
 
-    INSERT INTO screen_name (screen_name)
-    VALUES (sn_name)
-    RETURNING owner_id, "screen_name".screen_name
-    INTO sn_record;
+    SELECT *
+    INTO sn_record
+    FROM screen_name_insert(null, sn_name)
+    ;
 
     INSERT INTO
     "user" ( id,                 pswd_hash )
-    VALUES ( sn_record.owner_id, pswd_hash );
+    VALUES ( sn_record.owner_id, pswd_hash )
+    ;
 
     id          := sn_record.owner_id;
     screen_name := sn_record.screen_name;

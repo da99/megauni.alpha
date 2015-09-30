@@ -38,17 +38,27 @@ defmodule Screen_Name do
     Megauni.Model.applet_results(result, "screen_name")
   end
 
-  def create data do
-    vals = Enum.into(%{"owner_id"=>nil}, data)
-    result = Ecto.Adapters.SQL.query(
+  def clean_screen_name sn do
+    if !sn do
+      sn = ""
+    end
+
+    if String.length(sn > 30) do
+      %{"error": "screen_name: max 30"}
+    else
+      sn
+    end
+  end
+
+  def create raw_data do
+    vals = Enum.into(%{"owner_id"=>nil}, raw_data)
+    Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
-      "INSERT INTO screen_name (owner_id, screen_name)
-      VALUES($1, $2)
-      RETURNING screen_name;",
+      "SELECT screen_name
+      FROM screen_name_insert($1, $2);",
       [vals["owner_id"], vals["screen_name"]]
     )
-
-    Megauni.Model.applet_results(result, "screen_name")
+    |> Megauni.Model.applet_results "screen_name"
   end
 
   def is_allowed_to_post_to sn do
