@@ -79,9 +79,9 @@
   {
     "it": "saves Customer id to Customer object",
     "input": {
-      screen_name       : "rand screen_name",
-      pass_word         : "valid pass",
-      confirm_pass_word : "valid pass"
+      "screen_name"       : "rand screen_name",
+      "pass_word"         : "valid pass",
+      "confirm_pass_word" : "valid pass"
     },
     "output": { "id": "user.id" }
   }

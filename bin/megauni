@@ -527,6 +527,11 @@ case "$action" in
     ;;
 
   jshint)
+    if [[ -n "$@" ]]; then
+      js_setup jshint! $@
+      exit 0
+    fi
+
     IFS=$' '
     for file in $js_files
     do
@@ -571,12 +576,9 @@ case "$action" in
 
       if [[ ! -z "$file" ]]; then
 
-        $0 specs $@ || :
 
         if [[ "$path" == *bin/megauni* ]]; then
-          echo ""
-          echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 $action"
-          exec $0 $action
+          break
         fi
 
         if [[ "$file" == *.js ]]; then
@@ -587,13 +589,21 @@ case "$action" in
             $0 run_specs $@ || :
             bin/megauni restart
           fi # === if $js_pass
-
         fi # === if $file == *.js
 
-      fi
+        if [[ "$file" == *.json ]]; then
+          ( $0 jshint $path && $0 specs $@ ) || :
+        else
+          $0 specs $@ || :
+        fi
+
+      fi # === if $file
 
       echo ""
-    done < <(inotifywait --quiet --monitor --event close_write -r lib/ -r specs/ $js_files $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
+    done < <(inotifywait --quiet --monitor --event close_write -r lib/ -r specs/ $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
+    echo ""
+    echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 $action"
+    exec $0 $action $@
     ;;
 
   "watch")
