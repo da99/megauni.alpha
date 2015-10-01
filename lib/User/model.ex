@@ -1,12 +1,21 @@
 
 defmodule User do
 
-  @min 10
-  @max 300
+  @min 5
+  @min_word 3
+  @max 150
 
-  def clean_password confirm, pass_word do
-    confirm   = (confirm   || '') |> to_string |> String.strip
-    pass_word = (pass_word || '') |> to_string |> String.strip
+  def canonize_pass pass_word do
+    (pass_word || '')
+    |> to_string
+    |> String.strip
+    |> String.split( ~r/[[:cntrl:]+]/, trim: true )
+    |> Enum.join(" ")
+  end
+
+  def clean_pass_confirm pass_word, confirm do
+    confirm   = canonize_pass(confirm)
+    pass_word = canonize_pass(pass_word)
 
     cond do
       String.length(pass_word) < @min ->
@@ -15,8 +24,8 @@ defmodule User do
       String.length(pass_word) > @max ->
         %{"error" => "pass_word: max #{@max}"}
 
-      (String.split(pass_word, ~r/\s/, trim: true) < 3) ->
-        %{"error" => "pass_word: min 3 words"}
+      (Enum.count(String.split(pass_word, ~r/\s/, trim: true)) < @min_word) ->
+        %{"error" => "pass_word: min_words #{@min_word}"}
 
       (confirm !== pass_word) ->
         %{"error" => "confirm_pass_word: no match"}
@@ -29,7 +38,7 @@ defmodule User do
   def create raw_data do
     data = raw_data
 
-    clean_pass = clean_password(data["confirm_pass"], data["pass"])
+    clean_pass = clean_pass_confirm(data["pass"], data["confirm_pass"])
     case clean_pass do
 
       %{"error"=>_msg} ->

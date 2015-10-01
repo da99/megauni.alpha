@@ -43,7 +43,20 @@
       "confirm_pass" : "t"
     },
     "output": {
-      "error": "pass_word: min 3 words"
+      "error": "pass_word: min 5"
+    }
+
+  },
+
+  {
+    "it": "checks min word count of pass_word",
+    "input": {
+      "screen_name"  : "1234567",
+      "pass"         : "p1234567",
+      "confirm_pass" : "p1234567"
+    },
+    "output": {
+      "error": "pass_word: min_words 3"
     }
 
   },
@@ -53,10 +66,10 @@
     "input": {
       "screen_name"  : "rand screen_name",
       "pass"         : "long_pass_word",
-      "confirm_pass" : "pass_word"
+      "confirm_pass" : "long_pass_word"
     },
     "output": {
-      "error" : "pass_word: max 300"
+      "error" : "pass_word: max 150"
     }
   },
 
@@ -68,7 +81,7 @@
       "confirm_pass" : "this is my pass word too"
     },
     "output": {
-      "error": "pass_word: no match"
+      "error": "confirm_pass_word: no match"
     }
   },
 
@@ -76,8 +89,8 @@
     "it": "saves Customer id to Customer object",
     "input": {
       "screen_name"  : "rand screen_name",
-      "pass"         : "valid pass",
-      "confirm_pass" : "valid pass"
+      "pass"         : "valid pass valid pass",
+      "confirm_pass" : "valid pass valid pass"
     },
     "output": { "id": "user.id" }
   }

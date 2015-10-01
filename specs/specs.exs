@@ -237,6 +237,10 @@ env = %{
     { sn, Map.put(env, "screen_name", sn) }
   end,
 
+  "long_pass_word" => fn(env) ->
+    { String.duplicate("one word ", 150), env}
+  end,
+
   "Screen_Name.create" => fn(data, env) ->
     if Map.has_key?(data, "error") do
       raise "#{inspect data}"
