@@ -14,6 +14,8 @@ defmodule JSON_Spec do
   6) Compiles non-arg tokens:
      [ ..., {"key": "this must be compiled"}]
   7) Adds counted var to map env: .put(env, key, val)
+  8) Before all, Before each: Can only be one if "desc" has been
+     used.
   """
 
   def canon_key(x) do
@@ -280,6 +282,10 @@ env = %{
         {result, JSON_Spec.put(env, "user", result)}
       _ -> raise "Unknown error: #{inspect result}"
     end
+  end,
+
+  "all log_in_attempts old" => fn(data, env) ->
+    "query", ["UPDATE log_in SET at = at + '25 hours'::interval"]
   end
 
 }
