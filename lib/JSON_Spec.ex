@@ -18,48 +18,65 @@ defmodule JSON_Spec do
      used.
   """
 
+  """
+    Core funcs return an env.
+  """
   @core [
 
-  desc: fn(task, env) ->
-    %{"desc"=>desc} = task
-    IO.puts "\n#{IO.ANSI.yellow}#{desc}#{IO.ANSI.reset}"
-    Enum.into %{ :desc=>desc }, env
-  end,
+  const: fn(list, env) ->
+    [ name | prog ] = list
+    { stack , env } = run(prog)
+    val = List.last(stack)
+    Map.put env, name, val
+  end
 
   before_all: fn(prog, env) ->
-      if !desc do
-        raise "desc not set for: before all"
-      end
-      run_prog(prog, env)
+    { stack, env } = run(prog, env)
+    env
   end, # === def run_before_all
 
   after_each: fn(prog, env) ->
-      if !desc do
-        raise "desc not set for: after each"
+    if Map.has_key?(env, :after_each) do
+      if is_list(env.after_each) do
+        Map.put env, :after_each, List.append(env.after_each, prog)
+      else
+        Map.put env, :after_each, List.append([env.after_each], prog)
       end
-      Enum.into %{:after_each=> prog}, env
+    else
+      Enum.into %{:after_each => env}, env
+    end
   end, # === def run_after_each
 
+  desc: fn(name, env) ->
+    IO.puts "\n#{IO.ANSI.yellow}#{name}#{IO.ANSI.reset}"
+    Enum.into %{ :desc=>name }, env
+  end,
+
   it: fn(task, desc_env) ->
-      env = desc_env
-      %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
-      {actual, env}   = run_input(raw_input, env)
-      {expected, env} = run_output(raw_output, env)
+    env = desc_env
+    %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
+    {actual, env}   = run_input(raw_input, env)
+    {expected, env} = run_output(raw_output, env)
 
-      num    = "#{format_num(env.it_count)})"
-      bright = IO.ANSI.bright
-      reset  = IO.ANSI.reset
-      red    = "#{bright}#{IO.ANSI.red}"
+    num    = "#{format_num(env.it_count)})"
+    bright = IO.ANSI.bright
+    reset  = IO.ANSI.reset
+    red    = "#{bright}#{IO.ANSI.red}"
 
-      if maps_match?(actual, expected) do
-        IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{it}"
-      else
-        IO.puts "#{bright}"
-        IO.puts "#{red}#{num}#{reset}#{bright} #{it}"
-        IO.puts "#{red}#{inspect actual} !== #{reset}#{bright}#{inspect expected}"
-      end
-      IO.puts reset
-      Enum.into %{ :it_count => env.it_count + 1 }, desc_env
+    if maps_match?(actual, expected) do
+      IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{it}"
+    else
+      IO.puts "#{bright}"
+      IO.puts "#{red}#{num}#{reset}#{bright} #{it}"
+      IO.puts "#{red}#{inspect actual} !== #{reset}#{bright}#{inspect expected}"
+    end
+    IO.puts reset
+    fin_env = Enum.into %{ :it_count => env.it_count + 1 }, desc_env
+
+    if Map.has_key?(fin_env, :after_each) do
+      {stack, fin_env} = run(fin_env.after_each, fin_env)
+    end
+    fin_env
   end,
 
   input: fn(input, env) ->

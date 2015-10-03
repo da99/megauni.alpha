@@ -4,15 +4,20 @@
 [
 
   {
-    "desc"       : "Log_In.create",
-    "after each" : "Log_In.reset_all" ,
+    "const"      : [
+      "@MIN_FAILS", "Log_In.FAIL_COUNT"
+    ],
+
     "before all" : [
-      "@MIN_FAILS", "Log_In.FAIL_COUNT",
       "create user",
       "create screen_name",
       "create screen_name"
-    ]
+    ],
+
+    "after each" : "Log_In.reset_all"
   },
+
+  { "desc" : "Log_In.create" },
 
   {
     "it"    : "returns the id of the user",
