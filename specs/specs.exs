@@ -77,9 +77,11 @@ defmodule JSON_Spec do
 
     Enum.reduce(json, Enum.into(%{:it_count=>1}, env), fn(task, env) ->
       case task do
-        %{"desc"=>_desc} -> run_desc(task, env)
-        %{"it"  =>_it}   -> run_it(task, env)
-        _               -> raise "Don't know what to do with: #{inspect task}"
+        %{"desc"=>_desc}        -> run_desc(task, env)
+        %{"before all" => prog} -> run_before_all(prog, env)
+        %{"after each" => prog} -> run_after_each(prog, env)
+        %{"it"  =>_it}          -> run_it(task, env)
+        _                        -> raise "Don't know what to do with: #{inspect task}"
       end # === cond
     end)
   end # === run_file
@@ -89,6 +91,36 @@ defmodule JSON_Spec do
     IO.puts "\n#{IO.ANSI.yellow}#{desc}#{IO.ANSI.reset}"
     Enum.into %{ :desc=>desc }, env
   end
+
+  def run_before_all prog, env do
+    if !desc do
+      raise "desc not set for: before all"
+    end
+    run_prog(prog, env)
+  end # === def run_before_all
+
+  def run_after_each prog, env do
+    if !desc do
+      raise "desc not set for: after each"
+    end
+    Enum.into %{:after_each=> prog}, env
+  end # === def run_after_each
+
+  def run_prog prog, env do
+    cond do
+      is_binary(prog) ->
+        env[prog].( nil, env )
+
+      is_list(prog) && !all_maps?(prog) ->
+        run_list_of_inputs(prog, env)
+
+      is_list(prog) ->
+        run_list(prog, env)
+
+      true ->
+        raise "unknown run for #{inspect prog}"
+    end
+  end # === def run_prog
 
   def run_it(task, desc_env) do
     env = desc_env
@@ -112,6 +144,13 @@ defmodule JSON_Spec do
     Enum.into %{ :it_count => env.it_count + 1 }, desc_env
   end
 
+  def run_list_of_inputs list, env do
+    Enum.reduce list, {nil, env}, fn(args, {_prev, env}) ->
+      {args, env} = compile(args, env)
+      env[env[:desc]].(args, env)
+    end
+  end # === def run_list_of_inputs
+
   def run_input input, env do
     cond do
 
@@ -120,10 +159,7 @@ defmodule JSON_Spec do
         env[env[:desc]].(input, env)
 
       is_list(input) && all_maps?(input) ->
-        Enum.reduce input, {nil, env}, fn(args, {_prev, env}) ->
-          {args, env} = compile(args, env)
-          env[env[:desc]].(args, env)
-        end
+        run_list_of_inputs(input, env)
 
       is_list(input) ->
         run_list(input, env)
