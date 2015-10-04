@@ -73,7 +73,21 @@ defmodule JSON_Spec do
     end
   end
 
-  def it title, env do
+  def title raw, env do
+    Regex.replace ~r/(\@[A-Z\_]+)(\s?([+\-\/\*])\s?([0-9]+))?/, raw, fn match, var, op_num, op, num ->
+      if Map.has_key?(env, var) do
+        if String.length(op_num) > 0 do
+          to_string(apply(Kernel, String.to_atom(op), [env[var], String.to_integer(num)]))
+        else
+          to_string(env[var])
+        end
+      else
+        match
+      end
+    end
+  end
+
+  def it raw_title, env do
     # env = desc_env
     # %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
     # {actual, env}   = JSON_Spec.run_input(raw_input, env)
@@ -82,6 +96,8 @@ defmodule JSON_Spec do
     if !Map.has_key?(env, :it_count) do
       env = Map.put env, :it_count, 1
     end
+
+    title = title(raw_title, env)
 
     env = new_env(env)
 
