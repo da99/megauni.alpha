@@ -49,7 +49,7 @@ defmodule JSON_Spec do
 
   desc: fn(name, env) ->
     IO.puts "\n#{IO.ANSI.yellow}#{name}#{IO.ANSI.reset}"
-    Enum.into %{ :desc=>name }, env
+    Enum.into %{ :desc=>name }, new_env(env)
   end,
 
   it: fn(task, desc_env) ->
@@ -76,7 +76,7 @@ defmodule JSON_Spec do
     if Map.has_key?(fin_env, :after_each) do
       {stack, fin_env} = run(fin_env.after_each, fin_env)
     end
-    fin_env
+    new_env(fin_env)
   end,
 
   input: fn(input, env) ->
@@ -98,16 +98,18 @@ defmodule JSON_Spec do
   end,  # === run_input
 
   output: fn(output, env) ->
-      cond do
-        is_map(output) ->
-          compile(output, env)
+    cond do
+      is_map(output) ->
+        compile(output, env)
 
-        is_list(output) && !all_maps?(output) ->
-          run_list(output, env)
+      is_list(output) && !all_maps?(output) ->
+        run_list(output, env)
 
-        true ->
-          raise "Don't know what to do with input/output: #{inspect output}"
-      end
+      true ->
+        raise "Don't know what to do with input/output: #{inspect output}"
+    end
+
+    revert_env(env)
   end, # === def run_output
 
 
@@ -188,12 +190,20 @@ defmodule JSON_Spec do
     end
   end
 
+  def new_env env do
+    Map.put env, :_parent_env, env
+  end
+
+  def revert_env env do
+    env[:_parent_env]
+  end
+
   def run_file(path, custom_funcs) do
     json = File.read!(path) |> Poison.decode!
 
     IO.puts "\nfile: #{IO.ANSI.bright}#{path}#{IO.ANSI.reset}"
 
-    env        = Enum.into(%{:it_count=>1}, custom_funcs)
+    env        = Enum.into(%{:it_count=>1, :_parent_env=>nil}, custom_funcs)
     core_names = Keyword.keys(@core)
     func_names = Map.keys(env)
 
