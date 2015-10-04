@@ -47,6 +47,11 @@ env = %{
     end
   end,
 
+  "Log_In.FAIL_LIMIT" => fn(stack, prog, env) ->
+    stack = stack ++ [Log_In.fail_count]
+    [stack, prog, env]
+  end,
+
   "User.create" => fn(data, env) ->
     if Map.has_key?(data, "error") do
       raise "#{inspect data}"
@@ -62,7 +67,11 @@ env = %{
   end,
 
   "all log_in_attempts old" => fn(data, env) ->
-    "query", ["UPDATE log_in SET at = at + '25 hours'::interval"]
+    {ok, _} = Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      "UPDATE log_in SET at = at + '25 hours'::interval",
+      []
+    )
   end
 
 }

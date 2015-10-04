@@ -3,7 +3,7 @@
 
 [
 
-  "const", [ "@MIN_FAILS", "Log_In.FAIL_COUNT" ],
+  "const", [ "@FAIL_LIMIT", 5 ],
 
   "before all", [
     "create user",
@@ -23,41 +23,41 @@
   },
   "output", {"id" : "user.id"},
 
-  "it"     , "returns user id: fails = @MIN_FAILS, success = 1",
+  "it"     , "returns user id: fails = @FAIL_LIMIT, success = 1",
   "input"  , [
-    "@MIN_FAILS", "times", [ "bad_log_in" ],
+    "@FAIL_LIMIT", "times", [ "bad_log_in" ],
     "good_log_in"
   ],
   "output" , {"id": "user.id"}
   ,
 
-  "it"     , "returns user id: fails = @MIN_FAILS, success = 1, fails = 1, success = 1",
+  "it"     , "returns user id: fails = @FAIL_LIMIT, success = 1, fails = 1, success = 1",
   "input"  , [
-    "@MIN_FAILS", "times", [ "bad_log_in" ],
+    "@FAIL_LIMIT", "times", [ "bad_log_in" ],
     "good_log_in", "bad_log_in", "good_log_in"
   ],
   "output" , {"id": "user.id"}
 ,
 
-  "it"     , "returns lock-out error: @MIN_FAILS + 1",
+  "it"     , "returns lock-out error: @FAIL_LIMIT + 1",
   "input"  , [
-    "@MIN_FAILS + 1", "times", [ "bad_log_in" ],
+    "@FAIL_LIMIT + 1", "times", [ "bad_log_in" ],
     "good_log_in"
   ],
   "output" , {"error": "screen_name: locked out"}
 ,
 
-  "it"     , "returns user id: fails = @MIN_FAILS + 1, 1 success of another screen name",
+  "it"     , "returns user id: fails = @FAIL_LIMIT + 1, 1 success of another screen name",
   "input"  , [
-    "@MIN_FAILS + 1", "times", [ "bad_log_in" ],
+    "@FAIL_LIMIT + 1", "times", [ "bad_log_in" ],
     "good_log_in"
   ],
   "output" , {"id": "user.id"}
 ,
 
-  "it"     , "returns user id: fails = @MIN_FAILS + 1 that are 25 hours old, 1 success",
+  "it"     , "returns user id: fails = @FAIL_LIMIT + 1 that are 25 hours old, 1 success",
   "input"  , [
-    "@MIN_FAILS + 1", "times", [ "bad_log_in" ],
+    "@FAIL_LIMIT + 1", "times", [ "bad_log_in" ],
     "age_ify log_in_attempts", [25],
     "good_log_in"
   ],

@@ -18,24 +18,29 @@ defmodule JSON_Spec do
      used.
   """
 
-  """
-    Core funcs return an env.
-  """
-  @core [
+  #  Core funcs return an env.
+  @core %{
+    "const"      => :const,
+    "before all" => :before_all,
+    "after each" => :after_each,
+    "desc"       => :desc,
+    "it"         => :it,
+    "input"      => :input,
+    "output"     => :output
+  }
 
-  const: fn(list, env) ->
+  def const list, env do
     [ name | prog ] = list
-    { stack , env } = run(prog)
-    val = List.last(stack)
-    Map.put env, name, val
+    { stack , env } = JSON_Spec.run_prog(prog, env)
+    Map.put env, name, List.last(stack)
   end
 
-  before_all: fn(prog, env) ->
-    { stack, env } = run(prog, env)
+  def before_all prog, env do
+    { _stack, env } = JSON_Spec.run_prog(prog, env)
     env
-  end, # === def run_before_all
+  end # === def run_before_all
 
-  after_each: fn(prog, env) ->
+  def after_each prog, env do
     if Map.has_key?(env, :after_each) do
       if is_list(env.after_each) do
         Map.put env, :after_each, List.append(env.after_each, prog)
@@ -45,75 +50,104 @@ defmodule JSON_Spec do
     else
       Enum.into %{:after_each => env}, env
     end
-  end, # === def run_after_each
+  end # === def run_after_each
 
-  desc: fn(name, env) ->
+  def desc name, env do
+    if !is_top?(env) do
+      env = revert_env(env)
+    end
+
     IO.puts "\n#{IO.ANSI.yellow}#{name}#{IO.ANSI.reset}"
-    Enum.into %{ :desc=>name }, new_env(env)
-  end,
+    Enum.into %{ :desc=>name }, JSON_Spec.new_env(env)
+  end
 
-  it: fn(task, desc_env) ->
-    env = desc_env
-    %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
-    {actual, env}   = run_input(raw_input, env)
-    {expected, env} = run_output(raw_output, env)
+  def is_top? env do
+    !env[:_parent_env]
+  end
 
-    num    = "#{format_num(env.it_count)})"
+  def top_env env do
+    if env[:_parent_env] do
+      top_env(env[:_parent_env])
+    else
+      env
+    end
+  end
+
+  def it title, env do
+    # env = desc_env
+    # %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
+    # {actual, env}   = JSON_Spec.run_input(raw_input, env)
+    # {expected, env} = JSON_Spec.run_output(raw_output, env)
+
+    if !Map.has_key?(env, :it_count) do
+      env = Map.put env, :it_count, 1
+    end
+
+    env = new_env(env)
+
+    num    = "#{JSON_Spec.format_num(env.it_count)})"
     bright = IO.ANSI.bright
     reset  = IO.ANSI.reset
     red    = "#{bright}#{IO.ANSI.red}"
 
-    if maps_match?(actual, expected) do
-      IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{it}"
-    else
-      IO.puts "#{bright}"
-      IO.puts "#{red}#{num}#{reset}#{bright} #{it}"
-      IO.puts "#{red}#{inspect actual} !== #{reset}#{bright}#{inspect expected}"
-    end
-    IO.puts reset
-    fin_env = Enum.into %{ :it_count => env.it_count + 1 }, desc_env
+    # if JSON_Spec.maps_match?(actual, expected) do
+      IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{title}"
+    # else
+      # IO.puts "#{bright}"
+      # IO.puts "#{red}#{num}#{reset}#{bright} #{it}"
+      # IO.puts "#{red}#{inspect actual} !== #{reset}#{bright}#{inspect expected}"
+    # end
+    # IO.puts reset
+    # fin_env = Enum.into %{ :it_count => env.it_count + 1 }, desc_env
 
-    if Map.has_key?(fin_env, :after_each) do
-      {stack, fin_env} = run(fin_env.after_each, fin_env)
-    end
-    new_env(fin_env)
-  end,
+    # if Map.has_key?(fin_env, :after_each) do
+      # {_stack, fin_env} = JSON_Spec.run(fin_env.after_each, fin_env)
+    # end
+    JSON_Spec.new_env(env)
+  end # === def it
 
-  input: fn(input, env) ->
-      cond do
-
-        is_map(input) ->
-          {input, env} = compile(input, env)
-          env[env[:desc]].(input, env)
-
-        is_list(input) && all_maps?(input) ->
-          run_list_of_inputs(input, env)
-
-        is_list(input) ->
-          run_list(input, env)
-
-          true -> raise "Don't know how to run: #{inspect input}"
-
-      end # === cond
-  end,  # === run_input
-
-  output: fn(output, env) ->
+  def input input, env do
     cond do
-      is_map(output) ->
-        compile(output, env)
 
-      is_list(output) && !all_maps?(output) ->
-        run_list(output, env)
+      true ->
+        IO.puts "INPUT:  #{inspect input}"
+        env
+
+      is_map(input) ->
+        {input, env} = JSON_Spec.compile(input, env)
+        env[env[:desc]].(input, env)
+
+      is_list(input) && JSON_Spec.all_maps?(input) ->
+        JSON_Spec.run_list_of_inputs(input, env)
+
+      is_list(input) ->
+        JSON_Spec.run_list(input, env)
+
+      true -> raise "Don't know how to run: #{inspect input}"
+
+    end # === cond
+  end  # === run_input
+
+  def output output, env do
+    cond do
+      true ->
+        IO.puts "OUTPUT: #{inspect output}"
+        env
+
+      is_map(output) ->
+        JSON_Spec.compile(output, env)
+
+      is_list(output) && !JSON_Spec.all_maps?(output) ->
+        JSON_Spec.run_list(output, env)
 
       true ->
         raise "Don't know what to do with input/output: #{inspect output}"
     end
 
-    revert_env(env)
-  end, # === def run_output
-
-
-  ] # === @core
+    old = env
+    env = JSON_Spec.revert_env(env)
+    Map.put env, :it_count, old.it_count + 1
+  end # === def run_output
 
   def canon_key(x) do
     x |> String.strip
@@ -203,35 +237,27 @@ defmodule JSON_Spec do
 
     IO.puts "\nfile: #{IO.ANSI.bright}#{path}#{IO.ANSI.reset}"
 
-    env        = Enum.into(%{:it_count=>1, :_parent_env=>nil}, custom_funcs)
-    core_names = Keyword.keys(@core)
-    func_names = Map.keys(env)
-
-    Enum.reduce json, env, fn(task, env) ->
-      all_funcs! task, core_names
-
-      # Map keys are not ordered, so we have to
-      # run through each known func in order from
-      # @core (a list)
-      Enum.reduce core_names, env, fn(f_name, env) ->
-        if Map.has_key?(task, f_name) do
-          @core[f_name].(task[f_name], env)
-        else
-          env
-        end
-      end # === run through func names in proper order
-
-    end
-
+    env = Enum.into(%{:_parent_env=>nil}, custom_funcs)
+    run_core json, env
   end # === run_file
 
+  def run_core prog, env do
+    if Enum.count(prog) == 0 do
+      env
+    else
+      [ cmd | [arg | prog] ] = prog
+      run_core prog, apply(JSON_Spec, @core[cmd], [arg, env])
+    end
+  end # === def run_core prog, env
+
+  @doc """
+    Returns: { stack, env }
+  """
   def run_prog prog, env do
     cond do
+
       is_binary(prog) ->
         env[prog].( nil, env )
-
-      is_list(prog) && !all_maps?(prog) ->
-        run_list_of_inputs(prog, env)
 
       is_list(prog) ->
         run_list(prog, env)
@@ -241,36 +267,34 @@ defmodule JSON_Spec do
     end
   end # === def run_prog
 
-  def run_list_of_inputs list, env do
-    Enum.reduce list, {nil, env}, fn(args, {_prev, env}) ->
-      {args, env} = compile(args, env)
-      env[env[:desc]].(args, env)
-    end
-  end # === def run_list_of_inputs
+  # def run_list_of_inputs list, env do
+    # Enum.reduce list, {nil, env}, fn(args, {_prev, env}) ->
+      # {args, env} = compile(args, env)
+      # env[env[:desc]].(args, env)
+    # end
+  # end # === def run_list_of_inputs
 
   @doc """
-    Returns: { val, env }
+    Returns: { stack, env }
   """
   def run_list(list, env) do
-    [val, _func, env] = Enum.reduce list, [nil, nil, env], fn(token, [_prev, func, env]) ->
-      cond do
-        Map.has_key?(env, token) && !is_function(env[token])->
-          [token, nil, env]
 
-        Map.has_key?(env, token) && is_function(env[token])->
-          [token, token, env]
+    [stack, prog, env] = Enum.reduce list, [[], [], env ], fn(token, [stack, prog, env]) ->
+      if !Map.has_key?(env, token) do
+        stack = stack ++ [token]
+      else
+        val = env[token]
+        if is_function(val) do
+          [stack, prog, env] = val.(stack, prog, env)
+        else
+          stack = stack ++ [val]
+        end
+      end # === if
 
-        func -> # === run function
-          {token, env} = compile(token, env)
-          {token, env} = env[func].(token, env)
-          [token, nil, env]
-
-        true ->
-          {token, env} = compile(token, env)
-          [token, nil, env]
-      end
+      [stack, prog, env]
     end
-    {val, env}
+
+    {stack, env}
   end
 
   @doc """
