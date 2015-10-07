@@ -28,8 +28,7 @@
     "@FAIL_LIMIT", "times", [ "bad_log_in" ],
     "good_log_in"
   ],
-  "output" , {"id": "user.id"}
-  ,
+  "output" , {"id": "user.id"},
 
   "it"     , "returns user id: fails = @FAIL_LIMIT, success = 1, fails = 1, success = 1",
   "input"  , [

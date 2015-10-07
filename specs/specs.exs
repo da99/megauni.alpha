@@ -47,11 +47,6 @@ env = %{
     end
   end,
 
-  "Log_In.FAIL_LIMIT" => fn(stack, prog, env) ->
-    stack = stack ++ [Log_In.fail_count]
-    [stack, prog, env]
-  end,
-
   "User.create" => fn(data, env) ->
     if Map.has_key?(data, "error") do
       raise "#{inspect data}"

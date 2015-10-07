@@ -18,6 +18,12 @@ defmodule JSON_Spec do
      used.
   """
 
+  @reset   IO.ANSI.reset
+  @bright  IO.ANSI.bright
+  @green   IO.ANSI.green
+  @yellow  "#{@bright}#{IO.ANSI.yellow}"
+  @red     "#{@bright}#{IO.ANSI.red}"
+
   #  Core funcs return an env.
   @core %{
     "const"      => :const,
@@ -57,8 +63,8 @@ defmodule JSON_Spec do
       env = revert_env(env)
     end
 
-    IO.puts "\n#{IO.ANSI.yellow}#{name}#{IO.ANSI.reset}"
-    Enum.into %{ :desc=>name }, JSON_Spec.new_env(env)
+    IO.puts "\n#{@yellow}#{name}#{@reset}"
+    Enum.into %{ :desc=>name }, new_env(env)
   end
 
   def is_top? env do
@@ -87,82 +93,70 @@ defmodule JSON_Spec do
     end
   end
 
-  def it raw_title, env do
-    # env = desc_env
-    # %{"it"=>it, "input"=>raw_input,"output"=>raw_output} = task
-    # {actual, env}   = JSON_Spec.run_input(raw_input, env)
-    # {expected, env} = JSON_Spec.run_output(raw_output, env)
-
-    if !Map.has_key?(env, :it_count) do
-      env = Map.put env, :it_count, 1
+  def it raw_title, prev_env do
+    env = new_env(prev_env)
+    env = if Map.has_key?(env, :it_count) do
+      Map.put env, :it_count, env.it_count + 1
+    else
+      Map.put env, :it_count, 1
     end
 
     title = title(raw_title, env)
+    num   = "#{format_num(env.it_count)})"
 
-    env = new_env(env)
-
-    num    = "#{JSON_Spec.format_num(env.it_count)})"
-    bright = IO.ANSI.bright
-    reset  = IO.ANSI.reset
-    red    = "#{bright}#{IO.ANSI.red}"
-
-    # if JSON_Spec.maps_match?(actual, expected) do
-      IO.puts "#{bright}#{IO.ANSI.green}#{num}#{reset} #{title}"
-    # else
-      # IO.puts "#{bright}"
-      # IO.puts "#{red}#{num}#{reset}#{bright} #{it}"
-      # IO.puts "#{red}#{inspect actual} !== #{reset}#{bright}#{inspect expected}"
-    # end
-    # IO.puts reset
-    # fin_env = Enum.into %{ :it_count => env.it_count + 1 }, desc_env
-
-    # if Map.has_key?(fin_env, :after_each) do
-      # {_stack, fin_env} = JSON_Spec.run(fin_env.after_each, fin_env)
-    # end
-    JSON_Spec.new_env(env)
+    Enum.into %{:it=>title, :it_count=>num}, new_env(env)
   end # === def it
 
   def input input, env do
-    cond do
-
-      true ->
-        IO.puts "INPUT:  #{inspect input}"
-        env
+    {actual, env} = cond do
 
       is_map(input) ->
-        {input, env} = JSON_Spec.compile(input, env)
-        env[env[:desc]].(input, env)
+        {input, env} = compile(input, env)
+        [stack, _prog, env] = env[env[:desc]].([], [input], env)
+        {List.last(stack), env}
 
-      is_list(input) && JSON_Spec.all_maps?(input) ->
-        JSON_Spec.run_list_of_inputs(input, env)
+      list_of_maps?(input) ->
+        { stack, env } = Enum.reduce input, {[], env}, fn(map, {stack, env}) ->
+          {map, env} = compile(map, env)
+          [stack, _prog, env] = env[env[:desc]].(stack, [map], env)
+          {stack, env}
+        end
+        { List.last(stack), env }
 
       is_list(input) ->
-        JSON_Spec.run_list(input, env)
+        [stack, _prog, env] = run_list(input, env)
+        { List.last(stack), env }
 
-      true -> raise "Don't know how to run: #{inspect input}"
-
+      true ->
+        raise "Don't know how to run: #{inspect input}"
     end # === cond
+    Map.put env, :actual, actual
   end  # === run_input
 
   def output output, env do
-    cond do
-      true ->
-        IO.puts "OUTPUT: #{inspect output}"
-        env
-
+    {actual, env} = cond do
       is_map(output) ->
-        JSON_Spec.compile(output, env)
+        compile(output, env)
 
-      is_list(output) && !JSON_Spec.all_maps?(output) ->
-        JSON_Spec.run_list(output, env)
+      is_list(output) && !list_of_maps?(output) ->
+        run_list(output, env)
 
       true ->
         raise "Don't know what to do with input/output: #{inspect output}"
     end
 
-    old = env
-    env = JSON_Spec.revert_env(env)
-    Map.put env, :it_count, old.it_count + 1
+    if maps_match?(actual, env.expected) do
+      IO.puts "#{@bright}#{@green}#{env.it_count}#{@reset} #{env.it}"
+    else
+      IO.puts "#{@bright}#{@red}#{env.it_count}#{@reset}#{@bright} #{env.it}"
+      IO.puts "#{@red}#{inspect actual} !== #{@reset}#{@bright}#{inspect env.expected}"
+    end
+    IO.puts @reset
+
+    if Map.has_key?(env, :after_each) do
+      {_stack, env} = run_list(env.after_each, env)
+    end
+    carry_over(env, :it_count)
   end # === def run_output
 
   def canon_key(x) do
@@ -175,9 +169,13 @@ defmodule JSON_Spec do
     "#{space}#{num}"
   end
 
-  def all_maps? list do
-    !Enum.find list, fn(v) ->
-      !is_map(v)
+  def list_of_maps? list do
+    if !is_list(list) do
+      false
+    else
+      !Enum.find list, fn(v) ->
+        !is_map(v)
+      end
     end
   end
 
@@ -244,8 +242,23 @@ defmodule JSON_Spec do
     Map.put env, :_parent_env, env
   end
 
+  def carry_over env, key_or_list do
+    if is_list(key_or_list) do
+      Enum.reduce key_or_list, env, fn (key, env) ->
+        carry_over env, key
+      end
+    else
+      key = key_or_list
+      Map.put revert_env(env), key, env[key]
+    end
+  end
+
   def revert_env env do
-    env[:_parent_env]
+    if Map.has_key?(env, :_parent_env) && env._parent_env do
+      env._parent_env
+    else
+      raise "No parent env found."
+    end
   end
 
   def run_file(path, custom_funcs) do
@@ -282,13 +295,6 @@ defmodule JSON_Spec do
         raise "unknown run for #{inspect prog}"
     end
   end # === def run_prog
-
-  # def run_list_of_inputs list, env do
-    # Enum.reduce list, {nil, env}, fn(args, {_prev, env}) ->
-      # {args, env} = compile(args, env)
-      # env[env[:desc]].(args, env)
-    # end
-  # end # === def run_list_of_inputs
 
   @doc """
     Returns: { stack, env }
