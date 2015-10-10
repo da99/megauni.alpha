@@ -16,6 +16,8 @@ defmodule JSON_Spec do
   7) Adds counted var to map env: .put(env, key, val)
   8) Before all, Before each: Can only be one if "desc" has been
      used.
+  9) Raises error if list of input maps returns an error before last input.
+  10) "key.key1.key2.key3" -> Returns string if key2 or earlier is not found
   """
 
   @reset   IO.ANSI.reset
@@ -108,29 +110,30 @@ defmodule JSON_Spec do
   end # === def it
 
   def input input, env do
-    {actual, env} = cond do
-
+    cond do
       is_map(input) ->
         {input, env} = compile(input, env)
         [stack, _prog, env] = env[env[:desc]].([], [input], env)
-        {List.last(stack), env}
+        Map.put env, :actual, List.last(stack)
 
       list_of_maps?(input) ->
-        { stack, env } = Enum.reduce input, {[], env}, fn(map, {stack, env}) ->
-          {map, env} = compile(map, env)
-          [stack, _prog, env] = env[env[:desc]].(stack, [map], env)
-          {stack, env}
+        with_index = Enum.with_index(input)
+        {_, last}  = List.last(with_index)
+        Enum.reduce with_index, env, fn({map, i}, env) ->
+          env = input map, env
+          if i < last && is_map(env.actual) && Map.has_key?(env.actual, "error") do
+            raise env.actual["error"]
+          end
+          env
         end
-        { List.last(stack), env }
 
       is_list(input) ->
         [stack, _prog, env] = run_list(input, env)
-        { List.last(stack), env }
+        Map.put env, :actual, List.last(stack)
 
       true ->
         raise "Don't know how to run: #{inspect input}"
     end # === cond
-    Map.put env, :actual, actual
   end  # === run_input
 
   def output output, env do
@@ -321,9 +324,10 @@ defmodule JSON_Spec do
 
   @doc """
     Examples:
-    iex> JSON_Spec.compile("screen_name", env)
-    iex> JSON_Spec.compile(%{"screen_name": "screen_name"}, env)
-    iex> JSON_Spec.compile([%{}, %{}], env)
+    iex> .compile("user.id", env)
+    iex> .compile("screen_name", env)
+    iex> .compile(%{"screen_name": "screen_name"}, env)
+    iex> .compile([%{}, %{}], env)
   """
   def compile(x, env) do
 

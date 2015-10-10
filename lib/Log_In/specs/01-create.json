@@ -35,24 +35,21 @@
     "@FAIL_LIMIT", "times", [ "bad_log_in" ],
     "good_log_in", "bad_log_in", "good_log_in"
   ],
-  "output" , {"id": "user.id"}
-,
+  "output" , {"id": "user.id"},
 
   "it"     , "returns lock-out error: @FAIL_LIMIT + 1",
   "input"  , [
     "@FAIL_LIMIT + 1", "times", [ "bad_log_in" ],
     "good_log_in"
   ],
-  "output" , {"error": "screen_name: locked out"}
-,
+  "output" , {"error": "screen_name: locked out"},
 
   "it"     , "returns user id: fails = @FAIL_LIMIT + 1, 1 success of another screen name",
   "input"  , [
     "@FAIL_LIMIT + 1", "times", [ "bad_log_in" ],
     "good_log_in"
   ],
-  "output" , {"id": "user.id"}
-,
+  "output" , {"id": "user.id"},
 
   "it"     , "returns user id: fails = @FAIL_LIMIT + 1 that are 25 hours old, 1 success",
   "input"  , [
