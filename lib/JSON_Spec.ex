@@ -37,6 +37,22 @@ defmodule JSON_Spec do
     "output"     => :output
   }
 
+  def take list, num, env do
+    if Enum.count(list) < num do
+      raise "Out of bounds: #{inspect num} #{inspect list}"
+    end
+
+    args = Enum.take list, num
+
+    {args, env} = Enum.reduce args, {[], env}, fn raw_arg, {args, env} ->
+      {fin_arg, env} = compile(raw_arg, env)
+      {(args ++ [fin_arg]), env}
+    end
+
+    list = Enum.take list, (num - Enum.count(list))
+    {args, list, env}
+  end # === def args
+
   def const list, env do
     [ name | prog ] = list
     { stack , env } = JSON_Spec.run_prog(prog, env)
