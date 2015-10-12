@@ -48,7 +48,7 @@ AS $$
     end_date   := (current_date + '1 day'::interval);
 
     -- SEE IF ip is locked out
-    SELECT sum(ip) AS locked_out_screen_names
+    PERFORM count(ip) AS locked_out_screen_names
     FROM log_in
     WHERE
       ip = raw_ip
@@ -56,7 +56,7 @@ AS $$
       fail_count > 3
       AND
       at > start_date AND at < end_date
-    HAVING locked_out_screen_names > 3
+    HAVING count(ip) > 3
     ;
 
     IF FOUND THEN
@@ -76,7 +76,7 @@ AS $$
     END IF;
 
     -- SEE IF screen_name is locked out
-    SELECT sum(fail_count) AS total_fail_count
+    SELECT count(fail_count) AS total_fail_count
     FROM log_in
     WHERE
       screen_name_id = sn_record.id
