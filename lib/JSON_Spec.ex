@@ -37,6 +37,7 @@ defmodule JSON_Spec do
     "output"     => :output
   }
 
+  # Compiles elements from a list of args (prog)
   def take list, num, env do
     if Enum.count(list) < num do
       raise "Out of bounds: #{inspect num} #{inspect list}"
@@ -50,7 +51,11 @@ defmodule JSON_Spec do
     end
 
     list = Enum.take list, (num - Enum.count(list))
-    {args, list, env}
+    if num == 1 do
+      [List.first(args), list, env]
+    else
+      [args, list, env]
+    end
   end # === def args
 
   def const list, env do
@@ -153,7 +158,7 @@ defmodule JSON_Spec do
   end  # === run_input
 
   def output output, env do
-    {actual, env} = cond do
+    {expected, env} = cond do
       is_map(output) ->
         compile(output, env)
 
@@ -164,11 +169,13 @@ defmodule JSON_Spec do
         raise "Don't know what to do with input/output: #{inspect output}"
     end
 
-    if maps_match?(actual, env.expected) do
+    if maps_match?(expected, env.actual) do
       IO.puts "#{@bright}#{@green}#{env.it_count}#{@reset} #{env.it}"
     else
       IO.puts "#{@bright}#{@red}#{env.it_count}#{@reset}#{@bright} #{env.it}"
-      IO.puts "#{@red}#{inspect actual} !== #{@reset}#{@bright}#{inspect env.expected}"
+      IO.puts "#{@red}#{inspect expected} !== #{@reset}#{@bright}#{inspect env.actual}"
+      IO.puts @reset
+      Process.exit(self, "spec failed")
     end
     IO.puts @reset
 

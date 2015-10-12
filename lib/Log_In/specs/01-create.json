@@ -13,7 +13,7 @@
 
   "after each", "Log_In.reset_all",
 
-  "desc", "Log_In.create",
+  "desc", "Log_In.attempt",
 
   "it",   "returns the id of the user",
   "input", {

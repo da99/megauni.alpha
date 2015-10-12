@@ -61,6 +61,13 @@ env = %{
     end
   end,
 
+  "Log_In.attempt" => fn(stack, prog, env) ->
+    [arg, prog, env] = JSON_Spec.take(prog, 1, env)
+    In.spect(arg)
+    stack = stack ++ [Log_In.attempt(arg)]
+    [stack, prog, env]
+  end,
+
   "all log_in_attempts old" => fn(data, env) ->
     {ok, _} = Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
