@@ -51,7 +51,7 @@ defmodule Screen_Name do
   end
 
   def create raw_data do
-    vals = Enum.into(%{"owner_id"=>nil}, raw_data)
+    vals = Enum.into(raw_data, %{"owner_id"=>nil})
     Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
       "SELECT screen_name

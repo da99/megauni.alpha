@@ -37,7 +37,6 @@ CREATE FUNCTION log_in_attempt(
 )
 AS $$
   DECLARE
-    log_in_record  RECORD;
     sn_record      RECORD;
     sn_id          int;
     ip_locked_out  boolean;
@@ -65,7 +64,7 @@ AS $$
     END IF;
 
     -- Get screen name id:
-    SELECT id
+    SELECT id, owner_id
     INTO sn_record
     FROM screen_name
     WHERE
@@ -77,13 +76,13 @@ AS $$
     END IF;
 
     -- SEE IF screen_name is locked out
-    SELECT count(fail_count) AS total_fail_count
+    PERFORM count(fail_count) AS total_fail_count
     FROM log_in
     WHERE
       screen_name_id = sn_record.id
       AND
       at > start_date AND at < end_date
-    HAVING total_fail_count > 5
+    HAVING count(fail_count) > 5
     ;
 
     IF FOUND THEN
@@ -92,7 +91,7 @@ AS $$
 
 
     -- SEE IF password matches:
-    SELECT id
+    PERFORM id
     FROM "user"
     WHERE
       pswd_hash = raw_pswd_hash
@@ -112,12 +111,11 @@ AS $$
       ip = raw_ip::inet
       AND
       screen_name_id = sn_record.id
-    RETURNING *
     ;
 
     IF NOT FOUND THEN
       INSERT INTO log_in (ip,     screen_name_id)
-      VALUES             (raw_ip, sn_record.id);
+      VALUES             (raw_ip::inet, sn_record.id);
     END IF;
 
     raise 'log_in: password no match';

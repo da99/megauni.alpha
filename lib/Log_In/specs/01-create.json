@@ -18,7 +18,7 @@
   "it",   "returns the id of the user",
   "input", {
     "screen_name" : "sn_1.screen_name",
-    "pass"        : "valid_pass",
+    "pass"        : "user.pass",
     "ip"          : "127.0.0.1"
   },
   "output", {"id" : "user.id"},

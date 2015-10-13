@@ -8,6 +8,20 @@ else
 end
 
 files = Path.wildcard("lib/{#{models |> Enum.join ","}}/specs/*.json")
+
+defmodule Spec_Funcs do
+
+  def rand_screen_name do
+    {_mega, sec, micro} = :erlang.timestamp
+    "SN_#{sec}_#{micro}"
+  end # === def rand_screen_name
+
+  def valid_pass do
+    "valid pass word phrase"
+  end
+
+end # === defmodule Megauni.Specs
+
 env = %{
 
   "rand screen_name" => fn(env) ->
@@ -57,15 +71,70 @@ env = %{
         {%{"error"=>msg}, Map.put(env, "error", msg)}
       %{"id"=>user_id} ->
         {result, JSON_Spec.put(env, "user", result)}
-      _ -> raise "Unknown error: #{inspect result}"
+      _ ->
+        raise "Unknown error: #{inspect result}"
     end
   end,
 
   "Log_In.attempt" => fn(stack, prog, env) ->
     [arg, prog, env] = JSON_Spec.take(prog, 1, env)
-    In.spect(arg)
     stack = stack ++ [Log_In.attempt(arg)]
     [stack, prog, env]
+  end,
+
+  "create user" => fn(stack, prog, env) ->
+    user = User.create(%{
+      "screen_name"  => Spec_Funcs.rand_screen_name,
+      "pass"         => Spec_Funcs.valid_pass,
+      "confirm_pass" => Spec_Funcs.valid_pass
+    })
+
+    env = Map.put env, "user.pass", Spec_Funcs.valid_pass
+
+    case user do
+      %{"error" => msg} ->
+        raise "create user: #{msg}"
+      %{"id"=>user_id} ->
+        env = JSON_Spec.put(env, "user", user)
+        if Map.has_key?(env, :user_count) do
+          env = Map.put env, :user_count, env.user_count + 1
+        else
+          env = Map.put env, :user_count, 1
+        end
+        env = JSON_Spec.put(env, "user_#{env.user_count}", user)
+      _ ->
+        raise "Unknown error: #{inspect user}"
+    end
+    [(stack ++ [user]), prog, env]
+  end,
+
+  "create screen_name" => fn(stack, prog, env) ->
+    arg = if Map.has_key?(env, "user") do
+      %{
+        "screen_name" => Spec_Funcs.rand_screen_name,
+        "owner_id"     => env["user"]["id"]
+      }
+    else
+      %{ "screen_name" => Spec_Funcs.rand_screen_name }
+    end
+
+    sn = Screen_Name.create(arg)
+
+    case sn do
+      %{"error" => msg} ->
+        raise "create screen_name: #{msg}"
+      %{"screen_name"=>name} ->
+        env = JSON_Spec.put(env, "sn", sn)
+        if Map.has_key?(env, :sn_count) do
+          env = Map.put env, :sn_count, env.sn_count + 1
+        else
+          env = Map.put env, :sn_count, 1
+        end
+        env = JSON_Spec.put(env, "sn_#{env.sn_count}", sn)
+      _ ->
+        raise "Unknown error: #{inspect sn}"
+    end
+    [(stack ++ [sn]), prog, env]
   end,
 
   "all log_in_attempts old" => fn(data, env) ->

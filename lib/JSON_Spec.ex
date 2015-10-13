@@ -173,7 +173,7 @@ defmodule JSON_Spec do
       IO.puts "#{@bright}#{@green}#{env.it_count}#{@reset} #{env.it}"
     else
       IO.puts "#{@bright}#{@red}#{env.it_count}#{@reset}#{@bright} #{env.it}"
-      IO.puts "#{@red}#{inspect expected} !== #{@reset}#{@bright}#{inspect env.actual}"
+      IO.puts "#{@bright}#{inspect expected} !== #{@reset}#{@red}#{@bright}#{inspect env.actual}"
       IO.puts @reset
       Process.exit(self, "spec failed")
     end
@@ -328,18 +328,12 @@ defmodule JSON_Spec do
   def run_list(list, env) do
 
     [stack, prog, env] = Enum.reduce list, [[], [], env ], fn(token, [stack, prog, env]) ->
-      if !Map.has_key?(env, token) do
+      if !Map.has_key?(env, token) || !is_function(env[token]) do
         stack = stack ++ [token]
+        [stack, prog, env]
       else
-        val = env[token]
-        if is_function(val) do
-          [stack, prog, env] = val.(stack, prog, env)
-        else
-          stack = stack ++ [val]
-        end
+        [stack, prog, env] = env[token].(stack, prog, env)
       end # === if
-
-      [stack, prog, env]
     end
 
     {stack, env}

@@ -5,21 +5,51 @@ defmodule Log_In do
     ip   = Map.fetch!(data, "ip")
     sn   = Map.fetch!(data, "screen_name")
     pass = Map.fetch!(data, "pass")
-    pswd_hash = Comeonin.Bcrypt.hashpwsalt( pass )
-    In.spect pswd_hash
+    pswd_hash = Comeonin.Bcrypt.hashpwsalt( User.canonize_pass(pass) )
+
     result = Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
-      " SELECT * FROM log_in_attempt($1, $2, $3); ",
-      [ip, sn, pswd_hash]
-    )
+      """
+        SELECT pswd_hash
+        FROM "user"
+        WHERE id IN (
+          SELECT owner_id FROM screen_name WHERE screen_name = screen_name_canonize($1)
+        );
+      """,
+      [sn]
+    );
+
     case result do
-      %{"error" => _msg} ->
-        result
-      _ when is_list(result) ->
-        List.first(result).user_id
+      {:ok, %{:rows => users}} ->
+        In.spect users
+        pswd_hash = if Enum.count(users) == 0 do
+          nil
+        else
+          users |> List.first |> List.first
+        end
+
+        result = Ecto.Adapters.SQL.query(
+          Megauni.Repos.Main,
+          " SELECT * FROM log_in_attempt($1, $2, $3); ",
+          [ip, sn, pswd_hash]
+        )
+
+        case result do
+          %{"error" => _msg} ->
+            result
+          {:ok, %{:rows=>ids}} ->
+            user_id = ids |> List.first |> List.first
+            %{"id"=>user_id}
+          _ ->
+            In.spect result
+            %{"error" => "programmer error: during log in attempt"}
+        end # === case
+
       _ ->
-        %{"error" => "programmer error: during log in attempt"}
-    end # === case
+        In.spect(result)
+        raise "programmer error: error in searching for user of screen name"
+    end
+
   end # === def attempt
 
 end # === defmodule Log_In
