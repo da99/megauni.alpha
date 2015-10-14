@@ -1,6 +1,12 @@
 
 defmodule Log_In do
 
+  def reset_all do
+    {:ok, _} = Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main, " DELETE FROM log_in; ", []
+    );
+  end # === def reset_all
+
   def attempt data do
     ip   = Map.fetch!(data, "ip")
     sn   = Map.fetch!(data, "screen_name")
@@ -21,7 +27,6 @@ defmodule Log_In do
 
     case result do
       {:ok, %{:rows => users}} ->
-        In.spect users
         pswd_hash = if Enum.count(users) == 0 do
           nil
         else

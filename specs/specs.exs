@@ -82,6 +82,43 @@ env = %{
     [stack, prog, env]
   end,
 
+  "Log_In.reset_all" => fn(stack, prog, env) ->
+    Log_In.reset_all
+    [stack, prog, env]
+  end,
+
+  "bad_log_in" => fn(stack, prog, env) ->
+    if is_list(List.first(prog)) do
+      [[num] | prog] = prog
+    else
+      num = 1
+    end
+    bads =Enum.map 1..num, fn(x) ->
+      Log_In.attempt %{
+        "pass"        => "bass pass",
+        "screen_name" => env["sn"]["screen_name"],
+        "ip"          => "127.0.0.1"
+      }
+    end
+    [stack ++ bads, prog, env]
+  end,
+
+  "good_log_in" => fn(stack, prog, env) ->
+    if is_list(List.first(prog)) do
+      [[num] | prog] = prog
+    else
+      num = 1
+    end
+    goods = Enum.map 1..num, fn(x) ->
+      Log_In.attempt %{
+        "pass"        => Spec_Funcs.valid_pass,
+        "screen_name" => env["sn"]["screen_name"],
+        "ip"          => "127.0.0.1"
+      }
+    end
+    [stack ++ goods, prog, env]
+  end,
+
   "create user" => fn(stack, prog, env) ->
     user = User.create(%{
       "screen_name"  => Spec_Funcs.rand_screen_name,

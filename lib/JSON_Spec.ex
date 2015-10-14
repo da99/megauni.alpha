@@ -77,7 +77,10 @@ defmodule JSON_Spec do
         Map.put env, :after_each, List.append([env.after_each], prog)
       end
     else
-      Enum.into %{:after_each => env}, env
+      if !is_list(prog) do
+        prog = [prog]
+      end
+      Enum.into %{:after_each => prog}, env
     end
   end # === def run_after_each
 
@@ -125,9 +128,8 @@ defmodule JSON_Spec do
     end
 
     title = title(raw_title, env)
-    num   = "#{format_num(env.it_count)})"
 
-    Enum.into %{:it=>title, :it_count=>num}, new_env(env)
+    Enum.into %{:it=>title, :it_count=>env.it_count}, new_env(env)
   end # === def it
 
   def input input, env do
@@ -149,7 +151,7 @@ defmodule JSON_Spec do
         end
 
       is_list(input) ->
-        [stack, _prog, env] = run_list(input, env)
+        {stack, env} = run_list(input, env)
         Map.put env, :actual, List.last(stack)
 
       true ->
@@ -161,18 +163,15 @@ defmodule JSON_Spec do
     {expected, env} = cond do
       is_map(output) ->
         compile(output, env)
-
-      is_list(output) && !list_of_maps?(output) ->
-        run_list(output, env)
-
       true ->
         raise "Don't know what to do with input/output: #{inspect output}"
     end
 
+    num = "#{format_num(env.it_count)})"
     if maps_match?(expected, env.actual) do
-      IO.puts "#{@bright}#{@green}#{env.it_count}#{@reset} #{env.it}"
+      IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}"
     else
-      IO.puts "#{@bright}#{@red}#{env.it_count}#{@reset}#{@bright} #{env.it}"
+      IO.puts "#{@bright}#{@red}#{num}#{@reset}#{@bright} #{env.it}"
       IO.puts "#{@bright}#{inspect expected} !== #{@reset}#{@red}#{@bright}#{inspect env.actual}"
       IO.puts @reset
       Process.exit(self, "spec failed")
@@ -247,12 +246,15 @@ defmodule JSON_Spec do
   end
 
   def maps_match? actual, expected do
-    if Enum.count(actual) < 1 do
-      false
-    else
-      !Enum.find expected, fn({k,v}) ->
-        actual[k] !== v
-      end
+    cond do
+      Enum.count(actual) < 1 ->
+        false
+      !is_map(actual) || !is_map(expected) ->
+        false
+      true ->
+        !Enum.find expected, fn({k,v}) ->
+          actual[k] !== v
+        end
     end
   end # === maps_match?
 
@@ -326,18 +328,38 @@ defmodule JSON_Spec do
     Returns: { stack, env }
   """
   def run_list(list, env) do
-
-    [stack, prog, env] = Enum.reduce list, [[], [], env ], fn(token, [stack, prog, env]) ->
-      if !Map.has_key?(env, token) || !is_function(env[token]) do
-        stack = stack ++ [token]
-        [stack, prog, env]
-      else
-        [stack, prog, env] = env[token].(stack, prog, env)
-      end # === if
-    end
-
-    {stack, env}
+    run_list([], list, env)
   end
+
+  @doc """
+    Returns: { stack, env }
+  """
+  def run_list stack, prog, env do
+    if Enum.count(prog) == 0 do
+      {stack, env}
+    else
+      [token | prog] = prog
+
+      [stack, prog, env] = cond do
+        # [ "func", [...], ...]
+        is_list(List.first(prog)) ->
+          [raw_args | prog]    = prog
+          {compiled_args, env} = run_list(raw_args, env)
+          env[token].(stack, [compiled_args | prog], env)
+
+        # [ "func", "func", "func", ...]
+        is_function(env[token]) ->
+          env[token].(stack, prog, env)
+
+        # [ "string", 5, 100, ...]
+        true ->
+          {token, env} = compile(token, env)
+          [(stack ++ [token]), prog, env]
+      end # === cond
+
+      run_list stack, prog, env
+    end # === run_list
+  end # === def run_list
 
   @doc """
     Examples:
@@ -345,6 +367,8 @@ defmodule JSON_Spec do
     iex> .compile("screen_name", env)
     iex> .compile(%{"screen_name": "screen_name"}, env)
     iex> .compile([%{}, %{}], env)
+
+    Returns: {result, env}
   """
   def compile(x, env) do
 
@@ -383,6 +407,9 @@ defmodule JSON_Spec do
           )
         end
         {result.map, result.env}
+
+      is_number(x) ->
+        {x, env}
 
       true ->
         raise "Don't know what to do with: #{inspect x}"

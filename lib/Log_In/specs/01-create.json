@@ -25,36 +25,36 @@
 
   "it"     , "returns user id: fails = @FAIL_LIMIT, success = 1",
   "input"  , [
-    "@FAIL_LIMIT", "times", [ "bad_log_in" ],
+    "bad_log_in", [ "@FAIL_LIMIT" ],
     "good_log_in"
   ],
   "output" , {"id": "user.id"},
 
   "it"     , "returns user id: fails = @FAIL_LIMIT, success = 1, fails = 1, success = 1",
   "input"  , [
-    "@FAIL_LIMIT", "times", [ "bad_log_in" ],
+    "bad_log_in", [ "@FAIL_LIMIT" ],
     "good_log_in", "bad_log_in", "good_log_in"
   ],
   "output" , {"id": "user.id"},
 
   "it"     , "returns lock-out error: @FAIL_LIMIT + 1",
   "input"  , [
-    "@FAIL_LIMIT + 1", "times", [ "bad_log_in" ],
+    "bad_log_in", [ "@FAIL_LIMIT + 1" ],
     "good_log_in"
   ],
   "output" , {"error": "screen_name: locked out"},
 
   "it"     , "returns user id: fails = @FAIL_LIMIT + 1, 1 success of another screen name",
   "input"  , [
-    "@FAIL_LIMIT + 1", "times", [ "bad_log_in" ],
+    "bad_log_in", [ "@FAIL_LIMIT + 1" ],
     "good_log_in"
   ],
   "output" , {"id": "user.id"},
 
   "it"     , "returns user id: fails = @FAIL_LIMIT + 1 that are 25 hours old, 1 success",
   "input"  , [
-    "@FAIL_LIMIT + 1", "times", [ "bad_log_in" ],
-    "age_ify log_in_attempts", [25],
+    "bad_log_in", [ "@FAIL_LIMIT + 1" ],
+    "log_in_attempts aged", ["25 hrs"],
     "good_log_in"
   ],
   "output" , {"id": "user.id"}
