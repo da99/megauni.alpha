@@ -7,53 +7,61 @@ defmodule Log_In do
     );
   end # === def reset_all
 
+  @doc """
+    This is made complicated because we are hashing the pass phrase
+    before sending it to the DB, to ensure raw pass phrase from traveling
+    as little as possible throught the network/system.
+  """
   def attempt data do
     ip   = Map.fetch!(data, "ip")
     sn   = Map.fetch!(data, "screen_name")
-    pass = Map.fetch!(data, "pass")
-    pswd_hash = Comeonin.Bcrypt.hashpwsalt( User.canonize_pass(pass) )
+    pass = User.canonize_pass Map.fetch!(data, "pass")
 
-    result = Ecto.Adapters.SQL.query(
+    user = Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
       """
-        SELECT pswd_hash
-        FROM "user"
-        WHERE id IN (
-          SELECT owner_id FROM screen_name WHERE screen_name = screen_name_canonize($1)
-        );
+        SELECT "user".id, "user".pswd_hash, "screen_name".id AS sn_id
+        FROM "user", screen_name
+        WHERE
+          "screen_name".owner_id = "user".id
+          AND
+          "screen_name".screen_name = screen_name_canonize($1)
+        ;
       """,
       [sn]
     );
 
-    case result do
+    user_id    = nil
+    sn_id      = nil
+    pass_match = false
+
+    case user do
       {:ok, %{:rows => users}} ->
-        pswd_hash = if Enum.count(users) == 0 do
-          nil
-        else
-          users |> List.first |> List.first
+        if Enum.count(users) > 0 do
+          [[user_id, valid_pswd_hash, sn_id]] = users
+          pass_match                          = Comeonin.Bcrypt.checkpw pass, valid_pswd_hash
         end
 
-        result = Ecto.Adapters.SQL.query(
-          Megauni.Repos.Main,
-          " SELECT * FROM log_in_attempt($1, $2, $3); ",
-          [ip, sn, pswd_hash]
-        )
-
-        case result do
-          %{"error" => _msg} ->
-            result
-          {:ok, %{:rows=>ids}} ->
-            user_id = ids |> List.first |> List.first
-            %{"id"=>user_id}
-          _ ->
-            In.spect result
-            %{"error" => "programmer error: during log in attempt"}
-        end # === case
-
       _ ->
-        In.spect(result)
-        raise "programmer error: error in searching for user of screen name"
+        In.spect user
+        raise "programmer or system error"
     end
+
+    result = Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      " SELECT * FROM log_in_attempt($1, $2, $3, $4); ",
+      [ip, sn_id, user_id, pass_match]
+    )
+
+    case result do
+      %{"error" => _msg} ->
+        result
+      {:ok, %{:rows=>[[true]]}} ->
+        %{"id"=>user_id}
+      _ ->
+        In.spect result
+        %{"error" => "programmer error: during log in attempt"}
+    end # === case
 
   end # === def attempt
 

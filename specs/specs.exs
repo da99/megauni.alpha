@@ -24,7 +24,9 @@ defmodule Spec_Funcs do
     if is_list(List.first(prog)) do
       [[num] | prog] = prog
       {num, env} = JSON_Spec.compile(num, env)
-      num = String.to_integer(num)
+      if !is_number(num) do
+        num = String.to_integer(num)
+      end
     else
       num = 1
     end

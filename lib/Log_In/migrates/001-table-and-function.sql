@@ -31,14 +31,13 @@ WHERE screen_name_id > 0;
 CREATE FUNCTION log_in_attempt(
   -- Workaround: Elixir has trouble encoding "inet", so we use varchar for raw_ip.
   IN  raw_ip          varchar,
-  IN  raw_screen_name varchar,
-  IN  raw_pswd_hash   bytea,
-  OUT user_id         int
+  IN  sn_id           int,
+  IN  user_id         int,
+  IN  pass_match      boolean,
+  OUT has_pass        boolean
 )
 AS $$
   DECLARE
-    sn_record      RECORD;
-    sn_id          int;
     ip_locked_out  boolean;
     start_date     timestamp;
     end_date       timestamp;
@@ -60,72 +59,54 @@ AS $$
     ;
 
     IF FOUND THEN
-      raise 'log_in: ip locked out for 24 hours';
+      RAISE 'log_in: ip locked out for 24 hours';
     END IF;
 
     -- Get screen name id:
-    SELECT id, owner_id
-    INTO sn_record
-    FROM screen_name
-    WHERE
-      screen_name = screen_name_canonize(raw_screen_name)
-    ;
-
-    IF NOT FOUND THEN
-      raise 'log_in: screen name not found';
+    IF sn_id IS NULL THEN
+      RAISE 'log_in: screen name not found';
     END IF;
 
     -- SEE IF screen_name is locked out
     PERFORM count(fail_count) AS total_fail_count
     FROM log_in
     WHERE
-      screen_name_id = sn_record.id
+      screen_name_id = sn_id
       AND
       at > start_date AND at < end_date
     HAVING count(fail_count) > 5
     ;
 
     IF FOUND THEN
-      raise 'log_in: screen name locked out';
-    END IF;
-
-
-    -- SEE IF password matches:
-    PERFORM id
-    FROM "user"
-    WHERE
-      pswd_hash = raw_pswd_hash
-    ;
-
-    IF FOUND THEN
-      user_id := sn_record.owner_id;
-      RETURN;
+      RAISE 'log_in: screen name locked out';
     END IF;
 
     -- Log failed log in attempt:
-    UPDATE log_in
-    SET
-      fail_count = fail_count + 1,
-      at         = timezone('UTC'::text, now())
-    WHERE
-      ip = raw_ip::inet
-      AND
-      screen_name_id = sn_record.id
-    ;
+    IF NOT pass_match THEN
+      UPDATE log_in
+      SET
+        fail_count = fail_count + 1,
+        at         = timezone('UTC'::text, now())
+      WHERE
+        ip = raw_ip::inet
+        AND
+        screen_name_id = sn_id;
 
-    IF NOT FOUND THEN
-      INSERT INTO log_in (ip,     screen_name_id)
-      VALUES             (raw_ip::inet, sn_record.id);
+      IF NOT FOUND THEN
+        INSERT INTO log_in (ip,           screen_name_id)
+        VALUES             (raw_ip::inet, sn_id);
+      END IF;
+
+      raise 'log_in: password no match';
     END IF;
 
-    raise 'log_in: password no match';
-
+    has_pass := TRUE;
   END
 $$ LANGUAGE plpgsql;
 
 -- DOWN
 
-DROP FUNCTION log_in_attempt (varchar, varchar, bytea) CASCADE;
+DROP FUNCTION log_in_attempt (varchar, int, int, boolean) CASCADE;
 DROP INDEX    log_in_screen_name_id_idx CASCADE;
 DROP TABLE    log_in CASCADE;
 
