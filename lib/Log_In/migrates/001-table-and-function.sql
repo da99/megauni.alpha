@@ -30,15 +30,16 @@ WHERE screen_name_id > 0;
 
 CREATE FUNCTION log_in_attempt(
   -- Workaround: Elixir has trouble encoding "inet", so we use varchar for raw_ip.
-  IN  raw_ip          varchar,
-  IN  sn_id           int,
-  IN  user_id         int,
-  IN  pass_match      boolean,
-  OUT has_pass        boolean
+  IN  raw_ip          VARCHAR,
+  IN  sn_id           INT,
+  IN  user_id         INT,
+  IN  pass_match      BOOLEAN,
+  OUT has_pass        BOOLEAN,
+  OUT reason          VARCHAR
 )
 AS $$
   DECLARE
-    ip_locked_out  boolean;
+    log_in_record  RECORD;
     start_date     timestamp;
     end_date       timestamp;
   BEGIN
@@ -47,7 +48,8 @@ AS $$
     end_date   := (current_date + '1 day'::interval);
 
     -- SEE IF ip is locked out
-    PERFORM count(ip) AS locked_out_screen_names
+    SELECT count(ip) AS locked_out_screen_names
+    INTO log_in_record
     FROM log_in
     WHERE
       ip = raw_ip::inet
@@ -59,26 +61,36 @@ AS $$
     ;
 
     IF FOUND THEN
-      RAISE 'log_in: ip locked out for 24 hours';
+      -- RAISE 'log_in: ip locked out for 24 hours';
+      has_pass := false;
+      reason   := 'log_in: ip locked out for 24 hours';
+      RETURN;
     END IF;
 
     -- Get screen name id:
     IF sn_id IS NULL THEN
-      RAISE 'log_in: screen name not found';
+      -- RAISE 'log_in: screen name not found';
+      has_pass := false;
+      reason   := 'log_in: screen name not found';
+      RETURN;
     END IF;
 
     -- SEE IF screen_name is locked out
-    PERFORM count(fail_count) AS total_fail_count
+    SELECT sum(fail_count) AS total_fail_count
+    INTO log_in_record
     FROM log_in
     WHERE
       screen_name_id = sn_id
       AND
       at > start_date AND at < end_date
-    HAVING count(fail_count) > 5
+    HAVING sum(fail_count) > 4
     ;
 
     IF FOUND THEN
-      RAISE 'log_in: screen name locked out';
+      -- RAISE 'log_in: screen name locked out';
+      has_pass := false;
+      reason   := 'log_in: screen name locked out';
+      RETURN;
     END IF;
 
     -- Log failed log in attempt:
@@ -97,10 +109,20 @@ AS $$
         VALUES             (raw_ip::inet, sn_id);
       END IF;
 
-      raise 'log_in: password no match';
+      --- RAISE EXCEPTION 'log_in: password no match';
+      has_pass := FALSE;
+      reason   := 'log_in: password no match';
+      RETURN;
     END IF;
 
+    DELETE FROM log_in
+    WHERE screen_name_id IN (
+      SELECT id
+      FROM screen_name_ids_for_owner_id(user_id)
+    );
+
     has_pass := TRUE;
+    reason   := NULL;
   END
 $$ LANGUAGE plpgsql;
 

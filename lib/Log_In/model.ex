@@ -23,9 +23,12 @@ defmodule Log_In do
         SELECT "user".id, "user".pswd_hash, "screen_name".id AS sn_id
         FROM "user", screen_name
         WHERE
-          "screen_name".owner_id = "user".id
+          "user".id = screen_name.owner_id
           AND
-          "screen_name".screen_name = screen_name_canonize($1)
+          screen_name.id IN (
+            SELECT id
+            FROM screen_name_read($1)
+          )
         ;
       """,
       [sn]
@@ -54,10 +57,10 @@ defmodule Log_In do
     )
 
     case result do
-      %{"error" => _msg} ->
-        result
-      {:ok, %{:rows=>[[true]]}} ->
+      {:ok, %{:rows=>[[true, _reason]]}} ->
         %{"id"=>user_id}
+      {:ok, %{:rows=>[[false, reason]]}} ->
+        %{"error"=>reason}
       _ ->
         In.spect result
         %{"error" => "programmer error: during log in attempt"}

@@ -3,7 +3,7 @@
 
 [
 
-  "const", [ "@FAIL_LIMIT", 5 ],
+  "const", [ "@FAIL_LIMIT", 4 ],
 
   "before all", [
     "create user",
@@ -38,6 +38,12 @@
   "output" , {"id": "user.id"},
 
   "it"     , "returns lock-out error: @FAIL_LIMIT + 1",
+  "input"  , [
+    "bad_log_in", [ "@FAIL_LIMIT + 1" ]
+  ],
+  "output" , {"error": "log_in: screen_name locked out"},
+
+  "it"     , "returns lock-out error: @FAIL_LIMIT + 1, success = 1",
   "input"  , [
     "bad_log_in", [ "@FAIL_LIMIT + 1" ],
     "good_log_in"
