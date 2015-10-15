@@ -105,20 +105,6 @@ defmodule JSON_Spec do
     end
   end
 
-  def title raw, env do
-    Regex.replace ~r/(\@[A-Z\_]+)(\s?([+\-\/\*])\s?([0-9]+))?/, raw, fn match, var, op_num, op, num ->
-      if Map.has_key?(env, var) do
-        if String.length(op_num) > 0 do
-          to_string(apply(Kernel, String.to_atom(op), [env[var], String.to_integer(num)]))
-        else
-          to_string(env[var])
-        end
-      else
-        match
-      end
-    end
-  end
-
   def it raw_title, prev_env do
     env = new_env(prev_env)
     env = if Map.has_key?(env, :it_count) do
@@ -127,9 +113,12 @@ defmodule JSON_Spec do
       Map.put env, :it_count, 1
     end
 
-    title = title(raw_title, env)
+    {compiled_it, env} = compile(raw_title, env)
 
-    Enum.into %{:it=>title, :it_count=>env.it_count}, new_env(env)
+    Enum.into %{
+      :it       => compiled_it,
+      :it_count => env.it_count
+    }, new_env(env)
   end # === def it
 
   def input input, env do
@@ -373,7 +362,34 @@ defmodule JSON_Spec do
   def compile(x, env) do
 
     cond do
-      is_binary(x) -> # === See if string is a var or func call.
+
+      is_map(x) -> # === used to compile inputs and outputs
+        result = Enum.reduce x, %{:map=>%{}, :env=>env}, fn({k,v}, pair) ->
+          {new_v, new_e} = compile(v, env)
+          Enum.into(
+            %{:map=>Map.put(pair.map, k, new_v), :env=>new_e},
+            pair
+          )
+        end
+        {result.map, result.env}
+
+      is_number(x) ->
+        {x, env}
+
+      is_binary(x) ->
+        raw = x
+        x = Regex.replace ~r/(\@[A-Z\_]+)(\s?([+\-\/\*])\s?([0-9]+))?/, raw, fn match, var, op_num, op, num ->
+          if Map.has_key?(env, var) do
+            if String.length(op_num) > 0 do
+              to_string(apply(Kernel, String.to_atom(op), [env[var], String.to_integer(num)]))
+            else
+              to_string(env[var])
+            end
+          else
+            match
+          end
+        end
+
         name = canon_key(x)
         cond do
           Map.has_key?(env, name) && !is_function(env[name]) ->
@@ -397,19 +413,6 @@ defmodule JSON_Spec do
               {x, env}
             end
         end # === cond
-
-      is_map(x) -> # === used to compile inputs and outputs
-        result = Enum.reduce x, %{:map=>%{}, :env=>env}, fn({k,v}, pair) ->
-          {new_v, new_e} = compile(v, env)
-          Enum.into(
-            %{:map=>Map.put(pair.map, k, new_v), :env=>new_e},
-            pair
-          )
-        end
-        {result.map, result.env}
-
-      is_number(x) ->
-        {x, env}
 
       true ->
         raise "Don't know what to do with: #{inspect x}"

@@ -20,6 +20,21 @@ defmodule Spec_Funcs do
     "valid pass word phrase"
   end
 
+  def log_in data, stack, prog, env do
+    if is_list(List.first(prog)) do
+      [[num] | prog] = prog
+      {num, env} = JSON_Spec.compile(num, env)
+      num = String.to_integer(num)
+    else
+      num = 1
+    end
+
+    attempts = Enum.map 1..num, fn(x) ->
+      Log_In.attempt data
+    end
+    [stack ++ attempts, prog, env]
+  end
+
 end # === defmodule Megauni.Specs
 
 env = %{
@@ -88,35 +103,19 @@ env = %{
   end,
 
   "bad_log_in" => fn(stack, prog, env) ->
-    if is_list(List.first(prog)) do
-      [[num] | prog] = prog
-    else
-      num = 1
-    end
-    bads =Enum.map 1..num, fn(x) ->
-      Log_In.attempt %{
-        "pass"        => "bass pass",
-        "screen_name" => env["sn"]["screen_name"],
-        "ip"          => "127.0.0.1"
-      }
-    end
-    [stack ++ bads, prog, env]
+    Spec_Funcs.log_in %{
+      "pass"        => "bass pass",
+      "screen_name" => env["sn"]["screen_name"],
+      "ip"          => "127.0.0.1"
+    }, stack, prog, env
   end,
 
   "good_log_in" => fn(stack, prog, env) ->
-    if is_list(List.first(prog)) do
-      [[num] | prog] = prog
-    else
-      num = 1
-    end
-    goods = Enum.map 1..num, fn(x) ->
-      Log_In.attempt %{
-        "pass"        => Spec_Funcs.valid_pass,
-        "screen_name" => env["sn"]["screen_name"],
-        "ip"          => "127.0.0.1"
-      }
-    end
-    [stack ++ goods, prog, env]
+    Spec_Funcs.log_in %{
+      "pass"        => Spec_Funcs.valid_pass,
+      "screen_name" => env["sn"]["screen_name"],
+      "ip"          => "127.0.0.1"
+    }, stack, prog, env
   end,
 
   "create user" => fn(stack, prog, env) ->
