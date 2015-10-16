@@ -120,6 +120,12 @@ env = %{
     }, stack, prog, env
   end,
 
+  "log_in_attempts aged" => fn(stack, prog, env) ->
+    [[arg] | prog] = prog
+    {:ok, _} = Log_In.aged arg
+    [stack, prog, env]
+  end,
+
   "create user" => fn(stack, prog, env) ->
     user = User.create(%{
       "screen_name"  => Spec_Funcs.rand_screen_name,

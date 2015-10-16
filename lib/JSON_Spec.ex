@@ -281,10 +281,11 @@ defmodule JSON_Spec do
   def run_file(path, custom_funcs) do
     json = File.read!(path) |> Poison.decode!
 
-    IO.puts "\nfile: #{IO.ANSI.bright}#{path}#{IO.ANSI.reset}"
+    IO.puts "\nfile: #{@bright}#{path}#{@reset}"
 
     env = Enum.into(%{:_parent_env=>nil}, custom_funcs)
     run_core json, env
+    IO.puts "#{@bright}#{@green}All tests pass.#{@reset}"
   end # === run_file
 
   def run_core prog, env do

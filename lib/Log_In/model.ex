@@ -7,6 +7,20 @@ defmodule Log_In do
     );
   end # === def reset_all
 
+  def aged str do
+    if !In.dev do
+      raise "Only to be used in dev"
+    end
+    Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      """
+        UPDATE log_in
+        SET at = at + '#{str}'::interval
+      """,
+      []
+    );
+  end
+
   @doc """
     This is made complicated because we are hashing the pass phrase
     before sending it to the DB, to ensure raw pass phrase from traveling

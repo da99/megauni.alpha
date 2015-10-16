@@ -40,10 +40,14 @@ CREATE FUNCTION log_in_attempt(
 AS $$
   DECLARE
     log_in_record  RECORD;
-    start_date     timestamp;
-    end_date       timestamp;
+    start_date     TIMESTAMP;
+    end_date       TIMESTAMP;
+    MAX_FAIL_COUNT SMALLINT;
+    IP_FAIL_COUNT  SMALLINT;
   BEGIN
 
+    MAX_FAIL_COUNT = 4;
+    IP_FAIL_COUNT  = 4;
     start_date := (current_date - '1 day'::interval);
     end_date   := (current_date + '1 day'::interval);
 
@@ -54,14 +58,14 @@ AS $$
     WHERE
       ip = raw_ip::inet
       AND
-      fail_count > 3
+      fail_count >= MAX_FAIL_COUNT
       AND
       at > start_date AND at < end_date
-    HAVING count(ip) > 3
+    HAVING count(ip) >= IP_FAIL_COUNT
     ;
 
     IF FOUND THEN
-      -- RAISE 'log_in: ip locked out for 24 hours';
+      -- FAIL
       has_pass := false;
       reason   := 'log_in: ip locked out for 24 hours';
       RETURN;
@@ -69,7 +73,7 @@ AS $$
 
     -- Get screen name id:
     IF sn_id IS NULL THEN
-      -- RAISE 'log_in: screen name not found';
+      -- FAIL
       has_pass := false;
       reason   := 'log_in: screen name not found';
       RETURN;
@@ -83,13 +87,13 @@ AS $$
       screen_name_id = sn_id
       AND
       at > start_date AND at < end_date
-    HAVING sum(fail_count) > 4
+    HAVING sum(fail_count) >= MAX_FAIL_COUNT
     ;
 
     IF FOUND THEN
-      -- RAISE 'log_in: screen name locked out';
+      -- FAIL
       has_pass := false;
-      reason   := 'log_in: screen name locked out';
+      reason   := 'log_in: screen_name locked out';
       RETURN;
     END IF;
 
@@ -109,7 +113,7 @@ AS $$
         VALUES             (raw_ip::inet, sn_id);
       END IF;
 
-      --- RAISE EXCEPTION 'log_in: password no match';
+      --- FAIL
       has_pass := FALSE;
       reason   := 'log_in: password no match';
       RETURN;
