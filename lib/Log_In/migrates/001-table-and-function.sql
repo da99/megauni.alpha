@@ -40,16 +40,18 @@ CREATE FUNCTION log_in_attempt(
 AS $$
   DECLARE
     log_in_record  RECORD;
-    start_date     TIMESTAMP;
-    end_date       TIMESTAMP;
     MAX_FAIL_COUNT SMALLINT;
     IP_FAIL_COUNT  SMALLINT;
+    NOW_UTC        TIMESTAMP;
+    START_DATE     TIMESTAMP;
+    END_DATE       TIMESTAMP;
   BEGIN
 
-    MAX_FAIL_COUNT = 4;
-    IP_FAIL_COUNT  = 4;
-    start_date := (current_date - '1 day'::interval);
-    end_date   := (current_date + '1 day'::interval);
+    MAX_FAIL_COUNT := 4;
+    IP_FAIL_COUNT  := 4;
+    NOW_UTC    := timezone('UTC'::text, now());
+    START_DATE := (NOW_UTC - '1 day'::interval);
+    END_DATE   := (NOW_UTC + '1 day'::interval);
 
     -- SEE IF ip is locked out
     SELECT count(ip) AS locked_out_screen_names
@@ -60,7 +62,7 @@ AS $$
       AND
       fail_count >= MAX_FAIL_COUNT
       AND
-      at > start_date AND at < end_date
+      at > START_DATE AND at < END_DATE
     HAVING count(ip) >= IP_FAIL_COUNT
     ;
 
@@ -75,7 +77,7 @@ AS $$
     IF sn_id IS NULL THEN
       -- FAIL
       has_pass := false;
-      reason   := 'log_in: screen name not found';
+      reason   := 'log_in: screen_name not found';
       RETURN;
     END IF;
 
@@ -86,7 +88,7 @@ AS $$
     WHERE
       screen_name_id = sn_id
       AND
-      at > start_date AND at < end_date
+      at > START_DATE AND at < END_DATE
     HAVING sum(fail_count) >= MAX_FAIL_COUNT
     ;
 

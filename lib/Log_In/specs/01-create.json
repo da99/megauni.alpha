@@ -24,6 +24,15 @@
     "output": {"id" : "user.id"}
   },
 
+  {
+    "it": "returns screen_name not found",
+    "input" : {
+      "screen_name" : "wrong_screen_name",
+      "pass"        : "user.pass",
+      "ip"          : "127.0.0.1"
+    },
+    "output": {"error":"log_in: screen_name not found"}
+  },
 
   {
     "it"     : "returns user id: fails = @FAIL_LIMIT - 1, success = 1",
