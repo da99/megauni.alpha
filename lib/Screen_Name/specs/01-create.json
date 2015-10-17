@@ -1,6 +1,6 @@
 
 [
-  {"desc": "Screen_Name.create"},
+  "desc", "Screen_Name.create",
 
   {
     "it"     : "creates record if data validates",
@@ -17,24 +17,24 @@
   {
     "it"     : "raises Invalid if screen name is over 30",
     "input"  : {"screen_name": "abcd5678901234567890123456712245647890234546578"},
-    "output": { "error": "screen_name: max 30" }
+    "output" : { "error": "screen_name: max 30" }
   },
 
   {
-    "it": "megauni is not allowed (despite case)",
-    "input": {"screen_name": "meGauNi"},
+    "it"    : "megauni is not allowed (despite case)",
+    "input" : {"screen_name": "meGauNi"},
     "output": {"error" : "screen_name: not available"}
   },
 
   {
-    "it": "\"screen_name\" is not allowed (despite case)",
-    "input": {"screen_name": "sCreen_NamE"},
-    "output": {"error" : "screen_name: not available"}
+    "it"     : "\"screen_name\" is not allowed (despite case)",
+    "input"  : {"screen_name": "sCreen_NamE"},
+    "output" : {"error" : "screen_name: not available"}
   },
 
   {
-    "it": "raises Invalid for duplicate name",
-    "input": [
+    "it"    : "raises Invalid for duplicate name",
+    "input" : [
       {"screen_name" : "rand screen_name"},
       {"screen_name" : "screen_name"}
     ],

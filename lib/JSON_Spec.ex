@@ -289,11 +289,18 @@ defmodule JSON_Spec do
   end # === run_file
 
   def run_core prog, env do
-    if Enum.count(prog) == 0 do
-      env
-    else
-      [ cmd | [arg | prog] ] = prog
-      run_core prog, apply(JSON_Spec, @core[cmd], [arg, env])
+    cond do
+      Enum.count(prog) == 0 ->
+        env
+
+      is_binary(List.first prog) ->
+        [ cmd | [arg | prog] ] = prog
+        run_core prog, apply(JSON_Spec, @core[cmd], [arg, env])
+
+      is_map(List.first prog) ->
+        [ %{"it"=>_it, "input"=>_input, "output"=>_output} | prog ] = prog
+        prog = ["it", _it, "input", _input, "output", _output | prog]
+        run_core(prog, env)
     end
   end # === def run_core prog, env
 
