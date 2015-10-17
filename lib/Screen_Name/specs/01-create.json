@@ -11,7 +11,7 @@
   {
     "it"     : "raises Invalid if screen name is empty",
     "input"  : {"screen_name": ""},
-    "output" : {"error" : "screen_name: min: 4"}
+    "output" : {"error" : "screen_name: min 4"}
   },
 
   {
@@ -23,13 +23,13 @@
   {
     "it"    : "megauni is not allowed (despite case)",
     "input" : {"screen_name": "meGauNi"},
-    "output": {"error" : "screen_name: not available"}
+    "output": {"error" : "screen_name: not_available"}
   },
 
   {
     "it"     : "\"screen_name\" is not allowed (despite case)",
     "input"  : {"screen_name": "sCreen_NamE"},
-    "output" : {"error" : "screen_name: not available"}
+    "output" : {"error" : "screen_name: not_available"}
   },
 
   {
@@ -38,7 +38,7 @@
       {"screen_name" : "rand screen_name"},
       {"screen_name" : "screen_name"}
     ],
-    "output": {"error": "screen_name: already taken"}
+    "output": {"error": "screen_name: already_taken"}
   },
 
   {

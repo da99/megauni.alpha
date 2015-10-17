@@ -26,16 +26,13 @@ defmodule Screen_Name do
   end # === def canonize_screen_name
 
   def read data do
-    result = if System.get_env("IS_DEV") do
-      Ecto.Adapters.SQL.query(
-        Megauni.Repos.Main,
-        "SELECT * FROM screen_name WHERE screen_name = screen_name_canonize($1);",
-        [data["screen_name"]]
-      )
-    else
-      raise "NOT DONE"
-    end
-    Megauni.Model.applet_results(result, "screen_name")
+    Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      "SELECT * FROM screen_name_read($1);",
+      [data["screen_name"]]
+    )
+    |> Megauni.Model.applet_results("screen_name")
+    |> List.first
   end
 
   def clean_screen_name sn do
@@ -52,13 +49,15 @@ defmodule Screen_Name do
 
   def create raw_data do
     vals = Enum.into(raw_data, %{"owner_id"=>nil})
+
     Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
       "SELECT screen_name
       FROM screen_name_insert($1, $2);",
       [vals["owner_id"], vals["screen_name"]]
     )
-    |> Megauni.Model.applet_results "screen_name"
+    |> Megauni.Model.applet_results("screen_name")
+    |> List.first
   end
 
   def is_allowed_to_post_to sn do

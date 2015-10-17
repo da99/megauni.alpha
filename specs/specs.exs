@@ -51,32 +51,35 @@ env = %{
     { String.duplicate("one word ", 150), env}
   end,
 
-  "Screen_Name.create" => fn(data, env) ->
-    if Map.has_key?(data, "error") do
-      raise "#{inspect data}"
-    end
-    result = Screen_Name.create data
-    case result do
-      %{"error" => msg} ->
-        {%{"error"=>msg}, Map.put(env, "error", msg)}
-      %{"screen_name"=>_sn} ->
-        {result, JSON_Spec.put(env, "sn", result)}
-      _ -> raise "Unknown error: #{inspect result}"
-    end
-  end,
+  "Screen_Name.create" => fn(stack, prog, env) ->
+    [data | prog] = prog
+    result        = Screen_Name.create data
 
-  "Screen_Name.read" => fn(data, env) ->
-    result = Screen_Name.read data
     case result do
       %{"error" => msg} ->
-        {%{"error"=>msg}, Map.put(env, "error", msg)}
+        result
+
       %{"screen_name"=>_sn} ->
-        {result, JSON_Spec.put(env, "sn", result)}
-      _ ->
-        {result, JSON_Spec.put(env, "sn", result)}
-        # raise "Not found: #{inspect data} result: #{inspect result}"
+        env = JSON_Spec.put(env, "sn", result)
     end
-  end,
+
+    [stack ++ [result], prog, env]
+  end, # === Screen_Name.create
+
+  "Screen_Name.read" => fn(stack, prog, env) ->
+    [data | prog] = prog
+    result        = Screen_Name.read data
+
+    In.spect result
+    case result do
+      %{"error" => msg} ->
+        result
+      %{"screen_name"=>_sn} ->
+        env = JSON_Spec.put(env, "sn", result)
+    end
+
+    [stack ++ [result], prog, env]
+  end, # === Screen_Name.read
 
   "User.create" => fn(data, env) ->
     if Map.has_key?(data, "error") do

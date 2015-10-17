@@ -5,17 +5,11 @@ defmodule Megauni.Model do
     case result do
 
       {:ok, meta} ->
-        maps = Enum.map(meta.rows, fn(r) ->
+        Enum.map(meta.rows, fn(r) ->
           Enum.reduce(Enum.zip(meta.columns, r), %{}, fn({col, val}, map) ->
             Map.put(map, col, val)
           end)
         end)
-
-        if Enum.count(maps) == 1 do
-          List.first(maps)
-        else
-          maps
-        end
 
       {:error, e} ->
         msg            = Exception.message(e)
@@ -24,12 +18,9 @@ defmodule Megauni.Model do
 
         cond do
           msg =~ err_unique_idx ->
-            %{"error"=> "#{prefix}: already taken"}
+            [%{"error"=> "#{prefix}: already_taken"}]
           msg =~ err_exception ->
-            %{"error"=> Regex.replace(err_exception, msg, "")}
-          true ->
-            In.spect e
-            %{"error"=> "#{prefix}: programmer error"}
+            [%{"error"=> Regex.replace(err_exception, msg, "")}]
         end # === cond
 
     end # === case
