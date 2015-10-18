@@ -9,10 +9,7 @@
       "pass"         : "this is my weak password",
       "confirm_pass" : "this is my weak password"
     },
-    "output": [
-      "Screen_Name.read", { "screen_name": "screen_name" },
-      {"id" : "sn.owner_id", "screen_name" : "sn.screen_name"}
-    ]
+    "output": { "screen_name": "screen_name" }
   },
 
   {
