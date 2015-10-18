@@ -81,19 +81,20 @@ env = %{
     [stack ++ [result], prog, env]
   end, # === Screen_Name.read
 
-  "User.create" => fn(data, env) ->
+  "User.create" => fn(stack, prog, env) ->
+    [data | prog] = prog
     if Map.has_key?(data, "error") do
       raise "#{inspect data}"
     end
     result = User.create data
     case result do
       %{"error" => msg} ->
-        {%{"error"=>msg}, Map.put(env, "error", msg)}
+        result
       %{"id"=>user_id} ->
-        {result, JSON_Spec.put(env, "user", result)}
-      _ ->
-        raise "Unknown error: #{inspect result}"
+        env = JSON_Spec.put(env, "user", result)
     end
+
+    [stack, prog, env]
   end,
 
   "Log_In.attempt" => fn(stack, prog, env) ->

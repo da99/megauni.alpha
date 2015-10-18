@@ -54,7 +54,8 @@ defmodule User do
           """,
           [raw_data["screen_name"], pswd_hash]
         )
-        |> Megauni.Model.applet_results "user"
+        |> Megauni.Model.applet_results("user")
+        |> List.first
     end # === case clean_pass
 
 

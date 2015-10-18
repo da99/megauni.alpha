@@ -1,6 +1,6 @@
 
 [
-  {"desc": "User.create"},
+  "desc", "User.create",
 
   {
     "it":  "creates a Screen_Name",
