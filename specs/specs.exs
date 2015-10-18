@@ -94,7 +94,7 @@ env = %{
         env = JSON_Spec.put(env, "user", result)
     end
 
-    [stack, prog, env]
+    [stack ++ [result], prog, env]
   end,
 
   "Log_In.attempt" => fn(stack, prog, env) ->

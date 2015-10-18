@@ -40,7 +40,6 @@ defmodule User do
 
     clean_pass = clean_pass_confirm(data["pass"], data["confirm_pass"])
     case clean_pass do
-
       %{"error"=>_msg} ->
           clean_pass
 

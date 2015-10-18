@@ -9,7 +9,10 @@
       "pass"         : "this is my weak password",
       "confirm_pass" : "this is my weak password"
     },
-    "output": { "screen_name": "screen_name" }
+    "output": {
+      "id"         : "INT",
+      "screen_name": "screen_name"
+    }
   },
 
   {

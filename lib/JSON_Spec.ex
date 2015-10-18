@@ -157,7 +157,7 @@ defmodule JSON_Spec do
     end
 
     num = "#{format_num(env.it_count)})"
-    if maps_match?(expected, env.actual) do
+    if maps_match?(env.actual, expected) do
       IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}"
     else
       IO.puts "#{@bright}#{@red}#{num}#{@reset}#{@bright} #{env.it}"
@@ -236,14 +236,17 @@ defmodule JSON_Spec do
 
   def maps_match? actual, expected do
     cond do
-      Enum.count(actual) < 1 ->
-        false
-      !is_map(actual) || !is_map(expected) ->
-        false
-      true ->
+      is_map(actual) && is_map(expected) ->
         !Enum.find expected, fn({k,v}) ->
-          actual[k] !== v
+          cond do
+            (is_integer(actual[k]) && v == "INT") ->
+              false
+            true ->
+              !(actual[k] == v)
+          end
         end
+      true ->
+        actual === expected
     end
   end # === maps_match?
 
