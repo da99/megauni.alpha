@@ -7,7 +7,9 @@ else
   System.argv
 end
 
-files = Path.wildcard("lib/{#{models |> Enum.join ","}}/specs/*.json")
+files = Enum.map models, fn(mod) ->
+  Path.wildcard("lib/#{mod}/specs/*.json")
+end
 
 defmodule Spec_Funcs do
 
@@ -31,7 +33,7 @@ defmodule Spec_Funcs do
       num = 1
     end
 
-    attempts = Enum.map 1..num, fn(x) ->
+    attempts = Enum.map 1..num, fn(_x) ->
       Log_In.attempt data
     end
     [stack ++ attempts, prog, env]
@@ -56,10 +58,10 @@ env = %{
     result            = Screen_Name.create data
 
     case result do
-      %{"user_error" => msg} ->
+      %{"user_error" => _msg} ->
         result
 
-      %{"error" => msg} ->
+      %{"error" => _msg} ->
         result
 
       %{"screen_name"=>_sn} ->
@@ -74,11 +76,11 @@ env = %{
     rows          = Screen_Name.read data
 
     case rows do
-      %{"error" => msg} ->
+      %{"error" => _msg} ->
         [stack ++ [rows], prog, env]
 
       %{"screen_name"=>_sn} ->
-        {fin, env} = Enum.reduce rows, {nil, env}, fn(r, {fin, env}) ->
+        {fin, env} = Enum.reduce rows, {nil, env}, fn(r, {_fin, env}) ->
           env = JSON_Spec.put(env, "sn", r)
           {r, env}
         end
@@ -91,7 +93,7 @@ env = %{
     result            = Screen_Name.read_one data
 
     case result do
-      %{"user_error" => msg} ->
+      %{"user_error" => _msg} ->
         result
 
       %{"screen_name"=>_sn} ->
@@ -109,9 +111,9 @@ env = %{
 
     result = User.create data
     case result do
-      %{"user_error" => msg} ->
+      %{"user_error" => _msg} ->
         result
-      %{"id"=>user_id} ->
+      %{"id"=> _user_id} ->
         env = JSON_Spec.put(env, "user", result)
     end
 
@@ -163,7 +165,7 @@ env = %{
     case user do
       %{"error" => msg} ->
         raise "create user: #{msg}"
-      %{"id"=>user_id} ->
+      %{"id"=>_user_id} ->
         env = JSON_Spec.put(env, "user", user)
         if Map.has_key?(env, :user_count) do
           env = Map.put env, :user_count, env.user_count + 1
@@ -192,7 +194,7 @@ env = %{
     case sn do
       %{"error" => msg} ->
         raise "create screen_name: #{msg}"
-      %{"screen_name"=>name} ->
+      %{"screen_name"=> _name} ->
         env = JSON_Spec.put(env, "sn", sn)
         if Map.has_key?(env, :sn_count) do
           env = Map.put env, :sn_count, env.sn_count + 1
@@ -206,8 +208,8 @@ env = %{
     [(stack ++ [sn]), prog, env]
   end,
 
-  "all log_in_attempts old" => fn(data, env) ->
-    {ok, _} = Ecto.Adapters.SQL.query(
+  "all log_in_attempts old" => fn(_data, _env) ->
+    {:ok, _} = Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
       "UPDATE log_in SET at = at + '25 hours'::interval",
       []

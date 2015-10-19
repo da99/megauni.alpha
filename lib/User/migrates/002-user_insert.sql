@@ -1,4 +1,9 @@
 
+--  Use "user_insert" instead of "insert"
+--  because:
+--    * "insert" won't accept a non-column
+--     value, like sn_name.
+--    * Also, "user_insert" creates a Screen_Name and User.
 CREATE OR REPLACE FUNCTION user_insert(
   IN  sn_name     varchar,
   IN  pswd_hash   bytea,

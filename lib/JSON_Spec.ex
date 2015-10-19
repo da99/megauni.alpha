@@ -143,6 +143,9 @@ defmodule JSON_Spec do
         input([raw], env)
 
       list_of_maps?(raw) ->
+        if Enum.count(raw) > 1 do
+          env = Map.put env, :raise_errors, true
+        end
         new_list = Enum.reduce raw, [], fn(map, list) ->
           list ++ [ env[:desc], map ]
         end
@@ -368,7 +371,7 @@ defmodule JSON_Spec do
 
       # === If last value is an error and there is still more
       #     to process in the prog, raise the error:
-      if Enum.count(prog) != 0 && is_error?(List.last(stack)) do
+      if env[:raise_errors] && Enum.count(prog) != 0 && is_error?(List.last(stack)) do
         raise err_msg(List.last(stack))
       else
         run_list stack, prog, env
