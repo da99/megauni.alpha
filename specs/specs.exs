@@ -52,10 +52,13 @@ env = %{
   end,
 
   "Screen_Name.create" => fn(stack, prog, env) ->
-    [data | prog] = prog
-    result        = Screen_Name.create data
+    [data, prog, env] = JSON_Spec.take(prog, 1, env)
+    result            = Screen_Name.create data
 
     case result do
+      %{"user_error" => msg} ->
+        result
+
       %{"error" => msg} ->
         result
 
@@ -67,19 +70,36 @@ env = %{
   end, # === Screen_Name.create
 
   "Screen_Name.read" => fn(stack, prog, env) ->
-    [data | prog] = prog
-    result        = Screen_Name.read data
+    [data, prog, env] = JSON_Spec.take(prog, 1, env)
+    rows          = Screen_Name.read data
 
-    In.spect result
-    case result do
+    case rows do
       %{"error" => msg} ->
+        [stack ++ [rows], prog, env]
+
+      %{"screen_name"=>_sn} ->
+        {fin, env} = Enum.reduce rows, {nil, env}, fn(r, {fin, env}) ->
+          env = JSON_Spec.put(env, "sn", r)
+          {r, env}
+        end
+        [stack ++ [fin], prog, env]
+    end
+  end, # === Screen_Name.read
+
+  "Screen_Name.read_one" => fn(stack, prog, env) ->
+    [data, prog, env] = JSON_Spec.take(prog, 1, env)
+    result            = Screen_Name.read_one data
+
+    case result do
+      %{"user_error" => msg} ->
         result
+
       %{"screen_name"=>_sn} ->
         env = JSON_Spec.put(env, "sn", result)
     end
 
     [stack ++ [result], prog, env]
-  end, # === Screen_Name.read
+  end, # === Screen_Name.read_one
 
   "User.create" => fn(stack, prog, env) ->
     [data | prog] = prog

@@ -12,12 +12,6 @@ AS $$
     sn_record RECORD;
   BEGIN
 
-    raw_screen_name := screen_name_canonize(raw_screen_name);
-
-    IF char_length(raw_screen_name) > 30 THEN
-      RAISE EXCEPTION 'screen_name: max 30';
-    END IF;
-
     INSERT INTO screen_name (owner_id, screen_name)
     VALUES (raw_owner_id, raw_screen_name)
     RETURNING "screen_name".owner_id, "screen_name".screen_name

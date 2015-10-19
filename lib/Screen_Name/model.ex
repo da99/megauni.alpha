@@ -31,7 +31,12 @@ defmodule Screen_Name do
       "SELECT * FROM screen_name_read($1);",
       [data["screen_name"]]
     )
-    |> Megauni.Model.applet_results("screen_name")
+    |> Megauni.Model.rows
+  end
+
+  def read_one data do
+    data
+    |> read
     |> List.first
   end
 
@@ -50,14 +55,18 @@ defmodule Screen_Name do
   def create raw_data do
     vals = Enum.into(raw_data, %{"owner_id"=>nil})
 
-    Ecto.Adapters.SQL.query(
+    result = Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
       "SELECT screen_name
       FROM screen_name_insert($1, $2);",
       [vals["owner_id"], vals["screen_name"]]
     )
-    |> Megauni.Model.applet_results("screen_name")
-    |> List.first
+
+    if Megauni.Model.is_too_long?(result) do
+      %{"user_error"=>"screen_name: max #{Megauni.Model.max_length result}"}
+    else
+      Megauni.Model.one_row(result, "screen_name")
+    end
   end
 
   def is_allowed_to_post_to sn do

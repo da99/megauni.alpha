@@ -11,25 +11,25 @@
   {
     "it"     : "raises Invalid if screen name is empty",
     "input"  : {"screen_name": ""},
-    "output" : {"error" : "screen_name: min 4"}
+    "output" : {"user_error" : "screen_name: min 4"}
   },
 
   {
     "it"     : "raises Invalid if screen name is over 30",
     "input"  : {"screen_name": "abcd5678901234567890123456712245647890234546578"},
-    "output" : { "error": "screen_name: max 30" }
+    "output" : { "user_error": "screen_name: max 30" }
   },
 
   {
     "it"    : "megauni is not allowed (despite case)",
     "input" : {"screen_name": "meGauNi"},
-    "output": {"error" : "screen_name: not_available"}
+    "output": {"user_error" : "screen_name: not_available"}
   },
 
   {
     "it"     : "\"screen_name\" is not allowed (despite case)",
     "input"  : {"screen_name": "sCreen_NamE"},
-    "output" : {"error" : "screen_name: not_available"}
+    "output" : {"user_error" : "screen_name: not_available"}
   },
 
   {
@@ -38,14 +38,14 @@
       {"screen_name" : "rand screen_name"},
       {"screen_name" : "screen_name"}
     ],
-    "output": {"error": "screen_name: already_taken"}
+    "output": {"user_error": "screen_name: already_taken"}
   },
 
   {
     "it": "updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id",
     "input": [
       "Screen_Name.create", {"screen_name": "rand screen_name"},
-      "Screen_Name.read", {"screen_name":"screen_name"}
+      "Screen_Name.read_one", {"screen_name":"screen_name"}
     ],
     "output": {"screen_name": "sn_1.screen_name", "owner_id": "sn.id", "id": "sn.id"}
   }

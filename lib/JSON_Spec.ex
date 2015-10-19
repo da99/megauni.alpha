@@ -121,30 +121,39 @@ defmodule JSON_Spec do
     }, new_env(env)
   end # === def it
 
-  def input input, env do
+  def is_error? e do
+    is_map(e) &&
+    (
+      Map.has_key?(e, "error") ||
+      Map.has_key?(e, "user_error")
+    )
+  end
+
+  def err_msg e do
+    if Map.has_key?(e, "error") do
+      e["error"]
+    else
+      e["user_error"]
+    end
+  end
+
+  def input raw, env do
     cond do
-      is_map(input) ->
-        {input, env} = compile(input, env)
-        [stack, _prog, env] = env[env[:desc]].([], [input], env)
-        Map.put env, :actual, List.last(stack)
+      is_map(raw) ->
+        input([raw], env)
 
-      list_of_maps?(input) ->
-        with_index = Enum.with_index(input)
-        {_, last}  = List.last(with_index)
-        Enum.reduce with_index, env, fn({map, i}, env) ->
-          env = input map, env
-          if i < last && is_map(env.actual) && Map.has_key?(env.actual, "error") do
-            raise env.actual["error"]
-          end
-          env
+      list_of_maps?(raw) ->
+        new_list = Enum.reduce raw, [], fn(map, list) ->
+          list ++ [ env[:desc], map ]
         end
+        input(new_list, env)
 
-      is_list(input) ->
-        {stack, env} = run_list(input, env)
+      is_list(raw) ->
+        {stack, env} = run_list(raw, env)
         Map.put env, :actual, List.last(stack)
 
       true ->
-        raise "Don't know how to run: #{inspect input}"
+        raise "Don't know how to run: #{inspect raw}"
     end # === cond
   end  # === run_input
 
@@ -357,7 +366,13 @@ defmodule JSON_Spec do
           [(stack ++ [token]), prog, env]
       end # === cond
 
-      run_list stack, prog, env
+      # === If last value is an error and there is still more
+      #     to process in the prog, raise the error:
+      if Enum.count(prog) != 0 && is_error?(List.last(stack)) do
+        raise err_msg(List.last(stack))
+      else
+        run_list stack, prog, env
+      end
     end # === run_list
   end # === def run_list
 

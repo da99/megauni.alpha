@@ -14,19 +14,23 @@ RETURNS trigger AS $$
     -- screen_name
     NEW.screen_name := screen_name_canonize(NEW.screen_name);
 
+    IF char_length(NEW.screen_name) > 30 THEN
+      RAISE EXCEPTION 'user_error: screen_name: max 30';
+    END IF;
+
     IF char_length(NEW.screen_name) < 4 THEN
-      RAISE EXCEPTION 'screen_name: min 4';
+      RAISE EXCEPTION 'user_error: screen_name: min 4';
     END IF;
 
     IF NEW.screen_name !~ '^[A-Z\d\-\_\.]+$' THEN
-      raise EXCEPTION 'screen_name: invalid_chars %', regexp_replace(NEW.screen_name, '[A-Z\d\-\_\.]+', '', 'ig');
+      raise EXCEPTION 'user_error: screen_name: invalid_chars %', regexp_replace(NEW.screen_name, '[A-Z\d\-\_\.]+', '', 'ig');
     END IF;
 
     -- Banned screen names:
     IF NEW.screen_name ~* '(SCREEN[\_\.\-\+]+NAME|MEGAUNI|MINIUNI|OKDOKI|okjak|okjon)' OR
        NEW.screen_name ~* '^(BOT-|ME|MINE|MY|MI|[.]+-COLA|UNDEFINED|DEF|SEX|SEXY|XXX|TED|LARRY|ONLINE|CONTACT|INFO|OFFICIAL|ABOUT|NEWS|HOME)$'
     THEN
-      RAISE EXCEPTION 'screen_name: not_available';
+      RAISE EXCEPTION 'user_error: screen_name: not_available';
     END IF;
 
     -- owner_id
