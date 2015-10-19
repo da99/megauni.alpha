@@ -74,10 +74,7 @@ defmodule Log_In do
       {:ok, %{:rows=>[[true, _reason]]}} ->
         %{"id"=>user_id}
       {:ok, %{:rows=>[[false, reason]]}} ->
-        %{"error"=>reason}
-      _ ->
-        In.spect result
-        %{"error" => "programmer error: during log in attempt"}
+        %{"user_error"=>reason}
     end # === case
 
   end # === def attempt

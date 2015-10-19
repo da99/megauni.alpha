@@ -13,7 +13,6 @@
 
   "desc", "Log_In.attempt",
 
-
   {
     "it":   "returns the id of the user",
     "input": {
@@ -31,7 +30,7 @@
       "pass"        : "user.pass",
       "ip"          : "127.0.0.1"
     },
-    "output": {"error":"log_in: screen_name not found"}
+    "output": {"user_error":"log_in: screen_name not found"}
   },
 
   {
@@ -59,7 +58,7 @@
     "input"  : [
       "bad_log_in", [ "@FAIL_LIMIT + 1" ]
     ],
-    "output" : {"error": "log_in: screen_name locked out"}
+    "output" : {"user_error": "log_in: screen_name locked out"}
   },
 
 
@@ -69,7 +68,7 @@
       "bad_log_in", [ "@FAIL_LIMIT + 1" ],
       "good_log_in"
     ],
-    "output" : {"error": "log_in: screen_name locked out"}
+    "output" : {"user_error": "log_in: screen_name locked out"}
   },
 
 

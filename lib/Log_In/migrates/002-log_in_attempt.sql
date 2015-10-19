@@ -1,4 +1,10 @@
 
+--  We don't use "raise" here because
+--  it would prevent inserting 
+--  bad attempts (ie rollback the transaction).
+--  So instead we return a row [{has_pass, reason}]
+--  and the application will standardize it into
+--  {has_pass: ..., reason: ...}
 CREATE FUNCTION log_in_attempt(
   -- Workaround: Elixir has trouble encoding "inet", so we use varchar for raw_ip.
   IN  raw_ip          VARCHAR,
