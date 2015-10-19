@@ -19,16 +19,16 @@ defmodule User do
 
     cond do
       String.length(pass_word) < @min ->
-        %{"error" => "pass_word: min #{@min}"}
+        %{"user_error" => "pass_word: min #{@min}"}
 
       String.length(pass_word) > @max ->
-        %{"error" => "pass_word: max #{@max}"}
+        %{"user_error" => "pass_word: max #{@max}"}
 
       (Enum.count(String.split(pass_word, ~r/\s/, trim: true)) < @min_word) ->
-        %{"error" => "pass_word: min_words #{@min_word}"}
+        %{"user_error" => "pass_word: min_words #{@min_word}"}
 
       (confirm !== pass_word) ->
-        %{"error" => "confirm_pass_word: no match"}
+        %{"user_error" => "confirm_pass_word: no match"}
 
       true ->
         pass_word
@@ -40,21 +40,22 @@ defmodule User do
 
     clean_pass = clean_pass_confirm(data["pass"], data["confirm_pass"])
     case clean_pass do
-      %{"error"=>_msg} ->
+      %{"user_error"=>_msg} ->
           clean_pass
 
-      _ ->
-        pswd_hash = Comeonin.Bcrypt.hashpwsalt( clean_pass )
+      _ when is_binary(clean_pass) ->
         Ecto.Adapters.SQL.query(
           Megauni.Repos.Main,
           """
             SELECT id, screen_name
             FROM user_insert( $1 , $2 );
           """,
-          [raw_data["screen_name"], pswd_hash]
+          [
+            raw_data["screen_name"],
+            Comeonin.Bcrypt.hashpwsalt( clean_pass )
+          ]
         )
-        |> Megauni.Model.applet_results("user")
-        |> List.first
+        |> Megauni.Model.one_row("screen_name")
     end # === case clean_pass
 
 

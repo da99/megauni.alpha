@@ -22,7 +22,7 @@
       "pass"         :         "this is my password",
       "confirm_pass" : "this is my password"
     },
-    "output": { "error": "screen_name: min 4" }
+    "output": { "user_error": "screen_name: min 4" }
   },
 
   {
@@ -32,7 +32,7 @@
       "pass"         : "this is my password",
       "confirm_pass" : "this is my password"
     },
-    "output": { "error": "screen_name: max 30" }
+    "output": { "user_error": "screen_name: max 30" }
   },
 
   {
@@ -43,7 +43,7 @@
       "confirm_pass" : "t"
     },
     "output": {
-      "error": "pass_word: min 5"
+      "user_error": "pass_word: min 5"
     }
 
   },
@@ -56,7 +56,7 @@
       "confirm_pass" : "p1234567"
     },
     "output": {
-      "error": "pass_word: min_words 3"
+      "user_error": "pass_word: min_words 3"
     }
 
   },
@@ -69,7 +69,7 @@
       "confirm_pass" : "long_pass_word"
     },
     "output": {
-      "error" : "pass_word: max 150"
+      "user_error" : "pass_word: max 150"
     }
   },
 
@@ -81,7 +81,7 @@
       "confirm_pass" : "this is my pass word too"
     },
     "output": {
-      "error": "confirm_pass_word: no match"
+      "user_error": "confirm_pass_word: no match"
     }
   },
 

@@ -102,13 +102,14 @@ env = %{
   end, # === Screen_Name.read_one
 
   "User.create" => fn(stack, prog, env) ->
-    [data | prog] = prog
+    [data, prog, env] = JSON_Spec.take(prog, 1, env)
     if Map.has_key?(data, "error") do
       raise "#{inspect data}"
     end
+
     result = User.create data
     case result do
-      %{"error" => msg} ->
+      %{"user_error" => msg} ->
         result
       %{"id"=>user_id} ->
         env = JSON_Spec.put(env, "user", result)

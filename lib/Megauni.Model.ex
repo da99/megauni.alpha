@@ -56,6 +56,15 @@ defmodule Megauni.Model do
           Map.put(map, col, val)
         end)
 
+      { :error, %{postgres: %{code: :string_data_right_truncation, message: msg}} } ->
+        case Regex.run( ~r/value too long for type character varying\((\d+)\)/, msg ) do
+          [match, raw_num] ->
+            max = String.to_integer(raw_num)
+            %{"user_error" => "#{prefix}: max #{max}"}
+          nil ->
+            inspect_and_raise_db_err result, :string_data_right_truncation, msg
+        end
+
       { :error, %{postgres: %{code: :unique_violation, message: msg}} } ->
         if msg =~ ~r/violates.+"#{prefix}_unique_idx"/ do
           %{"user_error"=> "#{prefix}: already_taken"}
