@@ -89,7 +89,7 @@ defmodule JSON_Spec do
       env = revert_env(env)
     end
 
-    IO.puts "\n#{@yellow}#{name}#{@reset}"
+    IO.puts "#{@yellow}#{name}#{@reset}"
     Enum.into %{ :desc=>name }, new_env(env)
   end
 
@@ -170,14 +170,13 @@ defmodule JSON_Spec do
 
     num = "#{format_num(env.it_count)})"
     if maps_match?(env.actual, expected) do
-      IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}"
+      IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}#{@reset}"
     else
       IO.puts "#{@bright}#{@red}#{num}#{@reset}#{@bright} #{env.it}"
       IO.puts "#{@bright}#{inspect expected} !== #{@reset}#{@red}#{@bright}#{inspect env.actual}"
       IO.puts @reset
       Process.exit(self, "spec failed")
     end
-    IO.puts @reset
 
     if Map.has_key?(env, :after_each) do
       {_stack, env} = run_list(env.after_each, env)
@@ -313,8 +312,8 @@ defmodule JSON_Spec do
         run_core prog, apply(JSON_Spec, @core[cmd], [arg, env])
 
       is_map(List.first prog) ->
-        [ %{"it"=>_it, "input"=>_input, "output"=>_output} | prog ] = prog
-        prog = ["it", _it, "input", _input, "output", _output | prog]
+        [ %{"it"=>it_, "input"=>input_, "output"=>output_} | prog ] = prog
+        prog = ["it", it_, "input", input_, "output", output_ | prog]
         run_core(prog, env)
     end
   end # === def run_core prog, env

@@ -610,7 +610,11 @@ case "$action" in
 
   "watch")
     # === watch
-    # === watch no_server
+
+    # === temporary convenience
+    export USE_SERVER=""
+    export RUN_FAST="yes"
+
 
     eval "$(bash_setup setup_traps)"
     setup_traps

@@ -2,6 +2,7 @@
 use Mix.Config
 
 config :logger, :console, format: "$time $metadata$message\n"
+config :logger, level: :warn
 
 config :megauni, Megauni.Repos.Main,
   adapter: Ecto.Adapters.Postgres,
@@ -11,6 +12,7 @@ config :megauni, Megauni.Repos.Main,
   hostname: "localhost"
 
 if System.get_env("IS_DEV") do
+  # config :logger, level: :warn
   config :comeonin, :bcrypt_log_rounds, 4
 else
   config :comeonin, :bcrypt_log_rounds, 13
