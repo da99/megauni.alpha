@@ -6,6 +6,7 @@ describe 'Link.create' do
     l.data[:id].should.is_a Numeric
   end
 
+  it "ignores duplicates of follows between the same consumer and publication"
   it "throws :not_allowed if :POST_TO_SCREEN_NAME is made by SN/Customer lacking a :ALLOW_TO_LINK"
   it "throws :not_allowed if linker is linking non-owned computers"
 
