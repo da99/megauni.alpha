@@ -2,7 +2,7 @@
 
 -- Results:
 --   mask id | mask sn (aud alias) |  pub id  | pub sn | follow created at
-follow(user_id) AS (
+raw_follow(user_id) AS ( -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
   SELECT
     mask.id                 AS mask_id,
@@ -29,23 +29,23 @@ follow(user_id) AS (
     AND mask.id        = follow.a_id
     AND publication.id = follow.b_id
 
-) -- follow
+)
 
 
 
 -- Results:
 --   mask sn (aud alias) |  pub id  | pub sn | follow created at
-allowed_follow(user_id) AS (
+follow(user_id) AS ( -- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
   SELECT *
   FROM
-    follow(AUDIENCE_ID) AS follow
+    raw_follow(AUDIENCE_ID) AS follow
   WHERE
     publication_id NOT IN (blocked by aud)
     AND mask_id NOT IN (blocked by publication user/owner)
 ) -- allowed_follow
 
 
-last_card AS (
+raw_last_card AS ( -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
   SELECT
     publication INFO,
     card.id,
@@ -62,7 +62,7 @@ last_card AS (
 )
 
 
-allowed_last_card(AUDIENCE_ID) AS (
+last_card(AUDIENCE_ID) AS ( -- ||||||||||||||||||||||||||||||||||||||||||||||||||||
   SELECT *
   FROM last_card
   WHERE
@@ -75,7 +75,7 @@ allowed_last_card(AUDIENCE_ID) AS (
 )
 
 
-last_read AS (
+last_read AS ( -- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
   SELECT
     link_reads_at.a_id       AS owner_id,
     link_reads_at.b_id       AS publication_id,
@@ -93,7 +93,7 @@ last_read AS (
 ) -- last_read
 
 
-news AS (
+???news AS (
   -- JOIN cards through "link" table
   link_cards.type_id  = 20
   AND link_cards.owner_id = following.publication_id

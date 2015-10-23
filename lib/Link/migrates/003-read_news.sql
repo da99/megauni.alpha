@@ -37,8 +37,8 @@ BEGIN
       last_card.created_at
 
     FROM
-      allowed_follow(AUDIENCE_ID)              AS follow
-      LEFT JOIN allowed_last_card(AUDIENCE_ID) AS last_card
+      follow(AUDIENCE_ID)              AS follow
+      LEFT JOIN last_card(AUDIENCE_ID) AS last_card
       ON follow.publication_id = last_card.publication_id
 
     ORDER BY last_card.created_at DESC
@@ -50,6 +50,6 @@ $$ LANGUAGE plpgsql;
 
 -- DOWN
 
-DROP FUNCTION allowed_news(INT) CASCADE;
+DROP FUNCTION news(INT) CASCADE;
 
 
