@@ -4,12 +4,6 @@ class Link
   include Datoki
 
   # === Link Types
-  BLOCK_ACCESS_SCREEN_NAME         = 1 # meanie  -> target
-  BLOCK_ACCESS_TO_ALL_SCREEN_NAMES = 6 # meanie  -> target
-  ALLOW_ACCESS_SCREEN_NAME         = 2 # friend  -> target
-  POST_TO_SCREEN_NAME              = 3      # content -> target
-  ALLOW_TO_LINK                    = 4      # friend  -> target
-  COMMENT                          = 5      # comment -> post
 
   # === Read Types
   READ_TREE        = 10_000
