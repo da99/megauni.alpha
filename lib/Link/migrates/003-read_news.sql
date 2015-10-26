@@ -14,9 +14,7 @@
 --   following "publication_sn3" as "my_sn_1"    null (nothing posted since last read)
 --   following "publication_sn4" as "my_sn_2"    null (nothing posted since last read)
 --
-CREATE FUNCTION allowed_news(
-  IN AUDIENCE_USER_ID    INT
-)
+CREATE FUNCTION news_of( IN USER_ID  INT)
 RETURNS TABLE (
   mask_id                 INT,
   mask_screen_name        VARCHAR,
@@ -30,26 +28,32 @@ BEGIN
   RETURN QUERY
 
     SELECT
-      follow.mask_id,
-      follow.mask_screen_name,
-      follow.publication_id,
-      follow.publication_screen_name,
-      last_card.created_at
+      FIELDS
 
     FROM
-      follow(AUDIENCE_ID)              AS follow
-      LEFT JOIN last_card(AUDIENCE_ID) AS last_card
-      ON follow.publication_id = last_card.publication_id
+      follow(AUDIENCE_USER_ID)         AS follow
+
+      LEFT JOIN link AS link_card
+      ON link_card.type_id = 20 AND link_card.b_id = follow.b_id
+
+      LEFT JOIN card
+      ON
+        link_card.a_id = card.id
+        AND
+        card.created_at > last_read.at
+
+    WHERE
+      allowed(audience, publication, card_owner)
+      AND
+      card_allowed_to_be_read(audience, publication)
 
     ORDER BY last_card.created_at DESC
-
-  RETURN; -- |||||||||||||||||||||||||||||||||||||||||||||||||||
-
+  ;
 END
 $$ LANGUAGE plpgsql;
 
 -- DOWN
 
-DROP FUNCTION news(INT) CASCADE;
+DROP FUNCTION news_of(INT) CASCADE;
 
 

@@ -1,81 +1,118 @@
 
 
--- Results:
---   mask id | mask sn (aud alias) |  pub id  | pub sn | follow created at
-raw_follow(user_id) AS ( -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-  SELECT
-    mask.id                 AS mask_id,
-    mask.screen_name        AS mask_screen_name,
-    publication.id          AS publication_id,
-    publication.screen_name AS publication_screen_name,
-    follow.created_at       AS created_at
-
+CREATE OR REPLACE FUNCTION user_id_in_allow_list_of(IN USER_ID INT, IN SN_ID INT)
+RETURNS TABLE ( id INT )
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT mask.id AS id
   FROM
-    link        AS follow,
-    screen_name AS mask,
-    screen_name AS publication
+    link INNER JOIN screen_name_ids_of_owner_id(USER_ID) AS mask
+    ON type_id = 12 AND
+    owner_id = SN_ID AND owner_id = b_id AND
+    a_id = mask.id
+  LIMIT 1;
+END
+$$ LANGUAGE plpgsql;
 
+
+CREATE FUNCTION screen_name_ids_readable_for(IN USER_ID INT)
+RETURNS TABLE (id INT)
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT id AS id
+  FROM screen_name
   WHERE
-    -- find the right links -----------------
-    follow.type_id  = 23
-    AND follow.owner_id IN (
-      SELECT id
-      FROM screen_name_read(AUDIENCE_USER_ID)
+    (
+      screen_name.privacy = 2 AND
+      EXISTS (
+        SELECT sn.id
+        FROM user_id_in_allow_list_of(USER_ID, id) AS sn
+      )
     )
-    AND follow.owner_id = follow.a_id
+    OR
+    screen_name.privacy = 3 -- WORLD read_able
+  ;
+END
+$$ LANGUAGE plpgsql;
 
-    -- join the screen_names ----------------
-    AND mask.id        = follow.a_id
-    AND publication.id = follow.b_id
 
-)
-
+CREATE OR REPLACE FUNCTION raw_follows_of(IN USER_ID INT)
+RETURNS TABLE ( publication_id INT )
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    link.b_id AS publication_id
+  FROM
+    link
+  WHERE
+    type_id = 23
+    AND owner_id = a_id
+    AND owner_id IN (
+      SELECT sn.id
+      FROM screen_name_ids_for_owner_id(USER_ID) sn
+    )
+  ;
+END
+$$ LANGUAGE plpgsql;
 
 
 -- Results:
---   mask sn (aud alias) |  pub id  | pub sn | follow created at
-follow(user_id) AS ( -- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-  SELECT *
-  FROM
-    raw_follow(AUDIENCE_ID) AS follow
-  WHERE
-    publication_id NOT IN (blocked by aud)
-    AND mask_id NOT IN (blocked by publication user/owner)
-) -- allowed_follow
-
-
-raw_last_card AS ( -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+--   mask id |  pub id  | follow created at
+CREATE OR REPLACE FUNCTION follows_of(IN USER_ID INT)
+RETURNS TABLE (
+  mask_id        INT,
+  publication_id INT,
+  followed_at    TIMESTAMP WITH TIME ZONE
+) AS $$
+BEGIN
+  RETURN QUERY
   SELECT
-    publication INFO,
-    card.id,
-    MAX(card.created_at) AS created_at
+    follow.owner_id         AS mask_id,
+    follow.b_id             AS publication_id,
+    follow.created_at       AS followed_at
+
   FROM
-    link,
-    card,
-    screen_name AS publication
+    raw_follows_of(USER_ID) AS follow
+    INNER JOIN
+    screen_name_ids_readable_for(USER_ID) AS people
+    ON
+    follow.a_id = people.a_id AND
+    follow.b_id = people.b_id
+  ;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION card_ids_readable_for(IN USER_ID INT)
+RETURNS TABLE ( id INT ) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    card.id
+  FROM
+    card
   WHERE
-    link.type_id = 20
-    AND link.a_id = card.id
-    AND link.b_id = publication.id
-  GROUP BY publication.id
-)
+    -- AUD must be on list to read:
+    ( card.privacy = 2 AND EXISTS (SELECT id FROM user_id_in_allow_list_for_card_of(USER_ID, card.id)) )
+
+    OR -- AUD can see screen_name? Then can see card:
+    ( card.privacy = 3 AND card.owner_id IN (SELECT id FROM screen_name_ids_readable_for(USER_ID)) )
+
+    OR -- bypasses screen_name privacy:
+    card.privacy = 4
+  ;
+END
+$$ LANGUAGE plpgsql;
 
 
-last_card(AUDIENCE_ID) AS ( -- ||||||||||||||||||||||||||||||||||||||||||||||||||||
-  SELECT *
-  FROM last_card
-  WHERE
-    card (owner NOT blocked by pub owner) AND
-    card (owner NOT blocked by aud/owner) AND
-
-    card (owner has not blocked pub/owner) AND
-    card (owner has not blocked aud/owner) AND
-    card.created_at > LAST_READ.at
-)
-
-
-last_read AS ( -- |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+CREATE OR REPLACE FUNCTION last_read(IN USER_ID INT)
+RETURNS TABLE ( owner_id INT, publication_id INT, last_at TIMESTAMP WITH TIME ZONE )
+AS $$
+BEGIN
+  RETURN QUERY
   SELECT
     link_reads_at.a_id       AS owner_id,
     link_reads_at.b_id       AS publication_id,
@@ -90,40 +127,20 @@ last_read AS ( -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
       FROM screen_name_read(AUDIENCE_USER_ID)
     )
     AND link.a_id = link.owner_id
-) -- last_read
+  ;
+END
+$$ LANGUAGE plpgsql;
 
 
-???news AS (
-  -- JOIN cards through "link" table
-  link_cards.type_id  = 20
-  AND link_cards.owner_id = following.publication_id
-  AND link_cards.a_id     = cards.id
-  AND link_cards.b_id     = following.publication_id
-  -- ---------------------------------------------------------------------
+-- DOWN
 
-  --  filter out posts viewer can't read.
-  --    banned by viewer
-  --    banned/protected by card author (viewer, publication)
-  --    banned/protected by publication
-  -- ----------------------------------------------------------------------
 
-  -- ----------------------------------------------------------------------
-  -- SN owner allows AUDIENCE to see it
-  AND ( AUDIENCE_USER_ID (IS ALLOWED) AND (NOT BLOCKED) PINNER, PUB, AUTHOR )
-
-  -- SN owner gave permission, and not blocked, PINNER to card
-  AND ( PINNER IS ALLOWED NOT BLOCKED TO CARD )
-  AND ( AUTHOR IS ALLOWED NOT BLOCKED BY PINNER, PUB )
-
-  -- POST allowed to be seen by: SN owner, PINNER owner, AUDIENCE
-  AND ( CARD     PRIVACY SETTINGS for PINNER, PUB, AUDIENCE_USER_ID )
-  -- ----------------------------------------------------------------------
-
-  --  ONLY include latest card published after viewer read the publication.
-  AND link_cards.a_id = last_readings.publication_id
-  AND cards.created_at >= readings.last_at
-  --  ---------------------------------------------------------------------
-)
+DROP FUNCTION user_id_in_allow_list_of(INT, INT)  CASCADE;
+DROP FUNCTION screen_name_ids_readable_for(INT)   CASCADE;
+DROP FUNCTION raw_follows_of(INT)                 CASCADE;
+DROP FUNCTION follows_of(INT)                     CASCADE;
+DROP FUNCTION card_ids_readable_for(INT)          CASCADE;
+DROP FUNCTION last_read(INT)                      CASCADE;
 
 
 

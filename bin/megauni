@@ -99,15 +99,11 @@ BG_RED='\e[1;31m'
 # ===============================================
 
 mods=(
-  Card
-  Link
-  Session
-)
-
-mods=(
   Screen_Name
   User
   Log_In
+  Card
+  Link
 )
 
 # === Create a reverse of the list.

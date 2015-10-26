@@ -1,8 +1,8 @@
 
 -- LINK_TYPE_ID = 1
-  --  BLOCK_ACCESS_SCREEN_NAME         = 10 # meanie  -> target
-  --  BLOCK_ACCESS_TO_ALL_SCREEN_NAMES = 11 # meanie  -> target
-  --  ALLOW_ACCESS_SCREEN_NAME         = 12 # friend  -> target
+  --  BLOCK_ACCESS_SCREEN_NAME         = 10 # meanie  -> me
+  --  BLOCK_ACCESS_TO_ALL_SCREEN_NAMES = 11 # meanie  -> me
+  --  ALLOW_ACCESS_SCREEN_NAME         = 12 # friend  -> me
 
   --  POST_TO_SCREEN_NAME              = 20     # content -> target
   --  ALLOW_TO_LINK                    = 21     # friend  -> target
@@ -32,7 +32,7 @@ CREATE TABLE link (
   updated_at        timestamp with time zone,
 
   CONSTRAINT  "link_unique_idx"
-    UNIQUE (owner_id, type_id, asker_id, giver_id)
+    UNIQUE (owner_id, type_id, a_id, b_id)
 
 ); -- CREATE TABLE link
 

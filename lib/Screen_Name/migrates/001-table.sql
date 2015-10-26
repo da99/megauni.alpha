@@ -9,6 +9,9 @@ CREATE TABLE screen_name (
   owner_id       integer  NOT NULL,
 
   -- privacy:
+  -- 1: me_only
+  -- 2: list
+  -- 3: world readable
   privacy        smallint NOT NULL DEFAULT 1,
 
   -- Refers to "screen_name" id. 0 == top level:
