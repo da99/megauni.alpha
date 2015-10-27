@@ -1,13 +1,39 @@
 
-
-CREATE OR REPLACE FUNCTION user_id_in_allow_list_of(IN USER_ID INT, IN SN_ID INT)
-RETURNS TABLE ( id INT )
+-- DOWN
+DROP FUNCTION              can_read(INT, INT)    CASCADE;
+-- UP
+CREATE OR REPLACE FUNCTION can_read(IN A_ID INT, IN B_ID INT)
+RETURNS TABLE ( publication_id INT )
 AS $$
 BEGIN
   RETURN QUERY
-  SELECT mask.id AS id
+  SELECT SN.id AS publication_id
   FROM
-    link INNER JOIN screen_name_ids_of_owner_id(USER_ID) AS mask
+  screen_name SN
+  WHERE
+  SN.id = B_ID
+  AND (
+    SN.privacy = 3 -- is world_read
+    OR -- in list
+    ( SN.privacy = 2 AND EXISTS (SELECT is_one FROM in_sn_list_of(A_ID, B_ID)) )
+  )
+  ;
+END
+$$ LANGUAGE plpgsql;
+
+
+
+-- DOWN
+DROP FUNCTION              in_sn_list_of(INT, INT)  CASCADE;
+-- UP
+CREATE OR REPLACE FUNCTION in_sn_list_of(IN SN_ID INT, IN SN_ID INT)
+RETURNS TABLE ( is_one INT )
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 1 AS is_one
+  FROM
+    link INNER JOIN sn_ids_of(USER_ID) AS mask
     ON type_id = 12 AND
     owner_id = SN_ID AND owner_id = b_id AND
     a_id = mask.id
@@ -16,52 +42,34 @@ END
 $$ LANGUAGE plpgsql;
 
 
-CREATE FUNCTION screen_name_ids_readable_for(IN USER_ID INT)
-RETURNS TABLE (id INT)
-AS $$
-BEGIN
-  RETURN QUERY
-  SELECT id AS id
-  FROM screen_name
-  WHERE
-    (
-      screen_name.privacy = 2 AND
-      EXISTS (
-        SELECT sn.id
-        FROM user_id_in_allow_list_of(USER_ID, id) AS sn
-      )
-    )
-    OR
-    screen_name.privacy = 3 -- WORLD read_able
-  ;
-END
-$$ LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION raw_follows_of(IN USER_ID INT)
+-- DOWN
+DROP FUNCTION   raw_follows_of(INT)                 CASCADE;
+--UP
+CREATE FUNCTION raw_follows_of(IN USER_ID INT)
 RETURNS TABLE ( publication_id INT )
 AS $$
 BEGIN
   RETURN QUERY
   SELECT
+    link.a_id AS mask_id,
     link.b_id AS publication_id
   FROM
     link
   WHERE
     type_id = 23
     AND owner_id = a_id
-    AND owner_id IN (
-      SELECT sn.id
-      FROM screen_name_ids_for_owner_id(USER_ID) sn
-    )
+    AND owner_id IN (SELECT sn.id FROM sn_ids_of(USER_ID) sn)
   ;
 END
 $$ LANGUAGE plpgsql;
 
 
+-- DOWN
+DROP FUNCTION   follows_of(INT)                     CASCADE;
+-- UP
 -- Results:
 --   mask id |  pub id  | follow created at
-CREATE OR REPLACE FUNCTION follows_of(IN USER_ID INT)
+CREATE FUNCTION follows_of(IN USER_ID INT)
 RETURNS TABLE (
   mask_id        INT,
   publication_id INT,
@@ -70,23 +78,25 @@ RETURNS TABLE (
 BEGIN
   RETURN QUERY
   SELECT
-    follow.owner_id         AS mask_id,
-    follow.b_id             AS publication_id,
+    follow.mask_id          AS mask_id,
+    follow.publication_id   AS publication_id,
     follow.created_at       AS followed_at
 
   FROM
-    raw_follows_of(USER_ID) AS follow
-    INNER JOIN
-    screen_name_ids_readable_for(USER_ID) AS people
-    ON
-    follow.a_id = people.a_id AND
-    follow.b_id = people.b_id
+    raw_follows_of(USER_ID) follow
+
+  WHERE
+    EXISTS (SELECT * FROM can_read(USER_ID, follow.publicaton_id))
   ;
 END
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION card_ids_readable_for(IN USER_ID INT)
+-- DOWN
+DROP FUNCTION   card_ids_readable_for(INT)          CASCADE;
+
+-- UP
+CREATE FUNCTION card_ids_readable_for(IN SN_ID INT)
 RETURNS TABLE ( id INT ) AS $$
 BEGIN
   RETURN QUERY
@@ -108,7 +118,11 @@ END
 $$ LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION last_read(IN USER_ID INT)
+-- DOWN
+DROP FUNCTION   last_read(INT)                      CASCADE;
+
+-- UP
+CREATE FUNCTION last_read(IN USER_ID INT)
 RETURNS TABLE ( owner_id INT, publication_id INT, last_at TIMESTAMP WITH TIME ZONE )
 AS $$
 BEGIN
@@ -132,15 +146,6 @@ END
 $$ LANGUAGE plpgsql;
 
 
--- DOWN
-
-
-DROP FUNCTION user_id_in_allow_list_of(INT, INT)  CASCADE;
-DROP FUNCTION screen_name_ids_readable_for(INT)   CASCADE;
-DROP FUNCTION raw_follows_of(INT)                 CASCADE;
-DROP FUNCTION follows_of(INT)                     CASCADE;
-DROP FUNCTION card_ids_readable_for(INT)          CASCADE;
-DROP FUNCTION last_read(INT)                      CASCADE;
 
 
 

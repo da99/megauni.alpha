@@ -8,11 +8,11 @@
 -- Implementation:
 --
 -- Results:
---   following "publication_sn1" as "my_sn_1"    date of last post
---   following "publication_sn2" as "my_sn_1"    date of last post
---   following "publication_sn2" as "my_sn_2"    date of last post
---   following "publication_sn3" as "my_sn_1"    null (nothing posted since last read)
---   following "publication_sn4" as "my_sn_2"    null (nothing posted since last read)
+--   "my_sn_1" "publication_sn1"                 date of last post
+--   "my_sn_2" "publication_sn2"                 date of last post
+--   "my_sn_3" "publication_sn2"                 date of last post
+--   "my_sn_3" "publication_sn3"                 null (nothing posted since last read)
+--   "my_sn_4" "publication_sn4"                 null (nothing posted since last read)
 --
 CREATE FUNCTION news_of( IN USER_ID  INT)
 RETURNS TABLE (
@@ -28,26 +28,22 @@ BEGIN
   RETURN QUERY
 
     SELECT
-      FIELDS
+      follow.mask_id        AS mask_id,
+      follow.publication_id AS publication_id
+      MAX(card.created_at)  AS card_created_at
 
     FROM
-      follow(AUDIENCE_USER_ID)         AS follow
+      follows_of(USER_ID)  AS follow
+      LEFT JOIN
+      ( -- We make sure cards are viewable by both publication_id and AUD/USER id
+        posted_cards() AS posted_cards
+        INNER JOIN
+        card_ids_readable_for(USER_ID) AS aud_cards
+        ON posted_cards.id = aud_cards.id
+      ) AS cards
+      ON follow.publication_id = cards.publication_id
 
-      LEFT JOIN link AS link_card
-      ON link_card.type_id = 20 AND link_card.b_id = follow.b_id
-
-      LEFT JOIN card
-      ON
-        link_card.a_id = card.id
-        AND
-        card.created_at > last_read.at
-
-    WHERE
-      allowed(audience, publication, card_owner)
-      AND
-      card_allowed_to_be_read(audience, publication)
-
-    ORDER BY last_card.created_at DESC
+    GROUP BY follow.mask_id, follow.publication_id
   ;
 END
 $$ LANGUAGE plpgsql;
