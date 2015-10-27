@@ -9,7 +9,7 @@ AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    id
+    SN.id
   FROM
     screen_name SN
   WHERE

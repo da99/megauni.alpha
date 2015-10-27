@@ -13,8 +13,11 @@ BEGIN
   WHERE
   SN.id = B_ID
   AND (
-    SN.privacy = 3 -- is world_read
-    OR -- in list
+    -- Can read self:
+    A_ID = B_ID
+    OR -- Is world readable:
+    SN.privacy = 3
+    OR -- In list:
     ( SN.privacy = 2 AND EXISTS (SELECT is_one FROM in_sn_list_of(A_ID, B_ID)) )
   )
   ;
@@ -26,17 +29,18 @@ $$ LANGUAGE plpgsql;
 -- DOWN
 DROP FUNCTION              in_sn_list_of(INT, INT)  CASCADE;
 -- UP
-CREATE OR REPLACE FUNCTION in_sn_list_of(IN SN_ID INT, IN SN_ID INT)
-RETURNS TABLE ( is_one INT )
+CREATE OR REPLACE FUNCTION in_sn_list_of(IN AUD_ID INT, IN SN_ID INT)
+RETURNS TABLE ( mask_id INT )
 AS $$
 BEGIN
   RETURN QUERY
-  SELECT 1 AS is_one
+  SELECT a_id AS mask_id
   FROM
-    link INNER JOIN sn_ids_of(USER_ID) AS mask
-    ON type_id = 12 AND
-    owner_id = SN_ID AND owner_id = b_id AND
-    a_id = mask.id
+    link
+  WHERE
+    type_id = 12 AND
+    owner_id = b_id AND
+    a_id IN (SELECT id FROM sn_ids_of(AUD_ID))
   LIMIT 1;
 END
 $$ LANGUAGE plpgsql;

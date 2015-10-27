@@ -29,7 +29,7 @@ BEGIN
 
     SELECT
       follow.mask_id        AS mask_id,
-      follow.publication_id AS publication_id
+      follow.publication_id AS publication_id,
       MAX(card.created_at)  AS card_created_at
 
     FROM
