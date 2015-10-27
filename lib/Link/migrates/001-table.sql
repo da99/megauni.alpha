@@ -8,6 +8,7 @@
   --  ALLOW_TO_LINK                    = 21     # friend  -> target
   --  LAST READ AT                     = 22
   --  follow                           = 23     # sn, sn -> target
+  --  ALLOW TO READ CARD               = 24     # sn, sn -> target
 
   --  COMMENT                          = 30     # comment -> post
 

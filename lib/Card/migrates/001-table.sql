@@ -9,8 +9,8 @@ CREATE TABLE card (
 
   -- privacy:
   -- 1: me_only
-  -- 2: list
-  -- 3: world readable within screen_name
+  -- 2: same as SN
+  -- 3: list of card, ignoring SN list
   -- 4: world readable bypassing screen_name
   privacy           smallint              NOT NULL DEFAULT 1,
 

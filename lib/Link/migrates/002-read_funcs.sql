@@ -3,11 +3,11 @@
 DROP FUNCTION              can_read(INT, INT)    CASCADE;
 -- UP
 CREATE OR REPLACE FUNCTION can_read(IN A_ID INT, IN B_ID INT)
-RETURNS TABLE ( publication_id INT )
+RETURNS TABLE ( answer BOOLEAN )
 AS $$
 BEGIN
   RETURN QUERY
-  SELECT SN.id AS publication_id
+  SELECT true AS answer
   FROM
   screen_name SN
   WHERE
@@ -20,6 +20,7 @@ BEGIN
     OR -- In list:
     ( SN.privacy = 2 AND EXISTS (SELECT is_one FROM in_sn_list_of(A_ID, B_ID)) )
   )
+  LIMIT 1
   ;
 END
 $$ LANGUAGE plpgsql;
@@ -71,8 +72,6 @@ $$ LANGUAGE plpgsql;
 -- DOWN
 DROP FUNCTION   follows_of(INT)                     CASCADE;
 -- UP
--- Results:
---   mask id |  pub id  | follow created at
 CREATE FUNCTION follows_of(IN USER_ID INT)
 RETURNS TABLE (
   mask_id        INT,
@@ -97,26 +96,54 @@ $$ LANGUAGE plpgsql;
 
 
 -- DOWN
-DROP FUNCTION   card_ids_readable_for(INT)          CASCADE;
-
+DROP FUNCTION   in_card_read_list_of(INT, INT)   CASCADE;
 -- UP
-CREATE FUNCTION card_ids_readable_for(IN SN_ID INT)
-RETURNS TABLE ( id INT ) AS $$
+CREATE FUNCTION in_card_read_list_of(IN SN_ID, IN CARD_ID INT)
+RETURNS TABLE ( answer BOOLEAN ) AS $$
+DECLARE
+  LINK_ALLOW_TO_READ_CARD = 24
 BEGIN
   RETURN QUERY
   SELECT
-    card.id
+    TRUE AS answer
+  FROM
+    link
+  WHERE
+    type_id = LINK_ALLOW_TO_READ_CARD
+    AND -- Make sure owner of card granted permission:
+    owner_id IN (SELECT owner_id FROM card WHERE card.id = CARD_ID)
+    AND
+    a_id IN (SELECT id FROM sn_ids_of(SN_ID))
+    AND
+    b_id = CARD_ID
+  LIMIT 1
+  ;
+END
+$$ LANGUAGE plpgsql;
+
+-- DOWN
+DROP FUNCTION   can_read_card(INT, INT)          CASCADE;
+-- UP
+CREATE FUNCTION can_read_card(IN SN_ID INT, IN CARD_ID INT)
+RETURNS TABLE ( answer BOOLEAN ) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    true AS answer
   FROM
     card
   WHERE
-    -- AUD must be on list to read:
-    ( card.privacy = 2 AND EXISTS (SELECT id FROM user_id_in_allow_list_for_card_of(USER_ID, card.id)) )
-
-    OR -- AUD can see screen_name? Then can see card:
-    ( card.privacy = 3 AND card.owner_id IN (SELECT id FROM screen_name_ids_readable_for(USER_ID)) )
-
-    OR -- bypasses screen_name privacy:
+    -- WORLD READable, bypassing SN permission
     card.privacy = 4
+
+    OR
+    -- SAME AS SN:
+    ( card.privacy = 3 AND EXISTS (SELECT * FROM can_read(SN_ID, card.owner_id)) )
+
+    OR
+    -- AUD must be on list allowed card readers to read:
+    ( card.privacy = 2 AND EXISTS (SELECT * FROM in_card_read_list_of(USER_ID, card.id)) )
+  LIMIT 1
   ;
 END
 $$ LANGUAGE plpgsql;
