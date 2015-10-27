@@ -1,9 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    duck_duck_duck (3.0.0)
-    pg (0.18.2)
-    sequel (4.25.0)
+    duck_duck_duck (3.1.0)
+    pg (0.18.3)
+    sequel (4.27.0)
 
 PLATFORMS
   ruby
