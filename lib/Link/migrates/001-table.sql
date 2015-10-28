@@ -6,7 +6,7 @@
 
   --  link CARD to SN                  = 20     # sn_id, card.id -> sn.id
   --  ALLOW_TO_LINK                    = 21     # friend  -> target
-  --  LAST READ AT                     = 22
+  --  LAST READ AT                     = 22     # owner_id -> owner_id => sn.id
   --  follow                           = 23     # sn, sn -> target
   --  ALLOW TO READ CARD               = 24     # sn, sn -> card.id
 

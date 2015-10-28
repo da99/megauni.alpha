@@ -84,13 +84,18 @@ $$ LANGUAGE plpgsql;
 DROP FUNCTION   raw_follows_of(INT)                 CASCADE;
 --UP
 CREATE FUNCTION raw_follows_of(IN USER_ID INT)
-RETURNS TABLE ( publication_id INT )
+RETURNS TABLE (
+  mask_id        INT,
+  publication_id INT,
+  created_at     TIMESTAMP WITH TIME ZONE
+)
 AS $$
 BEGIN
   RETURN QUERY
   SELECT
     link.a_id AS mask_id,
-    link.b_id AS publication_id
+    link.b_id AS publication_id,
+    link.created_at
   FROM
     link
   WHERE
@@ -122,7 +127,7 @@ BEGIN
     raw_follows_of(USER_ID) follow
 
   WHERE
-    EXISTS (SELECT * FROM can_read(USER_ID, follow.publicaton_id))
+    EXISTS (SELECT * FROM can_read(USER_ID, follow.publication_id))
   ;
 END
 $$ LANGUAGE plpgsql;
@@ -183,26 +188,29 @@ $$ LANGUAGE plpgsql;
 
 
 -- DOWN
-DROP FUNCTION   last_read(INT)                      CASCADE;
+DROP FUNCTION   last_read_of(INT)                      CASCADE;
 
 -- UP
-CREATE FUNCTION last_read(IN USER_ID INT)
-RETURNS TABLE ( owner_id INT, publication_id INT, last_at TIMESTAMP WITH TIME ZONE )
+CREATE FUNCTION last_read_of(IN SN_ID INT)
+RETURNS TABLE (
+  publication_id INT,
+  at             TIMESTAMP WITH TIME ZONE
+)
 AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    link_reads_at.a_id       AS owner_id,
-    link_reads_at.b_id       AS publication_id,
-    link_reads_at.created_at AS last_at
+    link.b_id       AS publication_id,
+    link.created_at AS at
   FROM
-    link         AS link_reads_at
+    link
   WHERE
-    link_cards.type_id  = 22
+    link.type_id  = 22
     AND
     link.owner_id IN (
       SELECT owner_id
-      FROM screen_name_read(AUDIENCE_USER_ID)
+      FROM screen_name_read(SN_ID)
+      LIMIT 1
     )
     AND link.a_id = link.owner_id
   ;

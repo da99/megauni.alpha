@@ -44,15 +44,13 @@ BEGIN
       linked_cards_for(USER_ID)  card
       ON
       follow.publication_id = card.publication_id
-      AND (last_read.at IS NULL || card.linked_at > last_read.at)
-      AND EXISTS (SELECT * FROM can_read_card(follow.publication_id, card.id))
 
       LEFT OUTER JOIN
       last_read_of(USER_ID)      last_read
       ON
       follow.publication_id = last_read.publication_id
 
-    GROUP BY follow.mask_id, follow.publication_id
+    GROUP BY follow.mask_id, follow.publication_id, last_read.at
     ORDER BY updated_at DESC NULLS LAST
   ;
 END
