@@ -25,8 +25,8 @@ BEGIN
     --   link cards to their screen_name.
     link.owner_id = link.b_id AND
     link.a_id     = card.id AND
-    EXISTS ( SELECT * FROM can_read(SN_ID, card.owner_id) ) AND
-    EXISTS ( SELECT * FROM can_read(link.a_id, card.owner_id) )
+    EXISTS ( SELECT * FROM can_read_card(SN_ID, card.id) ) AND
+    EXISTS ( SELECT * FROM can_read_card(link.b_id, card.id) )
   ;
 END
 $$ LANGUAGE plpgsql;
@@ -180,7 +180,7 @@ BEGIN
 
     OR
     -- AUD must be on list allowed card readers to read:
-    ( card.privacy = 2 AND EXISTS (SELECT * FROM in_card_read_list_of(USER_ID, card.id)) )
+    ( card.privacy = 2 AND EXISTS (SELECT * FROM in_card_read_list_of(SN_ID, card.id)) )
   LIMIT 1
   ;
 END
