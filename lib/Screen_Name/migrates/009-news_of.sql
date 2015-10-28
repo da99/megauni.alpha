@@ -1,4 +1,6 @@
 
+
+
 --
 -- This function is meant to be used as:
 --    SELECT * FROM link_read(link_type_id, aud_user_id)
@@ -55,4 +57,7 @@ BEGIN
   ;
 END
 $$ LANGUAGE plpgsql;
+
+
+
 
