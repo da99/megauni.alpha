@@ -11,6 +11,7 @@ RETURNS TABLE (
 )
 AS $$
 BEGIN
+  RETURN QUERY
   SELECT
   card.id         AS card_id,
   link.b_id       AS publication_id,
@@ -26,7 +27,7 @@ BEGIN
     link.a_id     = card.id AND
     EXISTS ( SELECT * FROM can_read(SN_ID, card.owner_id) ) AND
     EXISTS ( SELECT * FROM can_read(link.a_id, card.owner_id) )
-
+  ;
 END
 $$ LANGUAGE plpgsql;
 
