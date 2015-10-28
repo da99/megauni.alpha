@@ -12,12 +12,12 @@ CREATE TABLE card (
   -- 2: same as SN
   -- 3: list of card, ignoring SN list
   -- 4: world readable bypassing screen_name
-  privacy           smallint              NOT NULL DEFAULT 1,
+  privacy        SMALLINT                 NOT NULL DEFAULT 1,
 
-  code              jsonb                 NOT NULL,
+  code           JSONB                    NOT NULL,
 
-  created_at     timestamp with time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
-  updated_at     timestamp with time zone
+  created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('UTC'::text, now()),
+  updated_at     TIMESTAMP WITH TIME ZONE
 
 );
 
