@@ -51,7 +51,7 @@ BEGIN
     OR -- Is world readable:
     SN.privacy = 3
     OR -- In list:
-    ( SN.privacy = 2 AND EXISTS (SELECT is_one FROM in_sn_list_of(A_ID, B_ID)) )
+    ( SN.privacy = 2 AND EXISTS (SELECT * FROM in_sn_list_of(A_ID, B_ID)) )
   )
   LIMIT 1
   ;
