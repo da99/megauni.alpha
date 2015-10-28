@@ -4,7 +4,7 @@
   --  BLOCK_ACCESS_TO_ALL_SCREEN_NAMES = 11 # meanie  -> me
   --  ALLOW_ACCESS_SCREEN_NAME         = 12 # friend  -> me
 
-  --  POST_TO_SCREEN_NAME              = 20     # content -> target
+  --  link CARD to SN                  = 20     # sn_id, card.id -> sn.id
   --  ALLOW_TO_LINK                    = 21     # friend  -> target
   --  LAST READ AT                     = 22
   --  follow                           = 23     # sn, sn -> target

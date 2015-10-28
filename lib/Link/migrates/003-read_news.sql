@@ -22,10 +22,9 @@ DROP FUNCTION news_of(INT) CASCADE;
 CREATE FUNCTION news_of( IN USER_ID  INT)
 RETURNS TABLE (
   mask_id                 INT,
-  mask_screen_name        VARCHAR,
   publication_id          INT,
-  publication_screen_name VARCHAR,
-  created_at              TIMESTAMP WITH TIME ZONE
+  updated_at              TIMESTAMP WITH TIME ZONE,
+  last_read_at            TIMESTAMP WITH TIME ZONE
 )
 AS $$
 BEGIN
@@ -35,19 +34,27 @@ BEGIN
     SELECT
       follow.mask_id                AS mask_id,
       follow.publication_id         AS publication_id,
-      MAX(linked_cards.linked_at)   AS linked_at
+      MAX(card.linked_at)           AS updated_at,
+      last_read.at                  AS last_read_at
 
     FROM
       follows_of(USER_ID)        follow
-      LEFT JOIN
-      linked_cards_for(USER_ID)  linked_cards
+
+      LEFT OUTER JOIN
+      linked_cards_for(USER_ID)  card
       ON
-      follow.publication_id = linked_cards.publication_id
-      AND EXISTS can_read_card(follow.publication_id)
+      follow.publication_id = card.publication_id
+      AND (last_read.at IS NULL || card.linked_at > last_read.at)
+      AND EXISTS (SELECT * FROM can_read_card(follow.publication_id, card.id))
+
+      LEFT OUTER JOIN
+      last_read_of(USER_ID)      last_read
+      ON
+      follow.publication_id = last_read.publication_id
 
     GROUP BY follow.mask_id, follow.publication_id
+    ORDER BY updated_at DESC NULLS LAST
   ;
 END
 $$ LANGUAGE plpgsql;
-
 
