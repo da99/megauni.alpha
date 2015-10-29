@@ -64,12 +64,27 @@ env = %{
   end,
 
   "create card" => fn(stack, prog, env) ->
-    {arg, prog, env} = JSON_Spec.take(prog, 1, env)
-    raise "create card: not done"
+    {data, prog, env} = JSON_Spec.take(prog, 1, env)
+    result = Card.create data
+    case result do
+      %{"card"=> _card} ->
+        env = JSON_Spec.put(env, "card", result)
+      _ ->
+        result
+    end
+    {stack ++ [result], prog, env}
   end,
 
-  "follow" => fn(stack, prog, env) ->
-    raise "follow not done yet"
+  "create link" => fn(stack, prog, env) ->
+    {data, prog, env} = JSON_Spec.take(prog, 1, env)
+    result = Link.create data
+    case result do
+      %{"link"=> _link} ->
+        env = JSON_Spec.put(env, "link", result)
+      _ ->
+        result
+    end
+    {stack ++ [result], prog, env}
   end,
 
   "Screen_Name.create" => fn(stack, prog, env) ->
@@ -77,14 +92,11 @@ env = %{
     result            = Screen_Name.create data
 
     case result do
-      %{"user_error" => _msg} ->
-        result
-
-      %{"error" => _msg} ->
-        result
-
       %{"screen_name"=>_sn} ->
         env = JSON_Spec.put(env, "sn", result)
+
+      _ ->
+        result
     end
 
     {stack ++ [result], prog, env}
