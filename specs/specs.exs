@@ -8,7 +8,17 @@ else
 end
 
 files = Enum.map models, fn(mod) ->
-  Path.wildcard("lib/#{mod}/specs/*.json")
+   cond do
+     mod =~ ~r/[\*|\/]/ ->
+       Path.wildcard("lib/#{mod}.json")
+     true ->
+       Path.wildcard("lib/*/specs/*.json")
+   end
+end
+
+
+if Enum.empty?(files) do
+  Process.exit self, "!!! No specs found: #{inspect System.argv}. Exiting..."
 end
 
 defmodule Spec_Funcs do
