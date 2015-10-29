@@ -38,6 +38,8 @@ defmodule JSON_Spec do
   }
 
   # Compiles elements from a list of args (prog)
+  # Returns:
+  #   { compiled_value, list, env }
   def take list, num, env do
     if Enum.count(list) < num do
       raise "Out of bounds: #{inspect num} #{inspect list}"
@@ -52,9 +54,9 @@ defmodule JSON_Spec do
 
     list = Enum.take list, (num - Enum.count(list))
     if num == 1 do
-      [List.first(args), list, env]
+      {List.first(args), list, env}
     else
-      [args, list, env]
+      {args, list, env}
     end
   end # === def args
 
@@ -354,7 +356,7 @@ defmodule JSON_Spec do
       if !is_function(env[token]) do
         raise "Function not found: #{inspect token}"
       end
-      [stack, prog, env] = env[token].(stack, prog, env)
+      {stack, prog, env} = env[token].(stack, prog, env)
 
       # === If last value is an error and there is still more
       #     to process in the prog, raise the error:

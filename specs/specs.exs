@@ -46,7 +46,7 @@ defmodule Spec_Funcs do
     attempts = Enum.map 1..num, fn(_x) ->
       Log_In.attempt data
     end
-    [stack ++ attempts, prog, env]
+    {stack ++ attempts, prog, env}
   end
 
 end # === defmodule Megauni.Specs
@@ -63,12 +63,17 @@ env = %{
     { String.duplicate("one word ", 150), env}
   end,
 
+  "create card" => fn(stack, prog, env) ->
+    {arg, prog, env} = JSON_Spec.take(prog, 1, env)
+    raise "create card: not done"
+  end,
+
   "follow" => fn(stack, prog, env) ->
     raise "follow not done yet"
   end,
 
   "Screen_Name.create" => fn(stack, prog, env) ->
-    [data, prog, env] = JSON_Spec.take(prog, 1, env)
+    {data, prog, env} = JSON_Spec.take(prog, 1, env)
     result            = Screen_Name.create data
 
     case result do
@@ -82,28 +87,28 @@ env = %{
         env = JSON_Spec.put(env, "sn", result)
     end
 
-    [stack ++ [result], prog, env]
+    {stack ++ [result], prog, env}
   end, # === Screen_Name.create
 
   "Screen_Name.read" => fn(stack, prog, env) ->
-    [data, prog, env] = JSON_Spec.take(prog, 1, env)
+    {data, prog, env} = JSON_Spec.take(prog, 1, env)
     rows          = Screen_Name.read data
 
     case rows do
       %{"error" => _msg} ->
-        [stack ++ [rows], prog, env]
+        {stack ++ [rows], prog, env}
 
       %{"screen_name"=>_sn} ->
         {fin, env} = Enum.reduce rows, {nil, env}, fn(r, {_fin, env}) ->
           env = JSON_Spec.put(env, "sn", r)
           {r, env}
         end
-        [stack ++ [fin], prog, env]
+        {stack ++ [fin], prog, env}
     end
   end, # === Screen_Name.read
 
   "Screen_Name.read_one" => fn(stack, prog, env) ->
-    [data, prog, env] = JSON_Spec.take(prog, 1, env)
+    {data, prog, env} = JSON_Spec.take(prog, 1, env)
     result            = Screen_Name.read_one data
 
     case result do
@@ -114,11 +119,11 @@ env = %{
         env = JSON_Spec.put(env, "sn", result)
     end
 
-    [stack ++ [result], prog, env]
+    {stack ++ [result], prog, env}
   end, # === Screen_Name.read_one
 
   "User.create" => fn(stack, prog, env) ->
-    [data, prog, env] = JSON_Spec.take(prog, 1, env)
+    {data, prog, env} = JSON_Spec.take(prog, 1, env)
     if Map.has_key?(data, "error") do
       raise "#{inspect data}"
     end
@@ -131,18 +136,18 @@ env = %{
         env = JSON_Spec.put(env, "user", result)
     end
 
-    [stack ++ [result], prog, env]
+    {stack ++ [result], prog, env}
   end,
 
   "Log_In.attempt" => fn(stack, prog, env) ->
-    [arg, prog, env] = JSON_Spec.take(prog, 1, env)
+    {arg, prog, env} = JSON_Spec.take(prog, 1, env)
     stack = stack ++ [Log_In.attempt(arg)]
-    [stack, prog, env]
+    {stack, prog, env}
   end,
 
   "Log_In.reset_all" => fn(stack, prog, env) ->
     Log_In.reset_all
-    [stack, prog, env]
+    {stack, prog, env}
   end,
 
   "bad_log_in" => fn(stack, prog, env) ->
@@ -164,7 +169,7 @@ env = %{
   "log_in_attempts aged" => fn(stack, prog, env) ->
     [[arg] | prog] = prog
     {:ok, _} = Log_In.aged arg
-    [stack, prog, env]
+    {stack, prog, env}
   end,
 
   "create user" => fn(stack, prog, env) ->
@@ -190,7 +195,7 @@ env = %{
       _ ->
         raise "Unknown error: #{inspect user}"
     end
-    [(stack ++ [user]), prog, env]
+    {(stack ++ [user]), prog, env}
   end,
 
   "create screen_name" => fn(stack, prog, env) ->
@@ -219,7 +224,7 @@ env = %{
       _ ->
         raise "Unknown error: #{inspect sn}"
     end
-    [(stack ++ [sn]), prog, env]
+    {(stack ++ [sn]), prog, env}
   end,
 
   "all log_in_attempts old" => fn(_data, _env) ->
