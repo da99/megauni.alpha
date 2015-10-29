@@ -345,6 +345,9 @@ defmodule JSON_Spec do
   end
 
   @doc """
+    Mostly used by core funcs such as :input, :output,
+    and the main JSON specs.
+
     Returns: { stack, env }
   """
   def run_list stack, prog, env do
@@ -369,7 +372,13 @@ defmodule JSON_Spec do
   end # === def run_list
 
   @doc """
-    Examples:
+    Used when you want to "compile" args to be used
+    in a custom function:
+       JSON: "input": [ "create something", { "some_id": "sn.id" } ]
+    In this case, the arg for "create something" will be compiled.
+    NOTE: The value of "input" would be run through :run_list.
+
+    Usage in Elixir:
     iex> .compile("user.id", env)
     iex> .compile("screen_name", env)
     iex> .compile(%{"screen_name": "screen_name"}, env)
