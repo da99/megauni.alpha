@@ -37,9 +37,11 @@ defmodule JSON_Spec do
     "output"     => :output
   }
 
-  # Compiles elements from a list of args (prog)
-  # Returns:
-  #   { compiled_value, list, env }
+  @doc """
+    Compiles elements from a list of args (prog)
+    Returns:
+      { compiled_value, list, env }
+  """
   def take list, num, env do
     if Enum.count(list) < num do
       raise "Out of bounds: #{inspect num} #{inspect list}"
