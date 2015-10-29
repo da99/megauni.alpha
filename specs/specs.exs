@@ -7,12 +7,12 @@ else
   System.argv
 end
 
-files = Enum.map models, fn(mod) ->
+files = Enum.reduce models, [], fn(mod, acc) ->
    cond do
      mod =~ ~r/[\*|\/]/ ->
-       Path.wildcard("lib/#{mod}.json")
+       acc ++ Path.wildcard("lib/#{mod}.json")
      true ->
-       Path.wildcard("lib/*/specs/*.json")
+       acc ++ Path.wildcard("lib/#{mod}/specs/*.json")
    end
 end
 
