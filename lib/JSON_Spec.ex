@@ -351,22 +351,10 @@ defmodule JSON_Spec do
     else
       [token | prog] = prog
 
-      [stack, prog, env] = cond do
-        # [ "func", [...], ...]
-        is_list(List.first(prog)) ->
-          [raw_args | prog]    = prog
-          {compiled_args, env} = run_list(raw_args, env)
-          env[token].(stack, [compiled_args | prog], env)
-
-        # [ "func", "func", "func", ...]
-        is_function(env[token]) ->
-          env[token].(stack, prog, env)
-
-        # [ "string", 5, 100, ...]
-        true ->
-          {token, env} = compile(token, env)
-          [(stack ++ [token]), prog, env]
-      end # === cond
+      if !is_function(env[token]) do
+        raise "Function not found: #{inspect token}"
+      end
+      [stack, prog, env] = env[token].(stack, prog, env)
 
       # === If last value is an error and there is still more
       #     to process in the prog, raise the error:
@@ -441,6 +429,12 @@ defmodule JSON_Spec do
               {x, env}
             end
         end # === cond
+
+      is_list(x) ->
+        Enum.reduce x, {[], env}, fn(var, {arr, env}) ->
+          {result, env} = compile(var, env)
+          { arr ++ [result], env}
+        end
 
       true ->
         raise "Don't know what to do with: #{inspect x}"

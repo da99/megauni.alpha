@@ -63,6 +63,10 @@ env = %{
     { String.duplicate("one word ", 150), env}
   end,
 
+  "follow" => fn(stack, prog, env) ->
+    raise "follow not done yet"
+  end,
+
   "Screen_Name.create" => fn(stack, prog, env) ->
     [data, prog, env] = JSON_Spec.take(prog, 1, env)
     result            = Screen_Name.create data
