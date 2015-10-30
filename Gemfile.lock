@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    duck_duck_duck (4.1.0)
+    duck_duck_duck (4.2.0)
     pg (0.18.3)
     sequel (4.27.0)
 
