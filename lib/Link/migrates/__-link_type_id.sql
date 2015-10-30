@@ -1,44 +1,4 @@
 
--- DOWN
-DROP FUNCTION IF EXISTS type_names () CASCADE;
--- UP
-CREATE OR REPLACE FUNCTION type_names()
-RETURNS VARCHAR[]
-AS $$
-DECLARE
-  names VARCHAR[] = ARRAY[
-    'BLOCK ACCESS TO SCREEN_NAME',  -- # meanie  -> me
-    'ALLOW TO LINK',                -- # friend  -> target
-    'BLOCK ACCESS TO ALL SCREEN_NAMES',  -- # meanie  -> me
-    'ALLOW ACCESS SCREEN_NAME',     -- # friend  -> me
-    -- ==============================================
-
-    -- CARDs linked to other stuff: 200++
-    'CARD LINKED TO SCREEN_NAME/HOMEPAGE',  -- # sn_id, card.id -> sn.id
-    'CARD/COMMENT LINKED TO CARD',          --  # comment -> post
-    -- ==============================================
-
-    -- Read/alter CARD: 300+
-    'ALLOW TO READ CARD',   --   # sn, sn -> card.id
-    -- ==============================================
-
-    -- permissions to read/alter SN
-    -- ==============================================
-
-    -- Miscellaneous:
-    'LAST READ AT',  --  # owner_id -> owner_id => sn.id
-    'FOLLOW'         --  # sn, sn -> target
-  ];
-BEGIN
-  RETURN names;
-END
-$$
-LANGUAGE plpgsql
-IMMUTABLE;
--- ========================================================================
-
-
-
 
 -- DOWN
 DROP FUNCTION IF EXISTS name_to_smallint (VARCHAR) CASCADE;
@@ -52,79 +12,60 @@ DROP FUNCTION IF EXISTS name_to_smallint (VARCHAR) CASCADE;
 --   written in using CASE or IF/ELSE.
 -- Read below for the guard functionality to find collisions while this file
 --   is being run.
-CREATE OR REPLACE FUNCTION name_to_smallint(IN NAME VARCHAR, OUT NUM SMALLINT)
+CREATE OR REPLACE FUNCTION name_to_smallint(IN NAME VARCHAR)
+RETURNS SMALLINT
 AS $$
-DECLARE
-  chars     CHAR[];
-  ascii_sum SMALLINT DEFAULT 0;
-  order_id  SMALLINT DEFAULT 0;
-  pos       SMALLINT DEFAULT 0;
 BEGIN
-  chars := regexp_split_to_array(NAME, '');
+  CASE NAME
 
-  FOR I IN array_lower(chars, 1)..array_upper(chars, 1) LOOP
-    ascii_sum := ascii_sum + (I + ascii(chars[I]));
-  END LOOP;
+  WHEN 'ME_ONLY'                             THEN RETURN 584;
+  WHEN 'LIST_ONLY'                           THEN RETURN 769;
+  WHEN 'WORLD READABLE'                      THEN RETURN 1043;
+  WHEN 'SAME AS OWNER'                       THEN RETURN 915;
+  WHEN 'LIST AND OWNER LIST'                 THEN RETURN 1409;
 
-  NUM := ascii_sum;
-END
-$$
-LANGUAGE plpgsql
-IMMUTABLE;
--- ========================================================================
+  WHEN 'BLOCK ACCESS TO SCREEN_NAME'         THEN RETURN 2143; -- # meanie  -> me
+  WHEN 'ALLOW TO LINK'                       THEN RETURN 926;  -- # friend  -> target
+  WHEN 'BLOCK ACCESS TO ALL SCREEN_NAMES'    THEN RETURN 2588; -- # meanie  -> me
+  WHEN 'ALLOW ACCESS SCREEN_NAME'            THEN RETURN 1925; -- # friend  -> me
 
--- DOWN
-DROP FUNCTION IF EXISTS find_collision_in_name_to_smallint (IN NAMES VARCHAR[]) CASCADE;
--- UP
-CREATE OR REPLACE FUNCTION find_collision_in_name_to_smallint(IN NAMES VARCHAR[])
-RETURNS BOOLEAN
-AS $$
-DECLARE
-  rec RECORD;
-BEGIN
+  WHEN 'CARD LINKED TO SCREEN_NAME/HOMEPAGE' THEN RETURN 2940; -- # sn_id, card.id -> sn.id
+  WHEN 'CARD/COMMENT LINKED TO CARD'         THEN RETURN 2095; --  # comment -> post
+  WHEN 'ALLOW TO READ CARD'                  THEN RETURN 1265; --   # sn, sn -> card.id
 
-  SELECT
-    DISTINCT *
-  INTO rec
-  FROM (
-    SELECT
-     id,
-     count(id)              OVER by_id AS count,
-     string_agg(name, ', ') OVER by_id AS names
-    FROM (
-      SELECT name_to_smallint(name) AS id, name FROM unnest(type_names()) t(name)
-    ) t
-    WINDOW by_id AS (PARTITION BY id)
-  ) fin
-  WHERE count > 1;
+  WHEN 'LAST READ AT'                        THEN RETURN 807;  --  # owner_id -> owner_id => sn.id
+  WHEN 'FOLLOW'                              THEN RETURN 482;  --  # sn, sn -> target
+    -- ==============================================
 
-  IF FOUND THEN
-    RAISE EXCEPTION 'name collision for type ids: %', rec;
   ELSE
-    RETURN FALSE;
-  END IF;
-END
-$$
-LANGUAGE plpgsql
-;
-SELECT * FROM find_collision_in_name_to_smallint(type_names());
-
-
--- DOWN
-DROP FUNCTION IF EXISTS type_name_to_id (VARCHAR) CASCADE;
--- UP
-CREATE OR REPLACE FUNCTION type_name_to_id(IN NAME VARCHAR, OUT TYPE_ID SMALLINT)
-AS $$
-BEGIN
-  IF NOT NAME = ANY(type_names()) THEN
-    RAISE EXCEPTION 'programmer error: NAME not found in type_names(): %', NAME;
-  END IF;
-
-  TYPE_ID := name_to_smallint(NAME);
+    RAISE EXCEPTION 'programmer_error: name not found: %', NAME;
+  END CASE;
 END
 $$
 LANGUAGE plpgsql
 IMMUTABLE;
+--  CREATE OR REPLACE FUNCTION name_to_smallint(IN NAME VARCHAR, OUT NUM SMALLINT)
+--  AS $$
+--  DECLARE
+  --  chars     CHAR[];
+  --  ascii_sum SMALLINT DEFAULT 0;
+  --  order_id  SMALLINT DEFAULT 0;
+  --  pos       SMALLINT DEFAULT 0;
+--  BEGIN
+  --  chars := regexp_split_to_array(NAME, '');
 
+  --  FOR I IN array_lower(chars, 1)..array_upper(chars, 1) LOOP
+    --  ascii_sum := ascii_sum + (I + ascii(chars[I]));
+  --  END LOOP;
+
+  --  NUM := ascii_sum;
+--  END
+--  $$
+--  LANGUAGE plpgsql
+--  IMMUTABLE;
 -- ========================================================================
+
+
+
+
 
