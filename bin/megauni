@@ -446,100 +446,11 @@ case "$action" in
     done # === while read output
     ;;
 
-  "specs")
-    # === Run all the specs of the projects.
-    mix run lib/Megauni.Spec.ex $@
-    ;;
 
   "test")
-    files=""
-    model=""
-    spec=""
-    reset=""
-    watch=""
-
-    if [[ "$@" =~ 'watch' && "$1" == "watch" ]]; then
-      watch="true"
-      shift
-      echo "=== Watching $(basename $0) (proc $$): $@"
-    fi
-
-    if [[ ! -z "$@" && "$1" == "reset" ]]; then
-      reset="true"
-      shift
-    fi
-
-    if [[ ! -z "$@" && -d "Server/$1" ]]; then
-      model="$1"
-      files="$(echo Server/$model/specs/*-*.rb)"
-      shift
-    fi
-
-    if [[ ! -z "$@" ]]; then
-      temp="$(find Server/$model/specs -regextype posix-extended -regex ".*/[0-9]{1,4}-${1}.rb")"
-      if [[ -f "$temp" ]]; then
-        spec="$1"
-        shift
-        files="$temp"
-      fi
-    fi
-
-    if [[ -z "$files" ]]; then
-      files="\
-        Server/Customer/specs/01-create.rb    \
-        Server/Screen_Name/specs/01-create.rb \
-        Server/Computer/specs/01-create.rb    \
-        Server/Link/specs/01-create.rb        \
-        Server/Link/specs/02-read.rb"
-    fi
-
-    if [[ -z "$files" ]]; then
-      colorize yellow "No tests found." 1>&2
-      exit 0
-    fi
-
-    # if [[ -z "$model" && -z "$spec" ]]; then
-      # # === Stop the server at the end
-      # trap "bin/megauni stop" EXIT
-
-      # # === Start server:
-      # bin/megauni start
-    # fi # === if start server
-
-    # === Migrate: ==========================================
-    if [[ ! -z "$@" && "$1" == "reset" ]]; then
-      reset="true"
-      shift
-    fi
-
-    if [[ ! -z "$reset" ]]; then
-      bin/megauni migrate reset # > /dev/null
-    fi
-    # =======================================================
-
-    cmd="bundle exec bacon Server/specs/helpers.rb $files"
-
-    if [[ -z "$watch" ]]; then
-      $cmd "$@"
-    else
-      echo "=== Running tests:"
-      $cmd "$@" || true
-      inotifywait -q -m -e close_write,close --exclude .git/ -r .  | while read CHANGE
-      do
-        dir=$(echo "$CHANGE" | cut -d' ' -f 1)
-        op=$(echo "$CHANGE" | cut -d' ' -f 2)
-        file=$(echo "$CHANGE" | cut -d' ' -f 3)
-        path="${dir}$file"
-
-        if [[ ! ( "$op" =~ "NOWRITE" ) && ( "$op" =~ "CLOSE" || "$op" =~ "WRITE" )  && ( "$file" =~ ".rb" || "$file" =~ ".lock") ]]; then
-        echo "=== Running tests: $op"
-        $cmd "$@" || true
-      fi
-
-      done # === inotifywait
-    fi
+    # === Run all the specs of the projects.
+    mix run spec/Spec.ex $@
     ;;
-
 
   "json")
     node_modules/json/lib/json.js "$@"
@@ -586,7 +497,7 @@ case "$action" in
     ;;
 
   "__watch")
-    $0 specs $@ || :
+    $0 test $@ || :
 
     eval "$(bash_setup setup_traps)"
     setup_traps
@@ -620,17 +531,17 @@ case "$action" in
         fi # === if $file == *.js
 
         if [[ "$path" == *.json ]]; then
-          ( $0 jshint $path && $0 specs $@ ) || :
+          ( $0 jshint $path && $0 test $@ ) || :
         else
           if [[ ! "$path" == *.sql ]]; then
-            $0 specs $@ || :
+            $0 test $@ || :
           fi
         fi
 
       fi # === if $file
 
       echo ""
-    done < <(inotifywait --quiet --monitor --event close_write -r lib/ $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
+    done < <(inotifywait --quiet --monitor --event close_write -r lib/ -r spec/ $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
     echo ""
     echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 $action"
     exec $0 $action $@

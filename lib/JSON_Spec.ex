@@ -38,7 +38,7 @@ defmodule JSON_Spec do
   }
 
   @doc """
-    Compiles elements from a list of args (prog)
+    Compiles elements from a list of args (ie prog)
     Returns:
       { compiled_value, list, env }
   """
@@ -47,9 +47,9 @@ defmodule JSON_Spec do
       raise "Out of bounds: #{inspect num} #{inspect list}"
     end
 
-    args = Enum.take list, num
+    raw_args = Enum.take list, num
 
-    {args, env} = Enum.reduce args, {[], env}, fn raw_arg, {args, env} ->
+    {args, env} = Enum.reduce raw_args, {[], env}, fn raw_arg, {args, env} ->
       {fin_arg, env} = compile(raw_arg, env)
       {(args ++ [fin_arg]), env}
     end
@@ -168,6 +168,9 @@ defmodule JSON_Spec do
     {expected, env} = cond do
       is_map(output) ->
         compile(output, env)
+      is_list(output) ->
+        {stack, env} = run_list(output, env)
+        {List.last(stack), env}
       true ->
         raise "Don't know what to do with input/output: #{inspect output}"
     end

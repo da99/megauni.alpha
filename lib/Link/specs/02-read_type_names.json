@@ -5,10 +5,10 @@
   {
     "it"     : "Turns strings into numbers.",
     "input"  : [
-      "query", ["SELECT name_to_type_id('SCREEN_NAME') AS id;"],
+      "query", ["SELECT name_to_type_id('ME_ONLY') AS id;"],
       "pluck", ["id"]
     ],
-    "output" : [584]
+    "output" : ["array", [584]]
   },
 
   {

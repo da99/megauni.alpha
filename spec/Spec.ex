@@ -63,6 +63,35 @@ env = %{
     { String.duplicate("one word ", 150), env}
   end,
 
+  "query" => fn(stack, prog, env) ->
+    {query, prog, env} = JSON_Spec.take(prog, 1, env)
+    {:ok, %{columns: keys, rows: rows}} = Ecto.Adapters.SQL.query( Megauni.Repos.Main, query, [] )
+    rows = Enum.map rows, fn(r) ->
+      Enum.reduce Enum.zip(keys,r), %{}, fn({key, val}, map) ->
+        Map.put map, key, val
+      end
+    end
+    {stack ++ [rows], prog, env}
+  end,
+
+  "array" => fn(stack, prog, env) ->
+    { arr, prog, env } = JSON_Spec.take(prog, 1, env)
+    {stack ++ [arr], prog, env}
+  end,
+
+  "pluck" => fn(stack, prog, env) ->
+    {[key], prog, env} = JSON_Spec.take(prog, 1, env)
+    results = Enum.map List.last(stack), fn(x) ->
+      x[key]
+    end
+    {stack ++ [results], prog, env}
+  end,
+
+  "unique" => fn(stack, prog, env) ->
+    arr = List.last(stack)
+    { stack ++ [Enum.uniq(arr)], prog, env }
+  end,
+
   "create card" => fn(stack, prog, env) ->
     {data, prog, env} = JSON_Spec.take(prog, 1, env)
     result = Card.create data
@@ -85,6 +114,18 @@ env = %{
         result
     end
     {stack ++ [result], prog, env}
+  end,
+
+  "type_names" => fn(stack, prog, env) ->
+    results = Regex.scan(
+      ~r/WHEN\s+'(.+)'\s+THEN[^\d]+(\d+)/,
+      File.read!("lib/Link/migrates/__-link_type_id.sql")
+    )
+    |> Enum.map(fn([match, name, id]) ->
+      %{"name"=>name, "id"=>id}
+    end)
+
+    {stack ++ [results], prog, env}
   end,
 
   "Screen_Name.create" => fn(stack, prog, env) ->
