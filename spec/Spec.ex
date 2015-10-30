@@ -117,14 +117,28 @@ env = %{
   end,
 
   "type_names" => fn(stack, prog, env) ->
-    results = Regex.scan(
-      ~r/WHEN\s+'(.+)'\s+THEN[^\d]+(\d+)/,
+    names = Regex.scan(
+      ~r/WHEN\s+'(.+)'/,
       File.read!("lib/Link/migrates/__-link_type_id.sql")
     )
-    |> Enum.map(fn([match, name, id]) ->
-      %{"name"=>name, "id"=>id}
+    |> Enum.map(fn([match, name]) ->
+      name
     end)
 
+    {:ok, %{columns: keys, rows: rows}} = Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      """
+        SELECT name_to_type_id(name) AS id, name
+        FROM unnest($1::VARCHAR[]) t(name);
+      """,
+      [names]
+    )
+
+    results = Enum.map rows, fn(r) ->
+      Enum.reduce Enum.zip(keys,r), %{}, fn({key, val}, map) ->
+        Map.put map, key, val
+      end
+    end
     {stack ++ [results], prog, env}
   end,
 
