@@ -1,7 +1,7 @@
 
 
 -- DOWN
-DROP FUNCTION IF EXISTS name_to_smallint (VARCHAR) CASCADE;
+DROP FUNCTION IF EXISTS name_to_type_id (VARCHAR) CASCADE;
 
 -- UP
 -- This function has name collisions:
@@ -12,7 +12,7 @@ DROP FUNCTION IF EXISTS name_to_smallint (VARCHAR) CASCADE;
 --   written in using CASE or IF/ELSE.
 -- Read below for the guard functionality to find collisions while this file
 --   is being run.
-CREATE OR REPLACE FUNCTION name_to_smallint(IN NAME VARCHAR)
+CREATE OR REPLACE FUNCTION name_to_type_id(IN NAME VARCHAR)
 RETURNS SMALLINT
 AS $$
 BEGIN
@@ -44,7 +44,7 @@ END
 $$
 LANGUAGE plpgsql
 IMMUTABLE;
---  CREATE OR REPLACE FUNCTION name_to_smallint(IN NAME VARCHAR, OUT NUM SMALLINT)
+--  CREATE OR REPLACE FUNCTION name_to_type_id(IN NAME VARCHAR, OUT NUM SMALLINT)
 --  AS $$
 --  DECLARE
   --  chars     CHAR[];

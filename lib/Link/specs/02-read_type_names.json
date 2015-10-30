@@ -1,0 +1,20 @@
+
+[
+  "desc", "Type Names",
+
+  {
+    "it"     : "Turns strings into numbers.",
+    "input"  : [
+      "query", ["SELECT name_to_type_id('SCREEN_NAME') AS id;"],
+      "pluck", ["id"]
+    ],
+    "output" : [584]
+  },
+
+  {
+    "it"     : "Has no duplicates.",
+    "input"  : ["type_names", "pluck", ["id"]],
+    "output" : ["type_names", "pluck", ["id"], "unique"]
+  }
+
+]

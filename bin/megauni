@@ -448,7 +448,7 @@ case "$action" in
 
   "specs")
     # === Run all the specs of the projects.
-    mix run specs/specs.exs $@
+    mix run lib/Megauni.Spec.ex $@
     ;;
 
   "test")
@@ -630,7 +630,7 @@ case "$action" in
       fi # === if $file
 
       echo ""
-    done < <(inotifywait --quiet --monitor --event close_write -r lib/ -r specs/ $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
+    done < <(inotifywait --quiet --monitor --event close_write -r lib/ $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
     echo ""
     echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 $action"
     exec $0 $action $@
