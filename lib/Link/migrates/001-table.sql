@@ -11,17 +11,28 @@
 
 CREATE TABLE link (
 
-  id          serial            NOT NULL PRIMARY KEY,
-  owner_id    integer           NOT NULL,
-  type_id     smallint          NOT NULL,
-  a_id        integer           NOT NULL,
-  b_id        integer           NOT NULL,
+  id            serial            NOT NULL PRIMARY KEY,
+  type_id       smallint          NOT NULL,
+
+  owner_id      integer           NOT NULL,
+  owner_type_id smallint          NOT NULL,
+
+  a_id          integer           NOT NULL,
+  a_type_id     smallint          NOT NULL,
+
+  b_id          integer           NOT NULL,
+  b_type_id     smallint          NOT NULL,
 
   created_at        timestamp with time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
   updated_at        timestamp with time zone,
 
   CONSTRAINT  "link_unique_idx"
-    UNIQUE (owner_id, type_id, a_id, b_id)
+    UNIQUE (
+      type_id,
+      owner_id,  owner_type_id,
+      a_id,      a_type_id,
+      b_id,      b_type_id
+    )
 
 ); -- CREATE TABLE link
 

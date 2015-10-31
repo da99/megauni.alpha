@@ -5,6 +5,15 @@
   {
     "it"     : "Turns strings into numbers.",
     "input"  : [
+      "query", ["SELECT name_to_type_id('SN|CARD|SN|LINK') AS id;"],
+      "pluck", ["id"]
+    ],
+    "output" : ["array", [584]]
+  },
+
+  {
+    "it"     : "Turns strings into numbers.",
+    "input"  : [
       "query", ["SELECT name_to_type_id('ME_ONLY') AS id;"],
       "pluck", ["id"]
     ],
