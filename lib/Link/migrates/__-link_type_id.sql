@@ -4,24 +4,24 @@ DROP FUNCTION IF EXISTS    name_to_type_ids (VARCHAR) CASCADE;
 
 -- UP
 CREATE OR REPLACE FUNCTION name_to_type_ids (IN NAME VARCHAR)
-RETURNS VARCHAR[]
+RETURNS SMALLINT[]
 AS $$
 DECLARE
-  SPLITS  VARCHAR[];
-  TRIMMED VARCHAR;
+  SPLITS     VARCHAR[];
+  IDS        SMALLINT[];
+  TRIMMED    VARCHAR;
 BEGIN
-  SPLITS := regexp_split_to_array(NAME, '\||,');
-
+  SPLITS     := regexp_split_to_array(NAME, '\||,');
   FOR i IN array_lower(SPLITS, 1)..array_upper(SPLITS, 1) LOOP
     TRIMMED := trim(BOTH FROM SPLITS[i]);
     IF i = 1 THEN
-      SPLITS[i] := name_to_link_type_id(TRIMMED);
+      IDS[i] = name_to_link_type_id(TRIMMED);
     ELSE
-      SPLITS[i] := name_to_type_id(TRIMMED);
+      IDS[i] = name_to_type_id(TRIMMED);
     END IF;
   END LOOP;
 
-  RETURN SPLITS;
+  RETURN IDS;
 END
 $$ LANGUAGE plpgsql IMMUTABLE;
 
@@ -68,12 +68,10 @@ BEGIN
   WHEN 'LIST AND OWNER LIST'                 THEN RETURN 14;
 
   WHEN 'BLOCK'                               THEN RETURN 20; -- # meanie  -> me
-  WHEN 'BLOCK ALL'                           THEN RETURN 21; -- # meanie  -> me
+  WHEN 'BLOCK ALL SCREEN_NAMES'              THEN RETURN 21; -- # meanie  -> me
 
-  WHEN 'ALLOW TO CREATE'                     THEN RETURN 30;  -- # friend  -> target
-  WHEN 'ALLOW TO READ'                       THEN RETURN 31;  -- # friend  -> target
+  WHEN 'ALLOW TO CREATE'                     THEN RETURN 31;  -- # friend  -> target
   WHEN 'ALLOW TO READ'                       THEN RETURN 32;  -- # friend  -> target
-  WHEN 'ALLOW TO LINK'                       THEN RETURN 33;  -- # friend  -> target
 
   WHEN 'LINK'                                THEN RETURN 40; -- # sn_id, card.id -> sn.id
 

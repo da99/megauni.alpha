@@ -116,30 +116,16 @@ env = %{
     {stack ++ [result], prog, env}
   end,
 
-  "type_names" => fn(stack, prog, env) ->
-    names = Regex.scan(
-      ~r/WHEN\s+'(.+)'/,
+  "type_ids" => fn(stack, prog, env) ->
+    ids = Regex.scan(
+      ~r/RETURN\s+(\d+)\s?;/,
       File.read!("lib/Link/migrates/__-link_type_id.sql")
     )
-    |> Enum.map(fn([match, name]) ->
-      name
+    |> Enum.map(fn([match, id]) ->
+      id
     end)
 
-    {:ok, %{columns: keys, rows: rows}} = Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main,
-      """
-        SELECT name_to_type_id(name) AS id, name
-        FROM unnest($1::VARCHAR[]) t(name);
-      """,
-      [names]
-    )
-
-    results = Enum.map rows, fn(r) ->
-      Enum.reduce Enum.zip(keys,r), %{}, fn({key, val}, map) ->
-        Map.put map, key, val
-      end
-    end
-    {stack ++ [results], prog, env}
+    {stack ++ [ids], prog, env}
   end,
 
   "Screen_Name.create" => fn(stack, prog, env) ->

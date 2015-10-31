@@ -3,27 +3,18 @@
   "desc", "Type Names",
 
   {
-    "it"     : "Turns strings into numbers.",
+    "it"     : "Turns strings into array of integers.",
     "input"  : [
-      "query", ["SELECT name_to_type_id('SN|CARD|SN|LINK') AS id;"],
-      "pluck", ["id"]
+      "query", ["SELECT name_to_type_ids('LINK | SN , CARD , SN') AS ids;"],
+      "pluck", ["ids"]
     ],
-    "output" : ["array", [584]]
-  },
-
-  {
-    "it"     : "Turns strings into numbers.",
-    "input"  : [
-      "query", ["SELECT name_to_type_id('ME_ONLY') AS id;"],
-      "pluck", ["id"]
-    ],
-    "output" : ["array", [584]]
+    "output" : ["array", [[40, 2, 3, 2]]]
   },
 
   {
     "it"     : "Has no duplicates.",
-    "input"  : ["type_names", "pluck", ["id"]],
-    "output" : ["type_names", "pluck", ["id"], "unique"]
+    "input"  : ["type_ids"],
+    "output" : ["type_ids", "unique"]
   }
 
 ]
