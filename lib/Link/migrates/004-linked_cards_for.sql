@@ -27,8 +27,8 @@ BEGIN
     --   link cards to their screen_name.
     link.owner_id = link.b_id AND
     link.a_id     = card.id AND
-    EXISTS ( SELECT * FROM can_read_card(SN_ID, card.id) ) AND
-    EXISTS ( SELECT * FROM can_read_card(link.b_id, card.id) )
+    can_read_card(SN_ID, card.id) AND
+    can_read_card(link.b_id, card.id)
   ;
 END
 $$ LANGUAGE plpgsql;
