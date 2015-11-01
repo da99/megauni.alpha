@@ -13,4 +13,9 @@ defmodule In do
     end
   end # === def spect(var)
 
+  def repeat var do
+    spect var
+    var
+  end
+
 end # === defmodule In

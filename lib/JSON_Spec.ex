@@ -129,7 +129,10 @@ defmodule JSON_Spec do
     is_map(e) &&
     (
       Map.has_key?(e, "error") ||
-      Map.has_key?(e, "user_error")
+      Map.has_key?(e, "user_error") ||
+      Map.has_key?(e, "user error") ||
+      Map.has_key?(e, "programmer_error") ||
+      Map.has_key?(e, "programmer error")
     )
   end
 
@@ -156,6 +159,7 @@ defmodule JSON_Spec do
         input(new_list, env)
 
       is_list(raw) ->
+        env = Map.put env, :raise_errors, true
         {stack, env} = run_list(raw, env)
         Map.put env, :actual, List.last(stack)
 
@@ -356,24 +360,30 @@ defmodule JSON_Spec do
     Returns: { stack, env }
   """
   def run_list stack, prog, env do
-    if Enum.count(prog) == 0 do
-      {stack, env}
-    else
-      [token | prog] = prog
+    cond do
+      Enum.count(prog) == 0 ->
+        {stack, env}
 
-      if !is_function(env[token]) do
-        raise "Function not found: #{inspect token}"
-      end
-      {stack, prog, env} = env[token].(stack, prog, env)
+      is_number(List.first(prog)) ->
+        [num | prog] = prog
+        run_list (stack ++ [num]), prog, env
 
-      # === If last value is an error and there is still more
-      #     to process in the prog, raise the error:
-      if env[:raise_errors] && Enum.count(prog) != 0 && is_error?(List.last(stack)) do
-        raise err_msg(List.last(stack))
-      else
-        run_list stack, prog, env
-      end
-    end # === run_list
+      true ->
+        [token | prog] = prog
+
+        if !is_function(env[token]) do
+          raise "Function not found: #{inspect token}"
+        end
+        {stack, prog, env} = env[token].(stack, prog, env)
+
+        # === If last value is an error and there is still more
+        #     to process in the prog, raise the error:
+        if env[:raise_errors] && Enum.count(prog) != 0 && is_error?(List.last(stack)) do
+          raise err_msg(List.last(stack))
+        else
+          run_list stack, prog, env
+        end
+    end # == cond
   end # === def run_list
 
   @doc """

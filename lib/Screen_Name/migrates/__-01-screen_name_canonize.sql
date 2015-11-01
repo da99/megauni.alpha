@@ -4,7 +4,7 @@ AS $$
   BEGIN
     -- screen_name
     IF sn IS NULL THEN
-      RAISE EXCEPTION 'programmer error: NULL value';
+      RAISE EXCEPTION 'programmer_error: NULL value';
     END IF;
     sn := upper(sn);
     sn := regexp_replace(sn, '^\@|[\s[:cntrl:]]+', '', 'ig');

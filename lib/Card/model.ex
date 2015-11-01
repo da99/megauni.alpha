@@ -7,14 +7,24 @@ defmodule Card do
   @min_code_bytes 1
   @max_code_bytes 2500
 
-  def create raw_data do
+  def create( data ) when is_map(data) do
+    create(
+      data["user_id"],
+      data["owner_screen_name"],
+      data["privacy"],
+      data["code"]
+    )
+  end # === def create
+
+  def create user_id, owner_screen_name, privacy, raw_code do
     Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
-      "SELECT * FROM card_insert($1, $2, $3);",
+      "SELECT id FROM card_insert($1, $2, $3, $4);",
       [
-        raw_data["owner"] || raw_data["owner_id"],
-        raw_data["privacy"],
-        Poison.encode!(raw_data["code"])
+        user_id,
+        owner_screen_name,
+        privacy,
+        Poison.encode!(raw_code)
       ]
     )
     |> Megauni.Model.one_row("card")

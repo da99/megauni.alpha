@@ -93,10 +93,20 @@ env = %{
   end,
 
   "create card" => fn(stack, prog, env) ->
-    {data, prog, env} = JSON_Spec.take(prog, 1, env)
+    if (prog |> List.first |> is_map) do
+      {data, prog, env} = JSON_Spec.take(prog, 1, env)
+    else
+      data = %{
+        "user_id"           => env["user"]["id"],
+        "owner_screen_name" => env["sn"]["screen_name"],
+        "privacy"           => "WORLD READABLE",
+        "code"              => [%{"cmd": "time"}]
+      }
+    end
+
     result = Card.create data
     case result do
-      %{"card"=> _card} ->
+      %{"id"=> _card} ->
         env = JSON_Spec.put(env, "card", result)
       _ ->
         result
@@ -121,11 +131,23 @@ env = %{
       ~r/RETURN\s+(\d+)\s?;/,
       File.read!("lib/Link/migrates/__-01-link_type_id.sql")
     )
-    |> Enum.map(fn([match, id]) ->
+    |> Enum.map(fn([_match, id]) ->
       id
     end)
 
     {stack ++ [ids], prog, env}
+  end,
+
+  "Link.create" => fn(stack, prog, env) ->
+    {args, prog, env} = JSON_Spec.take(prog, 1, env)
+    result            = Link.create env["user"]["id"], args
+    case result do
+      %{"link"=>_link} ->
+        env = JSON_Spec.put(env, "link", result)
+      _ ->
+        result
+    end
+    {stack ++ [result], prog, env}
   end,
 
   "Screen_Name.create" => fn(stack, prog, env) ->

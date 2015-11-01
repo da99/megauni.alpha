@@ -10,15 +10,15 @@
       "create screen_name",
 
       "create screen_name",
-      "create card", {"owner_id": "sn.id", "privacy": "world_readable", "code": [{"cmd":"print"}]},
+      "create card", {"owner_id": "sn.id", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
       "create link", {"type" : "follow", "owner_id": "sn_1.id", "a_id": "sn_1.id", "b_id": "sn.id"},
 
       "create screen_name",
-      "create card", {"owner_id": "sn.id", "privacy": "world_readable", "code": [{"cmd":"print"}]},
+      "create card", {"owner_id": "sn.id", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
       "create link", {"type" : "follow", "owner_id": "sn_1.id", "a_id": "sn_1.id", "b_id": "sn.id"},
 
       "create screen_name",
-      "create card", {"owner_id": "sn.id", "privacy": "world_readable", "code": [{"cmd":"print"}]},
+      "create card", {"owner_id": "sn.id", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
       "create link", {"type" : "follow", "owner_id": "sn_1.id", "a_id": "sn_1.id", "b_id": "sn.id"}
     ],
     "output" : [

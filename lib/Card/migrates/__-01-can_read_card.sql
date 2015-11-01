@@ -5,8 +5,20 @@
 -- DOWN
 DROP FUNCTION IF EXISTS  can_read_card         (INT, INT) CASCADE;
 DROP FUNCTION IF EXISTS  can_read_card_or_fail (INT, INT) CASCADE;
+DROP FUNCTION IF EXISTS  return_card_id_or_fail(INT, INT) CASCADE;
 
 -- UP
+CREATE OR REPLACE FUNCTION return_card_id_or_fail (
+  IN SN_ID INT, IN CARD_ID INT
+)
+RETURNS INT AS $$
+BEGIN
+  IF can_read_card_or_fail(SN_ID, CARD_ID) THEN
+    RETURN CARD_ID;
+  END IF;
+END
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION can_read_card_or_fail (
   IN SN_ID INT, IN CARD_ID INT
 )

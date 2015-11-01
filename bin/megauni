@@ -521,26 +521,26 @@ case "$action" in
         fi
 
         if [[ "$file" == *.sql ]]; then
-          bin/megauni migrate up "$(basename $(dirname $(dirname "$path")))" || :
-        fi
-
-        if [[ "$file" == *.js ]]; then
-          js_pass="true"
-          js_setup jshint! $path || js_pass=""
-
-          if [[ -n "$js_pass" ]]; then
-            $0 run_specs $@ || :
-            bin/megauni restart
-          fi # === if $js_pass
-        fi # === if $file == *.js
-
-        if [[ "$path" == *.json ]]; then
-          ( $0 jshint $path && $0 test $@ ) || :
+          ( bin/megauni migrate up "$(basename $(dirname $(dirname "$path")))" && $0 test $@ ) || :
         else
-          if [[ ! "$path" == *.sql ]]; then
-            $0 test $@ || :
-          fi
+          if [[ "$file" == *.js ]]; then
+            js_pass="true"
+            js_setup jshint! $path || js_pass=""
+
+            if [[ -n "$js_pass" ]]; then
+              $0 run_specs $@ || :
+              bin/megauni restart
+            fi # === if $js_pass
+          else
+            if [[ "$path" == *.json ]]; then
+              $0 jshint $path || :
+              $0 test $@ || :
+            else
+              $0 test $@ || :
+            fi
+          fi # === if $file == *.js
         fi
+
 
       fi # === if $file
 
