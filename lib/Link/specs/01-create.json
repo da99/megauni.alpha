@@ -1,0 +1,32 @@
+
+[
+
+  "before all", [ "create user" ],
+
+  "desc", "Link.create",
+
+  {
+    "it"     :  "creates a link",
+    "input"  : [
+      "create screen_name",
+      "create card",
+      "Link.create", [ "LINK | CARD, SN", "card.id", "sn.screen_name" ],
+      1
+    ],
+    "output" : [ "read homepage", "length" ]
+  },
+
+  {
+    "it" : "ignores duplicates",
+    "input"  : [
+      "create screen_name",
+      "create card",
+      "repeat", [ 3,
+        "Link.create", [ "LINK | CARD, SN", "card.id", "sn.screen_name" ]
+      ], 1
+    ],
+    "output" : [ "read homepage", "length" ]
+  }
+]
+
+

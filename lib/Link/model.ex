@@ -8,15 +8,15 @@ defmodule Link do
   @read_posts         13
   @read_comments      14
 
-  def create raw_data do
+  def create user, type, a, b  do
     Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
       "SELECT * FROM link_insert($1, $2, $3, $4);",
       [
-        raw_data["type"],
-        raw_data["owner_id"],
-        raw_data["a_id"],
-        raw_data["b_id"],
+        user,
+        type,
+        a,
+        b
       ]
     )
     |> Megauni.Model.one_row("card")

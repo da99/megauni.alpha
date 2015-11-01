@@ -3,9 +3,9 @@
 
 
 -- DOWN
-DROP FUNCTION              in_sn_list_of(INT, INT)  CASCADE;
+DROP FUNCTION              in_screen_name_list_of(INT, INT)  CASCADE;
 -- UP
-CREATE OR REPLACE FUNCTION in_sn_list_of(IN AUD_ID INT, IN SN_ID INT)
+CREATE OR REPLACE FUNCTION in_screen_name_list_of(IN AUD_ID INT, IN SN_ID INT)
 RETURNS TABLE ( mask_id INT )
 AS $$
 BEGIN

@@ -30,7 +30,7 @@ BEGIN
   WHERE
     type_id = 23
     AND owner_id = a_id -- 'follows' can only be made by sn
-    AND owner_id IN (SELECT sn.id FROM sn_ids_of(SN_ID) sn)
+    AND owner_id IN (SELECT sn.id FROM screen_name_ids_of(SN_ID) sn)
   ;
 END
 $$ LANGUAGE plpgsql;

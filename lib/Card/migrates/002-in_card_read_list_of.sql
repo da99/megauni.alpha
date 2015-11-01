@@ -20,7 +20,7 @@ BEGIN
     AND -- Make sure owner of card granted permission:
     owner_id IN (SELECT owner_id FROM card WHERE card.id = CARD_ID)
     AND
-    a_id IN (SELECT id FROM sn_ids_of(SN_ID))
+    a_id IN (SELECT id FROM screen_name_ids_of(SN_ID))
     AND
     b_id = CARD_ID
   LIMIT 1
