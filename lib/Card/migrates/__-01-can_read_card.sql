@@ -47,15 +47,15 @@ BEGIN
     card
   WHERE
     -- WORLD READable, bypassing SN permission
-    card.privacy = 4
+    card.privacy = name_to_type_id('WORLD READABLE')
 
     OR
     -- SAME AS SN:
-    ( card.privacy = 3 AND EXISTS (SELECT * FROM can_read(SN_ID, card.owner_id)) )
+    ( card.privacy = name_to_type_id('SAME AS OWNER') AND EXISTS (SELECT * FROM can_read(SN_ID, card.owner_id)) )
 
     OR
     -- AUD must be on list allowed card readers to read:
-    ( card.privacy = 2 AND EXISTS (SELECT * FROM in_card_read_list_of(SN_ID, card.id)) )
+    ( card.privacy = name_to_type_id('LIST ONLY') AND EXISTS (SELECT * FROM in_card_read_list_of(SN_ID, card.id)) )
   LIMIT 1
   ;
 
