@@ -2,8 +2,8 @@
 
 
 
--- DOWN
-DROP FUNCTION   last_read_of(INT)                      CASCADE;
+-- BOTH
+drop_megauni_func_and_void('last_read_of');
 
 -- UP
 CREATE FUNCTION last_read_of(IN SN_ID INT)

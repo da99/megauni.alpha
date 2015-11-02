@@ -2,8 +2,8 @@
 
 
 
--- DOWN
-DROP FUNCTION   follows_of(INT)                 CASCADE;
+-- BOTH
+drop_megauni_func_and_void('follows_of');
 
 -- UP
 -- 'follows' always provide all screen names, including

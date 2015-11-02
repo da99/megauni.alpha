@@ -1,6 +1,11 @@
 
+-- BOTH
+
+drop_megauni_func_and_void('log_in_attempt');
+
+-- UP
 --  We don't use "raise" here because
---  it would prevent inserting 
+--  it would prevent inserting
 --  bad attempts (ie rollback the transaction).
 --  So instead we return a row [{has_pass, reason}]
 --  and the application will standardize it into
@@ -109,8 +114,5 @@ AS $$
   END
 $$ LANGUAGE plpgsql;
 
--- DOWN
-
-DROP FUNCTION log_in_attempt (varchar, int, int, boolean) CASCADE;
 
 
