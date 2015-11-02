@@ -1,7 +1,7 @@
 
 -- BOTH
 
-drop_megauni_func_and_void('log_in_attempt');
+SELECT drop_megauni_func('log_in_attempt');
 
 -- UP
 --  We don't use "raise" here because

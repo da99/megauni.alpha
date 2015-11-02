@@ -70,10 +70,3 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION drop_megauni_func_and_void (TARGET_NAME VARCHAR)
-RETURNS VOID
-AS $$
-BEGIN
-  PERFORM * FROM drop_megauni_func(TARGET_NAME);
-END
-$$ LANGUAGE plpgsql;

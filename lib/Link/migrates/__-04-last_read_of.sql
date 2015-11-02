@@ -3,7 +3,7 @@
 
 
 -- BOTH
-drop_megauni_func_and_void('last_read_of');
+SELECT drop_megauni_func('last_read_of');
 
 -- UP
 CREATE FUNCTION last_read_of(IN SN_ID INT)

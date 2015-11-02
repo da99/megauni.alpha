@@ -3,7 +3,7 @@
 
 
 -- BOTH
-drop_megauni_func_and_void('in_card_read_list_of');
+SELECT drop_megauni_func('in_card_read_list_of');
 
 -- UP
 CREATE FUNCTION in_card_read_list_of(IN SN_ID INT, IN CARD_ID INT)

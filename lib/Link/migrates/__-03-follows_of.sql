@@ -3,7 +3,7 @@
 
 
 -- BOTH
-drop_megauni_func_and_void('follows_of');
+SELECT drop_megauni_func('follows_of');
 
 -- UP
 -- 'follows' always provide all screen names, including

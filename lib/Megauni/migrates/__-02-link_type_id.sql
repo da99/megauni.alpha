@@ -1,6 +1,6 @@
 
 -- DOWN
-DROP FUNCTION IF EXISTS    name_to_type_ids (VARCHAR) CASCADE;
+SELECT drop_megauni_func('name_to_type_ids');
 
 -- UP
 CREATE OR REPLACE FUNCTION name_to_type_ids (IN NAME VARCHAR)

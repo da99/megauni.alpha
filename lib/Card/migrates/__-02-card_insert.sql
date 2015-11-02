@@ -1,6 +1,6 @@
 
 -- BOTH
-drop_megauni_func_and_void('card_insert');
+SELECT drop_megauni_func('card_insert');
 
 -- UP
 

@@ -2,7 +2,7 @@
 
 
 -- DOWN
-DROP FUNCTION IF EXISTS    link_insert ( INT, VARCHAR, INT, VARCHAR ) CASCADE ;
+SELECT drop_megauni_func('link_insert');
 
 -- UP
 CREATE OR REPLACE FUNCTION link_insert (

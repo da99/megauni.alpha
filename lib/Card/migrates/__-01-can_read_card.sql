@@ -3,9 +3,9 @@
 
 
 -- BOTH
-drop_megauni_func_and_void('can_read_card');
-drop_megauni_func_and_void('can_read_card_or_fail');
-drop_megauni_func_and_void('return_card_id_or_fail');
+SELECT drop_megauni_func('can_read_card');
+SELECT drop_megauni_func('can_read_card_or_fail');
+SELECT drop_megauni_func('return_card_id_or_fail');
 
 -- UP
 CREATE OR REPLACE FUNCTION return_card_id_or_fail (

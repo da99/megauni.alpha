@@ -2,8 +2,8 @@
 
 
 
--- DOWN
-drop_megauni_func_and_void('linked_cards_for');
+-- BOTH
+SELECT drop_megauni_func('linked_cards_for');
 
 -- UP
 CREATE FUNCTION linked_cards_for(IN SN_ID INT)
