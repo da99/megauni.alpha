@@ -1,9 +1,10 @@
 
--- DOWN
-DROP FUNCTION IF EXISTS    card_insert (INT, VARCHAR, VARCHAR, VARCHAR ) CASCADE;
+-- BOTH
+drop_megauni_func_and_void('card_insert');
 
 -- UP
-CREATE OR REPLACE FUNCTION card_insert (
+
+CREATE FUNCTION card_insert (
   IN USER_ID INT,
   IN SN      VARCHAR,
   IN PRIVACY_NAME VARCHAR,

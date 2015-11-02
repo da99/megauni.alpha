@@ -2,10 +2,10 @@
 
 
 
--- DOWN
-DROP FUNCTION IF EXISTS  can_read_card         (INT, INT) CASCADE;
-DROP FUNCTION IF EXISTS  can_read_card_or_fail (INT, INT) CASCADE;
-DROP FUNCTION IF EXISTS  return_card_id_or_fail(INT, INT) CASCADE;
+-- BOTH
+drop_megauni_func_and_void('can_read_card');
+drop_megauni_func_and_void('can_read_card_or_fail');
+drop_megauni_func_and_void('return_card_id_or_fail');
 
 -- UP
 CREATE OR REPLACE FUNCTION return_card_id_or_fail (

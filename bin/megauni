@@ -99,6 +99,7 @@ BG_RED='\e[1;31m'
 # ===============================================
 
 mods=(
+  Megauni
   Screen_Name
   User
   Log_In
