@@ -1,4 +1,9 @@
 
+-- DOWN
+SELECT drop_megauni_func('user_insert');
+
+-- UP
+
 --  Use "user_insert" instead of "insert"
 --  because:
 --    * "insert" won't accept a non-column
@@ -37,7 +42,4 @@ AS $$
   END
 $$ LANGUAGE plpgsql;
 
--- DOWN
-
-DROP FUNCTION user_insert ( varchar, bytea ) CASCADE;
 

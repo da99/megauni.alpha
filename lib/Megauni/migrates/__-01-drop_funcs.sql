@@ -3,6 +3,22 @@
 -- http://stackoverflow.com/questions/16632117/get-all-procedural-user-defined-functions
 -- http://www.postgresonline.com/journal/archives/74-How-to-delete-many-functions.html
 
+-- DOWN
+
+-- DROP all custom functions.
+-- This ensures there are no forgotten funcs
+--   being used by other custom functions/queries.
+-- In other words: We want a clean slate for development/testing.
+DO $$
+  DECLARE
+    r RECORD;
+  BEGIN
+    FOR r IN SELECT drop_func_sql FROM megauni_funcs() LOOP
+      EXECUTE r.drop_func_sql;
+    END LOOP;
+  END
+  $$ LANGUAGE plpgsql;
+
 -- BOTH
 DROP FUNCTION IF EXISTS drop_megauni_func_and_void(VARCHAR);
 DROP FUNCTION IF EXISTS drop_megauni_func (VARCHAR);
