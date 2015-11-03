@@ -3,21 +3,10 @@
 
 
 -- BOTH
-SELECT drop_megauni_func('can_read_card');
 SELECT drop_megauni_func('can_read_card_or_fail');
-SELECT drop_megauni_func('return_card_id_or_fail');
+SELECT drop_megauni_func('can_read_card');
 
 -- UP
-CREATE OR REPLACE FUNCTION return_card_id_or_fail (
-  IN SN_ID INT, IN CARD_ID INT
-)
-RETURNS INT AS $$
-BEGIN
-  IF can_read_card_or_fail(SN_ID, CARD_ID) THEN
-    RETURN CARD_ID;
-  END IF;
-END
-$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION can_read_card_or_fail (
   IN SN_ID INT, IN CARD_ID INT

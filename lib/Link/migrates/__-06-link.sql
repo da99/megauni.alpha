@@ -1,8 +1,6 @@
 
 
 -- BOTH
-SELECT drop_megauni_func('link_from');
-SELECT drop_megauni_func('link_where');
 SELECT drop_megauni_func('link');
 
 -- UP

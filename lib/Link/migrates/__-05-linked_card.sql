@@ -3,10 +3,10 @@
 
 
 -- BOTH
-SELECT drop_megauni_func('linked_cards');
+SELECT drop_megauni_func('linked_card');
 
 -- UP
-CREATE FUNCTION linked_cards(IN SN_ID INT)
+CREATE FUNCTION linked_card(IN SN_ID INT)
 RETURNS TABLE (
   card_id        INT,
   publication_id INT,

@@ -12,30 +12,35 @@ CREATE OR REPLACE FUNCTION link_insert (
   IN SCREEN_NAME  VARCHAR
 ) RETURNS TABLE(id INT)
 AS $$
+DECLARE
+  IDS SMALLINT[];
 BEGIN
-  CASE TYPE_NAME
-  WHEN 'LINK | CARD, SCREEN_NAME' THEN
+  IDS := name_to_type_ids(TYPE_NAME);
+
+  CASE IDS
+  WHEN name_to_type_ids('LINK | CARD, SCREEN_NAME') THEN
+
     RETURN QUERY
     INSERT INTO link (
       type_id,
-      owner_id, owner_type_id,
-      a_type_id, a_id,
-      b_type_id, b_id
+      owner_type_id, owner_id,
+      a_type_id,     a_id,
+      b_type_id,     b_id
     )
     VALUES (
-      name_to_type_id('LINK'),
+      IDS[1],
 
-      name_to_type_id('SN'),
-      screen_name_id_or_fail(USER_ID, SCREEN_NAME),
-
-      name_to_type_id('CARD'),
-      return_card_id_or_fail(USER_ID, A_ID),
-
-      name_to_type_id('SN'),
-      screen_name_id_or_fail(USER_ID, SCREEN_NAME)
+      IDS[2], screen_name_id_or_fail(USER_ID, SCREEN_NAME),
+      IDS[3], card_id_or_fail(USER_ID, A_ID),
+      IDS[4], screen_name_id_or_fail(USER_ID, SCREEN_NAME)
     ) RETURNING link.id;
+
   ELSE
     RAISE EXCEPTION 'programmer_error: unknown link_insert type: %', TYPE_NAME;
+
   END CASE;
 END
 $$ LANGUAGE plpgsql;
+
+
+

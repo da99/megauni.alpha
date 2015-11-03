@@ -13,7 +13,6 @@
 --
 
 -- BOTH
-SELECT drop_megauni_func('homepage_of');
 SELECT drop_megauni_func('homepage_card');
 
 -- UP

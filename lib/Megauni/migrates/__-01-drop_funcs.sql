@@ -20,7 +20,6 @@ DO $$
   $$ LANGUAGE plpgsql;
 
 -- BOTH
-DROP FUNCTION IF EXISTS drop_megauni_func_and_void(VARCHAR);
 DROP FUNCTION IF EXISTS drop_megauni_func (VARCHAR);
 DROP FUNCTION IF EXISTS megauni_funcs     ();
 

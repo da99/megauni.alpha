@@ -1,10 +1,9 @@
 
 -- BOTH
-SELECT drop_megauni_func('screen_name_ids_of');
-SELECT drop_megauni_func('screen_name_ids_from');
+SELECT drop_megauni_func('screen_name_ids');
 
 -- UP
-CREATE OR REPLACE FUNCTION screen_name_ids_from(IN SN_ID INT)
+CREATE OR REPLACE FUNCTION screen_name_ids(IN SN_ID INT)
 RETURNS SETOF screen_name
 AS $$
 BEGIN

@@ -1,7 +1,8 @@
 
 
 -- DOWN
-DROP FUNCTION              can_read(INT, INT)    CASCADE;
+SELECT drop_megauni_func('can_read');
+
 -- UP
 CREATE OR REPLACE FUNCTION can_read(IN A_ID INT, IN B_ID INT)
 RETURNS TABLE ( answer BOOLEAN )

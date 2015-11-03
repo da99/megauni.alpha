@@ -1,6 +1,7 @@
 
 -- BOTH
 SELECT drop_megauni_func('name_to_type_ids');
+SELECT drop_megauni_func('name_to_type_id');
 
 -- UP
 CREATE OR REPLACE FUNCTION name_to_type_ids (IN NAME VARCHAR)
@@ -35,10 +36,6 @@ END
 $$ LANGUAGE plpgsql IMMUTABLE;
 
 
--- BOTH
-SELECT drop_megauni_func('name_to_type_id');
-
--- UP
 CREATE OR REPLACE FUNCTION name_to_type_id (IN NAME VARCHAR)
 RETURNS SMALLINT
 AS $$

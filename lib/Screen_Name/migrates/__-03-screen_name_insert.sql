@@ -1,5 +1,9 @@
 
 
+-- BOTH
+SELECT drop_megauni_func('screen_name_insert');
+
+-- UP
 
 CREATE OR REPLACE FUNCTION screen_name_insert(
   IN  raw_owner_id INT,
@@ -22,9 +26,5 @@ AS $$
   END
 $$ LANGUAGE plpgsql;
 
-
--- DOWN
-
-SELECT drop_megauni_func('screen_name_insert');
 
 

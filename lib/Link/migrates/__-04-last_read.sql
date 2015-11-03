@@ -3,7 +3,6 @@
 
 
 -- BOTH
-SELECT drop_megauni_func('last_read_of');
 SELECT drop_megauni_func('last_read');
 
 -- UP

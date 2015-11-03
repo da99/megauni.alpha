@@ -1,4 +1,7 @@
+-- BOTH
+SELECT drop_megauni_func('screen_name_read');
 
+-- UP
 CREATE OR REPLACE FUNCTION screen_name_read(
   IN  raw_screen_name VARCHAR
 )
@@ -44,6 +47,3 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
--- DOWN
-
-SELECT drop_megauni_func('screen_name_read');

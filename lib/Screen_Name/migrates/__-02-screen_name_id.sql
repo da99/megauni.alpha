@@ -1,32 +1,12 @@
 
 -- BOTH
-SELECT drop_megauni_func('screen_name_id');
 SELECT drop_megauni_func('screen_name_id_or_fail');
-
-SELECT drop_megauni_func('screen_name_id_of');
-SELECT drop_megauni_func('screen_name_id_of_or_fail');
+SELECT drop_megauni_func('screen_name_id');
 
 -- UP
 
-CREATE OR REPLACE FUNCTION  screen_name_id (IN RAW_SCREEN_NAME   VARCHAR)
-RETURNS INT
-AS $$
-DECLARE
-  sn_record   RECORD;
-BEGIN
-  SELECT id
-  INTO sn_record
-  FROM top_level_screen_name_from(RAW_SCREEN_NAME) SN
-  LIMIT 1;
-  RETURN sn_record.id;
-END
-$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-
-
 CREATE OR REPLACE FUNCTION  screen_name_id_or_fail (
-  IN USER_ID INT,
-  IN RAW_SCREEN_NAME VARCHAR
+  IN USER_ID INT, IN RAW_SCREEN_NAME VARCHAR
 ) RETURNS INT
 AS $$
 DECLARE
@@ -44,8 +24,7 @@ $$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 CREATE OR REPLACE FUNCTION  screen_name_id (
-  IN USER_ID INT,
-  IN RAW_SCREEN_NAME   VARCHAR
+  IN USER_ID INT, IN RAW_SCREEN_NAME   VARCHAR
 ) RETURNS INT
 AS $$
 DECLARE
@@ -58,6 +37,24 @@ BEGIN
     SN.owner_id = USER_ID
   LIMIT 1
   ;
+  RETURN sn_record.id;
+END
+$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+
+CREATE OR REPLACE FUNCTION  screen_name_id (
+  IN RAW_SCREEN_NAME   VARCHAR
+)
+RETURNS INT
+AS $$
+DECLARE
+  sn_record   RECORD;
+BEGIN
+  SELECT id
+  INTO sn_record
+  FROM top_level_screen_name_from(RAW_SCREEN_NAME) SN
+  LIMIT 1;
   RETURN sn_record.id;
 END
 $$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||

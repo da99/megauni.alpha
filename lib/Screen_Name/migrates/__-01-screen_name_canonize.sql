@@ -1,4 +1,8 @@
 
+-- BOTH
+SELECT drop_megauni_func('screen_name_canonize');
+
+-- UP
 CREATE OR REPLACE FUNCTION screen_name_canonize(inout sn varchar)
 AS $$
   BEGIN
@@ -14,10 +18,6 @@ LANGUAGE plpgsql
 IMMUTABLE
 ;
 
--- DOWN
-
-DROP FUNCTION IF EXISTS screen_name_canonize (VARCHAR)
-  CASCADE;
 
 
 

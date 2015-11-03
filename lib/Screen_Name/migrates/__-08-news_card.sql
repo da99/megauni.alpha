@@ -15,8 +15,7 @@
 --   "my_sn_4" "publication_sn4"                 null (nothing posted since last read)
 --
 
--- DOWN
-SELECT drop_megauni_func('news_of');
+-- BOTH
 SELECT drop_megauni_func('news_card');
 
 -- UP
