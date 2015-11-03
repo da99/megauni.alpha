@@ -437,9 +437,6 @@ defmodule JSON_Spec do
           Map.has_key?(env, name) && !is_function(env[name]) ->
             {env[name], env}
 
-          Map.has_key?(env, name) ->
-            {_val, _new_env} = env[name].(env)
-
           true -> # === Check for "key.key.key"
             {is_key, val} = Enum.reduce String.split(name, "."), {true, env}, fn(key, {is_key, data}) ->
               if is_key && Map.has_key?(data, key) do

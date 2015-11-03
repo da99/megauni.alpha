@@ -74,6 +74,16 @@ env = %{
     {stack ++ [rows], prog, env}
   end,
 
+  "repeat" => fn(stack, prog, env) ->
+    {[num | list], prog, env} = JSON_Spec.take(prog, 1, env)
+    {env, new_stack} = Enum.reduce 0..num, {env, []}, fn(i, {env, stack}) ->
+      {stack, env} = JSON_Spec.run_list(list, env)
+      {env, stack ++ [List.last(stack)]}
+    end
+
+    {stack ++ new_stack, prog, env}
+  end,
+
   "array" => fn(stack, prog, env) ->
     { arr, prog, env } = JSON_Spec.take(prog, 1, env)
     {stack ++ [arr], prog, env}

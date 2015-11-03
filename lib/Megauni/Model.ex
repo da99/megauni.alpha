@@ -41,6 +41,17 @@ defmodule Megauni.Model do
     end # === case raws
   end # === def rows
 
+  def true_if_map_or_unique_violation record, type do
+    cond do
+      is_map(record) ->
+        true
+      %{"user_error"=> "#{type}: already_taken"} == record ->
+        true
+      true ->
+        false
+    end
+  end
+
   @doc """
   This function standardizes errors. There are different
   ways to validate data on Postgresql (constraints, triggers, pgSQL funcs, etc).

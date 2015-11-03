@@ -20,6 +20,7 @@ defmodule Link do
       ]
     )
     |> Megauni.Model.one_row("link")
+    |> Megauni.Model.true_if_map_or_unique_violation("link")
   end # === def create
 
 end # === defmodule Link
