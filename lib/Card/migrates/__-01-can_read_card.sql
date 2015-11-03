@@ -55,7 +55,7 @@ BEGIN
 
     OR
     -- AUD must be on list allowed card readers to read:
-    ( card.privacy = name_to_type_id('LIST ONLY') AND EXISTS (SELECT * FROM in_card_read_list_of(SN_ID, card.id)) )
+    ( card.privacy = name_to_type_id('LIST ONLY') AND EXISTS (SELECT * FROM in_card_read_list(SN_ID, card.id)) )
   LIMIT 1
   ;
 

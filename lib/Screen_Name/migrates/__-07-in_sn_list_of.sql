@@ -3,9 +3,11 @@
 
 
 -- DOWN
-DROP FUNCTION              in_screen_name_list_of(INT, INT)  CASCADE;
+SELECT drop_megauni_func('in_screen_name_list');
+SELECT drop_megauni_func('in_screen_name_list_of');
+
 -- UP
-CREATE OR REPLACE FUNCTION in_screen_name_list_of(IN AUD_ID INT, IN SN_ID INT)
+CREATE OR REPLACE FUNCTION in_screen_name_list(IN AUD_ID INT, IN SN_ID INT)
 RETURNS TABLE ( mask_id INT )
 AS $$
 BEGIN

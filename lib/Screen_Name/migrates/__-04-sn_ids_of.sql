@@ -1,21 +1,24 @@
 
--- DOWN
-DROP FUNCTION screen_name_ids_of(INT) CASCADE;
+-- BOTH
+SELECT drop_megauni_func('screen_name_ids_of');
+SELECT drop_megauni_func('screen_name_ids_from');
 
 -- UP
-CREATE OR REPLACE FUNCTION screen_name_ids_of(IN SN_ID INT)
-RETURNS TABLE ( id INT )
+CREATE OR REPLACE FUNCTION screen_name_ids_from(IN SN_ID INT)
+RETURNS SETOF screen_name
 AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    SN.id
+    *
   FROM
-    screen_name SN
+    top_level_screen_name_from SN
   WHERE
-    SN.parent_id = 0
-    AND
-    SN.owner_id IN (SELECT owner_id FROM screen_name WHERE screen_name.id = SN_ID)
+    SN.owner_id IN (
+      SELECT owner_id
+      FROM screen_name
+      WHERE screen_name.id = SN_ID
+    )
   ;
 END
 $$ LANGUAGE plpgsql;
