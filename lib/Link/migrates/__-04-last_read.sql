@@ -4,9 +4,10 @@
 
 -- BOTH
 SELECT drop_megauni_func('last_read_of');
+SELECT drop_megauni_func('last_read');
 
 -- UP
-CREATE FUNCTION last_read_of(IN SN_ID INT)
+CREATE FUNCTION last_read(IN SN_ID INT)
 RETURNS TABLE (
   publication_id INT,
   at             TIMESTAMP WITH TIME ZONE

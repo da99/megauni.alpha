@@ -42,12 +42,12 @@ BEGIN
       follows_of(USER_ID)        follow
 
       LEFT OUTER JOIN
-      linked_cards_for(USER_ID)  card
+      linked_cards(USER_ID)  card
       ON
       follow.publication_id = card.publication_id
 
       LEFT OUTER JOIN
-      last_read_of(USER_ID)      last_read
+      last_read(USER_ID)      last_read
       ON
       follow.publication_id = last_read.publication_id
 
