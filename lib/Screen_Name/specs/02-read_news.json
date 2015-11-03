@@ -2,7 +2,7 @@
 
 
 [
-  "desc", "Screen_name.news_of",
+  "desc", "Screen_name.news_card",
 
   {
     "it": "news group by publication_id",

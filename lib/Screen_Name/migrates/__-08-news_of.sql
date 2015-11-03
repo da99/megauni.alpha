@@ -3,7 +3,7 @@
 
 --
 -- This function is meant to be used as:
---    SELECT * FROM news_of(link_type_id, aud_user_id)
+--    SELECT * FROM news_card(link_type_id, aud_user_id)
 --    WHERE ....
 --    LIMIT  NUM;
 --
@@ -17,9 +17,10 @@
 
 -- DOWN
 SELECT drop_megauni_func('news_of');
+SELECT drop_megauni_func('news_card');
 
 -- UP
-CREATE OR REPLACE FUNCTION news_of( IN USER_ID  INT)
+CREATE OR REPLACE FUNCTION news_card( IN USER_ID  INT)
 RETURNS TABLE (
   mask_id                 INT,
   publication_id          INT,

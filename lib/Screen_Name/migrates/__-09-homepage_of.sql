@@ -14,9 +14,10 @@
 
 -- BOTH
 SELECT drop_megauni_func('homepage_of');
+SELECT drop_megauni_func('homepage_card');
 
 -- UP
-CREATE OR REPLACE FUNCTION homepage_of( IN AUDIENCE_USER_ID INT, IN RAW_SCREEN_NAME VARCHAR)
+CREATE OR REPLACE FUNCTION homepage_card( IN AUDIENCE_USER_ID INT, IN RAW_SCREEN_NAME VARCHAR)
 RETURNS TABLE (
   publication_id          INT,
   publication_screen_name VARCHAR,
