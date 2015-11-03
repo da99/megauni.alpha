@@ -3,11 +3,9 @@
 
 --
 -- This function is meant to be used as:
---    SELECT * FROM link_read(link_type_id, aud_user_id)
+--    SELECT * FROM news_of(link_type_id, aud_user_id)
 --    WHERE ....
 --    LIMIT  NUM;
-
--- Implementation:
 --
 -- Results:
 --   "my_sn_1" "publication_sn1"                 date of last post
@@ -18,10 +16,10 @@
 --
 
 -- DOWN
-DROP FUNCTION news_of(INT) CASCADE;
+SELECT drop_megauni_func('news_of');
 
 -- UP
-CREATE FUNCTION news_of( IN USER_ID  INT)
+CREATE OR REPLACE FUNCTION news_of( IN USER_ID  INT)
 RETURNS TABLE (
   mask_id                 INT,
   publication_id          INT,

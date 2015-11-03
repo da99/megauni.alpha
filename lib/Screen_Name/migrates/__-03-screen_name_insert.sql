@@ -1,7 +1,7 @@
 
 
 
-CREATE FUNCTION screen_name_insert(
+CREATE OR REPLACE FUNCTION screen_name_insert(
   IN  raw_owner_id INT,
   IN  raw_screen_name VARCHAR,
   OUT owner_id INT,
@@ -25,6 +25,6 @@ $$ LANGUAGE plpgsql;
 
 -- DOWN
 
-DROP FUNCTION screen_name_insert ( INT, VARCHAR ) CASCADE;
+SELECT drop_megauni_func('screen_name_insert');
 
 

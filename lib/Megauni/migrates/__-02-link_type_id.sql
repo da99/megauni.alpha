@@ -1,5 +1,5 @@
 
--- DOWN
+-- BOTH
 SELECT drop_megauni_func('name_to_type_ids');
 
 -- UP
@@ -11,6 +11,13 @@ DECLARE
   IDS        SMALLINT[];
   TRIMMED    VARCHAR;
 BEGIN
+  CASE NAME
+    WHEN 'LINK | CARD, SN', 'LINK | CARD, SCREEN_NAME' THEN
+      NAME := 'LINK | SN, CARD, SN';
+    ELSE
+      NAME := NAME;
+  END CASE;
+
   SPLITS     := regexp_split_to_array(NAME, '\||,');
   FOR i IN array_lower(SPLITS, 1)..array_upper(SPLITS, 1) LOOP
     TRIMMED := trim(BOTH FROM SPLITS[i]);
@@ -22,11 +29,10 @@ END
 $$ LANGUAGE plpgsql IMMUTABLE;
 
 
--- DOWN
-DROP FUNCTION IF EXISTS    name_to_type_id (VARCHAR) CASCADE;
+-- BOTH
+SELECT drop_megauni_func('name_to_type_id');
 
 -- UP
-DROP FUNCTION IF EXISTS    name_to_link_type_id (VARCHAR) CASCADE;
 CREATE OR REPLACE FUNCTION name_to_type_id (IN NAME VARCHAR)
 RETURNS SMALLINT
 AS $$

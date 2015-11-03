@@ -1,5 +1,5 @@
 
-CREATE FUNCTION screen_name_read(
+CREATE OR REPLACE FUNCTION screen_name_read(
   IN  raw_screen_name VARCHAR
 )
 RETURNS TABLE (
@@ -20,7 +20,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION screen_name_read(
+CREATE OR REPLACE FUNCTION screen_name_read(
   IN  sn_id INT
 )
 RETURNS TABLE (
@@ -46,5 +46,4 @@ $$ LANGUAGE plpgsql;
 
 -- DOWN
 
-DROP FUNCTION screen_name_read   ( VARCHAR ) CASCADE;
-DROP FUNCTION screen_name_read   ( INT     ) CASCADE;
+SELECT drop_megauni_func('screen_name_read');
