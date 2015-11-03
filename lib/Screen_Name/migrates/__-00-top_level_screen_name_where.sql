@@ -1,9 +1,10 @@
 
 -- BOTH
 SELECT drop_megauni_func('top_level_screen_name_where');
+SELECT drop_megauni_func('top_level_screen_name_from');
 
 -- UP
-CREATE OR REPLACE FUNCTION top_level_screen_name_where (
+CREATE OR REPLACE FUNCTION top_level_screen_name_from (
   IN RAW_SN VARCHAR
 ) RETURNS SETOF screen_name
 AS $$

@@ -1,10 +1,11 @@
 
 
 -- BOTH
+SELECT drop_megauni_func('link_from');
 SELECT drop_megauni_func('link_where');
 
 -- UP
-CREATE OR REPLACE FUNCTION link_where (
+CREATE OR REPLACE FUNCTION link_from (
   IN TYPE_NAME VARCHAR
 )
 RETURNS SETOF link

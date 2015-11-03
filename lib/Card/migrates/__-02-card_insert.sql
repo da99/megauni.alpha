@@ -20,7 +20,7 @@ BEGIN
     code
   )
   VALUES (
-    screen_name_id_of_or_fail(USER_ID, SN),
+    screen_name_id_or_fail(USER_ID, SN),
     name_to_type_id(PRIVACY_NAME),
     CODE::JSONB
   ) RETURNING card.id;

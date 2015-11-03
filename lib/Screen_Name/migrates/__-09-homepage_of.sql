@@ -38,14 +38,14 @@ BEGIN
       card.created_at         AS card_created_at
 
     FROM
-      link_where('LINK | CARD , SN') AS link,
+      link_from('LINK | CARD , SN') AS link,
       card,
       screen_name
 
     WHERE
-      screen_name.id = screen_name_id_of_or_fail(AUDIENCE_USER_ID, RAW_SCREEN_NAME)
+      screen_name.id = screen_name_id_or_fail(AUDIENCE_USER_ID, RAW_SCREEN_NAME)
       AND -- For now: only owner of SN can link cards.
-      link.owner_id = screen_name_id_of(RAW_SCREEN_NAME)
+      link.owner_id = screen_name_id(RAW_SCREEN_NAME)
       AND
       card.id = link.a_id
       AND

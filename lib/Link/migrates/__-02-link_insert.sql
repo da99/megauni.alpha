@@ -26,13 +26,13 @@ BEGIN
       name_to_type_id('LINK'),
 
       name_to_type_id('SN'),
-      screen_name_id_of_or_fail(USER_ID, SCREEN_NAME),
+      screen_name_id_or_fail(USER_ID, SCREEN_NAME),
 
       name_to_type_id('CARD'),
       return_card_id_or_fail(USER_ID, A_ID),
 
       name_to_type_id('SN'),
-      screen_name_id_of_or_fail(USER_ID, SCREEN_NAME)
+      screen_name_id_or_fail(USER_ID, SCREEN_NAME)
     ) RETURNING link.id;
   ELSE
     RAISE EXCEPTION 'programmer_error: unknown link_insert type: %', TYPE_NAME;
