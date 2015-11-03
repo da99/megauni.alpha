@@ -7,7 +7,14 @@ SELECT drop_megauni_func('link');
 CREATE OR REPLACE FUNCTION link (
   IN TYPE_NAME VARCHAR
 )
-RETURNS SETOF link
+RETURNS TABLE(
+  id     INT,
+  type_id SMALLINT,
+  owner_type_id SMALLINT, owner_id INT,
+  a_type_id SMALLINT, a_id INT,
+  b_type_id SMALLINT, b_id INT,
+  created_at TIMESTAMP WITH TIME ZONE
+)
 AS $$
 DECLARE
   type_ids SMALLINT[];
@@ -16,7 +23,10 @@ BEGIN
 
   RETURN QUERY
   SELECT
-    link.*
+    id, type_id, owner_type_id, owner_id,
+    a_type_id, a_id,
+    b_type_id, b_id,
+    created_at
   FROM
     link
   WHERE

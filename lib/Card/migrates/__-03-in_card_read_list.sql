@@ -7,11 +7,13 @@ SELECT drop_megauni_func('in_card_read_list');
 
 -- UP
 CREATE FUNCTION in_card_read_list(IN SN_ID INT, IN CARD_ID INT)
-RETURNS TABLE ( answer BOOLEAN ) AS $$
+RETURNS BOOLEAN AS $$
+DECLARE
+  rec RECORD;
 BEGIN
-  RETURN QUERY
   SELECT
     TRUE AS answer
+  INTO rec
   FROM
     link_from('ALLOW TO READ | SN, CARD, SN') link
   WHERE
@@ -21,8 +23,13 @@ BEGIN
     a_id IN (SELECT id FROM screen_name_ids_from(SN_ID))
     AND
     b_id = CARD_ID
-  LIMIT 1
-  ;
+  LIMIT 1;
+
+  IF FOUND THEN
+    RETURN TRUE;
+  END IF;
+
+  RETURN FALSE;
 END
 $$ LANGUAGE plpgsql;
 

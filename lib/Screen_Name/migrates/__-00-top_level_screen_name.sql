@@ -5,11 +5,15 @@ SELECT drop_megauni_func('top_level_screen_name');
 -- UP
 CREATE OR REPLACE FUNCTION top_level_screen_name (
   IN RAW_SN VARCHAR
-) RETURNS SETOF screen_name
+) RETURNS TABLE(
+  id          INT,
+  owner_id    INT,
+  screen_name VARCHAR
+)
 AS $$
 BEGIN
   RETURN QUERY
-  SELECT *
+  SELECT id, owner_id, screen_name
   FROM screen_name
   WHERE
   parent_id = 0
