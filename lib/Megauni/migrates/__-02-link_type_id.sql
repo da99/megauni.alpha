@@ -11,18 +11,25 @@ DECLARE
   IDS        SMALLINT[];
   TRIMMED    VARCHAR;
 BEGIN
-  CASE NAME
-    WHEN 'LINK | CARD, SN', 'LINK | CARD, SCREEN_NAME' THEN
-      NAME := 'LINK | SN, CARD, SN';
-    ELSE
-      NAME := NAME;
+  SPLITS     := regexp_split_to_array(NAME, '\s*[\|,]\s*');
+
+  CASE SPLITS
+  WHEN ARRAY['LINK', 'CARD', 'SCREEN_NAME']::VARCHAR[] THEN
+    SPLITS := ARRAY['LINK', 'SCREEN_NAME', 'CARD', 'SCREEN_NAME'];
+  ELSE
+    NAME := NAME;
   END CASE;
 
-  SPLITS     := regexp_split_to_array(NAME, '\||,');
+  -- Guard against mistakes like: LINK | CARD , SCREEN_NAME
+  IF array_length(SPLITS, 1) != 4 THEN
+    RAISE EXCEPTION 'programmer_error: type not found: %', NAME;
+  END IF;
+
   FOR i IN array_lower(SPLITS, 1)..array_upper(SPLITS, 1) LOOP
     TRIMMED := trim(BOTH FROM SPLITS[i]);
-    IDS[i] = name_to_type_id(TRIMMED);
+    IDS[i]  := name_to_type_id(TRIMMED);
   END LOOP;
+
 
   RETURN IDS;
 END
