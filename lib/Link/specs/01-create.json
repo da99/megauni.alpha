@@ -10,7 +10,7 @@
     "input"  : [
       "create screen_name",
       "create card",
-      "Link.create", [ "LINK | CARD, SN", "card.id", "sn.screen_name" ],
+      "Link.create", [ "LINK | CARD, SCREEN_NAME", "card.id", "sn.screen_name" ],
       1
     ],
     "output" : [ "read homepage", "length" ]
@@ -22,7 +22,7 @@
       "create screen_name",
       "create card",
       "repeat", [ 3,
-        "Link.create", [ "LINK | CARD, SN", "card.id", "sn.screen_name" ]
+        "Link.create", [ "LINK | CARD, SCREEN_NAME", "card.id", "sn.screen_name" ]
       ], 1
     ],
     "output" : [ "read homepage", "length" ]

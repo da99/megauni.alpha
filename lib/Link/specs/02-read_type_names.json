@@ -5,7 +5,7 @@
   {
     "it"     : "Turns strings into array of integers.",
     "input"  : [
-      "query", ["SELECT name_to_type_ids('LINK | SN , CARD , SN') AS ids;"],
+      "query", ["SELECT name_to_type_ids('LINK | SCREEN_NAME , CARD , SCREEN_NAME') AS ids;"],
       "pluck", ["ids"]
     ],
     "output" : ["array", [[40, 2, 3, 2]]]

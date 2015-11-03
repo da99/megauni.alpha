@@ -39,7 +39,7 @@ BEGIN
       card.created_at         AS card_created_at
 
     FROM
-      link_from('LINK | CARD , SN') AS link,
+      link_from('LINK | CARD, SCREEN_NAME') AS link,
       card,
       screen_name
 
