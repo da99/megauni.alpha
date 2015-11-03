@@ -15,7 +15,7 @@ BEGIN
   SELECT
     id, owner_id, screen_name
   FROM
-    top_level_screen_name_from SN
+    top_level_screen_name SN
   WHERE
     SN.owner_id IN (
       SELECT owner_id

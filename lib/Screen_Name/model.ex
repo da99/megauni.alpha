@@ -35,9 +35,16 @@ defmodule Screen_Name do
   end
 
   def read_one data do
-    data
-    |> read
-    |> List.first
+    data |> read |> List.first
+  end
+
+  def read_homepage_cards user_id, sn do
+    Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      "SELECT * FROM homepage_card($1, $2) LIMIT 100;",
+      [user_id, sn]
+    )
+    |> Megauni.Model.rows
   end
 
   def clean_screen_name sn do

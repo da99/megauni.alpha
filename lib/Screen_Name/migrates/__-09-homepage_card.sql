@@ -16,8 +16,10 @@
 SELECT drop_megauni_func('homepage_card');
 
 -- UP
-CREATE OR REPLACE FUNCTION homepage_card( IN AUDIENCE_USER_ID INT, IN RAW_SCREEN_NAME VARCHAR)
-RETURNS TABLE (
+CREATE OR REPLACE FUNCTION homepage_card(
+  IN AUDIENCE_USER_ID INT,
+  IN RAW_SCREEN_NAME VARCHAR
+) RETURNS TABLE (
   publication_id          INT,
   publication_screen_name VARCHAR,
   card_id                 INT,
@@ -38,7 +40,7 @@ BEGIN
       card.created_at         AS card_created_at
 
     FROM
-      link_from('LINK | CARD, SCREEN_NAME') AS link,
+      link('LINK | CARD, SCREEN_NAME') AS link,
       card,
       screen_name
 

@@ -79,6 +79,10 @@ env = %{
     {stack ++ [arr], prog, env}
   end,
 
+  "length" => fn(stack, prog, env) ->
+    {stack ++ [stack |> List.last |> Enum.count], prog, env}
+  end,
+
   "pluck" => fn(stack, prog, env) ->
     {[key], prog, env} = JSON_Spec.take(prog, 1, env)
     results = Enum.map List.last(stack), fn(x) ->
@@ -124,6 +128,15 @@ env = %{
         result
     end
     {stack ++ [result], prog, env}
+  end,
+
+  "read homepage" => fn(stack, prog, env) ->
+    cards = Screen_Name.read_homepage_cards(
+      env["user"]["id"],
+      env["sn"]["screen_name"]
+    )
+    JSON_Spec.put(env, "cards", cards);
+    {stack ++ [cards], prog, env}
   end,
 
   "type_ids" => fn(stack, prog, env) ->
