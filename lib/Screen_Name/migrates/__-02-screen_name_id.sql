@@ -32,7 +32,7 @@ DECLARE
 BEGIN
   SELECT id
   INTO sn_record
-  FROM top_level_screen_name_from(RAW_SCREEN_NAME) SN
+  FROM top_level_screen_name(RAW_SCREEN_NAME) SN
   WHERE
     SN.owner_id = USER_ID
   LIMIT 1
@@ -53,7 +53,7 @@ DECLARE
 BEGIN
   SELECT id
   INTO sn_record
-  FROM top_level_screen_name_from(RAW_SCREEN_NAME) SN
+  FROM top_level_screen_name(RAW_SCREEN_NAME) SN
   LIMIT 1;
   RETURN sn_record.id;
 END
