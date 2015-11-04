@@ -17,7 +17,7 @@ BEGIN
   FROM
     link
   WHERE
-    type_id = 12 AND
+    type_id = name_to_type_id('ALLOW TO READ') AND
     owner_id = b_id AND
     a_id IN (SELECT id FROM sn_ids_of(AUD_ID))
   LIMIT 1;
