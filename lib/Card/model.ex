@@ -9,7 +9,7 @@ defmodule Card do
 
   def create( data ) when is_map(data) do
     create(
-      data["user_id"],
+      data["owner_id"],
       data["owner_screen_name"],
       data["privacy"],
       data["code"]

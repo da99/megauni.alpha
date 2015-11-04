@@ -109,10 +109,9 @@ env = %{
   "create card" => fn(stack, prog, env) ->
     if (prog |> List.first |> is_map) do
       {data, prog, env} = JSON_Spec.take(prog, 1, env)
-    In.spect data
     else
       data = %{
-        "user_id"           => env["user"]["id"],
+        "owner_id"          => env["user"]["id"],
         "owner_screen_name" => env["sn"]["screen_name"],
         "privacy"           => "WORLD READABLE",
         "code"              => [%{"cmd": "time"}]
