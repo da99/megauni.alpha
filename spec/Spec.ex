@@ -131,11 +131,15 @@ env = %{
   "create link" => fn(stack, prog, env) ->
     {args, prog, env} = JSON_Spec.take(prog, 1, env)
 
-    user_id = (
-      env["user"] && env["user"]["id"]
-    ) || Screen_Name.read_id!(env["sn"]["screen_name"])
+    if (args |> List.first |> is_number) do
+      [user_id | args] = args
+    else
+      user_id = (
+        env["user"] && env["user"]["id"]
+      ) || Screen_Name.read_id!(env["sn"]["screen_name"])
+    end
 
-    In.spect user_id
+    In.spect [user_id, args]
 
     result = Link.create user_id, args
     case result do

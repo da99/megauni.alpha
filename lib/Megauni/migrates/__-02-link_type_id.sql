@@ -1,9 +1,31 @@
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('name_to_type_ids');
 SELECT drop_megauni_func('name_to_type_id');
+SELECT drop_megauni_func('names_to_type_id_array');
+
 
 -- UP
+CREATE OR REPLACE FUNCTION names_to_type_id_array (IN NAME VARCHAR)
+RETURNS SMALLINT[]
+AS $$
+DECLARE
+  SPLITS     VARCHAR[];
+  IDS        SMALLINT[];
+  TRIMMED    VARCHAR;
+BEGIN
+  SPLITS     := regexp_split_to_array(NAME, '\s*[\|,]\s*');
+
+  FOR i IN array_lower(SPLITS, 1)..array_upper(SPLITS, 1) LOOP
+    TRIMMED := trim(BOTH FROM SPLITS[i]);
+    IDS[i]  := name_to_type_id(TRIMMED);
+  END LOOP;
+
+  RETURN IDS;
+END
+$$ LANGUAGE plpgsql IMMUTABLE;
+
+
 CREATE OR REPLACE FUNCTION name_to_type_ids (IN NAME VARCHAR)
 RETURNS SMALLINT[]
 AS $$

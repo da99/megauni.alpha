@@ -4,11 +4,13 @@
 
 CREATE OR REPLACE FUNCTION screen_name_before_insert()
 RETURNS trigger AS $$
+  DECLARE
+    allowed_privacy CONSTANT varchar := 'ME ONLY, LIST ONLY, WORLD READABLE';
   BEGIN
 
     -- privacy
-    IF NEW.privacy < 1 OR NEW.privacy > 3 THEN
-      RAISE EXCEPTION 'programmer_error: privacy must be in [1-ME_ONLY,2-ON_LIST,3-PUBLIC]';
+    IF NOT ( NEW.privacy = ANY(names_to_type_id_array(allowed_privacy)) ) THEN
+      RAISE EXCEPTION 'programmer_error: privacy must be: %', allowed_privacy;
     END IF;
 
     -- screen_name
