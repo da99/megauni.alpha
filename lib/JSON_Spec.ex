@@ -136,14 +136,6 @@ defmodule JSON_Spec do
     )
   end
 
-  def err_msg e do
-    if Map.has_key?(e, "error") do
-      e["error"]
-    else
-      e["user_error"]
-    end
-  end
-
   def input raw, env do
     cond do
       is_map(raw) ->
@@ -379,7 +371,7 @@ defmodule JSON_Spec do
         # === If last value is an error and there is still more
         #     to process in the prog, raise the error:
         if env[:raise_errors] && Enum.count(prog) != 0 && is_error?(List.last(stack)) do
-          raise err_msg(List.last(stack))
+          raise "From: #{inspect token} Result: #{inspect(List.last(stack))}"
         else
           run_list stack, prog, env
         end
@@ -444,6 +436,7 @@ defmodule JSON_Spec do
 
           true -> # === Check for "key.key.key"
             {is_key, val} = Enum.reduce String.split(name, "."), {true, env}, fn(key, {is_key, data}) ->
+
               if is_key && Map.has_key?(data, key) do
                 {true, data[key]}
               else
@@ -451,10 +444,10 @@ defmodule JSON_Spec do
               end
             end
 
-            if is_key do
-              {val, env}
-            else # === send the original, instead of the canonized
-              {x, env}
+            cond do
+              is_key           -> {val, env}
+              env["lookup kv"] -> env["lookup kv"].(x, env)
+              true             -> {x, env}
             end
         end # === cond
 

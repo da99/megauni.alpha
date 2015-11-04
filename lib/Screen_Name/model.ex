@@ -26,6 +26,21 @@ defmodule Screen_Name do
 
   end # === def canonize_screen_name
 
+  def read_id! raw_name do
+    result = Ecto.Adapters.SQL.query(
+      Megauni.Repos.Main,
+      "SELECT id FROM top_level_screen_name($1);",
+      [raw_name]
+    )
+
+    case result do
+      {:ok, %{num_rows: 1, columns: _cols, rows: [row]}} ->
+        List.first row
+      _ ->
+        raise "screen_name not found: #{inspect raw_name}"
+    end
+  end
+
   def read data do
     Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,

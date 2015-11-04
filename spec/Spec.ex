@@ -109,6 +109,7 @@ env = %{
   "create card" => fn(stack, prog, env) ->
     if (prog |> List.first |> is_map) do
       {data, prog, env} = JSON_Spec.take(prog, 1, env)
+    In.spect data
     else
       data = %{
         "user_id"           => env["user"]["id"],
@@ -294,6 +295,21 @@ env = %{
         raise "Unknown error: #{inspect user}"
     end
     {(stack ++ [user]), prog, env}
+  end,
+
+  "lookup kv" => fn(k, env) ->
+    cond do
+      x = Regex.run(~r/^sn_(.)?\.id$/, k) ->
+        name = env["sn_#{List.last(x)}"]["screen_name"]
+        {Screen_Name.read_id!(name), env}
+
+      k == "sn.id" ->
+        name = env["sn"]["screen_name"]
+        {Screen_Name.read_id!(name), env}
+
+      true ->
+        {k, env}
+    end # === cond
   end,
 
   "create screen_name" => fn(stack, prog, env) ->
