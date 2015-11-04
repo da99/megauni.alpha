@@ -12,7 +12,7 @@ CREATE TABLE card (
   -- 2: same as SN
   -- 3: list of card, ignoring SN list
   -- 4: world readable bypassing screen_name
-  privacy        SMALLINT                 NOT NULL DEFAULT 1,
+  privacy        SMALLINT                 NOT NULL DEFAULT name_to_type_id('ME ONLY'),
 
   code           JSONB                    NOT NULL,
 

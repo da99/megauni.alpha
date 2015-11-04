@@ -12,7 +12,7 @@ CREATE TABLE screen_name (
   -- 1: me_only
   -- 2: list
   -- 3: world readable
-  privacy        smallint NOT NULL DEFAULT 1,
+  privacy        smallint NOT NULL DEFAULT name_to_type_id('ME ONLY'),
 
   -- Refers to "screen_name" id. 0 == top level:
   parent_id      integer  NOT NULL DEFAULT 0,
