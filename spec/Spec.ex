@@ -135,6 +135,8 @@ env = %{
       env["user"] && env["user"]["id"]
     ) || Screen_Name.read_id!(env["sn"]["screen_name"])
 
+    In.spect user_id
+
     result = Link.create user_id, args
     case result do
       %{"link"=> _link} ->
@@ -162,7 +164,12 @@ env = %{
       args = [sn]
     end
 
-    result = Screen_Name.read_news_card env["user"]["id"], args
+    user_id = (
+      env["user"] && env["user"]["id"]
+    ) || Screen_Name.read_id!(env["sn"]["screen_name"])
+
+    In.spect [user_id, args]
+    result = Screen_Name.read_news_card user_id, args
 
     case result do
       x when is_list(x) ->
@@ -171,6 +178,12 @@ env = %{
         result
     end
     {stack ++ [result], prog, env}
+  end,
+
+  "user.id =" => fn(stack, prog, env) ->
+    {args, prog, env} = JSON_Spec.take prog, 1, env
+    env = Map.put env, "user", %{"id"=> List.last(args)}
+    {stack, prog, env}
   end,
 
   "type_ids" => fn(stack, prog, env) ->

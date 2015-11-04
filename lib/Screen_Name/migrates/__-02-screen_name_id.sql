@@ -1,20 +1,43 @@
 
 -- BOTH
+SELECT drop_megauni_func('screen_name_id_if_owns_or_fail');
 SELECT drop_megauni_func('screen_name_id_or_fail');
 SELECT drop_megauni_func('screen_name_id');
 
 -- UP
-
-CREATE OR REPLACE FUNCTION  screen_name_id_or_fail (
+CREATE OR REPLACE FUNCTION  screen_name_id_if_owns_or_fail (
   IN USER_ID INT, IN RAW_SCREEN_NAME VARCHAR
 ) RETURNS INT
 AS $$
+DECLARE
+  sn_record RECORD;
+BEGIN
+  SELECT id
+  INTO sn_record
+  FROM top_level_screen_name(RAW_SCREEN_NAME) SN
+  WHERE
+    SN.id = screen_name_id(RAW_SCREEN_NAME)
+    AND
+    SN.owner_id = USER_ID
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'user_error: not owner of screen_name: %', RAW_SCREEN_NAME;
+  END IF;
+
+  RETURN sn_record.id;
+END
+$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+CREATE OR REPLACE FUNCTION screen_name_id_or_fail ( IN USER_ID INT, IN RAW_SCREEN_NAME VARCHAR )
+RETURNS INT AS $$
 DECLARE
   sn_id INT;
 BEGIN
   sn_id := screen_name_id(USER_ID, RAW_SCREEN_NAME);
   IF sn_id IS NULL THEN
-    RAISE EXCEPTION 'user_error: not owner of screen_name: %', RAW_SCREEN_NAME;
+    RAISE EXCEPTION 'user_error: not allowed to read: %', RAW_SCREEN_NAME;
   END IF;
 
   RETURN sn_id;
@@ -23,10 +46,24 @@ $$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 
-CREATE OR REPLACE FUNCTION  screen_name_id (
-  IN USER_ID INT, IN RAW_SCREEN_NAME   VARCHAR
-) RETURNS INT
-AS $$
+CREATE OR REPLACE FUNCTION screen_name_id_or_fail ( IN RAW_SCREEN_NAME VARCHAR )
+RETURNS INT AS $$
+DECLARE
+  sn_id INT;
+BEGIN
+  sn_id := screen_name_id(RAW_SCREEN_NAME);
+  IF sn_id IS NULL THEN
+    RAISE EXCEPTION 'user_error: not found: %', RAW_SCREEN_NAME;
+  END IF;
+
+  RETURN sn_id;
+END
+$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+-- RETURNS SN id if USER_ID can read it.
+CREATE OR REPLACE FUNCTION  screen_name_id ( IN USER_ID INT, IN RAW_SCREEN_NAME   VARCHAR)
+RETURNS INT AS $$
 DECLARE
   sn_record   RECORD;
 BEGIN
@@ -34,7 +71,9 @@ BEGIN
   INTO sn_record
   FROM top_level_screen_name(RAW_SCREEN_NAME) SN
   WHERE
-    SN.owner_id = USER_ID
+    SN.id = screen_name_id(RAW_SCREEN_NAME)
+    AND
+    can_read(USER_ID, SN.id)
   LIMIT 1
   ;
   RETURN sn_record.id;
@@ -42,12 +81,9 @@ END
 $$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-
-CREATE OR REPLACE FUNCTION  screen_name_id (
-  IN RAW_SCREEN_NAME   VARCHAR
-)
-RETURNS INT
-AS $$
+-- Return id of RAW_SCREEN_NAME:
+CREATE OR REPLACE FUNCTION  screen_name_id ( IN RAW_SCREEN_NAME   VARCHAR)
+RETURNS INT AS $$
 DECLARE
   sn_record   RECORD;
 BEGIN

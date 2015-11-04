@@ -45,9 +45,10 @@ BEGIN
       screen_name
 
     WHERE
-      screen_name.id = screen_name_id_or_fail(AUDIENCE_USER_ID, RAW_SCREEN_NAME)
-      AND -- For now: only owner of SN can link cards.
+      -- For now: only owner of SN can link cards.
       link.owner_id = screen_name_id(RAW_SCREEN_NAME)
+      AND
+      can_read(AUDIENCE_USER_ID, link.owner_id)
       AND
       card.id = link.a_id
       AND

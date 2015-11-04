@@ -5,10 +5,10 @@ SELECT drop_megauni_func('card_insert');
 -- UP
 
 CREATE FUNCTION card_insert (
-  IN USER_ID INT,
-  IN SN      VARCHAR,
+  IN USER_ID      INT,
+  IN RAW_SN       VARCHAR,
   IN PRIVACY_NAME VARCHAR,
-  IN CODE    VARCHAR
+  IN CODE         VARCHAR
 ) RETURNS TABLE( id INT )
 AS $$
 DECLARE
@@ -20,7 +20,7 @@ BEGIN
     code
   )
   VALUES (
-    screen_name_id_or_fail(USER_ID, SN),
+    screen_name_id_if_owns_or_fail(USER_ID, RAW_SN),
     name_to_type_id(PRIVACY_NAME),
     CODE::JSONB
   ) RETURNING card.id;

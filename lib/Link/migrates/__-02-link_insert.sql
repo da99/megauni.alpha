@@ -32,10 +32,10 @@ BEGIN
       IDS[1],
 
       -- OWNER_ID = A_ID
-      IDS[2], screen_name_id_or_fail(USER_ID, A_SCREEN_NAME),
+      IDS[2], screen_name_id_if_owns_or_fail(USER_ID, A_SCREEN_NAME),
 
       -- A_ID
-      IDS[3], screen_name_id_or_fail(USER_ID, A_SCREEN_NAME),
+      IDS[3], screen_name_id_if_owns_or_fail(USER_ID, A_SCREEN_NAME),
 
       -- B_ID
       IDS[4], screen_name_id_or_fail(USER_ID, B_SCREEN_NAME)
@@ -54,9 +54,9 @@ BEGIN
     VALUES (
       IDS[1],
 
-      IDS[2], screen_name_id_or_fail(USER_ID, SCREEN_NAME),
+      IDS[2], screen_name_id_if_owns_or_fail(USER_ID, SCREEN_NAME),
       IDS[3], card_id_or_fail(USER_ID, A_ID),
-      IDS[4], screen_name_id_or_fail(USER_ID, SCREEN_NAME)
+      IDS[4], screen_name_id_if_owns_or_fail(USER_ID, SCREEN_NAME)
     ) RETURNING link.id;
 
   ELSE
@@ -93,9 +93,9 @@ BEGIN
     VALUES (
       IDS[1],
 
-      IDS[2], screen_name_id_or_fail(USER_ID, SCREEN_NAME),
+      IDS[2], screen_name_id_if_owns_or_fail(USER_ID, SCREEN_NAME),
       IDS[3], card_id_or_fail(USER_ID, A_ID),
-      IDS[4], screen_name_id_or_fail(USER_ID, SCREEN_NAME)
+      IDS[4], screen_name_id_if_owns_or_fail(USER_ID, SCREEN_NAME)
     ) RETURNING link.id;
 
   ELSE
