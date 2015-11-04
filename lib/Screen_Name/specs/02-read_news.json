@@ -11,15 +11,15 @@
 
       "create screen_name",
       "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-      "create link", {"type" : "follow", "owner_id": "sn_1.id", "a_id": "sn_1.id", "b_id": "sn.id"},
+      "create link", ["FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
 
       "create screen_name",
       "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-      "create link", {"type" : "follow", "owner_id": "sn_1.id", "a_id": "sn_1.id", "b_id": "sn.id"},
+      "create link", ["FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
 
       "create screen_name",
       "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-      "create link", {"type" : "follow", "owner_id": "sn_1.id", "a_id": "sn_1.id", "b_id": "sn.id"}
+      "create link", ["FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"]
     ],
     "output" : [
       {"mask_id": "sn_1.id", "publication_id": "sn_2.id", "card_id" : "card_1.id" },

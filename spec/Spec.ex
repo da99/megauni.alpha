@@ -129,8 +129,13 @@ env = %{
   end,
 
   "create link" => fn(stack, prog, env) ->
-    {data, prog, env} = JSON_Spec.take(prog, 1, env)
-    result = Link.create data
+    {args, prog, env} = JSON_Spec.take(prog, 1, env)
+
+    user_id = (
+      env["user"] && env["user"]["id"]
+    ) || Screen_Name.read_id!(env["sn"]["screen_name"])
+
+    result = Link.create user_id, args
     case result do
       %{"link"=> _link} ->
         env = JSON_Spec.put(env, "link", result)
