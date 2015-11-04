@@ -141,7 +141,7 @@ defmodule JSON_Spec do
       is_map(raw) ->
         input([raw], env)
 
-      list_of_maps?(raw) ->
+      is_list_of_maps?(raw) ->
         if Enum.count(raw) > 1 do
           env = Map.put env, :raise_errors, true
         end
@@ -164,9 +164,17 @@ defmodule JSON_Spec do
     {expected, env} = cond do
       is_map(output) ->
         compile(output, env)
+
+      is_list_of_maps?(output) ->
+        Enum.reduce output, {[], env}, fn(m, {list, env}) ->
+          {new_map, env} = compile(m, env)
+          {list ++ [new_map], env}
+        end
+
       is_list(output) ->
         {stack, env} = run_list(output, env)
         {List.last(stack), env}
+
       true ->
         raise "Don't know what to do with input/output: #{inspect output}"
     end
@@ -197,7 +205,7 @@ defmodule JSON_Spec do
     "#{space}#{num}"
   end
 
-  def list_of_maps? list do
+  def is_list_of_maps? list do
     if !is_list(list) do
       false
     else
