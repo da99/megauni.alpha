@@ -434,8 +434,13 @@ defmodule JSON_Spec do
 
         name = canon_key(x)
         cond do
+          # === is it a simple k/v lookup?
           Map.has_key?(env, name) && !is_function(env[name]) ->
             {env[name], env}
+
+          # === is function a "compile" func/1 or a run_prog func/3?
+          Map.has_key?(env, name) && is_function(env[name], 1)  ->
+            {val, env} = env[name].(env)
 
           true -> # === Check for "key.key.key"
             {is_key, val} = Enum.reduce String.split(name, "."), {true, env}, fn(key, {is_key, data}) ->

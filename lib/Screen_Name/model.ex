@@ -11,17 +11,18 @@ defmodule Screen_Name do
   @begin_at_or_hash  ~r/\A(\@|\#)/
   @all_white_space   ~r/\s+/
 
-  def canonize str do
-    cond do
-      is_list(str) ->
-        Enum.map(str, fn (v) -> canonize(v) end)
-      is_binary(str) ->
+  def canonize list_or_binary do
+    case list_or_binary do
+      list when is_list(list) ->
+        Enum.map(list, fn (v) -> canonize(v) end)
+
+      str when is_binary(str) ->
         str = str
         |> String.strip
         |> String.upcase
         |> (&Regex.replace(@begin_at_or_hash, &1, '')).()
         |> (&Regex.replace(@all_white_space, &1, '-')).()
-    end
+    end # === case
 
   end # === def canonize_screen_name
 
