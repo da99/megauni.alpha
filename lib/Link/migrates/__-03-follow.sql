@@ -28,9 +28,9 @@ BEGIN
   FROM
     link
   WHERE
-    type_id = 23
+    type_id = name_to_type_id('FOLLOW')
     AND owner_id = a_id -- 'follows' can only be made by sn
-    AND owner_id IN (SELECT sn.id FROM screen_name_ids(SN_ID))
+    AND owner_id IN (SELECT sn.id FROM screen_name_ids(SN_ID) sn)
   ;
 END
 $$ LANGUAGE plpgsql;

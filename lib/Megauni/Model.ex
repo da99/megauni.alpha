@@ -3,6 +3,10 @@ defmodule Megauni.Model do
 
   @user_err_regexp  ~r/\Auser_error: /
 
+  def query sql, args do
+    Ecto.Adapters.SQL.query( Megauni.Repos.Main, sql, args)
+  end
+
   def max_length raw do
     case raw do
       { :error, %{postgres: %{code: :string_data_right_truncation, message: msg}} } ->

@@ -154,6 +154,25 @@ env = %{
     {stack ++ [cards], prog, env}
   end,
 
+  "read news_card" => fn(stack, prog, env) ->
+    if prog |> List.first |> is_list do
+      {args, prog, env} = JSON_Spec.take(prog, 1, env)
+    else
+      {sn, env} = JSON_Spec.compile "sn.screen_name", env
+      args = [sn]
+    end
+
+    result = Screen_Name.read_news_card env["user"]["id"], args
+
+    case result do
+      x when is_list(x) ->
+        env = JSON_Spec.put(env, "news_cards", result)
+      _ ->
+        result
+    end
+    {stack ++ [result], prog, env}
+  end,
+
   "type_ids" => fn(stack, prog, env) ->
     ids = Regex.scan(
       ~r/RETURN\s+(\d+)\s?;/,

@@ -19,6 +19,24 @@
 SELECT drop_megauni_func('news_card');
 
 -- UP
+CREATE OR REPLACE FUNCTION news_card( IN USER_ID INT, IN RAW_SCREEN_NAME VARCHAR )
+RETURNS TABLE (
+  mask_id                 INT,
+  publication_id          INT,
+  updated_at              TIMESTAMP WITH TIME ZONE,
+  last_read_at            TIMESTAMP WITH TIME ZONE
+)
+AS $$
+BEGIN
+  RETURN QUERY
+    SELECT * FROM news_card(USER_ID) AS news
+    WHERE news.publication_id = screen_name_id(RAW_SCREEN_NAME)
+  ;
+END
+$$ LANGUAGE plpgsql;
+
+
+
 CREATE OR REPLACE FUNCTION news_card( IN USER_ID  INT)
 RETURNS TABLE (
   mask_id                 INT,
@@ -38,10 +56,10 @@ BEGIN
       last_read.at                  AS last_read_at
 
     FROM
-      follows_of(USER_ID)        follow
+      follow(USER_ID)        follow
 
       LEFT OUTER JOIN
-      linked_cards(USER_ID)  card
+      linked_card(USER_ID)  card
       ON
       follow.publication_id = card.publication_id
 

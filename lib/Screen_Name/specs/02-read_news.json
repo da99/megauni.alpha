@@ -2,7 +2,7 @@
 
 
 [
-  "desc", "Screen_name.news_card",
+  "desc", "Screen_name.read_news_card",
 
   {
     "it": "news group by publication_id",
@@ -19,7 +19,8 @@
 
       "create screen_name",
       "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-      "create link", ["FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"]
+      "create link", ["FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
+      "read news_card"
     ],
     "output" : [
       {"mask_id": "sn_1.id", "publication_id": "sn_2.id", "card_id" : "card_1.id" },

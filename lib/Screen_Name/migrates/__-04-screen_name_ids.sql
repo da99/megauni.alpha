@@ -13,14 +13,14 @@ AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    id, owner_id, screen_name
+    SN.id, SN.owner_id, SN.screen_name
   FROM
-    top_level_screen_name SN
+    top_level_screen_name() SN
   WHERE
     SN.owner_id IN (
-      SELECT owner_id
-      FROM screen_name
-      WHERE screen_name.id = SN_ID
+      SELECT s.owner_id
+      FROM screen_name s
+      WHERE s.id = SN_ID
     )
   ;
 END
