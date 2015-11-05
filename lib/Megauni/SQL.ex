@@ -1,4 +1,9 @@
 
+
+defmodule Megauni.Repos.Main do
+  use Ecto.Repo, otp_app: :megauni
+end
+
 defmodule Megauni.SQL do
   @user_err_regexp  ~r/\Auser_error: /
 
