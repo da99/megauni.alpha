@@ -465,6 +465,9 @@ defmodule JSON_Spec do
           { arr ++ [result], env}
         end
 
+      is_nil(x) ->
+        {nil, env}
+
       true ->
         raise "Don't know what to do with: #{inspect x}"
     end # === cond

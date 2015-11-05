@@ -28,9 +28,9 @@
       "read news_card"
     ],
     "output" : [
-      {"mask_id": "sn_1.id", "publication_id": "sn_2.id", "updated_at": "something" },
-      {"mask_id": "sn_1.id", "publication_id": "sn_3.id", "updated_at": "something" },
-      {"mask_id": "sn_1.id", "publication_id": "sn_4.id", "updated_at": "something" }
+      {"mask_id": "sn_1.id", "publication_id": "sn_4.id", "updated_at": "card_3.linked_at", "last_read_at": null },
+      {"mask_id": "sn_1.id", "publication_id": "sn_3.id", "updated_at": "card_2.linked_at", "last_read_at": null },
+      {"mask_id": "sn_1.id", "publication_id": "sn_2.id", "updated_at": "card_1.linked_at", "last_read_at": null }
     ]
   }
 

@@ -336,6 +336,20 @@ env = %{
 
   "lookup kv" => fn(k, env) ->
     cond do
+      x = Regex.run(~r/^card_(.)?\.linked_at$/, k) ->
+        id = env["card_#{List.last(x)}"]["id"]
+        row = Megauni.Model.query(
+          """
+           SELECT created_at AS linked_at FROM link
+           WHERE type_id = name_to_type_id('LINK')
+             AND  a_id = $1 AND a_type_id = name_to_type_id('CARD')
+             AND  b_type_id = name_to_type_id('SCREEN_NAME')
+           ORDER BY id DESC
+           LIMIT 1
+         """, [id]
+        ) |> Megauni.Model.one_row;
+        {row["linked_at"], env}
+
       x = Regex.run(~r/^sn_(.)?\.id$/, k) ->
         name = env["sn_#{List.last(x)}"]["screen_name"]
         {Screen_Name.read_id!(name), env}
@@ -343,6 +357,7 @@ env = %{
       k == "sn.id" ->
         name = env["sn"]["screen_name"]
         {Screen_Name.read_id!(name), env}
+
 
       true ->
         {k, env}
