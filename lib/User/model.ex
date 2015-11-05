@@ -44,8 +44,7 @@ defmodule User do
           clean_pass
 
       _ when is_binary(clean_pass) ->
-        Ecto.Adapters.SQL.query(
-          Megauni.Repos.Main,
+        Megauni.SQL.query(
           """
             SELECT id, screen_name
             FROM user_insert( $1 , $2 );
@@ -55,7 +54,7 @@ defmodule User do
             Comeonin.Bcrypt.hashpwsalt( clean_pass )
           ]
         )
-        |> Megauni.Model.one_row("screen_name")
+        |> Megauni.SQL.one_row("screen_name")
     end # === case clean_pass
 
 

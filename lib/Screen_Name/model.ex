@@ -27,8 +27,8 @@ defmodule Screen_Name do
   end # === def canonize_screen_name
 
   def select_id name do
-    Megauni.Model.query("SELECT screen_name_id($1) AS id;", [name])
-    |> Megauni.Model.one_row
+    Megauni.SQL.query("SELECT screen_name_id($1) AS id;", [name])
+    |> Megauni.SQL.one_row
     |> Map.get "id"
   end
 
@@ -36,61 +36,55 @@ defmodule Screen_Name do
     case action do
       "update screen_name privacy" ->
         sql = "SELECT * FROM update_screen_name_privacy( $1, $2, $3 );"
-        {:ok, _val} = Megauni.Model.query(sql, [user_id] ++ args)
+        {:ok, _val} = Megauni.SQL.query(sql, [user_id] ++ args)
         {:ok, true}
     end
   end # === def run
 
   def read_id! raw_name do
-    result = Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main,
+    result = Megauni.SQL.query(
       "SELECT id FROM top_level_screen_name($1);",
       [raw_name]
     )
 
     case result do
-      {:ok, %{num_rows: 1, columns: _cols, rows: [row]}} ->
-        List.first row
+      {:ok, [row]} ->
+        row |> Map.get("id")
       _ ->
         raise "screen_name not found: #{inspect raw_name}"
     end
   end
 
   def read data do
-    Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main,
+    Megauni.SQL.query(
       "SELECT * FROM screen_name_read($1);",
       [data["screen_name"]]
     )
-    |> Megauni.Model.rows
   end
 
   def read_one data do
-    data |> read |> List.first
+    data |> read |> Megauni.SQL.one_row
   end
 
   def read_news_card user_id do
-    Megauni.Model.query(
+    Megauni.SQL.query(
       "SELECT * FROM news_card($1) LIMIT 100;",
       [user_id]
     )
-    |> Megauni.Model.rows
   end
 
   def read_news_card user_id, [sn] do
-    Megauni.Model.query(
+    Megauni.SQL.query(
       "SELECT * FROM news_card($1, $2) LIMIT 100;",
       [user_id, sn]
     )
-    |> Megauni.Model.rows
   end
 
   def read_homepage_cards user_id, sn do
-    Megauni.Model.query(
+    Megauni.SQL.query(
       "SELECT * FROM homepage_card($1, $2) LIMIT 100;",
       [user_id, sn]
     )
-    |> Megauni.Model.rows
   end
 
   def clean_screen_name sn do
@@ -108,17 +102,16 @@ defmodule Screen_Name do
   def create raw_data do
     vals = Enum.into(raw_data, %{"owner_id"=>nil})
 
-    result = Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main,
+    result = Megauni.SQL.query(
       "SELECT screen_name
       FROM screen_name_insert($1, $2);",
       [vals["owner_id"], vals["screen_name"]]
     )
 
-    if Megauni.Model.is_too_long?(result) do
-      %{"user_error"=>"screen_name: max #{Megauni.Model.max_length result}"}
+    if Megauni.SQL.is_too_long?(result) do
+      %{"user_error"=>"screen_name: max #{Megauni.SQL.max_length result}"}
     else
-      Megauni.Model.one_row(result, "screen_name")
+      Megauni.SQL.one_row(result, "screen_name")
     end
   end
 
@@ -170,7 +163,7 @@ defmodule Screen_Name do
 
   def clean(r, raw_data) do
     # unique_index 'screen_name_unique_idx', "Screen name already taken: {{val}}"
-    Megauni.Model.grab_keys_from_raw_data(r, raw_data, Screen_Name.CLEAN_KEYS)
+    Megauni.SQL.grab_keys_from_raw_data(r, raw_data, Screen_Name.CLEAN_KEYS)
   end
 
   def on_error e, this do

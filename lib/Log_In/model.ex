@@ -2,17 +2,14 @@
 defmodule Log_In do
 
   def reset_all do
-    {:ok, _} = Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main, " DELETE FROM log_in; ", []
-    );
+    {:ok, _} = Megauni.SQL.query("DELETE FROM log_in;", []);
   end # === def reset_all
 
   def aged str do
     if !In.dev do
       raise "Only to be used in dev"
     end
-    Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main,
+    Megauni.SQL.query(
       """
         UPDATE log_in
         SET at = at + '#{str}'::interval
@@ -31,8 +28,7 @@ defmodule Log_In do
     sn   = Map.fetch!(data, "screen_name")
     pass = User.canonize_pass Map.fetch!(data, "pass")
 
-    user = Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main,
+    user = Megauni.SQL.query(
       """
         SELECT "user".id, "user".pswd_hash, "screen_name".id AS sn_id
         FROM "user", screen_name
@@ -64,8 +60,7 @@ defmodule Log_In do
         raise "programmer or system error"
     end
 
-    result = Ecto.Adapters.SQL.query(
-      Megauni.Repos.Main,
+    result = Megauni.SQL.query(
       " SELECT * FROM log_in_attempt($1, $2, $3, $4); ",
       [ip, sn_id, user_id, pass_match]
     )

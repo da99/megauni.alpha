@@ -10,10 +10,10 @@ defmodule Link do
 
   def create user_id, [type, a, b]  do
     args     = [user_id, type, a, b]
-    sql_args = Megauni.Model.sql_args args
+    sql_args = Megauni.SQL.to_dollar_num_binary args
 
-    result = Megauni.Model.query( "SELECT * FROM link_insert( #{sql_args} );", args)
-    |> Megauni.Model.one_row("link")
+    result = Megauni.SQL.query( "SELECT * FROM link_insert( #{sql_args} );", args)
+    |> Megauni.SQL.one_row("link")
     case result do
       %{"id"=>_id} ->
         true
