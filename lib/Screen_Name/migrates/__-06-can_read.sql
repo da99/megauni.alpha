@@ -19,6 +19,8 @@ BEGIN
   AND (
     -- Can read self:
     A_ID = B_ID
+    OR -- is owner
+    owner_id = A_ID
     OR -- Is world readable:
     SN.privacy = name_to_type_id('WORLD READABLE')
     OR -- In list:
