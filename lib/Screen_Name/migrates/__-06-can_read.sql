@@ -20,9 +20,9 @@ BEGIN
     -- Can read self:
     A_ID = B_ID
     OR -- Is world readable:
-    SN.privacy = 3
+    SN.privacy = name_to_type_id('WORLD READABLE')
     OR -- In list:
-    ( SN.privacy = 2 AND EXISTS (SELECT * FROM in_screen_name_list(A_ID, B_ID)) )
+    ( SN.privacy = name_to_type_id('LIST ONLY') AND in_screen_name_list(A_ID, B_ID) )
   )
   LIMIT 1;
 

@@ -22,7 +22,7 @@ BEGIN
   FROM
     link INNER JOIN card
     ON
-    link.type_id = type_id('LINK') AND
+    link.type_id = name_to_type_id('LINK') AND
     -- For now:
     --   We make sure only owners of screen_name can
     --   link cards to their screen_name.
