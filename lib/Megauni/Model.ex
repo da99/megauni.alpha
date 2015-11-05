@@ -4,7 +4,21 @@ defmodule Megauni.Model do
   @user_err_regexp  ~r/\Auser_error: /
 
   def query sql, args do
-    Ecto.Adapters.SQL.query( Megauni.Repos.Main, sql, args)
+    Ecto.Adapters.SQL.query(
+     Megauni.Repos.Main, sql, args
+    )
+  end
+
+
+  def sql_args args do
+    Enum.reduce(Enum.with_index(args), [], fn({val, i}, acc) ->
+      acc = case val do
+        x when is_number(x) -> (acc ++ ["$#{i + 1}::INT"])
+        x when is_binary(x) -> (acc ++ ["$#{i + 1}::VARCHAR"])
+        _                   -> (acc ++ ["$#{i + 1}"])
+      end
+    end)
+    |> Enum.join(", ")
   end
 
   def max_length raw do

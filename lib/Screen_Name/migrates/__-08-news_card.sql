@@ -59,7 +59,7 @@ BEGIN
       follow(USER_ID)        follow
 
       LEFT OUTER JOIN
-      linked_card(USER_ID)  card
+      linked_card(follow.publication_id)  card
       ON
       follow.publication_id = card.publication_id
 

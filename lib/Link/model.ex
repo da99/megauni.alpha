@@ -9,10 +9,10 @@ defmodule Link do
   @read_comments      14
 
   def create user_id, [type, a, b]  do
-    result = Megauni.Model.query(
-      "SELECT * FROM link_insert($1, $2, $3, $4);",
-      [ user_id, type, a, b ]
-    )
+    args     = [user_id, type, a, b]
+    sql_args = Megauni.Model.sql_args args
+
+    result = Megauni.Model.query( "SELECT * FROM link_insert( #{sql_args} );", args)
     |> Megauni.Model.one_row("link")
     case result do
       %{"id"=>_id} ->

@@ -125,6 +125,7 @@ env = %{
       _ ->
         result
     end
+
     {stack ++ [result], prog, env}
   end,
 
@@ -139,9 +140,8 @@ env = %{
       ) || Screen_Name.read_id!(env["sn"]["screen_name"])
     end
 
-    In.spect [user_id, args]
-
     result = Link.create user_id, args
+
     case result do
       %{"link"=> _link} ->
         env = JSON_Spec.put(env, "link", result)
@@ -161,19 +161,16 @@ env = %{
   end,
 
   "read news_card" => fn(stack, prog, env) ->
-    if prog |> List.first |> is_list do
-      {args, prog, env} = JSON_Spec.take(prog, 1, env)
-    else
-      {sn, env} = JSON_Spec.compile "sn.screen_name", env
-      args = [sn]
-    end
-
     user_id = (
       env["user"] && env["user"]["id"]
     ) || Screen_Name.read_id!(env["sn"]["screen_name"])
 
-    In.spect [user_id, args]
-    result = Screen_Name.read_news_card user_id, args
+    result = if prog |> List.first |> is_list do
+      {args, prog, env} = JSON_Spec.take(prog, 1, env)
+      Screen_Name.read_news_card user_id, args
+    else
+      Screen_Name.read_news_card user_id
+    end
 
     case result do
       x when is_list(x) ->

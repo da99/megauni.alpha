@@ -1,7 +1,7 @@
 
 
 
--- DOWN
+-- BOTH
 SELECT drop_megauni_func('link_insert');
 
 -- UP

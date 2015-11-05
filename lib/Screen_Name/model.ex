@@ -69,6 +69,14 @@ defmodule Screen_Name do
     data |> read |> List.first
   end
 
+  def read_news_card user_id do
+    Megauni.Model.query(
+      "SELECT * FROM news_card($1) LIMIT 100;",
+      [user_id]
+    )
+    |> Megauni.Model.rows
+  end
+
   def read_news_card user_id, [sn] do
     Megauni.Model.query(
       "SELECT * FROM news_card($1, $2) LIMIT 100;",
