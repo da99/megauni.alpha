@@ -9,15 +9,15 @@
     "input" : [
       "create screen_name",
 
-      "create screen_name",
+      "create screen_name", "update privacy", ["WORLD READABLE"],
       "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
       "create link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
 
-      "create screen_name",
+      "create screen_name", "update privacy", ["WORLD READABLE"],
       "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
       "create link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
 
-      "create screen_name",
+      "create screen_name", "update privacy", ["WORLD READABLE"],
       "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
       "create link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
       "user.id =", ["sn_1.id"],

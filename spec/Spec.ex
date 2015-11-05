@@ -381,6 +381,14 @@ env = %{
     {(stack ++ [sn]), prog, env}
   end,
 
+  "update privacy" => fn(stack, prog, env) ->
+    {args, prog, env} = JSON_Spec.take(prog, 1, env)
+    name = env["sn"]["screen_name"]
+    id   = Screen_Name.select_id(name)
+    {:ok, _answer} = Screen_Name.run id, ["update screen_name privacy", [name, List.last(args)]]
+    {stack, prog, env}
+  end,
+
   "all log_in_attempts old" => fn(_data, _env) ->
     {:ok, _} = Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,

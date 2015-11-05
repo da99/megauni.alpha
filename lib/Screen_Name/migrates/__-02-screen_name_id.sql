@@ -1,9 +1,6 @@
 
 -- BOTH
 SELECT drop_megauni_func('screen_name_id_if_owns_or_fail');
-SELECT drop_megauni_func('screen_name_id_or_fail');
-SELECT drop_megauni_func('screen_name_id');
-
 -- UP
 CREATE OR REPLACE FUNCTION  screen_name_id_if_owns_or_fail (
   IN USER_ID INT, IN RAW_SCREEN_NAME VARCHAR
@@ -30,6 +27,10 @@ END
 $$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
+-- BOTH
+SELECT drop_megauni_func('screen_name_id_or_fail');
+
+-- UP
 CREATE OR REPLACE FUNCTION screen_name_id_or_fail ( IN USER_ID INT, IN RAW_SCREEN_NAME VARCHAR )
 RETURNS INT AS $$
 DECLARE
@@ -44,8 +45,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-
-
+-- UP
 CREATE OR REPLACE FUNCTION screen_name_id_or_fail ( IN RAW_SCREEN_NAME VARCHAR )
 RETURNS INT AS $$
 DECLARE
@@ -60,6 +60,9 @@ BEGIN
 END
 $$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+
+-- BOTH
+SELECT drop_megauni_func('screen_name_id');
 
 -- RETURNS SN id if USER_ID can read it.
 CREATE OR REPLACE FUNCTION  screen_name_id ( IN USER_ID INT, IN RAW_SCREEN_NAME   VARCHAR)

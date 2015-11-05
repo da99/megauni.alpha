@@ -26,6 +26,21 @@ defmodule Screen_Name do
 
   end # === def canonize_screen_name
 
+  def select_id name do
+    Megauni.Model.query("SELECT screen_name_id($1) AS id;", [name])
+    |> Megauni.Model.one_row
+    |> Map.get "id"
+  end
+
+  def run user_id, [ action, args ] do
+    case action do
+      "update screen_name privacy" ->
+        sql = "SELECT * FROM update_screen_name_privacy( $1, $2, $3 );"
+        {:ok, _val} = Megauni.Model.query(sql, [user_id] ++ args)
+        {:ok, true}
+    end
+  end # === def run
+
   def read_id! raw_name do
     result = Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
