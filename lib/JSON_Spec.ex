@@ -380,9 +380,14 @@ defmodule JSON_Spec do
         #     to process in the prog, raise the error:
         if env[:raise_errors] && Enum.count(prog) != 0 && is_error?(List.last(stack)) do
           raise "From: #{inspect token} Result: #{inspect(List.last(stack))}"
-        else
-          run_list stack, prog, env
         end
+
+        stack = case List.last(stack) do
+          {:JSON_Spec, :ignore_last_error} -> Enum.take(stack, Enum.count(stack) - 1)
+          _ -> stack
+        end
+
+        run_list stack, prog, env
     end # == cond
   end # === def run_list
 

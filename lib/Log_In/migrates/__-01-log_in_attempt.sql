@@ -106,7 +106,7 @@ AS $$
     DELETE FROM log_in
     WHERE screen_name_id IN (
       SELECT id
-      FROM screen_name_ids_for_owner_id(user_id)
+      FROM screen_name_ids(user_id)
     );
 
     has_pass := TRUE;

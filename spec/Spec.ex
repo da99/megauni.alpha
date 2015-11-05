@@ -287,11 +287,13 @@ env = %{
   end,
 
   "bad_log_in" => fn(stack, prog, env) ->
-    Spec_Funcs.log_in %{
+    {stack, prog, env} = Spec_Funcs.log_in( %{
       "pass"        => "bass pass",
       "screen_name" => env["sn"]["screen_name"],
       "ip"          => "127.0.0.1"
-    }, stack, prog, env
+    }, stack, prog, env)
+
+    {stack ++ [{:JSON_Spec, :ignore_last_error}], prog, env}
   end,
 
   "good_log_in" => fn(stack, prog, env) ->
@@ -304,8 +306,9 @@ env = %{
 
   "log_in_attempts aged" => fn(stack, prog, env) ->
     [[arg] | prog] = prog
-    {:ok, _} = Log_In.aged arg
-    {stack, prog, env}
+    {:ok, %{:num_rows=>count}} = Log_In.aged arg
+
+    {stack ++ [count], prog, env}
   end,
 
   "create user" => fn(stack, prog, env) ->
