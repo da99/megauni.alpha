@@ -190,7 +190,7 @@ env = %{
   "type_ids" => fn(stack, prog, env) ->
     ids = Regex.scan(
       ~r/RETURN\s+(\d+)\s?;/,
-      File.read!("lib/Link/migrates/__-01-link_type_id.sql")
+      File.read!("lib/Megauni/migrates/__-02-link_type_id.sql")
     )
     |> Enum.map(fn([_match, id]) ->
       id
