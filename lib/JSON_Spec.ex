@@ -43,28 +43,29 @@ defmodule JSON_Spec do
     end # === def run_after_each
 
     def desc name, env do
-      if !is_top?(env) do
-        env = revert_env(env)
+      if !JSON_Spec.is_top?(env) do
+        env = JSON_Spec.revert_env(env)
       end
 
       IO.puts "#{@yellow}#{name}#{@reset}"
-      Enum.into %{ :desc=>name }, new_env(env)
+      Enum.into %{ :desc=>name }, JSON_Spec.new_env(env)
     end
 
     def it raw_title, prev_env do
-      env = new_env(prev_env)
+      env = JSON_Spec.new_env(prev_env)
       env = if Map.has_key?(env, :it_count) do
         Map.put env, :it_count, env.it_count + 1
       else
         Map.put env, :it_count, 1
       end
 
-      {compiled_it, env} = compile(raw_title, env)
+      {_stack, _empty, env} = JSON_Spec.run([], [raw_title], env)
+      title = _stack |> List.last
 
       Enum.into %{
-        :it       => compiled_it,
+        :it       => title,
         :it_count => env.it_count
-      }, new_env(env)
+      }, JSON_Spec.new_env(env)
     end # === def it
 
     def input raw, env do
@@ -144,7 +145,7 @@ defmodule JSON_Spec do
       raise "Out of bounds: #{inspect num} #{inspect list}"
     end
 
-    {args, _empty, env} = run([], Enum.take(list, num), env}
+    {args, _empty, env} = run([], Enum.take(list, num), env)
     {args, env}
   end # === def args
 
@@ -372,7 +373,7 @@ defmodule JSON_Spec do
 
   def run(stack, [map | prog], env) when is_map(map) do
     {map, env} = Enum.reduce map, {%{}, env}, fn({k,v}, {fin, env}) ->
-      {stack, _prog, env} = run([], [v], env}
+      {stack, _prog, env} = run([], [v], env)
       {Map.put(fin, k, List.last(stack)), env}
     end
 

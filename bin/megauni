@@ -534,8 +534,7 @@ case "$action" in
             fi # === if $js_pass
           else
             if [[ "$path" == *.json ]]; then
-              $0 jshint $path || :
-              $0 test $@ || :
+              (js_setup jshint! $path && $0 test $@)  || :
             else
               $0 test $@ || :
             fi

@@ -9,6 +9,8 @@ end
 
 files = Enum.reduce models, [], fn(mod, acc) ->
    cond do
+     File.exist?(mod) ->
+       acc ++ [mod]
      mod =~ ~r/[\*|\/]/ ->
        acc ++ Path.wildcard("lib/#{mod}.json")
      true ->
@@ -414,7 +416,7 @@ env = %{
 
 }
 
-Enum.each(files, &(JSON_Spec.run_file(&1, env)))
+JSON_Spec.run_files(files, [env])
 
 
 
