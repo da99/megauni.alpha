@@ -1,24 +1,6 @@
 
 
 defmodule JSON_Spec do
-  @docmodule """
-  Specs to be written:
-  1) uses a new env for "IT"
-  2) uses a new env for "DESC"
-  3) it compiles output AFTER running test
-     REASON: "some variables are evaluated during/after IT run"
-  4) Keys that partially exist evaluate to their original form:
-     sn.data.id => sn.data => if sn exists, but not keys: data or id
-  5) Compiles args when running list of commands:
-     [ "func", {"key": "must be compiled"} ]
-  6) Compiles non-arg tokens:
-     [ ..., {"key": "this must be compiled"}]
-  7) Adds counted var to map env: .put(env, key, val)
-  8) Before all, Before each: Can only be one if "desc" has been
-     used.
-  9) Raises error if list of input maps returns an error before last input.
-  10) "key.key1.key2.key3" -> Returns string if key2 or earlier is not found
-  """
 
   @reset   IO.ANSI.reset
   @bright  IO.ANSI.bright
@@ -26,16 +8,131 @@ defmodule JSON_Spec do
   @yellow  "#{@bright}#{IO.ANSI.yellow}"
   @red     "#{@bright}#{IO.ANSI.red}"
 
-  #  Core funcs return an env.
-  @core %{
-    "const"      => :const,
-    "before all" => :before_all,
-    "after each" => :after_each,
-    "desc"       => :desc,
-    "it"         => :it,
-    "input"      => :input,
-    "output"     => :output
-  }
+  defmodule Core do
+
+    def get stack, prog, env do
+      {[name], prog, env} = JSON_Spec.take(prog, 1, env)
+      val = stack |> List.last |> Map.fetch!(name)
+      {stack ++ [val], prog, env}
+    end
+
+    def const list, env do
+      [ name | prog ] = list
+      { stack, prog , env } = JSON_Spec.run([], prog, env)
+      Map.put env, name, List.last(stack)
+    end
+
+    def before_all prog, env do
+      { _stack, _prog, env } = JSON_Spec.run([], prog, env)
+      env
+    end # === def run_before_all
+
+    def after_each prog, env do
+      if Map.has_key?(env, :after_each) do
+        if is_list(env.after_each) do
+          Map.put env, :after_each, List.append(env.after_each, prog)
+        else
+          Map.put env, :after_each, List.append([env.after_each], prog)
+        end
+      else
+        if !is_list(prog) do
+          prog = [prog]
+        end
+        Enum.into %{:after_each => prog}, env
+      end
+    end # === def run_after_each
+
+    def desc name, env do
+      if !is_top?(env) do
+        env = revert_env(env)
+      end
+
+      IO.puts "#{@yellow}#{name}#{@reset}"
+      Enum.into %{ :desc=>name }, new_env(env)
+    end
+
+    def it raw_title, prev_env do
+      env = new_env(prev_env)
+      env = if Map.has_key?(env, :it_count) do
+        Map.put env, :it_count, env.it_count + 1
+      else
+        Map.put env, :it_count, 1
+      end
+
+      {compiled_it, env} = compile(raw_title, env)
+
+      Enum.into %{
+        :it       => compiled_it,
+        :it_count => env.it_count
+      }, new_env(env)
+    end # === def it
+
+    def input raw, env do
+      cond do
+        is_map(raw) ->
+          input([raw], env)
+
+        is_list_of_maps?(raw) ->
+          new_list = Enum.reduce raw, [], fn(map, list) ->
+            list ++ [ env[:desc], map ]
+          end
+          input(new_list, env)
+
+        is_list(raw) ->
+          {stack, env} = run_list(raw, env)
+          Map.put env, :actual, List.last(stack)
+
+        true ->
+          raise "Don't know how to run: #{inspect raw}"
+      end # === cond
+    end  # === run_input
+
+    def output output, env do
+      {expected, env} = cond do
+        is_map(output) ->
+          compile(output, env)
+
+        is_list_of_maps?(output) ->
+          Enum.reduce output, {[], env}, fn(m, {list, env}) ->
+            {new_map, env} = compile(m, env)
+            {list ++ [new_map], env}
+          end
+
+        is_list(output) ->
+          {stack, env} = run_list(output, env)
+          {List.last(stack), env}
+
+        true ->
+          raise "Don't know what to do with input/output: #{inspect output}"
+      end
+
+      num = "#{format_num(env.it_count)})"
+      if maps_match?(env.actual, expected) do
+        IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}#{@reset}"
+      else
+        IO.puts "#{@bright}#{@red}#{num}#{@reset}#{@bright} #{env.it}"
+        IO.puts "#{@bright}#{inspect expected} !== #{@reset}#{@red}#{@bright}#{inspect env.actual}"
+        IO.puts @reset
+        Process.exit(self, "spec failed")
+      end
+
+      if Map.has_key?(env, :after_each) do
+        {_stack, env} = run_list(env.after_each, env)
+      end
+      carry_over(env, :it_count)
+    end # === def run_output
+
+  end # === defmodule Core ========================================
+
+  def take([list | prog], num, env) when is_list(list) do
+    {args, _empty, env} = run([], list, env)
+    if Enum.count(args) < num do
+      raise "Not enought args: #{inspect num} desired from: #{inspect list}"
+    end
+
+    fin = Enum.take(args, num)
+    {args, env}
+  end
 
   @doc """
     Compiles elements from a list of args (ie prog)
@@ -47,55 +144,9 @@ defmodule JSON_Spec do
       raise "Out of bounds: #{inspect num} #{inspect list}"
     end
 
-    raw_args = Enum.take list, num
-
-    {args, env} = Enum.reduce raw_args, {[], env}, fn raw_arg, {args, env} ->
-      {fin_arg, env} = compile(raw_arg, env)
-      {(args ++ [fin_arg]), env}
-    end
-
-    list = Enum.take list, (num - Enum.count(list))
-    if num == 1 do
-      {List.first(args), list, env}
-    else
-      {args, list, env}
-    end
+    {args, _empty, env} = run([], Enum.take(list, num), env}
+    {args, env}
   end # === def args
-
-  def const list, env do
-    [ name | prog ] = list
-    { stack , env } = JSON_Spec.run_prog(prog, env)
-    Map.put env, name, List.last(stack)
-  end
-
-  def before_all prog, env do
-    { _stack, env } = JSON_Spec.run_prog(prog, env)
-    env
-  end # === def run_before_all
-
-  def after_each prog, env do
-    if Map.has_key?(env, :after_each) do
-      if is_list(env.after_each) do
-        Map.put env, :after_each, List.append(env.after_each, prog)
-      else
-        Map.put env, :after_each, List.append([env.after_each], prog)
-      end
-    else
-      if !is_list(prog) do
-        prog = [prog]
-      end
-      Enum.into %{:after_each => prog}, env
-    end
-  end # === def run_after_each
-
-  def desc name, env do
-    if !is_top?(env) do
-      env = revert_env(env)
-    end
-
-    IO.puts "#{@yellow}#{name}#{@reset}"
-    Enum.into %{ :desc=>name }, new_env(env)
-  end
 
   def is_top? env do
     !env[:_parent_env]
@@ -109,22 +160,6 @@ defmodule JSON_Spec do
     end
   end
 
-  def it raw_title, prev_env do
-    env = new_env(prev_env)
-    env = if Map.has_key?(env, :it_count) do
-      Map.put env, :it_count, env.it_count + 1
-    else
-      Map.put env, :it_count, 1
-    end
-
-    {compiled_it, env} = compile(raw_title, env)
-
-    Enum.into %{
-      :it       => compiled_it,
-      :it_count => env.it_count
-    }, new_env(env)
-  end # === def it
-
   def is_error? e do
     is_map(e) &&
     (
@@ -135,65 +170,6 @@ defmodule JSON_Spec do
       Map.has_key?(e, "programmer error")
     )
   end
-
-  def input raw, env do
-    cond do
-      is_map(raw) ->
-        input([raw], env)
-
-      is_list_of_maps?(raw) ->
-        if Enum.count(raw) > 1 do
-          env = Map.put env, :raise_errors, true
-        end
-        new_list = Enum.reduce raw, [], fn(map, list) ->
-          list ++ [ env[:desc], map ]
-        end
-        input(new_list, env)
-
-      is_list(raw) ->
-        env = Map.put env, :raise_errors, true
-        {stack, env} = run_list(raw, env)
-        Map.put env, :actual, List.last(stack)
-
-      true ->
-        raise "Don't know how to run: #{inspect raw}"
-    end # === cond
-  end  # === run_input
-
-  def output output, env do
-    {expected, env} = cond do
-      is_map(output) ->
-        compile(output, env)
-
-      is_list_of_maps?(output) ->
-        Enum.reduce output, {[], env}, fn(m, {list, env}) ->
-          {new_map, env} = compile(m, env)
-          {list ++ [new_map], env}
-        end
-
-      is_list(output) ->
-        {stack, env} = run_list(output, env)
-        {List.last(stack), env}
-
-      true ->
-        raise "Don't know what to do with input/output: #{inspect output}"
-    end
-
-    num = "#{format_num(env.it_count)})"
-    if maps_match?(env.actual, expected) do
-      IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}#{@reset}"
-    else
-      IO.puts "#{@bright}#{@red}#{num}#{@reset}#{@bright} #{env.it}"
-      IO.puts "#{@bright}#{inspect expected} !== #{@reset}#{@red}#{@bright}#{inspect env.actual}"
-      IO.puts @reset
-      Process.exit(self, "spec failed")
-    end
-
-    if Map.has_key?(env, :after_each) do
-      {_stack, env} = run_list(env.after_each, env)
-    end
-    carry_over(env, :it_count)
-  end # === def run_output
 
   def canon_key(x) do
     x |> String.strip
@@ -303,180 +279,139 @@ defmodule JSON_Spec do
     end
   end
 
-  def run_file(path, custom_funcs) do
-    json = File.read!(path) |> Poison.decode!
+  def modules_to_map arr do
+    arr
+    |> Enum.map( &(module_to_map &1) )
+    |> Enum.reduce(%{}, &(Map.merge &2, &1))
+  end
+
+  def module_to_map mod do
+    Enum.reduce mod.__info__(:functions), %{}, fn({name, arity}, map) ->
+      Map.put(map, name, fn(stack, prog, env) ->
+        apply(mod, name, [stack, prog, env])
+      end)
+    end
+  end
+
+  def run_files files, env \\ nil do
+    Enum.each files, fn(file) ->
+      JSON_Spec.run_file(file, env)
+    end
+  end # == def run_files
+
+  def run_file(path, raw_env \\ nil) do
+    env = case raw_env do
+      none when is_nil(none) -> %{}
+      arr  when is_list(arr) -> modules_to_map(arr)
+      mod                    -> module_to_map(mod)
+    end
+
+    look_in = (Map.get env, "look_in", []) ++ [JSON_Spec.Core]
+    env     = Map.put env, "look_in", look_in
+    json    = File.read!(path) |> Poison.decode!
 
     IO.puts "\nfile: #{@bright}#{path}#{@reset}"
 
-    env = Enum.into(%{:_parent_env=>nil}, custom_funcs)
-    run_core json, env
+    env = Enum.into(%{:_parent_env=>nil}, env)
+    run [], json, env
     IO.puts "#{@bright}#{@green}All tests pass.#{@reset}"
   end # === run_file
 
-  def run_core prog, env do
+  def get(raw, env) do
+    atom = to_atom(raw)
     cond do
-      Enum.count(prog) == 0 ->
-        env
+      Map.has_key?(env, raw)  -> env[raw]
+      Map.has_key?(env, atom) -> env[atom]
+      true                    -> raw
+    end # cond
+  end # def
 
-      is_binary(List.first prog) ->
-        [ cmd | [arg | prog] ] = prog
-        run_core prog, apply(JSON_Spec, @core[cmd], [arg, env])
-
-      is_map(List.first prog) ->
-        [ %{"it"=>it_, "input"=>input_, "output"=>output_} | prog ] = prog
-        prog = ["it", it_, "input", input_, "output", output_ | prog]
-        run_core(prog, env)
+  def to_prog(string) when is_binary(string) do
+    result = Regexp.run ~r/^([a-zA-Z0-9\_]+)\[([^\]]?)\]\.?(.+)?$/, string
+    if !result do
+      nil
+    else
+      [_match, func, raw_args |  tail ] = result
+      gets = Enum.reduce tail, [], fn(str, arr) ->
+        fields = String.split str, ","
+        Enum.reduce fields, arr, fn(fld, arr) ->
+          arr ++ ["get", [fld]]
+        end
+      end
+      [func, raw_args] ++ gets
     end
-  end # === def run_core prog, env
-
-  @doc """
-    Returns: { stack, env }
-  """
-  def run_prog prog, env do
-    cond do
-
-      is_binary(prog) ->
-        env[prog].( nil, env )
-
-      is_list(prog) ->
-        run_list(prog, env)
-
-      true ->
-        raise "unknown run for #{inspect prog}"
-    end
-  end # === def run_prog
-
-  @doc """
-    Returns: { stack, env }
-  """
-  def run_list(list, env) do
-    run_list([], list, env)
   end
 
   @doc """
-    Mostly used by core funcs such as :input, :output,
-    and the main JSON specs.
-
-    Returns: { stack, env }
+    "some string with @var" -> "some string with var value"
   """
-  def run_list stack, prog, env do
-    cond do
-      Enum.count(prog) == 0 ->
-        {stack, env}
-
-      is_number(List.first(prog)) ->
-        [num | prog] = prog
-        run_list (stack ++ [num]), prog, env
-
-      true ->
-        [token | prog] = prog
-
-        if !is_function(env[token]) do
-          raise "Function not found: #{inspect token}"
+  def replace_vars(x, env) when is_binary(x) do
+    raw = x
+    x = Regex.replace ~r/(\@[A-Z\_]+)(\s?([+\-\/\*])\s?([0-9]+))?/, raw, fn(match, var, op_num, op, num) ->
+      if Map.has_key?(env, var) do
+        if String.length(op_num) > 0 do
+          to_string(apply(Kernel, String.to_atom(op), [env[var], String.to_integer(num)]))
+        else
+          to_string(env[var])
         end
-        {stack, prog, env} = env[token].(stack, prog, env)
+      else
+      match
+      end
+    end
 
-        # === If last value is an error and there is still more
-        #     to process in the prog, raise the error:
-        if env[:raise_errors] && Enum.count(prog) != 0 && is_error?(List.last(stack)) do
-          raise "From: #{inspect token} Result: #{inspect(List.last(stack))}"
-        end
+    name = canon_key(x)
+  end # === def replace_vars
 
-        stack = case List.last(stack) do
-          {:JSON_Spec, :ignore_last_error} -> Enum.take(stack, Enum.count(stack) - 1)
-          _ -> stack
-        end
+  def run stack, [], env do
+    {stack, [], env}
+  end
 
-        run_list stack, prog, env
-    end # == cond
-  end # === def run_list
+  def run(stack, [num | prog], env) when is_number(num) do
+    run(stack ++ [num], prog, env)
+  end
 
-  @doc """
-    Used when you want to "compile" args to be used
-    in a custom function:
-       JSON: "input": [ "create something", { "some_id": "sn.id" } ]
-    In this case, the arg for "create something" will be compiled.
-    NOTE: The value of "input" would be run through :run_list.
+  def run(stack, [map | prog], env) when is_map(map) do
+    {map, env} = Enum.reduce map, {%{}, env}, fn({k,v}, {fin, env}) ->
+      {stack, _prog, env} = run([], [v], env}
+      {Map.put(fin, k, List.last(stack)), env}
+    end
 
-    Usage in Elixir:
-    iex> .compile("user.id", env)
-    iex> .compile("screen_name", env)
-    iex> .compile(%{"screen_name": "screen_name"}, env)
-    iex> .compile([%{}, %{}], env)
+    run(stack ++ [map], prog, env)
+  end
 
-    Returns: {result, env}
-  """
-  def compile(x, env) do
+  def run(stack, [raw_string | prog], env) when is_binary(raw_string) do
+    compiled = raw_string |> replace_vars(env) |> get(env)
 
-    cond do
+    {stack, prog, env} = case compiled do
 
-      is_map(x) -> # === used to compile inputs and outputs
-        result = Enum.reduce x, %{:map=>%{}, :env=>env}, fn({k,v}, pair) ->
-          {new_v, new_e} = compile(v, env)
-          Enum.into(
-            %{:map=>Map.put(pair.map, k, new_v), :env=>new_e},
-            pair
-          )
-        end
-        {result.map, result.env}
+      func when is_function(func) ->
+        func.( stack, prog, env )
 
-      is_number(x) ->
-        {x, env}
+      string when is_binary(string) ->
+        new_prog = to_prog string
 
-      is_binary(x) ->
-        raw = x
-        x = Regex.replace ~r/(\@[A-Z\_]+)(\s?([+\-\/\*])\s?([0-9]+))?/, raw, fn match, var, op_num, op, num ->
-          if Map.has_key?(env, var) do
-            if String.length(op_num) > 0 do
-              to_string(apply(Kernel, String.to_atom(op), [env[var], String.to_integer(num)]))
-            else
-              to_string(env[var])
-            end
-          else
-            match
-          end
+        if new_prog do
+          {new_stack, _prog, env} = run(stack, new_prog, env)
+          {stack ++ new_stack, prog, env}
+        else
+          {stack ++ [string], prog, env}
         end
 
-        name = canon_key(x)
-        cond do
-          # === is it a simple k/v lookup?
-          Map.has_key?(env, name) && !is_function(env[name]) ->
-            {env[name], env}
+    end # case ==========================
 
-          # === is function a "compile" func/1 or a run_prog func/3?
-          Map.has_key?(env, name) && is_function(env[name], 1)  ->
-            {val, env} = env[name].(env)
+    if Enum.count(prog) != 0 do
 
-          true -> # === Check for "key.key.key"
-            {is_key, val} = Enum.reduce String.split(name, "."), {true, env}, fn(key, {is_key, data}) ->
+      # === If last value is an error and there is still more
+      #     to process in the prog, raise the error:
+      last = List.last(stack)
+      if is_error?(last) do
+        raise "From: #{inspect string} Result: #{inspect last}"
+      end
 
-              if is_key && Map.has_key?(data, key) do
-                {true, data[key]}
-              else
-                {nil, nil}
-              end
-            end
+    end # == if prog count != 0
 
-            cond do
-              is_key           -> {val, env}
-              env["lookup kv"] -> env["lookup kv"].(x, env)
-              true             -> {x, env}
-            end
-        end # === cond
-
-      is_list(x) ->
-        Enum.reduce x, {[], env}, fn(var, {arr, env}) ->
-          {result, env} = compile(var, env)
-          { arr ++ [result], env}
-        end
-
-      is_nil(x) ->
-        {nil, env}
-
-      true ->
-        raise "Don't know what to do with: #{inspect x}"
-    end # === cond
-  end # === compile
+    run stack, prog, env
+  end # === def run stack, prog, env
 
 end # === defmodule JSON_Spec
 
