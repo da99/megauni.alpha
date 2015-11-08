@@ -9,17 +9,20 @@ defmodule JSON_Spec do
   @red     "#{@bright}#{IO.ANSI.red}"
 
   def spec_funcs do
-    %{
+    aliases = %{
       "==="        => :exactly_like,
-      "~="         => :similar_to,
-      "get"        => :get,
-      "const"      => :const,
-      "before all" => :before_all,
-      "after each" => :after_each,
-      "desc"       => :desc,
-      "input"      => :input,
-      "output"     => :output
+      "~="         => :similar_to
     }
+    Map.merge spec_func_map(JSON_Spec), aliases
+  end
+
+  def spec_func_map mod do
+    Enum.reduce mod.__info__(:functions), %{}, fn({name, arity}, map) ->
+      if arity == 3 do
+        map = Map.put map, name, name
+      end
+      map
+    end
   end
 
   def get stack, prog, env do
@@ -65,30 +68,27 @@ defmodule JSON_Spec do
     {stack, prog, env}
   end
 
-  def it raw_title, prev_env do
-    env = JSON_Spec.new_env(prev_env)
+  def it stack, prog, env do
+    env = JSON_Spec.new_env(env)
     env = if Map.has_key?(env, :it_count) do
       Map.put env, :it_count, env.it_count + 1
     else
       Map.put env, :it_count, 1
     end
 
-    {stack, _empty, env} = JSON_Spec.run([], [raw_title], env)
-    title = stack |> List.last
+    {[title], prog, env} = take(prog, 1, env)
 
-    Enum.into %{
-      :it       => title,
-      :it_count => env.it_count
-    }, JSON_Spec.new_env(env)
+    env = Enum.into(%{ :it => title, :it_count => env.it_count }, env)
+    {stack, prog, env}
   end # === def it
 
   def input stack, prog, env do
     [ input_prog | prog ] = prog
-    {results, _empty, env} = JSON_Spec.run([], input_prog, env)
+    {results, _empty, env} = run([], input_prog, env)
     actual = results |> List.last
 
     num = "#{JSON_Spec.format_num(env.it_count)})"
-    IO.print "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
+    IO.puts "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
     env = Map.put(env, :actual, actual)
 
     {stack ++ [actual], prog, env}
@@ -391,14 +391,21 @@ defmodule JSON_Spec do
     run(stack ++ [num], prog, env)
   end
 
+  def run(stack, [arr | prog], env) when is_list(arr) do
+    {new_arr, _empty, env} = run([], arr, env)
+    run(stack ++ [new_arr], prog, env)
+  end
+
   def run(stack, [string, arr_or_map | prog], env) when (is_binary(string) and (is_list(arr_or_map) or is_map(arr_or_map))) do
     func = get(string, env)
 
-    if func do
+    {stack, prog, env} = if func do
       func.( stack, [arr_or_map | prog], env )
     else
       {stack ++ [string], [ arr_or_map | prog ], env}
     end
+
+    run stack, prog, env
   end
 
   def run(stack, [map | prog], env) when is_map(map) do
