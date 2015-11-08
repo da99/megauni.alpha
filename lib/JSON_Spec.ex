@@ -31,6 +31,12 @@ defmodule JSON_Spec do
     {stack ++ [val], prog, env}
   end
 
+  def __ stack, prog, env do
+    [raw | prog] = prog
+    In.spect raw
+    run(stack, [env[:desc], raw], env)
+  end
+
   def const list, env do
     [ name | prog ] = list
     { stack, prog , env } = JSON_Spec.run([], prog, env)
@@ -39,7 +45,7 @@ defmodule JSON_Spec do
 
   def before_all prog, env do
     { _stack, _prog, env } = JSON_Spec.run([], prog, env)
-    env
+    env[:desc]
   end # === def run_before_all
 
   def after_each prog, env do
@@ -95,11 +101,11 @@ defmodule JSON_Spec do
   end  # === run_input
 
   def exactly_like stack, prog, env do
-    raise  :NOT_DONE
+    raise  "not impleemnted"
   end
 
   def similar_to stack, prog, env do
-    raise  :NOT_DONE
+    raise  "not impleemnted"
   end
 
   def raw stack, prog, env do
@@ -189,7 +195,6 @@ defmodule JSON_Spec do
       x
       |> String.downcase
       |> String.strip
-      |> (&(Regex.replace ~r/[^a-z0-9\_\!\?]/, &1, "_")).()
       |> String.to_atom
     end
   end
@@ -299,7 +304,7 @@ defmodule JSON_Spec do
     funcs = mod.__info__(:functions)
     if funcs[:spec_funcs] == 0 do
       Enum.reduce mod.spec_funcs, %{}, fn({alias_name, name}, map) ->
-        Map.put(map, alias_name, fn(stack, prog, env) ->
+        Map.put(map, to_atom(alias_name), fn(stack, prog, env) ->
           apply(mod, name, [stack, prog, env])
         end)
       end
@@ -341,16 +346,22 @@ defmodule JSON_Spec do
   end # === run_file
 
   def get(raw, env) do
-    atom = to_atom(raw)
+    name = cond do
+      is_binary(raw) ->
+        raw |> String.replace(~r/:$/, "") |> to_atom
+      is_atom(raw) ->
+        raw
+      true ->
+        to_atom(raw)
+    end
+
     cond do
-      Map.has_key?(env, raw)  -> env[raw]
-      Map.has_key?(env, atom) -> env[atom]
-      true                    ->
-        if is_top?(env) do
-          nil
-        else
-          get raw, top_env(env)
-        end
+      Map.has_key?(env, name) ->
+        env[name]
+      is_top?(env) ->
+        nil
+      true ->
+        get name, top_env(env)
     end # cond
   end # def
 

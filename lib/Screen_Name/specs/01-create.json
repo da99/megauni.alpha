@@ -1,54 +1,54 @@
 
 [
-  "desc", ["Screen_Name.create"],
+  "desc:", ["Screen_Name.create"],
 
-  "it"     , ["creates record if data validates"],
-  "input"  , [ "__", ["rand_screen_name[]"] ],
-  "output" , [ "~=", {"screen_name": "screen_name[]"}],
+  "it:"     , ["creates record if data validates"],
+  "input:"  , [ "__:", ["rand_screen_name[]"] ],
+  "output:" , [ "~=:", {"screen_name": "screen_name[]"}],
 
 
-  "it"     , ["raises Invalid if screen name is empty"],
-  "input"  , ["__", [""]],
-  "output" , [
-    "===", ["error", ["user_error", "screen_name: min 4"]]
+  "it:"     , ["raises Invalid if screen name is empty"],
+  "input:"  , ["__:", [""]],
+  "output:" , [
+    "===:", ["error", ["user_error", "screen_name: min 4"]]
   ],
 
 
-  "it"     , ["raises Invalid if screen name is over 30"],
-  "input"  , ["__", ["abcd5678901234567890123456712245647890234546578"]],
-  "output" , [
-    "===", ["error", ["user_error", "screen_name: max 30" ]]
+  "it:"     , ["raises Invalid if screen name is over 30"],
+  "input:"  , ["__:", ["abcd5678901234567890123456712245647890234546578"]],
+  "output:" , [
+    "===:", ["error", ["user_error", "screen_name: max 30" ]]
   ],
 
 
-  "it"    , ["megauni is not allowed (despite case)"],
-  "input" , ["__", ["meGauNi"]],
-  "output", [
-    "===", ["error", ["user_error" , "screen_name: not_available"]]
+  "it:"    , ["megauni is not allowed (despite case)"],
+  "input:" , ["__:", ["meGauNi"]],
+  "output:", [
+    "===:", ["error", ["user_error" , "screen_name: not_available"]]
   ],
 
 
-  "it"     , ["\"screen_name\" is not allowed (despite case)"],
-  "input"  , ["__", ["sCreen_NamE"]],
-  "output" , [
-    "===", ["error", ["user_error", "screen_name: not_available"]]
+  "it:"     , ["\"screen_name\" is not allowed (despite case)"],
+  "input:"  , ["__:", ["sCreen_NamE"]],
+  "output:" , [
+    "===:", ["error", ["user_error", "screen_name: not_available"]]
   ],
 
 
-  "it"    , ["raises Invalid for duplicate name"],
-  "input" , [ "__", ["rand_screen_name[]"], "__", ["screen_name[]"] ],
-  "output", [
-    "===", ["error", ["user_error", "screen_name: already_taken"] ]
+  "it:"    , ["raises Invalid for duplicate name"],
+  "input:" , [ "__:", ["rand_screen_name[]"], "__:", ["screen_name[]"] ],
+  "output:", [
+    "===:", ["error", ["user_error", "screen_name: already_taken"] ]
   ],
 
 
-  "it", ["updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id"],
-  "input", [
-    "__", ["rand_screen_name[]"],
-    "Screen_Name.read_one", ["screen_name[]"]
+  "it:", ["updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id"],
+  "input:", [
+    "__:", ["rand_screen_name[]"],
+    "Screen_Name.read_one:", ["screen_name[]"]
   ],
-  "output", [
-    "~=", {
+  "output:", [
+    "~=:", {
       "screen_name" : "sn[1].screen_name",
       "owner_id"    : "sn[].id",
       "id"          : "sn[].id"
