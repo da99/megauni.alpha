@@ -95,9 +95,16 @@ defmodule JSON_Spec do
   end  # === run_input
 
   def exactly_like stack, prog, env do
+    raise  :NOT_DONE
   end
 
   def similar_to stack, prog, env do
+    raise  :NOT_DONE
+  end
+
+  def raw stack, prog, env do
+    [args | prog] = prog
+    {stack ++ args, prog, env}
   end
 
   def passed env do
@@ -402,6 +409,7 @@ defmodule JSON_Spec do
     {stack, prog, env} = if func do
       func.( stack, [arr_or_map | prog], env )
     else
+      raise "Function not found: #{inspect string}"
       {stack ++ [string], [ arr_or_map | prog ], env}
     end
 
