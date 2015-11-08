@@ -19,7 +19,7 @@ defmodule JSON_Spec do
   def spec_func_map mod do
     Enum.reduce mod.__info__(:functions), %{}, fn({name, arity}, map) ->
       if arity == 3 do
-        map = Map.put map, name, name
+        map = Map.put map, Atom.to_string(name), name
       end
       map
     end
@@ -33,7 +33,6 @@ defmodule JSON_Spec do
 
   def __ stack, prog, env do
     [raw | prog] = prog
-    In.spect raw
     run(stack, [env[:desc], raw], env)
   end
 
@@ -83,8 +82,10 @@ defmodule JSON_Spec do
     end
 
     {[title], prog, env} = take(prog, 1, env)
-
     env = Enum.into(%{ :it => title, :it_count => env.it_count }, env)
+    num = "#{JSON_Spec.format_num(env.it_count)})"
+    IO.puts "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
+
     {stack, prog, env}
   end # === def it
 
@@ -92,11 +93,7 @@ defmodule JSON_Spec do
     [ input_prog | prog ] = prog
     {results, _empty, env} = run([], input_prog, env)
     actual = results |> List.last
-
-    num = "#{JSON_Spec.format_num(env.it_count)})"
-    IO.puts "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
     env = Map.put(env, :actual, actual)
-
     {stack ++ [actual], prog, env}
   end  # === run_input
 
@@ -304,7 +301,7 @@ defmodule JSON_Spec do
     funcs = mod.__info__(:functions)
     if funcs[:spec_funcs] == 0 do
       Enum.reduce mod.spec_funcs, %{}, fn({alias_name, name}, map) ->
-        Map.put(map, to_atom(alias_name), fn(stack, prog, env) ->
+        Map.put(map, alias_name, fn(stack, prog, env) ->
           apply(mod, name, [stack, prog, env])
         end)
       end
@@ -345,39 +342,48 @@ defmodule JSON_Spec do
     end
   end # === run_file
 
-  def get(raw, env) do
-    name = cond do
-      is_binary(raw) ->
-        raw |> String.replace(~r/:$/, "") |> to_atom
-      is_atom(raw) ->
-        raw
-      true ->
-        to_atom(raw)
+  def get(name, env) do
+    func = cond do
+      Map.has_key?(env, name) -> env[name]
+      is_top?(env)            -> nil
+      true                    -> get(name, top_env(env))
+    end # cond
+
+    if !func && is_binary(name) && name =~ ~r/\./ do
+      func = name
+      |> String.downcase
+      |> String.replace(".", "_")
+      |> get(env)
     end
 
-    cond do
-      Map.has_key?(env, name) ->
-        env[name]
-      is_top?(env) ->
-        nil
-      true ->
-        get name, top_env(env)
-    end # cond
+    func
   end # def
 
+  def to_args(string) when is_binary(string) do
+    string = string |> String.strip
+    case string do
+      "" -> []
+      _  -> string |> String.split(",") |> Enum.map(&(String.strip &1))
+    end
+  end
+
   def to_prog(string) when is_binary(string) do
-    result = Regex.run ~r/^([a-zA-Z0-9\_]+)\[([^\]]?)\]\.?(.+)?$/, string
+    result = Regex.run ~r/^([a-zA-Z0-9\_]+)\[([^\]]*)\]\.?(.+)?$/, string
     if !result do
       nil
     else
       [_match, func, raw_args |  tail ] = result
+
+      args = raw_args |> to_args
+
       gets = Enum.reduce tail, [], fn(str, arr) ->
-        fields = String.split str, ","
+        fields = String.split str, "."
         Enum.reduce fields, arr, fn(fld, arr) ->
           arr ++ ["get", [fld]]
         end
       end
-      [func, raw_args] ++ gets
+
+      [func, args] ++ gets
     end
   end
 
