@@ -67,7 +67,7 @@ defmodule Megauni.SQL do
   def to_rows! raws do
     case raws do
       {:ok, _} ->
-        rows |> ok_rows_to_list_of_maps
+        raws |> ok_rows_to_list_of_maps
 
       {:error, e} ->
         In.spect e

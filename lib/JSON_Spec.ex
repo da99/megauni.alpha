@@ -8,145 +8,143 @@ defmodule JSON_Spec do
   @yellow  "#{@bright}#{IO.ANSI.yellow}"
   @red     "#{@bright}#{IO.ANSI.red}"
 
-  defmodule Core do
+  def spec_funcs do
+    %{
+      "==="        => :exactly_like,
+      "~="         => :similar_to,
+      "get"        => :get,
+      "const"      => :const,
+      "before all" => :before_all,
+      "after each" => :after_each,
+      "desc"       => :desc,
+      "input"      => :input,
+      "output"     => :output
+    }
+  end
 
-    def get stack, prog, env do
-      {[name], prog, env} = JSON_Spec.take(prog, 1, env)
-      val = stack |> List.last |> Map.fetch!(name)
-      {stack ++ [val], prog, env}
+  def get stack, prog, env do
+    {[name], prog, env} = JSON_Spec.take(prog, 1, env)
+    val = stack |> List.last |> Map.fetch!(name)
+    {stack ++ [val], prog, env}
+  end
+
+  def const list, env do
+    [ name | prog ] = list
+    { stack, prog , env } = JSON_Spec.run([], prog, env)
+    Map.put env, name, List.last(stack)
+  end
+
+  def before_all prog, env do
+    { _stack, _prog, env } = JSON_Spec.run([], prog, env)
+    env
+  end # === def run_before_all
+
+  def after_each prog, env do
+    if Map.has_key?(env, :after_each) do
+      if is_list(env.after_each) do
+        Map.put env, :after_each, List.append(env.after_each, prog)
+      else
+        Map.put env, :after_each, List.append([env.after_each], prog)
+      end
+    else
+      if !is_list(prog) do
+        prog = [prog]
+      end
+      Enum.into %{:after_each => prog}, env
+    end
+  end # === def run_after_each
+
+  def desc stack, prog, env do
+    if !JSON_Spec.is_top?(env) do
+      env = JSON_Spec.revert_env(env)
     end
 
-    def const list, env do
-      [ name | prog ] = list
-      { stack, prog , env } = JSON_Spec.run([], prog, env)
-      Map.put env, name, List.last(stack)
+    {[name], prog, env} = take(prog, 1, env)
+    IO.puts "#{@yellow}#{name}#{@reset}"
+    env = Enum.into %{ :desc=>name }, JSON_Spec.new_env(env)
+    {stack, prog, env}
+  end
+
+  def it raw_title, prev_env do
+    env = JSON_Spec.new_env(prev_env)
+    env = if Map.has_key?(env, :it_count) do
+      Map.put env, :it_count, env.it_count + 1
+    else
+      Map.put env, :it_count, 1
     end
 
-    def before_all prog, env do
-      { _stack, _prog, env } = JSON_Spec.run([], prog, env)
-      env
-    end # === def run_before_all
+    {stack, _empty, env} = JSON_Spec.run([], [raw_title], env)
+    title = stack |> List.last
 
-    def after_each prog, env do
-      if Map.has_key?(env, :after_each) do
-        if is_list(env.after_each) do
-          Map.put env, :after_each, List.append(env.after_each, prog)
-        else
-          Map.put env, :after_each, List.append([env.after_each], prog)
-        end
-      else
-        if !is_list(prog) do
-          prog = [prog]
-        end
-        Enum.into %{:after_each => prog}, env
-      end
-    end # === def run_after_each
+    Enum.into %{
+      :it       => title,
+      :it_count => env.it_count
+    }, JSON_Spec.new_env(env)
+  end # === def it
 
-    def desc name, env do
-      if !JSON_Spec.is_top?(env) do
-        env = JSON_Spec.revert_env(env)
-      end
+  def input stack, prog, env do
+    [ input_prog | prog ] = prog
+    {results, _empty, env} = JSON_Spec.run([], input_prog, env)
+    actual = results |> List.last
 
-      IO.puts "#{@yellow}#{name}#{@reset}"
-      Enum.into %{ :desc=>name }, JSON_Spec.new_env(env)
+    num = "#{JSON_Spec.format_num(env.it_count)})"
+    IO.print "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
+    env = Map.put(env, :actual, actual)
+
+    {stack ++ [actual], prog, env}
+  end  # === run_input
+
+  def exactly_like stack, prog, env do
+  end
+
+  def similar_to stack, prog, env do
+  end
+
+  def passed env do
+    IO.print "\r"
+    num = "#{JSON_Spec.format_num(env.it_count)})"
+    IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}#{@reset}"
+  end # === def failed
+
+  def failed actual, expected, env do
+    IO.print "\r"
+    num = "#{JSON_Spec.format_num(env.it_count)})"
+    IO.puts "#{@bright}#{@red}#{num}#{@reset}#{@bright} #{env.it}"
+    IO.puts "#{@bright}#{inspect expected} !== #{@reset}#{@red}#{@bright}#{inspect env.actual}"
+    IO.puts @reset
+    Process.exit(self, "spec failed")
+  end # === def failed
+
+  def output stack, prog, env do
+    actual = stack |> List.last
+
+    {stack, _empty, env} = JSON_Spec.run(stack, prog, env)
+    spec_done = stack |> List.last
+
+    if spec_done != :spec_done do
+      Process.exit(self, "\nNo spec found.")
     end
 
-    def it raw_title, prev_env do
-      env = JSON_Spec.new_env(prev_env)
-      env = if Map.has_key?(env, :it_count) do
-        Map.put env, :it_count, env.it_count + 1
-      else
-        Map.put env, :it_count, 1
-      end
+    if Map.has_key?(env, :after_each) do
+      {_stack, _empty, env} = JSON_Spec.run(stack, env.after_each, env)
+    end
 
-      {_stack, _empty, env} = JSON_Spec.run([], [raw_title], env)
-      title = _stack |> List.last
+    env = JSON_Spec.carry_over(env, [:it_count, :spec_count])
+    {stack, prog, env}
+  end # === def output
 
-      Enum.into %{
-        :it       => title,
-        :it_count => env.it_count
-      }, JSON_Spec.new_env(env)
-    end # === def it
-
-    def input raw, env do
-      cond do
-        is_map(raw) ->
-          input([raw], env)
-
-        is_list_of_maps?(raw) ->
-          new_list = Enum.reduce raw, [], fn(map, list) ->
-            list ++ [ env[:desc], map ]
-          end
-          input(new_list, env)
-
-        is_list(raw) ->
-          {stack, env} = run_list(raw, env)
-          Map.put env, :actual, List.last(stack)
-
-        true ->
-          raise "Don't know how to run: #{inspect raw}"
-      end # === cond
-    end  # === run_input
-
-    def output output, env do
-      {expected, env} = cond do
-        is_map(output) ->
-          compile(output, env)
-
-        is_list_of_maps?(output) ->
-          Enum.reduce output, {[], env}, fn(m, {list, env}) ->
-            {new_map, env} = compile(m, env)
-            {list ++ [new_map], env}
-          end
-
-        is_list(output) ->
-          {stack, env} = run_list(output, env)
-          {List.last(stack), env}
-
-        true ->
-          raise "Don't know what to do with input/output: #{inspect output}"
-      end
-
-      num = "#{format_num(env.it_count)})"
-      if maps_match?(env.actual, expected) do
-        IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}#{@reset}"
-      else
-        IO.puts "#{@bright}#{@red}#{num}#{@reset}#{@bright} #{env.it}"
-        IO.puts "#{@bright}#{inspect expected} !== #{@reset}#{@red}#{@bright}#{inspect env.actual}"
-        IO.puts @reset
-        Process.exit(self, "spec failed")
-      end
-
-      if Map.has_key?(env, :after_each) do
-        {_stack, env} = run_list(env.after_each, env)
-      end
-      carry_over(env, :it_count)
-    end # === def run_output
-
-  end # === defmodule Core ========================================
-
+  @doc """
+    Compiles elements from a list of args (ie prog)
+    Returns:
+      { compiled_list_of_args, prog, env }
+  """
   def take([list | prog], num, env) when is_list(list) do
     {args, _empty, env} = run([], list, env)
     if Enum.count(args) < num do
       raise "Not enought args: #{inspect num} desired from: #{inspect list}"
     end
 
-    fin = Enum.take(args, num)
-    {args, env}
-  end
-
-  @doc """
-    Compiles elements from a list of args (ie prog)
-    Returns:
-      { compiled_value, list, env }
-  """
-  def take list, num, env do
-    if Enum.count(list) < num do
-      raise "Out of bounds: #{inspect num} #{inspect list}"
-    end
-
-    {args, _empty, env} = run([], Enum.take(list, num), env)
-    {args, env}
+    {Enum.take(args, num), prog, env}
   end # === def args
 
   def is_top? env do
@@ -175,6 +173,18 @@ defmodule JSON_Spec do
   def canon_key(x) do
     x |> String.strip
       |> (&(Regex.replace(~r/\s+/, &1," "))).()
+  end
+
+  def to_atom x do
+    if is_atom(x) do
+    x
+    else
+      x
+      |> String.downcase
+      |> String.strip
+      |> (&(Regex.replace ~r/[^a-z0-9\_\!\?]/, &1, "_")).()
+      |> String.to_atom
+    end
   end
 
   def format_num(num) do
@@ -249,14 +259,6 @@ defmodule JSON_Spec do
     end
   end # === maps_match?
 
-  def binary_to_atom s do
-    if is_atom(s) do
-      s
-    else
-      Regex.replace ~r/\s+/, String.strip(s), '_'
-    end
-  end
-
   def new_env env do
     Map.put env, :_parent_env, env
   end
@@ -280,19 +282,31 @@ defmodule JSON_Spec do
     end
   end
 
-  def modules_to_map arr do
-    arr
-    |> Enum.map( &(module_to_map &1) )
-    |> Enum.reduce(%{}, &(Map.merge &2, &1))
-  end
-
-  def module_to_map mod do
-    Enum.reduce mod.__info__(:functions), %{}, fn({name, arity}, map) ->
-      Map.put(map, name, fn(stack, prog, env) ->
-        apply(mod, name, [stack, prog, env])
-      end)
+  def to_map(arr) when is_list(arr) do
+    Enum.reduce arr, %{}, fn(mod, map) ->
+      Map.merge map, to_map(mod)
     end
   end
+
+  def to_map(mod) do
+    funcs = mod.__info__(:functions)
+    if funcs[:spec_funcs] == 0 do
+      Enum.reduce mod.spec_funcs, %{}, fn({alias_name, name}, map) ->
+        Map.put(map, alias_name, fn(stack, prog, env) ->
+          apply(mod, name, [stack, prog, env])
+        end)
+      end
+    else
+      Enum.reduce funcs, %{}, fn({name, arity}, map) ->
+        if arity == 3 do
+          map = Map.put(map, Atom.to_string(name), fn(stack, prog, env) ->
+            apply(mod, name, [stack, prog, env])
+          end)
+        end
+        map
+      end
+    end
+  end # === def
 
   def run_files files, env \\ nil do
     Enum.each files, fn(file) ->
@@ -300,22 +314,23 @@ defmodule JSON_Spec do
     end
   end # == def run_files
 
-  def run_file(path, raw_env \\ nil) do
-    env = case raw_env do
-      none when is_nil(none) -> %{}
-      arr  when is_list(arr) -> modules_to_map(arr)
-      mod                    -> module_to_map(mod)
-    end
+  def run_file(path, raw_env \\ %{}) do
+    # === Defaults for env
+    env = Enum.into(
+      %{ :_parent_env => nil, :spec_count  => 0, :it_count    => 0 },
+      Map.merge(to_map(JSON_Spec), to_map(raw_env))
+    )
 
-    look_in = (Map.get env, "look_in", []) ++ [JSON_Spec.Core]
-    env     = Map.put env, "look_in", look_in
-    json    = File.read!(path) |> Poison.decode!
+    {_stack, _prog, env} = run(
+      [], (File.read!(path) |> Poison.decode!), env
+    )
 
     IO.puts "\nfile: #{@bright}#{path}#{@reset}"
-
-    env = Enum.into(%{:_parent_env=>nil}, env)
-    run [], json, env
-    IO.puts "#{@bright}#{@green}All tests pass.#{@reset}"
+    if env.spec_count > 0 do
+      IO.puts "#{@bright}#{@green}All tests pass.#{@reset}"
+    else
+      IO.puts "#{@bright}#{@red}No tests found.#{@reset}"
+    end
   end # === run_file
 
   def get(raw, env) do
@@ -323,12 +338,17 @@ defmodule JSON_Spec do
     cond do
       Map.has_key?(env, raw)  -> env[raw]
       Map.has_key?(env, atom) -> env[atom]
-      true                    -> raw
+      true                    ->
+        if is_top?(env) do
+          nil
+        else
+          get raw, top_env(env)
+        end
     end # cond
   end # def
 
   def to_prog(string) when is_binary(string) do
-    result = Regexp.run ~r/^([a-zA-Z0-9\_]+)\[([^\]]?)\]\.?(.+)?$/, string
+    result = Regex.run ~r/^([a-zA-Z0-9\_]+)\[([^\]]?)\]\.?(.+)?$/, string
     if !result do
       nil
     else
@@ -371,6 +391,16 @@ defmodule JSON_Spec do
     run(stack ++ [num], prog, env)
   end
 
+  def run(stack, [string, arr_or_map | prog], env) when (is_binary(string) and (is_list(arr_or_map) or is_map(arr_or_map))) do
+    func = get(string, env)
+
+    if func do
+      func.( stack, [arr_or_map | prog], env )
+    else
+      {stack ++ [string], [ arr_or_map | prog ], env}
+    end
+  end
+
   def run(stack, [map | prog], env) when is_map(map) do
     {map, env} = Enum.reduce map, {%{}, env}, fn({k,v}, {fin, env}) ->
       {stack, _prog, env} = run([], [v], env)
@@ -381,23 +411,14 @@ defmodule JSON_Spec do
   end
 
   def run(stack, [raw_string | prog], env) when is_binary(raw_string) do
-    compiled = raw_string |> replace_vars(env) |> get(env)
+    string   = raw_string |> replace_vars(env)
+    new_prog = JSON_Spec.to_prog(string) # === e.g.: func[..].field.field.field
 
-    {stack, prog, env} = case compiled do
-
-      func when is_function(func) ->
-        func.( stack, prog, env )
-
-      string when is_binary(string) ->
-        new_prog = to_prog string
-
-        if new_prog do
-          {new_stack, _prog, env} = run(stack, new_prog, env)
-          {stack ++ new_stack, prog, env}
-        else
-          {stack ++ [string], prog, env}
-        end
-
+    {stack, prog, env} = if new_prog do
+      {new_stack, _empty, env} = run(stack, new_prog, env)
+      {stack ++ new_stack, prog, env}
+    else
+      {stack ++ [string], prog, env}
     end # case ==========================
 
     if Enum.count(prog) != 0 do

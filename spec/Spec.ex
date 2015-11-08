@@ -9,7 +9,7 @@ end
 
 files = Enum.reduce models, [], fn(mod, acc) ->
    cond do
-     File.exist?(mod) ->
+     File.exists?(mod) ->
        acc ++ [mod]
      mod =~ ~r/[\*|\/]/ ->
        acc ++ Path.wildcard("lib/#{mod}.json")
@@ -51,21 +51,18 @@ defmodule Spec_Funcs do
     {stack ++ attempts, prog, env}
   end
 
-end # === defmodule Megauni.Specs
-
-env = %{
-
-  "rand screen_name" => fn(env) ->
+  def rand_screen_name(stack, prog, env) do
     {_mega, sec, micro} = :erlang.timestamp
     sn = "SN_#{sec}_#{micro}"
-    { sn, Map.put(env, "screen_name", sn) }
-  end,
+    env = Map.put(env, "screen_name", sn)
+    {stack ++ [sn], prog, env}
+  end
 
-  "long_pass_word" => fn(env) ->
-    { String.duplicate("one word ", 150), env}
-  end,
+  def long_pass_word(stack, prog, env) do
+    { stack ++ [String.duplicate("one word ", 150)], prog, env}
+  end
 
-  "query" => fn(stack, prog, env) ->
+  def query(stack, prog, env) do
     {query, prog, env} = JSON_Spec.take(prog, 1, env)
     {:ok, %{columns: keys, rows: rows}} = Ecto.Adapters.SQL.query( Megauni.Repos.Main, query, [] )
     rows = Enum.map rows, fn(r) ->
@@ -74,41 +71,41 @@ env = %{
       end
     end
     {stack ++ [rows], prog, env}
-  end,
+  end
 
-  "repeat" => fn(stack, prog, env) ->
+  def repeat(stack, prog, env) do
     {[num | list], prog, env} = JSON_Spec.take(prog, 1, env)
-    {env, new_stack} = Enum.reduce 0..num, {env, []}, fn(i, {env, stack}) ->
+    {env, new_stack} = Enum.reduce 0..num, {env, []}, fn(_i, {env, _stack}) ->
       {stack, env} = JSON_Spec.run_list(list, env)
       {env, stack ++ [List.last(stack)]}
     end
 
     {stack ++ new_stack, prog, env}
-  end,
+  end
 
-  "array" => fn(stack, prog, env) ->
+  def array(stack, prog, env) do
     { arr, prog, env } = JSON_Spec.take(prog, 1, env)
     {stack ++ [arr], prog, env}
-  end,
+  end
 
-  "length" => fn(stack, prog, env) ->
+  def length(stack, prog, env) do
     {stack ++ [stack |> List.last |> Enum.count], prog, env}
-  end,
+  end
 
-  "pluck" => fn(stack, prog, env) ->
+  def pluck(stack, prog, env) do
     {[key], prog, env} = JSON_Spec.take(prog, 1, env)
     results = Enum.map List.last(stack), fn(x) ->
       x[key]
     end
     {stack ++ [results], prog, env}
-  end,
+  end
 
-  "unique" => fn(stack, prog, env) ->
+  def unique(stack, prog, env) do
     arr = List.last(stack)
     { stack ++ [Enum.uniq(arr)], prog, env }
-  end,
+  end
 
-  "create card" => fn(stack, prog, env) ->
+  def create_card(stack, prog, env) do
     if (prog |> List.first |> is_map) do
       {data, prog, env} = JSON_Spec.take(prog, 1, env)
     else
@@ -129,9 +126,9 @@ env = %{
     end
 
     {stack ++ [result], prog, env}
-  end,
+  end
 
-  "create link" => fn(stack, prog, env) ->
+  def create_link(stack, prog, env) do
     {args, prog, env} = JSON_Spec.take(prog, 1, env)
 
     if (args |> List.first |> is_number) do
@@ -151,18 +148,18 @@ env = %{
         result
     end
     {stack ++ [result], prog, env}
-  end,
+  end
 
-  "read homepage" => fn(stack, prog, env) ->
+  def read_homepage(stack, prog, env) do
     cards = Screen_Name.read_homepage_cards(
       env["user"]["id"],
       env["sn"]["screen_name"]
     )
     JSON_Spec.put(env, "cards", cards);
     {stack ++ [cards], prog, env}
-  end,
+  end
 
-  "read news_card" => fn(stack, prog, env) ->
+  def read_news_card(stack, prog, env) do
     user_id = (
       env["user"] && env["user"]["id"]
     ) || Screen_Name.read_id!(env["sn"]["screen_name"])
@@ -181,15 +178,15 @@ env = %{
         result
     end
     {stack ++ [result], prog, env}
-  end,
+  end
 
-  "user.id =" => fn(stack, prog, env) ->
+  def user_id(stack, prog, env) do
     {args, prog, env} = JSON_Spec.take prog, 1, env
     env = Map.put env, "user", %{"id"=> List.last(args)}
     {stack, prog, env}
-  end,
+  end
 
-  "type_ids" => fn(stack, prog, env) ->
+  def type_ids(stack, prog, env) do
     ids = Regex.scan(
       ~r/RETURN\s+(\d+)\s?;/,
       File.read!("lib/Megauni/migrates/__-02-link_type_id.sql")
@@ -199,9 +196,9 @@ env = %{
     end)
 
     {stack ++ [ids], prog, env}
-  end,
+  end
 
-  "Link.create" => fn(stack, prog, env) ->
+  def link_create(stack, prog, env) do
     {args, prog, env} = JSON_Spec.take(prog, 1, env)
     result            = Link.create env["user"]["id"], args
     case result do
@@ -211,9 +208,9 @@ env = %{
         result
     end
     {stack ++ [result], prog, env}
-  end,
+  end
 
-  "Screen_Name.create" => fn(stack, prog, env) ->
+  def screen_name_create(stack, prog, env) do
     {data, prog, env} = JSON_Spec.take(prog, 1, env)
     result            = Screen_Name.create data
 
@@ -226,9 +223,9 @@ env = %{
     end
 
     {stack ++ [result], prog, env}
-  end, # === Screen_Name.create
+  end # === Screen_Name.create
 
-  "Screen_Name.read" => fn(stack, prog, env) ->
+  def screen_name_read(stack, prog, env) do
     {data, prog, env} = JSON_Spec.take(prog, 1, env)
     rows          = Screen_Name.read data
 
@@ -243,9 +240,9 @@ env = %{
         end
         {stack ++ [fin], prog, env}
     end
-  end, # === Screen_Name.read
+  end # === Screen_Name.read
 
-  "Screen_Name.read_one" => fn(stack, prog, env) ->
+  def screen_name_read_one(stack, prog, env) do
     {data, prog, env} = JSON_Spec.take(prog, 1, env)
     result            = Screen_Name.read_one data
 
@@ -258,9 +255,9 @@ env = %{
     end
 
     {stack ++ [result], prog, env}
-  end, # === Screen_Name.read_one
+  end # === Screen_Name.read_one
 
-  "User.create" => fn(stack, prog, env) ->
+  def user_create(stack, prog, env) do
     {data, prog, env} = JSON_Spec.take(prog, 1, env)
     if Map.has_key?(data, "error") do
       raise "#{inspect data}"
@@ -275,20 +272,20 @@ env = %{
     end
 
     {stack ++ [result], prog, env}
-  end,
+  end
 
-  "Log_In.attempt" => fn(stack, prog, env) ->
+  def log_in_attempt(stack, prog, env) do
     {arg, prog, env} = JSON_Spec.take(prog, 1, env)
     stack = stack ++ [Log_In.attempt(arg)]
     {stack, prog, env}
-  end,
+  end
 
-  "Log_In.reset_all" => fn(stack, prog, env) ->
+  def log_in_reset_all(stack, prog, env) do
     Log_In.reset_all
     {stack, prog, env}
-  end,
+  end
 
-  "bad_log_in" => fn(stack, prog, env) ->
+  def bad_log_in(stack, prog, env) do
     {stack, prog, env} = Spec_Funcs.log_in( %{
       "pass"        => "bass pass",
       "screen_name" => env["sn"]["screen_name"],
@@ -296,24 +293,24 @@ env = %{
     }, stack, prog, env)
 
     {stack ++ [{:JSON_Spec, :ignore_last_error}], prog, env}
-  end,
+  end
 
-  "good_log_in" => fn(stack, prog, env) ->
+  def good_log_in(stack, prog, env) do
     Spec_Funcs.log_in %{
       "pass"        => Spec_Funcs.valid_pass,
       "screen_name" => env["sn"]["screen_name"],
       "ip"          => "127.0.0.1"
     }, stack, prog, env
-  end,
+  end
 
-  "log_in_attempts aged" => fn(stack, prog, env) ->
+  def log_in_attempts_aged(stack, prog, env) do
     [[arg] | prog] = prog
     {:ok, %{:num_rows=>count}} = Log_In.aged arg
 
     {stack ++ [count], prog, env}
-  end,
+  end
 
-  "create user" => fn(stack, prog, env) ->
+  def create_user(stack, prog, env) do
     user = User.create(%{
       "screen_name"  => Spec_Funcs.rand_screen_name,
       "pass"         => Spec_Funcs.valid_pass,
@@ -337,9 +334,9 @@ env = %{
         raise "Unknown error: #{inspect user}"
     end
     {(stack ++ [user]), prog, env}
-  end,
+  end
 
-  "lookup kv" => fn(k, env) ->
+  def lookup_kv(k, env) do
     cond do
       x = Regex.run(~r/^card_(.)?\.linked_at$/, k) ->
         id = env["card_#{List.last(x)}"]["id"]
@@ -367,9 +364,9 @@ env = %{
       true ->
         {k, env}
     end # === cond
-  end,
+  end
 
-  "create screen_name" => fn(stack, prog, env) ->
+  def create_screen_name(stack, prog, env) do
     arg = if Map.has_key?(env, "user") do
       %{
         "screen_name" => Spec_Funcs.rand_screen_name,
@@ -396,17 +393,17 @@ env = %{
         raise "Unknown error: #{inspect sn}"
     end
     {(stack ++ [sn]), prog, env}
-  end,
+  end
 
-  "update privacy" => fn(stack, prog, env) ->
+  def update_privacy(stack, prog, env) do
     {args, prog, env} = JSON_Spec.take(prog, 1, env)
     name = env["sn"]["screen_name"]
     id   = Screen_Name.select_id(name)
     {:ok, _answer} = Screen_Name.run id, ["update screen_name privacy", [name, List.last(args)]]
     {stack, prog, env}
-  end,
+  end
 
-  "all log_in_attempts old" => fn(_data, _env) ->
+  def all_log_in_attempts_old(_data, _env) do
     {:ok, _} = Ecto.Adapters.SQL.query(
       Megauni.Repos.Main,
       "UPDATE log_in SET at = at + '25 hours'::interval",
@@ -414,9 +411,10 @@ env = %{
     )
   end
 
-}
+end # === defmodule Spec_Funcs
 
-JSON_Spec.run_files(files, [env])
+
+JSON_Spec.run_files(files, Spec_Funcs)
 
 
 
