@@ -32,8 +32,7 @@ defmodule JSON_Spec do
   end
 
   def __ stack, prog, env do
-    [raw | prog] = prog
-    run(stack, [env[:desc], raw], env)
+    run(stack, [env[:desc] | prog], env)
   end
 
   @doc """
