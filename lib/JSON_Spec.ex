@@ -108,7 +108,7 @@ defmodule JSON_Spec do
 
     env = Map.put(env, :it, title)
     num = "#{format_num(env.it_count)})"
-    IO.write "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
+    IO.puts "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
 
     {stack, prog, env}
   end # === def it
@@ -146,13 +146,22 @@ defmodule JSON_Spec do
   end
 
   def similar_to!(actual, expected) when is_map(actual) and is_map(expected) do
-    !Enum.find expected, fn({k,v}) ->
+    key = Enum.find Map.keys(expected), fn(k) ->
       cond do
-        (is_integer(actual[k]) && v == "INT") ->
+        (is_integer(actual[k]) && expected[k] == "INT") ->
           false
         true ->
-          !(actual[k] == v)
+          !(actual[k] == expected[k])
       end
+    end
+    if key do
+      IO.puts "#{@bright}Key mismatch: #{key} : #{inspect actual[key]} != #{@red}#{inspect expected[key]}#{@reset}"
+      IO.puts "#{@bright}#{inspect actual}"
+      IO.puts "#{@reset}#{@red}#{@bright}#{inspect expected}"
+      IO.puts @reset
+      raise "spec failed"
+    else
+      true
     end
   end
 
@@ -162,18 +171,28 @@ defmodule JSON_Spec do
     end
 
     Enum.find Enum.with_index(expected), fn({val, i}) ->
-      similar_to!( actual[i], expected[i])
+      ! similar_to!( Enum.at(actual,i), Enum.at(expected, i))
     end
   end
 
-  def similar_to!(actual, expected) when is_binary(actual) do
-    raise "not done"
+  def similar_to!(actual, expected) when is_binary(actual) and is_binary(expected) do
+    if actual != expected do
+      similar_to_fail actual, expected
+    end
+    true
+  end
+
+  def similar_to!(actual, expected) when is_binary(actual) and is_map(expected) do
+    if !(actual =~ expected) do
+      similar_to_fail actual, expected
+    end
+    true
   end
 
   def similar_to_fail actual, expected do
-      IO.puts "\n#{@bright}#{inspect actual} needs to be similar to #{@reset}#{@red}#{@bright}#{inspect expected}"
-      IO.puts @reset
-      Process.exit(self, "spec failed")
+    IO.puts "\n#{@bright}#{inspect actual} needs to be similar to #{@reset}#{@red}#{@bright}#{inspect expected}"
+    IO.puts @reset
+    raise "spec failed"
   end
 
   def similar_to! actual, expected do
@@ -192,9 +211,8 @@ defmodule JSON_Spec do
   end
 
   def passed env do
-    IO.write "\r"
-    num = "#{format_num(get(:it_count, env))})"
-    IO.puts "#{@bright}#{@green}#{num}#{@reset} #{get(:it, env)}#{@reset}"
+    # num = "#{format_num(get(:it_count, env))})"
+    # IO.puts "#{@bright}#{@green}#{num}#{@reset} #{get(:it, env)}#{@reset}"
   end # === def failed
 
   def failed actual, expected, env do
@@ -323,18 +341,15 @@ defmodule JSON_Spec do
 
   """
   def put env, name, val do
-    counter_key = "#{name}_counter"
+    name_counter = String.to_atom "#{name}_counter"
 
-    counter = if Map.has_key?(env, counter_key) do
-      env[counter_key]+1
-    else
-      1
-    end
+    counter = (get(name_counter, env) || 0) + 1
+    name_id = String.to_atom "#{name}_#{counter}"
 
     env
-    |> Map.put(counter_key, counter)
+    |> Map.put(name_counter, counter)
+    |> Map.put(name_id, val)
     |> Map.put(name, val)
-    |> Map.put("#{name}_#{counter}", val)
   end
 
   def new_env env do

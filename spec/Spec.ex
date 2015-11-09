@@ -251,19 +251,34 @@ defmodule Spec_Funcs do
     end
   end # === Screen_Name.read
 
-  def screen_name_read_one(stack, prog, env) do
-    {data, prog, env} = JSON_Spec.take(prog, 1, env)
-    result            = Screen_Name.read_one data
+  def sn stack, [[]|prog], env do
+    sn stack, [[1]|prog], env
+  end
+
+  def sn stack, prog, env do
+    [[num] | prog] = prog
+    key = String.to_atom("sn_#{num}")
+    tuple = JSON_Spec.get(key, env)
+    val = case tuple do
+      {:ok, row} -> row
+      _ -> tuple
+    end
+    {stack ++ [val], prog, env}
+  end
+
+  def screen_name_raw!(stack, prog, env) do
+    {[name], prog, env} = JSON_Spec.take(prog, 1, env)
+    result            = Screen_Name.raw! name
 
     case result do
-      %{"user_error" => _msg} ->
+      {:error, {:user_error, _msg}} ->
         result
 
-      %{"screen_name"=>_sn} ->
-        env = JSON_Spec.put(env, "sn", result)
+      {:ok, %{"screen_name"=>_sn}} ->
+        env = JSON_Spec.put(env, :sn, result)
     end
 
-    {stack ++ [result], prog, env}
+    {stack ++ [result |> JSON_Spec.to_json_to_elixir], prog, env}
   end # === Screen_Name.read_one
 
   def user_create(stack, prog, env) do

@@ -59,14 +59,16 @@
   "it", ["updates :owner_id (of returned SN obj) to its :id if Customer is new and has no id"],
   "input", [
     "__", ["rand_screen_name[]"],
-    "Screen_Name.read_one", ["screen_name[]"]
+    "Screen_Name.raw!", ["screen_name[]"]
   ],
   "output", [
-    "~=", {
-      "screen_name" : "sn[1].screen_name",
-      "owner_id"    : "sn[].id",
-      "id"          : "sn[].id"
-    }
+    "~=", [
+      "data", ["ok", {
+        "screen_name" : "sn[1].screen_name",
+        "owner_id"    : "sn[].id",
+        "id"          : "sn[].id"
+      }]
+    ]
   ]
 
 ]

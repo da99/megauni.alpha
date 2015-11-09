@@ -11,6 +11,15 @@ defmodule Screen_Name do
   @begin_at_or_hash  ~r/\A(\@|\#)/
   @all_white_space   ~r/\s+/
 
+  def raw! raw_name do
+    if !System.get_env("IS_DEV") do
+      raise "Not on a dev machine"
+    end
+
+    Megauni.SQL.query("SELECT * FROM top_level_screen_name($1) AS id;", [raw_name])
+    |> Megauni.SQL.one_row
+  end
+
   def canonize list_or_binary do
     case list_or_binary do
       list when is_list(list) ->
@@ -60,10 +69,6 @@ defmodule Screen_Name do
       "SELECT * FROM screen_name_read($1);",
       [data["screen_name"]]
     )
-  end
-
-  def read_one data do
-    data |> read |> Megauni.SQL.one_row
   end
 
   def read_news_card user_id do
