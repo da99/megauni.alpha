@@ -4,7 +4,11 @@
 
   "it"     , ["creates record if data validates"],
   "input"  , [ "__", ["rand_screen_name[]"] ],
-  "output" , [ "~=", {"screen_name": "screen_name[]"}],
+  "output" , [
+    "~=", [
+    "data", ["ok", {"screen_name": "screen_name[]"}]
+    ]
+  ],
 
 
   "it"     , ["raises Invalid if screen name is empty"],

@@ -108,7 +108,7 @@ defmodule Screen_Name do
     )
 
     if Megauni.SQL.is_too_long?(result) do
-      %{"user_error"=>"screen_name: max #{Megauni.SQL.max_length result}"}
+      {:error, {:user_error, "screen_name: max #{Megauni.SQL.max_length result}"}}
     else
       Megauni.SQL.one_row(result, "screen_name")
     end

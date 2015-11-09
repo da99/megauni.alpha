@@ -51,7 +51,7 @@ defmodule JSON_Spec do
       case v do
         list when is_list(list) ->
           {new_stack, _empty, env} = data([], [list], env)
-          {data ++ [new_stack], env}
+          {data ++ new_stack, env}
         _ ->
           {new_stack, _empty, env} = run([], [v], env)
           { data ++ [List.last(new_stack)], env}
@@ -158,11 +158,23 @@ defmodule JSON_Spec do
   end
 
   def similar_to!(actual, expected) when is_list(actual) and is_list(expected) do
-    raise "not done"
+    if Enum.count(actual) != Enum.count(expected) do
+      similar_to_fail actual, expected
+    end
+
+    Enum.find Enum.with_index(expected), fn({val, i}) ->
+      similar_to!( actual[i], expected[i])
+    end
   end
 
   def similar_to!(actual, expected) when is_binary(actual) do
     raise "not done"
+  end
+
+  def similar_to_fail actual, expected do
+      IO.puts "\n#{@bright}#{inspect actual} needs to be similar to #{@reset}#{@red}#{@bright}#{inspect expected}"
+      IO.puts @reset
+      Process.exit(self, "spec failed")
   end
 
   def similar_to! actual, expected do
@@ -398,6 +410,17 @@ defmodule JSON_Spec do
       IO.puts "#{@bright}#{@red}No tests found.#{@reset}"
     end
   end # === run_file
+
+  def to_json_to_elixir val do
+    case val do
+      {:ok, val} ->
+        [:ok, val] |> to_json_to_elixir
+      {atom_1, {atom_2, v}} when is_atom(atom_1) and is_atom(atom_2) ->
+        [atom_1, [atom_2, v]] |> to_json_to_elixir
+      _ ->
+        val |> Poison.encode! |> Poison.decode!
+    end
+  end # === def to_json_to_elixir
 
   def get(name, env) do
     func = cond do

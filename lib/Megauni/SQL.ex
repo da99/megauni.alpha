@@ -96,25 +96,26 @@ defmodule Megauni.SQL do
   def one_row result, prefix \\ "unknown" do
     case result do
 
-      {:ok, [row]} -> row
+      {:ok, [row]} -> {:ok, row}
 
       {:ok, %{num_rows: 1, columns: cols, rows: [row]}} ->
-        Enum.reduce(Enum.zip(cols, row), %{}, fn({col, val}, map) ->
+        map = Enum.reduce(Enum.zip(cols, row), %{}, fn({col, val}, map) ->
           Map.put(map, col, val)
         end)
+        {:ok, map}
 
       { :error, %{postgres: %{code: :string_data_right_truncation, message: msg}} } ->
         case Regex.run( ~r/value too long for type character varying\((\d+)\)/, msg ) do
           [match, raw_num] ->
             max = String.to_integer(raw_num)
-            %{"user_error" => "#{prefix}: max #{max}"}
+            {:error, {:user_error, "#{prefix}: max #{max}"}}
           nil ->
             inspect_and_raise_db_err result, :string_data_right_truncation, msg
         end
 
       { :error, %{postgres: %{code: :unique_violation, message: msg}} } ->
         if msg =~ ~r/violates.+"#{prefix}_unique_idx"/ do
-          %{"user_error"=> "#{prefix}: already_taken"}
+          {:error, {:user_error,"#{prefix}: already_taken"}}
         else
           inspect_and_raise_db_err result, :unique_violation, msg
         end
@@ -122,7 +123,7 @@ defmodule Megauni.SQL do
       { :error, %{postgres: %{code: :raise_exception, message: msg}} } ->
         cond do
           msg =~ @user_err_regexp ->
-            %{"user_error" => String.replace(msg, ~r/\Auser_error: /, "", global: false) }
+            {:error, {:user_error, String.replace(msg, ~r/\Auser_error: /, "", global: false)}}
 
           true ->
             inspect_and_raise_db_err(result, :raise_exception, msg)
@@ -138,9 +139,9 @@ defmodule Megauni.SQL do
 
         cond do
           msg =~ err_unique_idx ->
-            %{"user_error"=> "#{prefix}: already_taken"}
+            {:error, {:user_error, "#{prefix}: already_taken"}}
           msg =~ err_exception ->
-            %{"error"=> Regex.replace(err_exception, msg, "")}
+            inspect_and_raise_db_err result, e, msg
         end # === cond
     end # === case
   end # === def one_row

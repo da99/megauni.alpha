@@ -231,7 +231,7 @@ defmodule Spec_Funcs do
         result
     end
 
-    {stack ++ [result], prog, env}
+    {stack ++ [JSON_Spec.to_json_to_elixir(result)], prog, env}
   end # === Screen_Name.create
 
   def screen_name_read(stack, prog, env) do
