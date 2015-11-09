@@ -99,13 +99,12 @@ defmodule Screen_Name do
     end
   end
 
-  def create raw_data do
-    vals = Enum.into(raw_data, %{"owner_id"=>nil})
+  def create user_id, new_name do
 
     result = Megauni.SQL.query(
       "SELECT screen_name
       FROM screen_name_insert($1, $2);",
-      [vals["owner_id"], vals["screen_name"]]
+      [user_id, new_name]
     )
 
     if Megauni.SQL.is_too_long?(result) do

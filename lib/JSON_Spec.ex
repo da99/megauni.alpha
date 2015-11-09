@@ -74,17 +74,18 @@ defmodule JSON_Spec do
   end
 
   def it stack, prog, env do
-    env = JSON_Spec.new_env(env)
+    {[title], prog, env} = take(prog, 1, env)
+
+    env = new_env(env)
     env = if Map.has_key?(env, :it_count) do
       Map.put env, :it_count, env.it_count + 1
     else
       Map.put env, :it_count, 1
     end
 
-    {[title], prog, env} = take(prog, 1, env)
-    env = Enum.into(%{ :it => title, :it_count => env.it_count }, env)
-    num = "#{JSON_Spec.format_num(env.it_count)})"
-    IO.puts "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
+    env = Map.put(env, :it, title)
+    num = "#{format_num(env.it_count)})"
+    IO.write "#{@bright}#{num}#{@reset} #{env.it}#{@reset}"
 
     {stack, prog, env}
   end # === def it
@@ -102,7 +103,42 @@ defmodule JSON_Spec do
   end
 
   def similar_to stack, prog, env do
-    raise  "not impleemnted"
+    actual = List.last stack
+    [raw | prog] = prog
+    {args, _empty, env} = run([], raw, env)
+    expected = List.last args
+    similar_to!(actual, expected)
+    env = Map.put env, :spec_count, get(:spec_count, env) + 1
+    {stack ++ [:spec_fulfilled], prog, env}
+  end
+
+  def similar_to!(actual, expected) when is_map(actual) and is_map(expected) do
+    !Enum.find expected, fn({k,v}) ->
+      cond do
+        (is_integer(actual[k]) && v == "INT") ->
+          false
+        true ->
+          !(actual[k] == v)
+      end
+    end
+  end
+
+  def similar_to!(actual, expected) when is_list(actual) and is_list(expected) do
+    raise "not done"
+  end
+
+  def similar_to!(actual, expected) when is_binary(actual) do
+    raise "not done"
+  end
+
+  def similar_to! actual, expected do
+    if actual == expected do
+      true
+    else
+      IO.puts "#{@bright}#{inspect actual} needs to be similar to #{@reset}#{@red}#{@bright}#{inspect expected}"
+      IO.puts @reset
+      Process.exit(self, "spec failed")
+    end
   end
 
   def raw stack, prog, env do
@@ -111,9 +147,9 @@ defmodule JSON_Spec do
   end
 
   def passed env do
-    IO.print "\r"
-    num = "#{JSON_Spec.format_num(env.it_count)})"
-    IO.puts "#{@bright}#{@green}#{num}#{@reset} #{env.it}#{@reset}"
+    IO.write "\r"
+    num = "#{format_num(get(:it_count, env))})"
+    IO.puts "#{@bright}#{@green}#{num}#{@reset} #{get(:it, env)}#{@reset}"
   end # === def failed
 
   def failed actual, expected, env do
@@ -127,11 +163,14 @@ defmodule JSON_Spec do
 
   def output stack, prog, env do
     actual = stack |> List.last
+    [output_prog | prog] = prog
 
-    {stack, _empty, env} = JSON_Spec.run(stack, prog, env)
-    spec_done = stack |> List.last
+    {results, _empty, env} = run([actual], output_prog, env)
+    spec_done = results |> List.last
 
-    if spec_done != :spec_done do
+    stack = stack ++ [spec_done]
+
+    if spec_done != :spec_fulfilled do
       Process.exit(self, "\nNo spec found.")
     end
 
@@ -139,7 +178,8 @@ defmodule JSON_Spec do
       {_stack, _empty, env} = JSON_Spec.run(stack, env.after_each, env)
     end
 
-    env = JSON_Spec.carry_over(env, [:it_count, :spec_count])
+    env = JSON_Spec.carry_over(env, [:it, :it_count, :spec_count])
+    passed env
     {stack, prog, env}
   end # === def output
 
@@ -252,35 +292,18 @@ defmodule JSON_Spec do
     |> Map.put("#{name}_#{counter}", val)
   end
 
-  def maps_match? actual, expected do
-    cond do
-      is_map(actual) && is_map(expected) ->
-        !Enum.find expected, fn({k,v}) ->
-          cond do
-            (is_integer(actual[k]) && v == "INT") ->
-              false
-            true ->
-              !(actual[k] == v)
-          end
-        end
-      true ->
-        actual === expected
-    end
-  end # === maps_match?
-
   def new_env env do
     Map.put env, :_parent_env, env
   end
 
-  def carry_over env, key_or_list do
-    if is_list(key_or_list) do
-      Enum.reduce key_or_list, env, fn (key, env) ->
-        carry_over env, key
-      end
-    else
-      key = key_or_list
-      Map.put revert_env(env), key, env[key]
+  def carry_over(child, list ) when is_list(list) do
+    Enum.reduce list, revert_env(child), fn (key, parent) ->
+      Map.put parent, key, get(key, child)
     end
+  end
+
+  def carry_over(env, key) when is_atom(key) do
+    Map.put revert_env(env), key, get(key, env)
   end
 
   def revert_env env do
@@ -326,7 +349,7 @@ defmodule JSON_Spec do
   def run_file(path, raw_env \\ %{}) do
     # === Defaults for env
     env = Enum.into(
-      %{ :_parent_env => nil, :spec_count  => 0, :it_count    => 0 },
+      %{ :spec_count  => 0, :it_count    => 0 },
       Map.merge(to_map(JSON_Spec), to_map(raw_env))
     )
 
@@ -433,6 +456,10 @@ defmodule JSON_Spec do
     run stack, prog, env
   end
 
+  def run(stack, map, env) when is_map(map) do
+    run stack, [map], env
+  end
+
   def run(stack, [map | prog], env) when is_map(map) do
     {map, env} = Enum.reduce map, {%{}, env}, fn({k,v}, {fin, env}) ->
       {stack, _prog, env} = run([], [v], env)
@@ -444,7 +471,7 @@ defmodule JSON_Spec do
 
   def run(stack, [raw_string | prog], env) when is_binary(raw_string) do
     string   = raw_string |> replace_vars(env)
-    new_prog = JSON_Spec.to_prog(string) # === e.g.: func[..].field.field.field
+    new_prog = to_prog(string) # === e.g.: func[..].field.field.field
 
     {stack, prog, env} = if new_prog do
       {new_stack, _empty, env} = run(stack, new_prog, env)

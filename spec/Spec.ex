@@ -54,7 +54,7 @@ defmodule Spec_Funcs do
   def rand_screen_name(stack, prog, env) do
     {_mega, sec, micro} = :erlang.timestamp
     sn = "SN_#{sec}_#{micro}"
-    env = Map.put(env, "screen_name", sn)
+    env = Map.put(env, :screen_name, sn)
     {stack ++ [sn], prog, env}
   end
 
@@ -210,13 +210,22 @@ defmodule Spec_Funcs do
     {stack ++ [result], prog, env}
   end
 
-  def screen_name_create(stack, prog, env) do
-    {data, prog, env} = JSON_Spec.take(prog, 1, env)
-    result            = Screen_Name.create data
+  def screen_name(stack, [[]], env) do
+    {stack ++ [JSON_Spec.get(:screen_name, env)], [], env}
+  end
 
+  def screen_name_create(stack, prog, env) do
+    {[new_name], prog, env} = JSON_Spec.take(prog, 1, env)
+    user_id = if env["user"] do
+      env["user"]["id"]
+    else
+      nil
+    end
+
+    result  = Screen_Name.create user_id, new_name
     case result do
       %{"screen_name"=>_sn} ->
-        env = JSON_Spec.put(env, "sn", result)
+        env = JSON_Spec.put(env, :sn, result)
 
       _ ->
         result
