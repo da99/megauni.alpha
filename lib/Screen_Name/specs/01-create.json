@@ -19,7 +19,9 @@
   "it"     , ["raises Invalid if screen name is over 30"],
   "input"  , ["__", ["abcd5678901234567890123456712245647890234546578"]],
   "output" , [
-    "===", ["error", ["user_error", "screen_name: max 30" ]]
+    "===", [
+      "data", ["error", ["user_error", "screen_name: max 30" ]]
+    ]
   ],
 
 

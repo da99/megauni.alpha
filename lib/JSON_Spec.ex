@@ -36,6 +36,30 @@ defmodule JSON_Spec do
     run(stack, [env[:desc], raw], env)
   end
 
+  @doc """
+    This function runs the "prog" without calling funcs in the
+    form of:  "string", [].  Functions in the form of "func[].id"
+    still run. Example:
+      ["data", ["error", ["user_error", "name[].name"]]]
+      =>
+      ["error", ["user_error", "some name"]]
+  """
+  def data stack, prog, env do
+    [ data_prog | prog ] = prog
+
+    {data, env} = Enum.reduce data_prog, {[], env}, fn(v, {data, env}) ->
+      case v do
+        list when is_list(list) ->
+          {new_stack, _empty, env} = data([], [list], env)
+          {data ++ [new_stack], env}
+        _ ->
+          {new_stack, _empty, env} = run([], [v], env)
+          { data ++ [List.last(new_stack)], env}
+      end
+    end
+    {stack ++ [data], prog, env}
+  end # === def data
+
   def const list, env do
     [ name | prog ] = list
     { stack, prog , env } = JSON_Spec.run([], prog, env)
@@ -99,7 +123,17 @@ defmodule JSON_Spec do
   end  # === run_input
 
   def exactly_like stack, prog, env do
-    raise  "not impleemnted"
+    actual = List.last stack
+    [new_prog | prog] = prog
+    {raw_target, _empty, env} = run([], new_prog, env)
+    expected = raw_target |> List.last
+
+    if actual == expected do
+      {stack ++ ["the same", :spec_fulfilled], prog, env}
+    else
+      IO.puts "\n#{@bright}#{inspect actual} needs to == #{@reset}#{@red}#{@bright}#{inspect expected}#{@reset}"
+      Process.exit(self, "spec failed")
+    end
   end
 
   def similar_to stack, prog, env do
@@ -135,7 +169,7 @@ defmodule JSON_Spec do
     if actual == expected do
       true
     else
-      IO.puts "#{@bright}#{inspect actual} needs to be similar to #{@reset}#{@red}#{@bright}#{inspect expected}"
+      IO.puts "\n#{@bright}#{inspect actual} needs to be similar to #{@reset}#{@red}#{@bright}#{inspect expected}"
       IO.puts @reset
       Process.exit(self, "spec failed")
     end
