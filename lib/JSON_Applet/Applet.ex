@@ -254,4 +254,15 @@ defmodule JSON_Applet do
     name = canon_key(x)
   end # === def replace_vars
 
+  def is_error? e do
+    is_map(e) &&
+    (
+      Map.has_key?(e, "error") ||
+      Map.has_key?(e, "user_error") ||
+      Map.has_key?(e, "user error") ||
+      Map.has_key?(e, "programmer_error") ||
+      Map.has_key?(e, "programmer error")
+    )
+  end
+
 end # === defmodule JSON_Applet

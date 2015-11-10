@@ -2,12 +2,9 @@
 
 defmodule JSON_Applet.Spec do
 
-  import JSON_Applet.Applet, only: :functions
-  @reset   IO.ANSI.reset
-  @bright  IO.ANSI.bright
-  @green   IO.ANSI.green
-  @yellow  "#{@bright}#{IO.ANSI.yellow}"
-  @red     "#{@bright}#{IO.ANSI.red}"
+  import JSON_Applet, only: :functions
+  import DA_3001, only: [color: 1]
+
 
   def spec_funcs do
     aliases = %{
@@ -37,10 +34,9 @@ defmodule JSON_Applet.Spec do
       end
     end
     if key do
-      IO.puts "#{@bright}Key mismatch: #{key} : #{inspect actual[key]} != #{@red}#{inspect expected[key]}#{@reset}"
-      IO.puts "#{@bright}#{inspect actual}"
-      IO.puts "#{@reset}#{@red}#{@bright}#{inspect expected}"
-      IO.puts @reset
+      IO.puts color([:bright, "Key mismatch: #{key} : #{inspect actual[key]} != ", :red, inspect(expected[key]), :reset])
+      IO.puts color([:bright, inspect(actual)])
+      IO.puts color([:reset, :red, :bright, inspect(expected), :reset])
       raise "spec failed"
     else
       true
@@ -52,8 +48,8 @@ defmodule JSON_Applet.Spec do
       similar_to_fail actual, expected
     end
 
-    Enum.find Enum.with_index(expected), fn({val, i}) ->
-      ! similar_to!( Enum.at(actual,i), Enum.at(expected, i))
+    Enum.find Enum.with_index(expected), fn({expected_i, i}) ->
+      ! similar_to!( Enum.at(actual,i), expected_i)
     end
   end
 
@@ -71,41 +67,38 @@ defmodule JSON_Applet.Spec do
     true
   end
 
-  def similar_to_fail actual, expected do
-    IO.puts "\n#{@bright}#{inspect actual} needs to be similar to #{@reset}#{@red}#{@bright}#{inspect expected}"
-    IO.puts @reset
-    raise "spec failed"
-  end
-
   def similar_to! actual, expected do
     if actual == expected do
       true
     else
-      IO.puts "\n#{@bright}#{inspect actual} needs to be similar to #{@reset}#{@red}#{@bright}#{inspect expected}"
-      IO.puts @reset
+      IO.puts color([
+        "\n", :bright,
+        "#{inspect actual} needs to be similar to ",
+        :reset, :red, :bright,
+        "#{inspect expected}",
+        :reset
+      ])
       Process.exit(self, "spec failed")
     end
   end
 
+  def similar_to_fail actual, expected do
+    IO.puts color([
+      "\n", :bright, inspect(actual),
+      " needs to be similar to ",
+      :reset, :red, :bright, inspect(expected),
+      :reset
+    ])
+    raise "spec failed"
+  end
+
   def failed actual, expected, env do
     IO.print "\r"
-    num = "#{JSON_Spec.format_num(env.it_count)})"
-    IO.puts "#{@bright}#{@red}#{num}#{@reset}#{@bright} #{env.it}"
-    IO.puts "#{@bright}#{inspect expected} !== #{@reset}#{@red}#{@bright}#{inspect env.actual}"
-    IO.puts @reset
+    num = :it_count |> get(env) |> format_num
+    IO.puts color([:bright, :red, num, :reset, :bright, " #{get(:it, env)}"])
+    IO.puts color([:bright, "#{inspect expected} !== ", :reset, :red, :bright, "#{inspect actual}", :reset])
     Process.exit(self, "spec failed")
   end # === def failed
-
-  def is_error? e do
-    is_map(e) &&
-    (
-      Map.has_key?(e, "error") ||
-      Map.has_key?(e, "user_error") ||
-      Map.has_key?(e, "user error") ||
-      Map.has_key?(e, "programmer_error") ||
-      Map.has_key?(e, "programmer error")
-    )
-  end
 
   def format_num(num) do
     space = String.duplicate " ", 2 - String.length(to_string(num))
@@ -155,11 +148,14 @@ defmodule JSON_Applet.Spec do
       [], (path |> File.read! |> Poison.decode!), env
     )
 
-    IO.puts "\nfile: #{@bright}#{path}#{@reset}"
+    ["\nfile: ", :bright, path, :reset]
+    |> color
+    |> IO.puts
+
     if env.spec_count > 0 do
-      IO.puts "#{@bright}#{@green}All tests pass.#{@reset}"
+      IO.puts color([:bright, :green, "All tests pass.", :reset])
     else
-      IO.puts "#{@bright}#{@red}No tests found.#{@reset}"
+      IO.puts color([:bright, :red, "No tests found.", :reset])
     end
   end # === run_file
 

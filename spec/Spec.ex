@@ -41,13 +41,22 @@ defmodule Main do
     files
   end # === def files
 
+  def syntax_check? do
+    ["syntax"] == System.argv
+  end
+
+  def run do
+    if Main.syntax_check? do
+      nil # === do nothin
+    else
+      JSON_Applet.Spec.run_files(
+      Main.files,
+      Main.modules
+      )
+    end
+  end
+
 end # === defmodule Main
-
-JSON_Applet.Spec.run_files(
-  Main.files,
-  Main.modules
-)
-
 
 
 

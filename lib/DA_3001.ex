@@ -1,7 +1,28 @@
 
 defmodule DA_3001 do
 
-  def to_file_paths(string) when is_string(string) do
+  @reset   IO.ANSI.reset
+  @bright  IO.ANSI.bright
+  @green   IO.ANSI.green
+  @yellow  "#{@bright}#{IO.ANSI.yellow}"
+  @red     "#{@bright}#{IO.ANSI.red}"
+
+  def color(list) when is_list(list) do
+    Enum.map list, fn(string_or_atom) ->
+      case string_or_atom do
+        :reset ->  @reset
+        :bright -> @bright
+        :green ->  @green
+        :yellow -> "#{@bright}#{@yellow}"
+        :red   -> "#{@bright}#{@red}"
+        str when is_binary(str) -> str
+        num when is_number(num) -> to_string(num)
+      end
+    end
+    |> Enum.join
+  end
+
+  def to_file_paths(string) when is_binary(string) do
     string |> Path.wildcard
   end
 
@@ -11,11 +32,11 @@ defmodule DA_3001 do
   end
 
   def split(list, delim) when is_list(list) do
-    Enum.map(list, &(String.split(&1, delim))
+    Enum.map list, &(String.split &1, delim)
   end
 
   def at(list, pos) when is_list(list) do
-    list |> Enum.map(&(Enum.at &1, 1))
+    list |> Enum.map(&(Enum.at &1, pos))
   end
 
   def pluck(list, pos) when is_list(list) and is_number(pos) do

@@ -1,9 +1,12 @@
 
 defmodule JSON_Applet.Spec_Funcs do
 
+  import DA_3001, only: :functions
+  import JSON_Applet, only: :functions
+
   def const list, env do
     [ name | prog ] = list
-    { stack, prog , env } = JSON_Spec.run([], prog, env)
+    { stack, _prog , env } = JSON_Spec.run([], prog, env)
     Map.put env, name, List.last(stack)
   end
 
@@ -67,7 +70,7 @@ defmodule JSON_Applet.Spec_Funcs do
     end
 
     {[name], prog, env} = take(prog, 1, env)
-    IO.puts "#{@yellow}#{name}#{@reset}"
+    IO.puts color([:yellow, name, :reset])
     env = Enum.into %{ :desc=>name }, JSON_Spec.new_env(env)
     {stack, prog, env}
   end
@@ -83,9 +86,8 @@ defmodule JSON_Applet.Spec_Funcs do
     end
 
     env = Map.put(env, :it, title)
-    num = "#{format_num(env.it_count)})"
-    num = "#{:it_count |> get(env) |> format_num})"
-    IO.puts "#{@bright}#{num}#{@reset} #{get(:it, env)}#{@reset}"
+    num = :it_count |> get(env) |> JSON_Applet.Spec.format_num
+    IO.puts color([:bright,num, :reset, get(:it, env), :reset])
 
     {stack, prog, env}
   end # === def it
@@ -107,7 +109,7 @@ defmodule JSON_Applet.Spec_Funcs do
     if actual == expected do
       {stack ++ ["the same", :spec_fulfilled], prog, env}
     else
-      IO.puts "\n#{@bright}#{inspect actual} needs to == #{@reset}#{@red}#{@bright}#{inspect expected}#{@reset}"
+      IO.puts color(["\n", :bright, inspect(actual), " needs to == ", :reset, :red, :bright, inspect(expected), :reset])
       Process.exit(self, "spec failed")
     end
   end
@@ -130,7 +132,6 @@ defmodule JSON_Applet.Spec_Funcs do
     end
 
     env = JSON_Spec.carry_over(env, [:it, :it_count, :spec_count])
-    passed env
     {stack, prog, env}
   end # === def output
 
@@ -139,7 +140,7 @@ defmodule JSON_Applet.Spec_Funcs do
     [raw | prog] = prog
     {args, _empty, env} = run([], raw, env)
     expected = List.last args
-    similar_to!(actual, expected)
+    JSON_Applet.Spec.similar_to!(actual, expected)
     env = Map.put env, :spec_count, get(:spec_count, env) + 1
     {stack ++ [:spec_fulfilled], prog, env}
   end
