@@ -58,5 +58,7 @@ defmodule Main do
 
 end # === defmodule Main
 
+Main.run
+
 
 

@@ -169,7 +169,6 @@ defmodule JSON_Applet do
       {stack ++ [string], prog, env}
     end # case ==========================
 
-    # === Raise an exception if an error exists:
     last = List.last(stack)
     case last do
       {:error, _} ->
@@ -177,7 +176,6 @@ defmodule JSON_Applet do
       _ ->
         run stack, prog, env
     end
-
   end # === def run stack, prog, env
 
   def to_json_to_elixir val do
@@ -253,7 +251,7 @@ defmodule JSON_Applet do
       end
     end
 
-    name = canon_key(x)
+    canon_key(x)
   end # === def replace_vars
 
 end # === defmodule JSON_Applet
