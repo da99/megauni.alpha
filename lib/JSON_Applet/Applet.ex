@@ -11,10 +11,10 @@ defmodule JSON_Applet do
     Also puts name_COUNTER/val into the env.
 
     Examples:
-    iex> JSON_Spec.put(env, "sn", "my_name")
+    iex> JSON_Applet.put(env, "sn", "my_name")
     %{"sn"=>"my_name", "sn_1"=>"my_name"}
 
-    iex> JSON_Spec.put(env, "sn", "my_other_name")
+    iex> JSON_Applet.put(env, "sn", "my_other_name")
     %{"sn"=>"my_other_name", "sn_2"=>"my_name"}
 
   """
@@ -253,5 +253,14 @@ defmodule JSON_Applet do
 
     canon_key(x)
   end # === def replace_vars
+
+  def func_map mod do
+    Enum.reduce mod.__info__(:functions), %{}, fn({name, arity}, map) ->
+      if arity == 3 do
+        map = Map.put map, Atom.to_string(name), name
+      end
+      map
+    end
+  end
 
 end # === defmodule JSON_Applet

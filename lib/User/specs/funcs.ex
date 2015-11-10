@@ -10,13 +10,13 @@ defmodule User.Spec_Funcs do
   end
 
   def user_id(stack, prog, env) do
-    {args, prog, env} = JSON_Spec.take prog, 1, env
+    {args, prog, env} = JSON_Applet.take prog, 1, env
     env = Map.put env, "user", %{"id"=> List.last(args)}
     {stack, prog, env}
   end
 
   def user_create(stack, prog, env) do
-    {data, prog, env} = JSON_Spec.take(prog, 1, env)
+    {data, prog, env} = JSON_Applet.take(prog, 1, env)
     if Map.has_key?(data, "error") do
       raise "#{inspect data}"
     end
@@ -26,7 +26,7 @@ defmodule User.Spec_Funcs do
       %{"user_error" => _msg} ->
         result
       %{"id"=> _user_id} ->
-        env = JSON_Spec.put(env, "user", result)
+        env = JSON_Applet.put(env, "user", result)
     end
 
     {stack ++ [result], prog, env}
@@ -45,13 +45,13 @@ defmodule User.Spec_Funcs do
       %{"error" => msg} ->
         raise "create user: #{msg}"
       %{"id"=>_user_id} ->
-        env = JSON_Spec.put(env, "user", user)
+        env = JSON_Applet.put(env, "user", user)
         if Map.has_key?(env, :user_count) do
           env = Map.put env, :user_count, env.user_count + 1
         else
           env = Map.put env, :user_count, 1
         end
-        env = JSON_Spec.put(env, "user_#{env.user_count}", user)
+        env = JSON_Applet.put(env, "user_#{env.user_count}", user)
       _ ->
         raise "Unknown error: #{inspect user}"
     end

@@ -2,7 +2,7 @@
 defmodule Megauni.Spec_Funcs do
 
   def query(stack, prog, env) do
-    {query, prog, env} = JSON_Spec.take(prog, 1, env)
+    {query, prog, env} = JSON_Applet.take(prog, 1, env)
     {:ok, %{columns: keys, rows: rows}} = Ecto.Adapters.SQL.query( Megauni.Repos.Main, query, [] )
     rows = Enum.map rows, fn(r) ->
       Enum.reduce Enum.zip(keys,r), %{}, fn({key, val}, map) ->

@@ -4,14 +4,22 @@ defmodule JSON_Applet.Spec_Funcs do
   import DA_3001, only: :functions
   import JSON_Applet, only: :functions
 
+  def spec_funcs do
+    aliases = %{
+      "==="        => :exactly_like,
+      "~="         => :similar_to
+    }
+    Map.merge func_map(JSON_Applet.Spec_Funcs), aliases
+  end
+
   def const list, env do
     [ name | prog ] = list
-    { stack, _prog , env } = JSON_Spec.run([], prog, env)
+    { stack, _prog , env } = JSON_Applet.run([], prog, env)
     Map.put env, name, List.last(stack)
   end
 
   def before_all prog, env do
-    { _stack, _prog, env } = JSON_Spec.run([], prog, env)
+    { _stack, _prog, env } = JSON_Applet.run([], prog, env)
     env[:desc]
   end # === def run_before_all
 
@@ -31,7 +39,7 @@ defmodule JSON_Applet.Spec_Funcs do
   end # === def run_after_each
 
   def get stack, prog, env do
-    {[name], prog, env} = JSON_Spec.take(prog, 1, env)
+    {[name], prog, env} = JSON_Applet.take(prog, 1, env)
     val = stack |> List.last |> Map.fetch!(name)
     {stack ++ [val], prog, env}
   end
@@ -65,13 +73,13 @@ defmodule JSON_Applet.Spec_Funcs do
   end # === def data
 
   def desc stack, prog, env do
-    if !JSON_Spec.is_top?(env) do
-      env = JSON_Spec.revert_env(env)
+    if !is_top?(env) do
+      env = JSON_Applet.revert_env(env)
     end
 
     {[name], prog, env} = take(prog, 1, env)
     IO.puts color([:yellow, name, :reset])
-    env = Enum.into %{ :desc=>name }, JSON_Spec.new_env(env)
+    env = Enum.into %{ :desc=>name }, new_env(env)
     {stack, prog, env}
   end
 
@@ -87,7 +95,7 @@ defmodule JSON_Applet.Spec_Funcs do
 
     env = Map.put(env, :it, title)
     num = :it_count |> get(env) |> JSON_Applet.Spec.format_num
-    IO.puts color([:bright,num, :reset, get(:it, env), :reset])
+    IO.puts color([:bright,num, ") ", :reset, get(:it, env), :reset])
 
     {stack, prog, env}
   end # === def it
@@ -128,10 +136,10 @@ defmodule JSON_Applet.Spec_Funcs do
     end
 
     if Map.has_key?(env, :after_each) do
-      {_stack, _empty, env} = JSON_Spec.run(stack, env.after_each, env)
+      {_stack, _empty, env} = JSON_Applet.run(stack, env.after_each, env)
     end
 
-    env = JSON_Spec.carry_over(env, [:it, :it_count, :spec_count])
+    env = JSON_Applet.carry_over(env, [:it, :it_count, :spec_count])
     {stack, prog, env}
   end # === def output
 

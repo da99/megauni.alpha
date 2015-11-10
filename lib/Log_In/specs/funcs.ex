@@ -4,7 +4,7 @@ defmodule Log_In.Spec_Funcs do
   def log_in data, stack, prog, env do
     if is_list(List.first(prog)) do
       [[num] | prog] = prog
-      {num, env} = JSON_Spec.compile(num, env)
+      {[num], _empty, env} = JSON_Applet.run([], [num], env)
       if !is_number(num) do
         num = String.to_integer(num)
       end
@@ -19,7 +19,7 @@ defmodule Log_In.Spec_Funcs do
   end
 
   def log_in_attempt(stack, prog, env) do
-    {arg, prog, env} = JSON_Spec.take(prog, 1, env)
+    {arg, prog, env} = JSON_Applet.take(prog, 1, env)
     stack = stack ++ [Log_In.attempt(arg)]
     {stack, prog, env}
   end
@@ -36,7 +36,7 @@ defmodule Log_In.Spec_Funcs do
       "ip"          => "127.0.0.1"
     }, stack, prog, env)
 
-    {stack ++ [{:JSON_Spec, :ignore_last_error}], prog, env}
+    {stack ++ [{:"JSON_Applet.Spec", :ignore_last_error}], prog, env}
   end
 
   def good_log_in(stack, prog, env) do

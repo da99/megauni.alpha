@@ -5,24 +5,6 @@ defmodule JSON_Applet.Spec do
   import JSON_Applet, only: :functions
   import DA_3001, only: [color: 1, puts: 1]
 
-  def spec_funcs do
-    aliases = %{
-      "==="        => :exactly_like,
-      "~="         => :similar_to
-    }
-    Map.merge spec_func_map(JSON_Applet.Spec), aliases
-  end
-
-  def spec_func_map mod do
-    Enum.reduce mod.__info__(:functions), %{}, fn({name, arity}, map) ->
-      if arity == 3 do
-        map = Map.put map, Atom.to_string(name), name
-      end
-      map
-    end
-  end
-
-
   def similar_to!(actual, expected) when is_map(actual) and is_map(expected) do
     key = Enum.find Map.keys(expected), fn(k) ->
       cond do
@@ -158,5 +140,5 @@ defmodule JSON_Applet.Spec do
     end
   end # === run_file
 
-end # === defmodule JSON_Spec
+end # === defmodule JSON_Applet.Spec
 

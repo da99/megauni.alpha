@@ -18,7 +18,7 @@ defmodule Screen_Name.Spec_Funcs do
       env["user"]["id"],
       env["sn"]["screen_name"]
     )
-    JSON_Spec.put(env, "cards", cards);
+    JSON_Applet.put(env, "cards", cards);
     {stack ++ [cards], prog, env}
   end
 
@@ -28,7 +28,7 @@ defmodule Screen_Name.Spec_Funcs do
     ) || Screen_Name.read_id!(env["sn"]["screen_name"])
 
     result = if prog |> List.first |> is_list do
-      {args, prog, env} = JSON_Spec.take(prog, 1, env)
+      {args, prog, env} = JSON_Applet.take(prog, 1, env)
       Screen_Name.read_news_card user_id, args
     else
       Screen_Name.read_news_card user_id
@@ -36,7 +36,7 @@ defmodule Screen_Name.Spec_Funcs do
 
     case result do
       x when is_list(x) ->
-        env = JSON_Spec.put(env, "news_cards", result)
+        env = JSON_Applet.put(env, "news_cards", result)
       _ ->
         result
     end
@@ -44,11 +44,11 @@ defmodule Screen_Name.Spec_Funcs do
   end
 
   def screen_name(stack, [[]], env) do
-    {stack ++ [JSON_Spec.get(:screen_name, env)], [], env}
+    {stack ++ [JSON_Applet.get(:screen_name, env)], [], env}
   end
 
   def screen_name_create(stack, prog, env) do
-    {[new_name], prog, env} = JSON_Spec.take(prog, 1, env)
+    {[new_name], prog, env} = JSON_Applet.take(prog, 1, env)
     user_id = if env["user"] do
       env["user"]["id"]
     else
@@ -58,17 +58,17 @@ defmodule Screen_Name.Spec_Funcs do
     result  = Screen_Name.create user_id, new_name
     case result do
       %{"screen_name"=>_sn} ->
-        env = JSON_Spec.put(env, :sn, result)
+        env = JSON_Applet.put(env, :sn, result)
 
       _ ->
         result
     end
 
-    {stack ++ [JSON_Spec.to_json_to_elixir(result)], prog, env}
+    {stack ++ [JSON_Applet.to_json_to_elixir(result)], prog, env}
   end # === Screen_Name.create
 
   def screen_name_read(stack, prog, env) do
-    {data, prog, env} = JSON_Spec.take(prog, 1, env)
+    {data, prog, env} = JSON_Applet.take(prog, 1, env)
     rows          = Screen_Name.read data
 
     case rows do
@@ -77,7 +77,7 @@ defmodule Screen_Name.Spec_Funcs do
 
       %{"screen_name"=>_sn} ->
         {fin, env} = Enum.reduce rows, {nil, env}, fn(r, {_fin, env}) ->
-          env = JSON_Spec.put(env, "sn", r)
+          env = JSON_Applet.put(env, "sn", r)
           {r, env}
         end
         {stack ++ [fin], prog, env}
@@ -91,7 +91,7 @@ defmodule Screen_Name.Spec_Funcs do
   def sn stack, prog, env do
     [[num] | prog] = prog
     key = String.to_atom("sn_#{num}")
-    tuple = JSON_Spec.get(key, env)
+    tuple = JSON_Applet.get(key, env)
     val = case tuple do
       {:ok, row} -> row
       _ -> tuple
@@ -100,7 +100,7 @@ defmodule Screen_Name.Spec_Funcs do
   end
 
   def screen_name_raw!(stack, prog, env) do
-    {[name], prog, env} = JSON_Spec.take(prog, 1, env)
+    {[name], prog, env} = JSON_Applet.take(prog, 1, env)
     result            = Screen_Name.raw! name
 
     case result do
@@ -108,10 +108,10 @@ defmodule Screen_Name.Spec_Funcs do
         result
 
       {:ok, %{"screen_name"=>_sn}} ->
-        env = JSON_Spec.put(env, :sn, result)
+        env = JSON_Applet.put(env, :sn, result)
     end
 
-    {stack ++ [result |> JSON_Spec.to_json_to_elixir], prog, env}
+    {stack ++ [result |> JSON_Applet.to_json_to_elixir], prog, env}
   end # === Screen_Name.read_one
 
   def create_screen_name(stack, prog, env) do
@@ -130,13 +130,13 @@ defmodule Screen_Name.Spec_Funcs do
       %{"error" => msg} ->
         raise "create screen_name: #{msg}"
       %{"screen_name"=> _name} ->
-        env = JSON_Spec.put(env, "sn", sn)
+        env = JSON_Applet.put(env, "sn", sn)
         if Map.has_key?(env, :sn_count) do
           env = Map.put env, :sn_count, env.sn_count + 1
         else
           env = Map.put env, :sn_count, 1
         end
-        env = JSON_Spec.put(env, "sn_#{env.sn_count}", sn)
+        env = JSON_Applet.put(env, "sn_#{env.sn_count}", sn)
       _ ->
         raise "Unknown error: #{inspect sn}"
     end
@@ -144,7 +144,7 @@ defmodule Screen_Name.Spec_Funcs do
   end
 
   def update_privacy(stack, prog, env) do
-    {args, prog, env} = JSON_Spec.take(prog, 1, env)
+    {args, prog, env} = JSON_Applet.take(prog, 1, env)
     name = env["sn"]["screen_name"]
     id   = Screen_Name.select_id(name)
     {:ok, _answer} = Screen_Name.run id, ["update screen_name privacy", [name, List.last(args)]]

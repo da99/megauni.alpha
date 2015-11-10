@@ -2,7 +2,7 @@
 defmodule Link.Spec_Funcs do
 
   def create_link(stack, prog, env) do
-    {args, prog, env} = JSON_Spec.take(prog, 1, env)
+    {args, prog, env} = JSON_Applet.take(prog, 1, env)
 
     if (args |> List.first |> is_number) do
       [user_id | args] = args
@@ -16,7 +16,7 @@ defmodule Link.Spec_Funcs do
 
     case result do
       %{"link"=> _link} ->
-        env = JSON_Spec.put(env, "link", result)
+        env = JSON_Applet.put(env, "link", result)
       _ ->
         result
     end
@@ -24,11 +24,11 @@ defmodule Link.Spec_Funcs do
   end
 
   def link_create(stack, prog, env) do
-    {args, prog, env} = JSON_Spec.take(prog, 1, env)
+    {args, prog, env} = JSON_Applet.take(prog, 1, env)
     result            = Link.create env["user"]["id"], args
     case result do
       %{"link"=>_link} ->
-        env = JSON_Spec.put(env, "link", result)
+        env = JSON_Applet.put(env, "link", result)
       _ ->
         result
     end

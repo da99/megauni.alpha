@@ -12,7 +12,7 @@ defmodule DA_3001 do
   end
 
   def color(list) when is_list(list) do
-    Enum.map list, fn(string_or_atom) ->
+    Enum.map(list, fn(string_or_atom) ->
       case string_or_atom do
         :reset ->  @reset
         :bright -> @bright
@@ -22,7 +22,7 @@ defmodule DA_3001 do
         str when is_binary(str) -> str
         num when is_number(num) -> to_string(num)
       end
-    end
+    end)
     |> Enum.join
   end
 
