@@ -2,37 +2,39 @@
 
 
 [
-  "desc", "Screen_name.read_news_card",
+  "desc", ["Screen_name.read_news_card"],
 
-  {
-    "it": "reads news grouped by publication_id",
-    "input" : [
-      "create screen_name",
+  "it", ["reads news grouped by publication_id"],
+  "input" , [
+    "create_screen_name", [],
 
-      "create screen_name", "update privacy", ["WORLD READABLE"],
-      "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-      "create link", ["sn.id",   "LINK | CARD, SCREEN_NAME",          "card.id",          "sn.screen_name"],
-      "create link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
+    "create_screen_name[]", "update_privacy", ["WORLD READABLE"],
+    "create_card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
+    "create_link", ["sn.id",   "LINK | CARD, SCREEN_NAME",          "card.id",          "sn.screen_name"],
+    "create_link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
 
-      "create screen_name", "update privacy", ["WORLD READABLE"],
-      "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-      "create link", ["sn.id",   "LINK | CARD, SCREEN_NAME",          "card.id",          "sn.screen_name"],
-      "create link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
+    "create_screen_name[]", "update_privacy", ["WORLD READABLE"],
+    "create_card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
+    "create_link", ["sn.id",   "LINK | CARD, SCREEN_NAME",          "card.id",          "sn.screen_name"],
+    "create_link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
 
-      "create screen_name", "update privacy", ["WORLD READABLE"],
-      "create card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-      "create link", ["sn.id",   "LINK | CARD, SCREEN_NAME",          "card.id",          "sn.screen_name"],
-      "create link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
+    "create_screen_name[]", "update_privacy", ["WORLD READABLE"],
+    "create_card", {"owner_id": "sn.id", "owner_screen_name" : "sn.screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
+    "create_link", ["sn.id",   "LINK | CARD, SCREEN_NAME",          "card.id",          "sn.screen_name"],
+    "create_link", ["sn_1.id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn_1.screen_name", "sn.screen_name"],
 
-      "user.id =", ["sn_1.id"],
-      "read news_card"
-    ],
-    "output" : [
-      {"mask_id": "sn_1.id", "publication_id": "sn_4.id", "updated_at": "card_3.linked_at", "last_read_at": null },
-      {"mask_id": "sn_1.id", "publication_id": "sn_3.id", "updated_at": "card_2.linked_at", "last_read_at": null },
-      {"mask_id": "sn_1.id", "publication_id": "sn_2.id", "updated_at": "card_1.linked_at", "last_read_at": null }
+    "user.id =", ["sn_1.id"],
+    "read_news_card", []
+  ],
+  "output" , [
+    "~=", [
+      "data", [
+        {"mask_id": "sn_1.id", "publication_id": "sn_4.id", "updated_at": "card_3.linked_at", "last_read_at": null },
+        {"mask_id": "sn_1.id", "publication_id": "sn_3.id", "updated_at": "card_2.linked_at", "last_read_at": null },
+        {"mask_id": "sn_1.id", "publication_id": "sn_2.id", "updated_at": "card_1.linked_at", "last_read_at": null }
+      ]
     ]
-  }
+  ]
 
 ]
 

@@ -1,20 +1,16 @@
 
 [
-  "desc", "Type Names",
+  "desc", ["Type Names"],
 
-  {
-    "it"     : "Turns strings into array of integers.",
-    "input"  : [
-      "query", ["SELECT name_to_type_ids('LINK | SCREEN_NAME , CARD , SCREEN_NAME') AS ids;"],
-      "pluck", ["ids"]
-    ],
-    "output" : ["array", [[40, 2, 3, 2]]]
-  },
+  "it", ["Turns strings into array of integers."],
+  "input", [
+    "query", ["SELECT name_to_type_ids('LINK | SCREEN_NAME , CARD , SCREEN_NAME') AS ids;"],
+    "pluck", ["ids"]
+  ],
+  "output" , ["array", [[40, 2, 3, 2]]],
 
-  {
-    "it"     : "Has no duplicates.",
-    "input"  : ["type_ids"],
-    "output" : ["type_ids", "unique"]
-  }
+  "it"     , "Has no duplicates.",
+  "input"  , ["type_ids[]"],
+  "output" , ["type_ids[]", "unique[]"]
 
 ]
