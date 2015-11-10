@@ -171,11 +171,13 @@ defmodule JSON_Applet do
 
     # === Raise an exception if an error exists:
     last = List.last(stack)
-    if is_error?(last) do
-      raise "From: #{inspect string} Result: #{inspect last}"
+    case last do
+      {:error, _} ->
+        raise "From: #{inspect string} Result: #{inspect last}"
+      _ ->
+        run stack, prog, env
     end
 
-    run stack, prog, env
   end # === def run stack, prog, env
 
   def to_json_to_elixir val do
@@ -253,16 +255,5 @@ defmodule JSON_Applet do
 
     name = canon_key(x)
   end # === def replace_vars
-
-  def is_error? e do
-    is_map(e) &&
-    (
-      Map.has_key?(e, "error") ||
-      Map.has_key?(e, "user_error") ||
-      Map.has_key?(e, "user error") ||
-      Map.has_key?(e, "programmer_error") ||
-      Map.has_key?(e, "programmer error")
-    )
-  end
 
 end # === defmodule JSON_Applet
