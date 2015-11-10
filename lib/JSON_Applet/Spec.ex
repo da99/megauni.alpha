@@ -3,8 +3,7 @@
 defmodule JSON_Applet.Spec do
 
   import JSON_Applet, only: :functions
-  import DA_3001, only: [color: 1]
-
+  import DA_3001, only: [color: 1, puts: 1]
 
   def spec_funcs do
     aliases = %{
@@ -34,9 +33,9 @@ defmodule JSON_Applet.Spec do
       end
     end
     if key do
-      IO.puts color([:bright, "Key mismatch: #{key} : #{inspect actual[key]} != ", :red, inspect(expected[key]), :reset])
-      IO.puts color([:bright, inspect(actual)])
-      IO.puts color([:reset, :red, :bright, inspect(expected), :reset])
+      puts([:bright, "Key mismatch: #{key} : #{inspect actual[key]} != ", :red, inspect(expected[key]), :reset])
+      puts([:bright, inspect(actual)])
+      puts([:reset, :red, :bright, inspect(expected), :reset])
       raise "spec failed"
     else
       true

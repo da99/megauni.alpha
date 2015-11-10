@@ -7,6 +7,10 @@ defmodule DA_3001 do
   @yellow  "#{@bright}#{IO.ANSI.yellow}"
   @red     "#{@bright}#{IO.ANSI.red}"
 
+  def puts(list) when is_list(list) do
+    list |> color |> IO.puts
+  end
+
   def color(list) when is_list(list) do
     Enum.map list, fn(string_or_atom) ->
       case string_or_atom do
