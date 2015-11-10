@@ -30,4 +30,8 @@ defmodule DA_3001 do
     Enum.map list, func
   end
 
+  def first({first, second}) when is_tuple({first, second}) do
+    first
+  end
+
 end # === defmodule DA_3001
