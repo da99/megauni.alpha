@@ -19,16 +19,16 @@ defmodule User do
 
     cond do
       String.length(pass_word) < @min ->
-        %{"user_error" => "pass_word: min #{@min}"}
+        {:error, [:user_error, "pass_word: min #{@min}"]}
 
       String.length(pass_word) > @max ->
-        %{"user_error" => "pass_word: max #{@max}"}
+        {:error, [:user_error, "pass_word: max #{@max}"]}
 
       (Enum.count(String.split(pass_word, ~r/\s/, trim: true)) < @min_word) ->
-        %{"user_error" => "pass_word: min_words #{@min_word}"}
+        {:error, [:user_error, "pass_word: min_words #{@min_word}"]}
 
       (confirm !== pass_word) ->
-        %{"user_error" => "confirm_pass_word: no match"}
+        {:error, [:user_error, "confirm_pass_word: no match"]}
 
       true ->
         pass_word
@@ -40,17 +40,17 @@ defmodule User do
 
     clean_pass = clean_pass_confirm(data["pass"], data["confirm_pass"])
     case clean_pass do
-      %{"user_error"=>_msg} ->
-          clean_pass
+      {:error, [:user_error,_msg]} ->
+        clean_pass
 
       _ when is_binary(clean_pass) ->
         Megauni.SQL.query(
           """
             SELECT id, screen_name
-            FROM user_insert( $1 , $2 );
+            FROM user_insert( $1, $2 );
           """,
           [
-            raw_data["screen_name"],
+            data["screen_name"],
             Comeonin.Bcrypt.hashpwsalt( clean_pass )
           ]
         )

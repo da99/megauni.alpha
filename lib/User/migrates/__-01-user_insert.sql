@@ -11,7 +11,7 @@ SELECT drop_megauni_func('user_insert');
 --    * Also, "user_insert" creates a Screen_Name and User.
 CREATE OR REPLACE FUNCTION user_insert(
   IN  sn_name     varchar,
-  IN  pswd_hash   bytea,
+  IN  pswd_hash   varchar,
   OUT id          int,
   OUT screen_name text
 )
@@ -34,7 +34,7 @@ AS $$
 
     INSERT INTO
     "user" ( id,                 pswd_hash )
-    VALUES ( sn_record.owner_id, pswd_hash )
+    VALUES ( sn_record.owner_id, pswd_hash::BYTEA )
     ;
 
     id          := sn_record.owner_id;

@@ -2,24 +2,29 @@
 [
   "desc", ["User.create"],
 
-  "it",  "creates a Screen_Name",
-  "input", {
-    "screen_name"  : "rand screen_name",
-    "pass"         : "this is my weak password",
-    "confirm_pass" : "this is my weak password"
-  },
-  "output", {
-    "id"         : "INT",
-    "screen_name": "screen_name"
-  },
+  "it", ["creates a Screen_Name"],
+  "input", [
+    "__", {
+      "screen_name"  : "rand_screen_name[]",
+      "pass"         : "this is my weak password",
+      "confirm_pass" : "this is my weak password"
+    }
+  ],
+  "output", [
+    "~=",
+    {
+      "id"         : "INT",
+      "screen_name": "screen_name"
+    }
+  ],
 
-  "it", "checks min length of screen_name",
-  "input", {
+  "it", ["checks min length of screen_name"],
+  "input", [ "__", {
     "screen_name"  :  "a",
     "pass"         :         "this is my password",
     "confirm_pass" : "this is my password"
-  },
-  "output", { "user_error": "screen_name: min 4" } ,
+  }],
+  "output", ["~=", { "user_error": "screen_name: min 4" }] ,
 
   "it", "checks max length of screen_name",
   "input", {
