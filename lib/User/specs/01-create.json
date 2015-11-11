@@ -11,11 +11,9 @@
     }
   ],
   "output", [
-    "~=",
-    {
-      "id"         : "INT",
-      "screen_name": "screen_name"
-    }
+    "~=", [ "data", [
+      "ok", { "id": "INT", "screen_name": "screen_name[]" }
+    ]]
   ],
 
   "it", ["checks min length of screen_name"],
@@ -24,17 +22,21 @@
     "pass"         :         "this is my password",
     "confirm_pass" : "this is my password"
   }],
-  "output", ["~=", { "user_error": "screen_name: min 4" }] ,
+  "output", ["~=", ["data", ["error", ["user_error", "screen_name: min 4" ]]]],
 
-  "it", "checks max length of screen_name",
-  "input", {
+  "it", ["checks max length of screen_name"],
+  "input", ["__", {
     "screen_name"  : "abcd5678901234567890123456712245647890234546578",
     "pass"         : "this is my password",
     "confirm_pass" : "this is my password"
-  },
-  "output", { "user_error": "screen_name: max 30" } ,
+  }],
+  "output", [
+    "~=", [
+      "data", ["error", ["user_error", "screen_name: max 30"]]
+    ]
+  ],
 
-  "it", "checks min length of pass_word",
+  "it", ["checks min length of pass_word"],
   "input", {
     "screen_name"  : "1234567",
     "pass"         : "t",
@@ -44,7 +46,7 @@
     "user_error": "pass_word: min 5"
   },
 
-  "it", "checks min word count of pass_word",
+  "it", ["checks min word count of pass_word"],
   "input", {
     "screen_name"  : "1234567",
     "pass"         : "p1234567",
@@ -54,7 +56,7 @@
     "user_error": "pass_word: min_words 3"
   },
 
-  "it", "checks max length of pass_word",
+  "it", ["checks max length of pass_word"],
   "input", {
     "screen_name"  : "rand screen_name",
     "pass"         : "long_pass_word",
@@ -64,7 +66,7 @@
     "user_error" : "pass_word: max 150"
   } ,
 
-  "it", "checks pass_phrase and confirm_pass_phrase match",
+  "it", ["checks pass_phrase and confirm_pass_phrase match"],
   "input", {
     "screen_name"  : "123456789",
     "pass"         : "this is my pass word",
@@ -74,7 +76,7 @@
     "user_error": "confirm_pass_word: no match"
   } ,
 
-  "it", "saves Customer id to Customer object",
+  "it", ["saves Customer id to Customer object"],
   "input", {
     "screen_name"  : "rand screen_name",
     "pass"         : "valid pass valid pass",

@@ -21,12 +21,13 @@ defmodule User.Spec_Funcs do
       raise "#{inspect data}"
     end
 
-    result = User.create data
+    result = User.create(data) |> JSON_Applet.to_json_to_elixir
     case result do
-      %{"user_error" => _msg} ->
+      ["error", ["user_error", _msg]] ->
         result
-      %{"id"=> _user_id} ->
+      ["ok", %{"id"=> _user_id}] ->
         env = JSON_Applet.put(env, "user", result)
+      _ -> ["error", ["programmer_error", result]]
     end
 
     {stack ++ [result], prog, env}
