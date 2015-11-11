@@ -21,7 +21,7 @@ defmodule JSON_Applet do
   def put env, name, val do
     name_counter = String.to_atom "#{name}_counter"
 
-    counter = (get(name_counter, env) || 0) + 1
+    counter = (get(name_counter, env) || -1) + 1
     name_id = String.to_atom "#{name}_#{counter}"
 
     env

@@ -87,16 +87,18 @@ defmodule Screen_Name.Spec_Funcs do
   end # === Screen_Name.read
 
   def sn stack, [[]|prog], env do
-    sn stack, [[1]|prog], env
+    sn stack, [[0]|prog], env
   end
 
   def sn stack, prog, env do
     [[num] | prog] = prog
     key = String.to_atom("sn_#{num}")
     tuple = JSON_Applet.get(key, env)
+
     val = case tuple do
       {:ok, row} -> row
-      _ -> tuple
+      ["ok", row] -> row
+      _ -> raise("Screen name not found: #{inspect tuple}")
     end
     {stack ++ [val], prog, env}
   end

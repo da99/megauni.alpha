@@ -64,7 +64,7 @@
   "output", [
     "~=", [
       "data", ["ok", {
-        "screen_name" : "sn[1].screen_name",
+        "screen_name" : "sn[].screen_name",
         "owner_id"    : "sn[].id",
         "id"          : "sn[].id"
       }]
