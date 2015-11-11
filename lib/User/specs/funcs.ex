@@ -15,6 +15,14 @@ defmodule User.Spec_Funcs do
     {stack, prog, env}
   end
 
+  def user(stack, [[] | prog], env) do
+    u = JSON_Applet.get(:user, env)
+    if !u do
+      raise "User not found."
+    end
+    {stack ++ [u], prog, env}
+  end
+
   def user_create(stack, prog, env) do
     {data, prog, env} = JSON_Applet.take(prog, 1, env)
     if Map.has_key?(data, "error") do
@@ -25,8 +33,8 @@ defmodule User.Spec_Funcs do
     case result do
       ["error", ["user_error", _msg]] ->
         result
-      ["ok", %{"id"=> _user_id}] ->
-        env = JSON_Applet.put(env, "user", result)
+      ["ok", u = %{"id"=> _user_id}] ->
+        env = JSON_Applet.put(env, :user, u)
       _ -> ["error", ["programmer_error", result]]
     end
 

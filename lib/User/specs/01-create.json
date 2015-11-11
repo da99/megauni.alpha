@@ -78,12 +78,12 @@
 
   "it", ["saves Customer id to Customer object"],
   "input", ["__", {
-    "screen_name"  : "rand screen_name",
+    "screen_name"  : "rand_screen_name[]",
     "pass"         : "valid pass valid pass",
     "confirm_pass" : "valid pass valid pass"
   }],
   "output", [
-    "~=", {"id": "user.id" }
+    "~=", ["data", ["ok", {"id": "user[].id" }]]
   ]
 ]
 

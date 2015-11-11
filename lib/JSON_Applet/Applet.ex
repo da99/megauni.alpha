@@ -208,9 +208,9 @@ defmodule JSON_Applet do
 
     if !func && is_binary(name) && name =~ ~r/\./ do
       func = name
-      |> String.downcase
-      |> String.replace(".", "_")
-      |> get(env)
+              |> String.downcase
+              |> String.replace(".", "_")
+              |> get(env)
     end
 
     func
