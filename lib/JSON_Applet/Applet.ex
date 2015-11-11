@@ -80,7 +80,7 @@ defmodule JSON_Applet do
     Returns:
       { compiled_list_of_args, prog, env }
   """
-  def take([list | prog], num, env) when is_list(list) do
+  def take([list | prog], num, env) when is_list(list) and is_number(num) do
     {args, _empty, env} = run([], list, env)
     if Enum.count(args) < num do
       raise "Not enought args: #{inspect num} desired from: #{inspect list}"
@@ -88,6 +88,11 @@ defmodule JSON_Applet do
 
     {Enum.take(args, num), prog, env}
   end # === def args
+
+  def take([map | prog], 1, env) when is_map(map) do
+    {[map], _empty, env} = run([], map, env)
+    {map, prog, env}
+  end
 
   def to_map(map) when is_map(map) do
     map

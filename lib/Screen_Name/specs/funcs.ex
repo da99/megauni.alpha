@@ -6,7 +6,7 @@ defmodule Screen_Name.Spec_Funcs do
     "SN_#{sec}_#{micro}"
   end # === def rand_screen_name
 
-  def rand_screen_name(stack, prog, env) do
+  def rand_screen_name(stack, [[] | prog], env) do
     {_mega, sec, micro} = :erlang.timestamp
     sn = "SN_#{sec}_#{micro}"
     env = Map.put(env, :screen_name, sn)

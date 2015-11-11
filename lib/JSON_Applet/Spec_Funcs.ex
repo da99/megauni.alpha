@@ -132,7 +132,8 @@ defmodule JSON_Applet.Spec_Funcs do
     stack = stack ++ [spec_done]
 
     if spec_done != :spec_fulfilled do
-      Process.exit(self, "\nNo spec found.")
+      IO.puts ""
+      Process.exit(self, "No spec found.")
     end
 
     if Map.has_key?(env, :after_each) do
