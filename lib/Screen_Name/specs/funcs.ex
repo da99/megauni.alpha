@@ -49,8 +49,10 @@ defmodule Screen_Name.Spec_Funcs do
 
   def screen_name_create(stack, prog, env) do
     {[new_name], prog, env} = JSON_Applet.take(prog, 1, env)
-    user_id = if env["user"] do
-      env["user"]["id"]
+
+    user = JSON_Applet.get(:user, env)
+    user_id = if user do
+      user["id"]
     else
       nil
     end
