@@ -37,51 +37,53 @@
   ],
 
   "it", ["checks min length of pass_word"],
-  "input", {
+  "input", ["__", {
     "screen_name"  : "1234567",
     "pass"         : "t",
     "confirm_pass" : "t"
-  },
-  "output", {
-    "user_error": "pass_word: min 5"
-  },
+  }],
+  "output", [
+    "~=", ["data", ["error",["user_error", "pass_word: min 5"]]]
+  ],
 
   "it", ["checks min word count of pass_word"],
-  "input", {
+  "input", ["__", {
     "screen_name"  : "1234567",
     "pass"         : "p1234567",
     "confirm_pass" : "p1234567"
-  },
-  "output", {
-    "user_error": "pass_word: min_words 3"
-  },
+  }],
+  "output", [
+    "~=", ["data", ["error", ["user_error","pass_word: min_words 3"]]]
+  ],
 
   "it", ["checks max length of pass_word"],
-  "input", {
+  "input", ["__", {
     "screen_name"  : "rand screen_name",
-    "pass"         : "long_pass_word",
-    "confirm_pass" : "long_pass_word"
-  },
-  "output", {
-    "user_error" : "pass_word: max 150"
-  } ,
+    "pass"         : "long_pass_word[]",
+    "confirm_pass" : "long_pass_word[]"
+  }],
+  "output", [
+    "~=", ["data", ["error",["user_error", "pass_word: max 150"]]]
+  ],
 
   "it", ["checks pass_phrase and confirm_pass_phrase match"],
-  "input", {
+  "input", ["__", {
     "screen_name"  : "123456789",
     "pass"         : "this is my pass word",
     "confirm_pass" : "this is my pass word too"
-  },
-  "output", {
-    "user_error": "confirm_pass_word: no match"
-  } ,
+  }],
+  "output", [
+    "~=", ["data", ["error", ["user_error", "confirm_pass_word: no match" ]]]
+  ],
 
   "it", ["saves Customer id to Customer object"],
-  "input", {
+  "input", ["__", {
     "screen_name"  : "rand screen_name",
     "pass"         : "valid pass valid pass",
     "confirm_pass" : "valid pass valid pass"
-  },
-  "output", { "id": "user.id" }
+  }],
+  "output", [
+    "~=", {"id": "user.id" }
+  ]
 ]
 

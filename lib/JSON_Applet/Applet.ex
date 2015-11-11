@@ -187,8 +187,13 @@ defmodule JSON_Applet do
     case val do
       {:ok, val} ->
         [:ok, val] |> to_json_to_elixir
+
       {atom_1, {atom_2, v}} when is_atom(atom_1) and is_atom(atom_2) ->
         [atom_1, [atom_2, v]] |> to_json_to_elixir
+
+      {atom_1, v} when is_atom(atom_1) ->
+        [atom_1, v] |> to_json_to_elixir
+
       _ ->
         val |> Poison.encode! |> Poison.decode!
     end

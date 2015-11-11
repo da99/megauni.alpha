@@ -5,7 +5,7 @@ defmodule User do
   @min_word 3
   @max 150
 
-  def canonize_pass pass_word do
+  def canonize_pass(pass_word) when is_binary(pass_word) do
     (pass_word || '')
     |> to_string
     |> String.strip
@@ -13,7 +13,7 @@ defmodule User do
     |> Enum.join(" ")
   end
 
-  def clean_pass_confirm pass_word, confirm do
+  def clean_pass_confirm(pass_word, confirm) when is_binary(pass_word) and is_binary(confirm) do
     confirm   = canonize_pass(confirm)
     pass_word = canonize_pass(pass_word)
 
@@ -35,8 +35,9 @@ defmodule User do
     end # === cond
   end # === def clean_password pswd
 
-  def create raw_data do
-    data = raw_data
+  def create(%{"screen_name"=>sn, "pass"=>raw_pass, "confirm_pass"=>confirm_pass})
+  when is_binary(sn) and is_binary(raw_pass) and is_binary(confirm_pass) do
+    data = %{"screen_name"=>sn, "pass"=>raw_pass, "confirm_pass"=>confirm_pass}
 
     clean_pass = clean_pass_confirm(data["pass"], data["confirm_pass"])
     case clean_pass do

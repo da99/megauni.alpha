@@ -5,8 +5,8 @@ defmodule User.Spec_Funcs do
     "valid pass word phrase"
   end
 
-  def long_pass_word(stack, prog, env) do
-    { stack ++ [String.duplicate("one word ", 150)], prog, env}
+  def long_pass_word(stack, [[]|prog], env) do
+    { stack ++ [String.duplicate("one two three four five ", 150)], prog, env}
   end
 
   def user_id(stack, prog, env) do
