@@ -38,14 +38,17 @@ defmodule Screen_Name do
   def select_id name do
     Megauni.SQL.query("SELECT screen_name_id($1) AS id;", [name])
     |> Megauni.SQL.one_row
-    |> Map.get "id"
+    |> DA_3001.ok_second
+    |> Map.get("id")
   end
 
   def run user_id, [ action, args ] do
     case action do
       "update screen_name privacy" ->
-        sql = "SELECT * FROM update_screen_name_privacy( $1, $2, $3 );"
-        {:ok, _val} = Megauni.SQL.query(sql, [user_id] ++ args)
+        {:ok, _val} = Megauni.SQL.query(
+          "SELECT * FROM update_screen_name_privacy( $1, $2, $3 );",
+          [user_id] ++ args
+        )
         {:ok, true}
     end
   end # === def run
@@ -58,7 +61,7 @@ defmodule Screen_Name do
 
     case result do
       {:ok, [row]} ->
-        row |> Map.get("id")
+        Map.fetch!(row, "id")
       _ ->
         raise "screen_name not found: #{inspect raw_name}"
     end

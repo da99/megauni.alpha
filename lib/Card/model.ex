@@ -7,12 +7,12 @@ defmodule Card do
   @min_code_bytes 1
   @max_code_bytes 2500
 
-  def create( data ) when is_map(data) do
+  def create( %{"owner_id"=>owner_id, "owner_screen_name"=>owner_screen_name, "privacy"=>privacy, "code"=>code} ) do
     create(
-      data["owner_id"],
-      data["owner_screen_name"],
-      data["privacy"],
-      data["code"]
+      owner_id,
+      owner_screen_name,
+      privacy,
+      code
     )
   end # === def create
 

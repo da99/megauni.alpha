@@ -1,6 +1,13 @@
 
 defmodule User.Spec_Funcs do
 
+  def spec_funcs do
+    Map.merge(
+      JSON_Applet.func_map(User.Spec_Funcs),
+      %{ "user.id =" => :user_id_equals }
+    )
+  end
+
   def valid_pass do
     "valid pass word phrase"
   end
@@ -9,9 +16,25 @@ defmodule User.Spec_Funcs do
     { stack ++ [String.duplicate("one two three four five ", 150)], prog, env}
   end
 
+  def user_id_equals stack, [ raw | prog], env do
+    {args, _empty, env} = JSON_Applet.run([], raw, env)
+    num = List.last args
+    user = (JSON_Applet.get(:user, env) || %{})
+            |> Map.put("id", num)
+
+    # === We use Map.put instead of JSON_Applet.en
+    # === because we don't want to put in a new :user,
+    # === only "update" it.
+    env = env
+          |> Map.put(:user, user)
+          |> Map.put(:"user_#{JSON_Applet.get(:user_counter, env)}", user)
+
+    { stack, prog, env }
+  end
+
   def user_id(stack, prog, env) do
     {args, prog, env} = JSON_Applet.take prog, 1, env
-    env = Map.put env, "user", %{"id"=> List.last(args)}
+    env = JSON_Applet.put :user, %{"id"=> List.last(args)}
     {stack, prog, env}
   end
 

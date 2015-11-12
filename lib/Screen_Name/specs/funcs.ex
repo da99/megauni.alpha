@@ -22,24 +22,28 @@ defmodule Screen_Name.Spec_Funcs do
     {stack ++ [cards], prog, env}
   end
 
-  def read_news_card(stack, prog, env) do
+  def read_news_card(stack, [args | prog], env) do
+    user = JSON_Applet.get(:user, env)
+    sn   = JSON_Applet.get(:sn, env)
     user_id = (
-      env["user"] && env["user"]["id"]
-    ) || Screen_Name.read_id!(env["sn"]["screen_name"])
+      user && user["id"]
+    ) || Screen_Name.read_id!(Map.fetch! sn, "screen_name")
 
-    result = if prog |> List.first |> is_list do
-      {args, prog, env} = JSON_Applet.take(prog, 1, env)
-      Screen_Name.read_news_card user_id, args
-    else
+    result = if Enum.empty?(args) do
       Screen_Name.read_news_card user_id
+    else
+      {[args], prog, env} = JSON_Applet.run([], ["data", args], env)
+      Screen_Name.read_news_card user_id, args
     end
 
     case result do
       x when is_list(x) ->
-        env = JSON_Applet.put(env, "news_cards", result)
+        env = JSON_Applet.put(env, :news_cards, result)
       _ ->
         result
     end
+
+    In.spect result
     {stack ++ [result], prog, env}
   end
 
@@ -87,20 +91,22 @@ defmodule Screen_Name.Spec_Funcs do
   end # === Screen_Name.read
 
   def sn stack, [[]|prog], env do
-    sn stack, [[0]|prog], env
+    i = JSON_Applet.get(:sn_counter, env) || 0
+    sn stack, [[i]|prog], env
   end
 
   def sn stack, prog, env do
     [[num] | prog] = prog
     key = String.to_atom("sn_#{num}")
-    tuple = JSON_Applet.get(key, env)
 
-    val = case tuple do
+    map = case raw = JSON_Applet.get(key, env) do
       {:ok, row} -> row
       ["ok", row] -> row
-      _ -> raise("Screen name not found: #{inspect tuple}")
+      map = %{"screen_name" => _name} -> map
+      _ -> raise("Screen name not found: #{inspect raw}")
     end
-    {stack ++ [val], prog, env}
+
+    {stack ++ [map], prog, env}
   end
 
   def screen_name_raw!(stack, prog, env) do
@@ -119,39 +125,32 @@ defmodule Screen_Name.Spec_Funcs do
   end # === Screen_Name.read_one
 
   def create_screen_name(stack, prog, env) do
-    arg = if Map.has_key?(env, "user") do
-      %{
-        "screen_name" => Spec_Funcs.rand_screen_name,
-        "owner_id"     => env["user"]["id"]
-      }
+    user = JSON_Applet.get(:user, env)
+    sn = if user do
+      Screen_Name.create(user["id"], rand_screen_name)
     else
-      %{ "screen_name" => Spec_Funcs.rand_screen_name }
+      Screen_Name.create(nil, rand_screen_name)
     end
-
-    sn = Screen_Name.create(arg)
 
     case sn do
-      %{"error" => msg} ->
-        raise "create screen_name: #{msg}"
-      %{"screen_name"=> _name} ->
-        env = JSON_Applet.put(env, "sn", sn)
-        if Map.has_key?(env, :sn_count) do
-          env = Map.put env, :sn_count, env.sn_count + 1
-        else
-          env = Map.put env, :sn_count, 1
-        end
-        env = JSON_Applet.put(env, "sn_#{env.sn_count}", sn)
-      _ ->
-        raise "Unknown error: #{inspect sn}"
+      {:ok, sn_map = %{"screen_name"=> name}} ->
+
+        # === Put :id field just in case it is needed later:
+        sn_map = Map.put(
+          sn_map, "id", Screen_Name.read_id!(name)
+        )
+        env = JSON_Applet.put(env, :sn, sn_map)
     end
-    {(stack ++ [sn]), prog, env}
+
+    {(stack ++ [sn |> JSON_Applet.to_json_to_elixir]), prog, env}
   end
 
   def update_privacy(stack, prog, env) do
     {args, prog, env} = JSON_Applet.take(prog, 1, env)
-    name = env["sn"]["screen_name"]
+    name = :sn |> JSON_Applet.get(env) |> Map.get("screen_name")
     id   = Screen_Name.select_id(name)
     {:ok, _answer} = Screen_Name.run id, ["update screen_name privacy", [name, List.last(args)]]
+
     {stack, prog, env}
   end
 

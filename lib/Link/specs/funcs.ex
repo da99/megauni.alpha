@@ -1,18 +1,18 @@
 
 defmodule Link.Spec_Funcs do
 
-  def create_link(stack, prog, env) do
-    {args, prog, env} = JSON_Applet.take(prog, 1, env)
+  def create_link(stack, [raw_args | prog], env) do
+    {[args], _empty, env} = JSON_Applet.run([], ["data", raw_args], env)
 
-    if (args |> List.first |> is_number) do
-      [user_id | args] = args
-    else
-      user_id = (
-        env["user"] && env["user"]["id"]
-      ) || Screen_Name.read_id!(env["sn"]["screen_name"])
+    result = case args do
+      [user_id | args] when is_number(user_id) ->
+        Link.create user_id, args
+      _ ->
+        user = JSON_Applet.get(:user, env)
+        sn   = JSON_Applet.get(:sn, env)
+        user_id = ( user && user["id"]) || Screen_Name.read_id!(sn |> Map.fetch!("screen_name"))
+        Link.create user_id, args
     end
-
-    result = Link.create user_id, args
 
     case result do
       %{"link"=> _link} ->

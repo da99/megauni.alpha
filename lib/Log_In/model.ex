@@ -56,7 +56,6 @@ defmodule Log_In do
         end
 
       _ ->
-        In.spect user
         raise "programmer or system error"
     end
 

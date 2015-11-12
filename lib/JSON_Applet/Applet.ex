@@ -83,7 +83,7 @@ defmodule JSON_Applet do
   def take([list | prog], num, env) when is_list(list) and is_number(num) do
     {args, _empty, env} = run([], list, env)
     if Enum.count(args) < num do
-      raise "Not enought args: #{inspect num} desired from: #{inspect list}"
+      raise "Not enough args: #{inspect num} desired from: #{inspect list}"
     end
 
     {Enum.take(args, num), prog, env}
@@ -182,6 +182,10 @@ defmodule JSON_Applet do
         run stack, prog, env
     end
   end # === def run stack, prog, env
+
+  def run stack, [ nil | prog ], env do
+    run( stack ++ [nil], prog, env )
+  end
 
   def to_json_to_elixir val do
     case val do
