@@ -203,22 +203,49 @@ defmodule JSON_Applet do
     end
   end # === def to_json_to_elixir
 
-  def get(name, env) do
-    func = cond do
-      Map.has_key?(env, name) -> env[name]
-      is_top?(env)            -> nil
-      true                    -> get(name, top_env(env))
+  def get_with_ok name, env do
+    {status, val} = cond do
+      Map.has_key?(env, name) -> {:ok, env[name]}
+      is_top?(env)            -> {:not_found, nil}
+      true                    -> get_with_ok(name, top_env(env))
     end # cond
 
-    if !func && is_binary(name) && name =~ ~r/\./ do
-      func = name
-              |> String.downcase
-              |> String.replace(".", "_")
-              |> get(env)
+    if !(status == :ok) && is_binary(name) && name =~ ~r/\./ do
+      {status, val} = name
+                      |> String.downcase
+                      |> String.replace(".", "_")
+                      |> get_with_ok(env)
     end
 
-    func
+    {status, val}
+  end
+
+  def get!(name, env) do
+    {status, val} = get_with_ok(name, env)
+    if status != :ok do
+      raise "Key not found in envs: #{inspect name}"
+    end
+    val
+  end
+
+  def get(name, env) do
+    {status, val} = get_with_ok(name, env)
+    val
   end # def
+
+  def get_by_count stack, [name, [] | prog], env do
+    num = JSON_Applet.get(:"#{name}_counter", env) || 0
+    get_by_count(stack, [name, [num] | prog], env)
+  end
+
+  def get_by_count(stack, [name, [str] | prog], env) when is_binary(str) do
+    get_by_count(stack, [name, [String.to_integer(str)]|prog], env)
+  end
+
+  def get_by_count(stack, [name, [num] | prog], env) when is_number(num) do
+    val = JSON_Applet.get!(:"#{name}_#{num}", env)
+    {stack ++ [val], prog, env}
+  end
 
   def to_args(string) when is_binary(string) do
     string = string |> String.strip

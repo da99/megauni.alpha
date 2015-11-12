@@ -10,12 +10,12 @@
 
     "create_screen_name[]", "update_privacy", ["WORLD READABLE"],
     "create_card", {"owner_id": "sn[].id", "owner_screen_name" : "sn[].screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-    "create_link", ["sn[].id",   "LINK | CARD, SCREEN_NAME",    "card[].id",  "sn[].screen_name"],
+    "create_link", ["sn[].id",  "LINK | CARD, SCREEN_NAME",    "card[].id",  "sn[].screen_name"],
     "create_link", ["sn[0].id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn[0].screen_name", "sn[0].screen_name"],
 
     "create_screen_name[]", "update_privacy", ["WORLD READABLE"],
     "create_card", {"owner_id": "sn[].id", "owner_screen_name" : "sn[].screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
-    "create_link", ["sn[].id",   "LINK | CARD, SCREEN_NAME",     "card[].id",        "sn[].screen_name"],
+    "create_link", ["sn[].id",  "LINK | CARD, SCREEN_NAME", "card[].id", "sn[].screen_name"],
     "create_link", ["sn[0].id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn[0].screen_name", "sn[].screen_name"],
 
     "create_screen_name[]", "update_privacy", ["WORLD READABLE"],
@@ -29,9 +29,9 @@
   "output" , [
     "~=", [
       "data", [
-        {"mask_id": "sn[0].id", "publication_id": "sn[3].id", "updated_at": "card[2].linked_at", "last_read_at": null },
-        {"mask_id": "sn[0].id", "publication_id": "sn[2].id", "updated_at": "card[1].linked_at", "last_read_at": null },
-        {"mask_id": "sn[0].id", "publication_id": "sn[1].id", "updated_at": "card[0].linked_at", "last_read_at": null }
+        {"mask_id": "sn[0].id", "publication_id": "sn[3].id", "updated_at": "link[4].created_at", "last_read_at": null },
+        {"mask_id": "sn[0].id", "publication_id": "sn[2].id", "updated_at": "link[2].created_at", "last_read_at": null },
+        {"mask_id": "sn[0].id", "publication_id": "sn[1].id", "updated_at": "link[0].created_at", "last_read_at": null }
       ]
     ]
   ]

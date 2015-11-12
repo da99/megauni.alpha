@@ -1,6 +1,18 @@
 
 defmodule In do
 
+  def dev! do
+    if dev? do
+      true
+    else
+      raise "Only available during development."
+    end
+  end
+
+  def dev? do
+    dev
+  end
+
   def dev do
     !!System.get_env("IS_DEV")
   end
