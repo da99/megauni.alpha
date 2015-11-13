@@ -24,7 +24,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION link_read (
-  IN USER_ID INT, IN TYPE_NAME VARCHAR, IN RAW_A VARCHAR, IN RAW_B INT
+  IN USER_ID INT, IN TYPE_NAME VARCHAR, IN RAW_A VARCHAR, IN B_ID INT
 ) RETURNS SETOF link AS $$
 DECLARE
   IDS SMALLINT[];
@@ -34,7 +34,7 @@ BEGIN
   IF IDS[3] = SN_TYPE_ID THEN
     RETURN QUERY
       SELECT *
-      FROM link_read(USER_ID, TYPE_NAME, screen_name_id(RAW_A), RAW_B);
+      FROM link_read(USER_ID, TYPE_NAME, screen_name_id(RAW_A), B_ID);
   ELSE
     RAISE EXCEPTION 'programmer_error: not implemented';
   END IF;
@@ -43,7 +43,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION link_read (
-  IN USER_ID INT, IN TYPE_NAME VARCHAR, IN RAW_A INT, IN RAW_B VARCHAR
+  IN USER_ID INT, IN TYPE_NAME VARCHAR, IN A_ID INT, IN RAW_B VARCHAR
 ) RETURNS SETOF link AS $$
 DECLARE
   IDS SMALLINT[];
@@ -53,7 +53,7 @@ BEGIN
   IF IDS[4] = SN_TYPE_ID THEN
     RETURN QUERY
       SELECT *
-      FROM link_read(USER_ID, TYPE_NAME, RAW_A, screen_name_id(RAW_B));
+      FROM link_read(USER_ID, TYPE_NAME, A_ID, screen_name_id(RAW_B));
   ELSE
     RAISE EXCEPTION 'programmer_error: not implemented';
   END IF;

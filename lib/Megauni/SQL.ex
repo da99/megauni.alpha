@@ -53,7 +53,13 @@ defmodule Megauni.SQL do
     case raws do
       {:ok, %{num_rows: num_rows, columns: cols, rows: rows }} ->
         list_of_maps = Enum.map rows, fn(r) ->
-          Enum.reduce(Enum.zip(cols, r), %{}, fn({col, val}, map) ->
+          Enum.reduce(Enum.zip(cols, r), %{}, fn({col, raw_val}, map) ->
+            val = case raw_val do
+              {{_yr, _mo, _dy}, {_hr,_min,_sec,_ms}} ->
+                raw_val |> Timex.Date.from |> Timex.DateFormat.format!("{ISO}")
+              _   ->
+                raw_val
+            end
             Map.put(map, col, val)
           end)
         end

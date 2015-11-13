@@ -43,8 +43,7 @@ defmodule Screen_Name.Spec_Funcs do
         result
     end
 
-    In.spect result
-    {stack ++ [result], prog, env}
+    {stack ++ [result |> JSON_Applet.to_json_to_elixir], prog, env}
   end
 
   def screen_name(stack, [[]], env) do

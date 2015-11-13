@@ -19,7 +19,7 @@ defmodule Megauni.Mixfile do
         :logger, :postgrex,
         :ecto, :cowboy,
         :plug, :poison,
-        :comeonin
+        :comeonin, :tzdata
       ],
       mod: {Megauni, []}
     ]
@@ -32,7 +32,8 @@ defmodule Megauni.Mixfile do
       {:poison   , "~> 1.5.0"},
       {:postgrex , ">= 0.9.0"},
       {:ecto     , "~> 1.0"},
-      {:comeonin , "> 1.1.0"}
+      {:comeonin , "> 1.1.0"},
+      {:timex    , "~> 0.19.5"}
     ]
   end
 

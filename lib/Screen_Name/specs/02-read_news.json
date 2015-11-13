@@ -29,10 +29,11 @@
   "output" , [
     "~=", [
       "data", [
+        "ok", [
         {"mask_id": "sn[0].id", "publication_id": "sn[3].id", "updated_at": "link[4].created_at", "last_read_at": null },
         {"mask_id": "sn[0].id", "publication_id": "sn[2].id", "updated_at": "link[2].created_at", "last_read_at": null },
         {"mask_id": "sn[0].id", "publication_id": "sn[1].id", "updated_at": "link[0].created_at", "last_read_at": null }
-      ]
+      ]]
     ]
   ]
 
