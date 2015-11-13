@@ -23,19 +23,11 @@ defmodule JSON_Applet.Spec_Funcs do
     env[:desc]
   end # === def run_before_all
 
-  def after_each prog, env do
-    if Map.has_key?(env, :after_each) do
-      if is_list(env.after_each) do
-        Map.put env, :after_each, List.append(env.after_each, prog)
-      else
-        Map.put env, :after_each, List.append([env.after_each], prog)
-      end
-    else
-      if !is_list(prog) do
-        prog = [prog]
-      end
-      Enum.into %{:after_each => prog}, env
-    end
+  def after_each stack, [ args | prog ], env do
+    # Get :after_each for the current env
+    after_each = Map.get(env, :after_each) || []
+    env = Map.put env, :after_each, (after_each ++ args)
+    {stack, prog, env}
   end # === def run_after_each
 
   def get stack, prog, env do

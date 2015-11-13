@@ -7,72 +7,86 @@
   "create_screen_name", [],
   "create_screen_name", [],
 
-  "after_each", ["Log_In.reset_all"],
+  "after_each", ["Log_In.reset_all[]"],
 
   "desc", ["Log_In.attempt"],
 
-  "it",   "returns the id of the user",
-  "input", {
+  "it",  ["returns the id of the user"],
+  "input", ["__", {
     "screen_name" : "sn_1.screen_name",
     "pass"        : "user.pass",
     "ip"          : "127.0.0.1"
-  },
-  "output", {"id" : "user.id"} ,
+  }],
+  "output", [ "~=", ["data", ["ok", {"id" : "user.id"} ]]],
 
-  "it", "returns screen_name not found",
-  "input", {
+  "it", ["returns screen_name not found"],
+  "input", ["__", {
     "screen_name" : "wrong_screen_name",
     "pass"        : "user.pass",
     "ip"          : "127.0.0.1"
-  },
-  "output", {"user_error":"log_in: screen_name not found"} ,
+  }],
+  "output", [
+    "~=", [ "data", [ "error", ["user_error","log_in: screen_name not found" ]]]
+  ],
 
-  "it", "returns user id: fails = @FAIL_LIMIT - 1, success = 1",
+  "it", ["returns user id: fails = @FAIL_LIMIT - 1, success = 1"],
   "input", [
     "bad_log_in", [ "@FAIL_LIMIT - 1" ],
     "good_log_in", []
   ],
-  "output", {"id": "user.id"} ,
+  "output", ["~=", ["data", ["ok", {"id": "user.id"} ]]],
 
 
-  "it", "returns user id: fails = @FAIL_LIMIT - 1, success = 1, fails = 1, success = 1",
+  "it", ["returns user id: fails = @FAIL_LIMIT - 1, success = 1, fails = 1, success = 1"],
   "input", [
     "bad_log_in", [ "@FAIL_LIMIT - 1" ],
     "good_log_in[]", "bad_log_in[]", "good_log_in[]"
   ],
-  "output", {"id": "user.id"} ,
+  "output", [
+    "~=", ["data", ["ok", {"id": "user.id"}]]
+  ],
 
 
-  "it", "returns lock-out error: @FAIL_LIMIT + 1",
+  "it", ["returns lock-out error: @FAIL_LIMIT + 1"],
   "input", [
     "bad_log_in", [ "@FAIL_LIMIT + 1" ]
   ],
-  "output", {"user_error": "log_in: screen_name locked out"} ,
+  "output", [
+    "~=", ["data", ["ok", ["user_error", "log_in: screen_name locked out"]]]
+  ],
 
 
-  "it", "returns lock-out error: @FAIL_LIMIT + 1, success = 1",
+  "it", ["returns lock-out error: @FAIL_LIMIT + 1, success = 1"],
   "input", [
     "bad_log_in", [ "@FAIL_LIMIT + 1" ],
     "good_log_in[]"
   ],
-  "output", {"user_error": "log_in: screen_name locked out"} ,
+  "output", [
+    "~=", ["data", ["ok", ["user_error", "log_in: screen_name locked out"]]]
+  ],
 
 
-  "it", "returns user id: fails = @FAIL_LIMIT + 1, 1 success of another screen name",
+  "it", ["returns user id: fails = @FAIL_LIMIT + 1, 1 success of another screen name"],
   "input", [
     "bad_log_in", [ "@FAIL_LIMIT + 1" ],
     "create_screen_name[]",
     "good_log_in[]"
   ],
-  "output", {"id": "user.id"} ,
+  "output", [
+    "~=", [
+      "data", ["ok", {"id": "user.id"}]
+    ]
+  ],
 
 
-  "it", "returns user id: fails = @FAIL_LIMIT + 1 that are 25 hours old, 1 success",
+  "it", ["returns user id: fails = @FAIL_LIMIT + 1 that are 25 hours old, 1 success"],
   "input", [
     "bad_log_in", [ "@FAIL_LIMIT + 1" ],
     "log_in_attempts aged", ["25 hrs"],
     "good_log_in[]"
   ],
-  "output", {"id": "user.id"}
+  "output", [
+    "~=", ["data", ["ok",{"id": "user.id"}]]
+  ]
 
 ]

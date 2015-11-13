@@ -23,10 +23,8 @@ defmodule Log_In do
     before sending it to the DB, to ensure raw pass phrase from traveling
     as little as possible throught the network/system.
   """
-  def attempt data do
-    ip   = Map.fetch!(data, "ip")
-    sn   = Map.fetch!(data, "screen_name")
-    pass = User.canonize_pass Map.fetch!(data, "pass")
+  def attempt %{"ip"=>ip, "screen_name"=>sn, "pass"=>raw_pass} do
+    pass = raw_pass |> User.canonize_pass
 
     user = Megauni.SQL.query(
       """
@@ -49,10 +47,10 @@ defmodule Log_In do
     pass_match = false
 
     case user do
-      {:ok, %{:rows => users}} ->
+      {:ok, users} when is_list(users) ->
         if Enum.count(users) > 0 do
           [[user_id, valid_pswd_hash, sn_id]] = users
-          pass_match                          = Comeonin.Bcrypt.checkpw pass, valid_pswd_hash
+          pass_match                          = Comeonin.Bcrypt.checkpw(pass, valid_pswd_hash)
         end
 
       _ ->
@@ -65,10 +63,10 @@ defmodule Log_In do
     )
 
     case result do
-      {:ok, %{:rows=>[[true, _reason]]}} ->
-        %{"id"=>user_id}
-      {:ok, %{:rows=>[[false, reason]]}} ->
-        %{"user_error"=>reason}
+      {:ok, [%{"has_pass"=>true}]} ->
+        {:ok, %{"id"=>user_id}}
+      {:ok, [%{"has_pass"=>false, "reason"=>reason}]} ->
+        {:error, [:user_error, reason]}
     end # === case
 
   end # === def attempt

@@ -125,13 +125,13 @@ defmodule JSON_Applet.Spec do
       %{ :spec_count => 0, :it_count => 0 }
     ])
 
+    [:yellow, "\nfile: ", :bright, path, :reset]
+    |> color
+    |> IO.puts
+
     {_stack, _prog, env} = run(
       [], (path |> File.read! |> Poison.decode!), env
     )
-
-    ["\nfile: ", :bright, path, :reset]
-    |> color
-    |> IO.puts
 
     if env.spec_count > 0 do
       IO.puts color([:bright, :green, "All tests pass.", :reset])
