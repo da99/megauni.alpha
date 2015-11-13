@@ -11,7 +11,7 @@
     "create_screen_name[]", "update_privacy", ["WORLD READABLE"],
     "create_card", {"owner_id": "sn[].id", "owner_screen_name" : "sn[].screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
     "create_link", ["sn[].id",  "LINK | CARD, SCREEN_NAME",    "card[].id",  "sn[].screen_name"],
-    "create_link", ["sn[0].id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn[0].screen_name", "sn[0].screen_name"],
+    "create_link", ["sn[0].id", "FOLLOW | SCREEN_NAME, SCREEN_NAME", "sn[0].screen_name", "sn[].screen_name"],
 
     "create_screen_name[]", "update_privacy", ["WORLD READABLE"],
     "create_card", {"owner_id": "sn[].id", "owner_screen_name" : "sn[].screen_name", "privacy": "WORLD READABLE", "code": [{"cmd":"print"}]},
