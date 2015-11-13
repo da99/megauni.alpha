@@ -66,26 +66,18 @@ defmodule User.Spec_Funcs do
 
   def create_user(stack, prog, env) do
     user = User.create(%{
-      "screen_name"  => Spec_Funcs.rand_screen_name,
-      "pass"         => Spec_Funcs.valid_pass,
-      "confirm_pass" => Spec_Funcs.valid_pass
+      "screen_name"  => Screen_Name.Spec_Funcs.rand_screen_name,
+      "pass"         => valid_pass,
+      "confirm_pass" => valid_pass
     })
 
-    env = Map.put env, "user.pass", Spec_Funcs.valid_pass
+    env = JSON_Applet.put env, :"user.pass", valid_pass
 
     case user do
-      %{"error" => msg} ->
-        raise "create user: #{msg}"
-      %{"id"=>_user_id} ->
-        env = JSON_Applet.put(env, "user", user)
-        if Map.has_key?(env, :user_count) do
-          env = Map.put env, :user_count, env.user_count + 1
-        else
-          env = Map.put env, :user_count, 1
-        end
-        env = JSON_Applet.put(env, "user_#{env.user_count}", user)
+      {:ok, u = %{"id"=>_user_id}} ->
+        env = JSON_Applet.put(env, :user, u)
       _ ->
-        raise "Unknown error: #{inspect user}"
+        raise "#{inspect user}"
     end
     {(stack ++ [user]), prog, env}
   end

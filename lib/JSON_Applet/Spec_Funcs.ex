@@ -12,10 +12,10 @@ defmodule JSON_Applet.Spec_Funcs do
     Map.merge func_map(JSON_Applet.Spec_Funcs), aliases
   end
 
-  def const list, env do
-    [ name | prog ] = list
-    { stack, _prog , env } = JSON_Applet.run([], prog, env)
-    Map.put env, name, List.last(stack)
+  def const stack, [ raw | prog ], env do
+    { [[name , val]], _empty , env } = JSON_Applet.run([], ["data", raw], env)
+    env = JSON_Applet.put env, name, val
+    {stack ++ [val], prog, env}
   end
 
   def before_all prog, env do
