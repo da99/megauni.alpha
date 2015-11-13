@@ -3,11 +3,9 @@
 SELECT drop_megauni_func('link_read');
 
 -- UP
+
 CREATE OR REPLACE FUNCTION link_read (
-  IN USER_ID   INT,
-  IN TYPE_NAME VARCHAR,
-  IN RAW_A     VARCHAR,
-  IN RAW_B     VARCHAR
+  IN USER_ID INT, IN TYPE_NAME VARCHAR, IN RAW_A VARCHAR, IN RAW_B VARCHAR
 ) RETURNS SETOF link AS $$
 DECLARE
   IDS SMALLINT[];
@@ -24,24 +22,41 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
+
 CREATE OR REPLACE FUNCTION link_read (
-  IN USER_ID   INT,
-  IN TYPE_NAME VARCHAR,
-  IN A_ID      INT,
-  IN RAW_SN    VARCHAR
+  IN USER_ID INT, IN TYPE_NAME VARCHAR, IN RAW_A VARCHAR, IN RAW_B INT
 ) RETURNS SETOF link AS $$
 DECLARE
   IDS SMALLINT[];
+  SN_TYPE_ID SMALLINT := name_to_type_id('SCREEN_NAME');
 BEGIN
   IDS := name_to_type_ids(TYPE_NAME);
-  CASE IDS[4]
-  WHEN name_to_type_id('SCREEN_NAME') THEN
+  IF IDS[3] = SN_TYPE_ID THEN
     RETURN QUERY
       SELECT *
-      FROM link_read(USER_ID, TYPE_NAME, A_ID, screen_name_id(RAW_SN));
+      FROM link_read(USER_ID, TYPE_NAME, screen_name_id(RAW_A), RAW_B);
   ELSE
     RAISE EXCEPTION 'programmer_error: not implemented';
-  END CASE;
+  END IF;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION link_read (
+  IN USER_ID INT, IN TYPE_NAME VARCHAR, IN RAW_A INT, IN RAW_B VARCHAR
+) RETURNS SETOF link AS $$
+DECLARE
+  IDS SMALLINT[];
+  SN_TYPE_ID SMALLINT := name_to_type_id('SCREEN_NAME');
+BEGIN
+  IDS := name_to_type_ids(TYPE_NAME);
+  IF IDS[4] = SN_TYPE_ID THEN
+    RETURN QUERY
+      SELECT *
+      FROM link_read(USER_ID, TYPE_NAME, RAW_A, screen_name_id(RAW_B));
+  ELSE
+    RAISE EXCEPTION 'programmer_error: not implemented';
+  END IF;
 END
 $$ LANGUAGE plpgsql;
 
