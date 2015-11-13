@@ -145,15 +145,12 @@ defmodule Screen_Name.Spec_Funcs do
   end
 
   def update_privacy(stack, prog, env) do
-    In.spect "updatE_priv"
     {args, prog, env} = JSON_Applet.take(prog, 1, env)
     name = :sn |> JSON_Applet.get(env) |> Map.get("screen_name")
     id   = Screen_Name.select_id(name)
 
-    In.spect "1 updatE_priv"
     {:ok, _answer} = Screen_Name.run id, ["update screen_name privacy", [name, List.last(args)]]
 
-    In.spect "2 updatE_priv"
     {stack, prog, env}
   end
 
