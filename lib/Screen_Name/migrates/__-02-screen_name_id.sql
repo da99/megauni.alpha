@@ -24,7 +24,7 @@ BEGIN
 
   RETURN sn_record.id;
 END
-$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$$ LANGUAGE plpgsql STABLE; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 -- BOTH
@@ -43,7 +43,7 @@ BEGIN
 
   RETURN sn_id;
 END
-$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$$ LANGUAGE plpgsql STABLE; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 -- UP
 CREATE OR REPLACE FUNCTION screen_name_id_or_fail ( IN RAW_SCREEN_NAME VARCHAR )
@@ -58,7 +58,7 @@ BEGIN
 
   RETURN sn_id;
 END
-$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$$ LANGUAGE plpgsql STABLE; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 -- BOTH
@@ -81,7 +81,7 @@ BEGIN
   ;
   RETURN sn_record.id;
 END
-$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$$ LANGUAGE plpgsql STABLE; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 -- Return id of RAW_SCREEN_NAME:
@@ -96,6 +96,6 @@ BEGIN
   LIMIT 1;
   RETURN sn_record.id;
 END
-$$ LANGUAGE plpgsql; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
+$$ LANGUAGE plpgsql STABLE; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
