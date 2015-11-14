@@ -65,6 +65,18 @@
     "~=", ["data", ["error", ["user_error", "log_in: screen_name locked out"]]]
   ],
 
+  "it", ["allows the same IP with different screen names"],
+  "comment", ["This tests to prevent the \"ip\" column from accidently marked as the primary key."],
+  "input", [
+    "bad_log_in", [],
+    "create_screen_name", [],
+    "bad_log_in", []
+  ],
+  "output", [
+    "~=", [
+      "data", ["error", ["user_error","log_in: password no match"]]
+    ]
+  ],
 
   "it", ["returns user id: fails = @FAIL_LIMIT + 1, 1 success of another screen name"],
   "input", [

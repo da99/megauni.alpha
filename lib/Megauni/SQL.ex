@@ -54,8 +54,8 @@ defmodule Megauni.SQL do
       {:ok, %{num_rows: 0}} ->
         {:ok, []}
 
-      {:ok, %{num_rows: 1, columns: nil, rows: nil }} ->
-        {:ok, [nil]}
+      {:ok, %{num_rows: num, columns: nil, rows: nil }} ->
+        {:ok,  Enum.map(1..num, &(&1 && nil))}
 
       {:ok, %{num_rows: num_rows, columns: cols, rows: rows }} ->
         list_of_maps = Enum.map rows, fn(r) ->

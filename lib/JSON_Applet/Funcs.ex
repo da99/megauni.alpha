@@ -11,6 +11,10 @@ defmodule JSON_Applet.Funcs do
     {stack ++ new_stack, prog, env}
   end
 
+  def comment(stack, [args | prog], env) do
+    {stack, prog, env}
+  end
+
   def array(stack, prog, env) do
     { arr, prog, env } = JSON_Applet.take(prog, 1, env)
     {stack ++ [arr], prog, env}
