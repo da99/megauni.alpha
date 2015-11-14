@@ -47,28 +47,27 @@ defmodule Log_In do
     pass_match = false
 
     case user do
-      {:ok, users} when is_list(users) ->
-        if Enum.count(users) > 0 do
-          [[user_id, valid_pswd_hash, sn_id]] = users
-          pass_match                          = Comeonin.Bcrypt.checkpw(pass, valid_pswd_hash)
-        end
+      {:error, error} -> user
 
-      _ ->
-        raise "programmer or system error"
-    end
+      {:ok, []} ->
+        {:error, [:user_error, "log_in: screen_name not found"]}
 
-    result = Megauni.SQL.query(
-      " SELECT * FROM log_in_attempt($1, $2, $3, $4); ",
-      [ip, sn_id, user_id, pass_match]
-    )
+      {:ok, [rec]} ->
+        %{"id"=>user_id, "pswd_hash"=>pswd_hash, "sn_id"=>sn_id} = rec
+        pass_match = Comeonin.Bcrypt.checkpw(pass, pswd_hash)
 
-    case result do
-      {:ok, [%{"has_pass"=>true}]} ->
-        {:ok, %{"id"=>user_id}}
-      {:ok, [%{"has_pass"=>false, "reason"=>reason}]} ->
-        {:error, [:user_error, reason]}
-    end # === case
+        result = Megauni.SQL.query(
+          " SELECT * FROM log_in_attempt($1, $2, $3, $4); ",
+          [ip, sn_id, user_id, pass_match]
+        )
 
+        case result do
+          {:ok, [%{"has_pass"=>true}]} ->
+            {:ok, %{"id"=>user_id}}
+          {:ok, [%{"has_pass"=>false, "reason"=>reason}]} ->
+            {:error, [:user_error, reason]}
+        end # === case
+    end # === case user
   end # === def attempt
 
 end # === defmodule Log_In

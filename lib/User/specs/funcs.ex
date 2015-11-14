@@ -71,13 +71,9 @@ defmodule User.Spec_Funcs do
       "confirm_pass" => valid_pass
     })
 
-    env = JSON_Applet.put env, :"user.pass", valid_pass
-
     case user do
       {:ok, u = %{"id"=>_user_id}} ->
-        env = JSON_Applet.put(env, :user, u)
-      _ ->
-        raise "#{inspect user}"
+        env = JSON_Applet.put(env, :user, Map.put(u, "pass", valid_pass))
     end
     {(stack ++ [user]), prog, env}
   end

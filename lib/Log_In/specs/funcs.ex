@@ -20,7 +20,7 @@ defmodule Log_In.Spec_Funcs do
 
   def log_in_attempt(stack, prog, env) do
     {arg, prog, env} = JSON_Applet.take(prog, 1, env)
-    stack = stack ++ [Log_In.attempt(arg)]
+    stack = stack ++ [Log_In.attempt(arg) |> JSON_Applet.to_json_to_elixir]
     {stack, prog, env}
   end
 

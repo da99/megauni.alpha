@@ -13,20 +13,20 @@
 
   "it",  ["returns the id of the user"],
   "input", ["__", {
-    "screen_name" : "sn_1.screen_name",
-    "pass"        : "user.pass",
+    "screen_name" : "sn[0].screen_name",
+    "pass"        : "user[].pass",
     "ip"          : "127.0.0.1"
   }],
-  "output", [ "~=", ["data", ["ok", {"id" : "user.id"} ]]],
+  "output", [ "~=", ["data", ["ok", {"id" : "user[].id"} ]]],
 
   "it", ["returns screen_name not found"],
   "input", ["__", {
     "screen_name" : "wrong_screen_name",
-    "pass"        : "user.pass",
+    "pass"        : "user[].pass",
     "ip"          : "127.0.0.1"
   }],
   "output", [
-    "~=", [ "data", [ "error", ["user_error","log_in: screen_name not found" ]]]
+    "~=", [ "data", [ "error", ["user_error", "log_in: screen_name not found"]]]
   ],
 
   "it", ["returns user id: fails = @FAIL_LIMIT - 1, success = 1"],
