@@ -9,7 +9,7 @@ defmodule Megauni.SQL do
 
   def to_dollar_num_binary args do
     Enum.reduce(Enum.with_index(args), [], fn({val, i}, acc) ->
-      acc = case val do
+      case val do
         x when is_number(x) -> (acc ++ ["$#{i + 1}::INT"])
         x when is_binary(x) -> (acc ++ ["$#{i + 1}::VARCHAR"])
         _                   -> (acc ++ ["$#{i + 1}"])
@@ -30,7 +30,7 @@ defmodule Megauni.SQL do
     case raw do
       { :error, %{postgres: %{code: :string_data_right_truncation, message: msg}} } ->
         case Regex.run( ~r/value too long for type character varying\((\d+)\)/, msg ) do
-          [match, raw_num] ->
+          [_match, raw_num] ->
             String.to_integer(raw_num)
           nil ->
             nil
@@ -54,10 +54,12 @@ defmodule Megauni.SQL do
       {:ok, %{num_rows: 0}} ->
         {:ok, []}
 
+      # == Useful when deleting rows and "rows" are nil,
+      # == while "num_rows" is a number.
       {:ok, %{num_rows: num, columns: nil, rows: nil }} ->
         {:ok,  Enum.map(1..num, &(&1 && nil))}
 
-      {:ok, %{num_rows: num_rows, columns: cols, rows: rows }} ->
+      {:ok, %{num_rows: _num_rows, columns: cols, rows: rows }} ->
         list_of_maps = Enum.map rows, fn(r) ->
           Enum.reduce(Enum.zip(cols, r), %{}, fn({col, raw_val}, map) ->
             val = case raw_val do
@@ -118,7 +120,7 @@ defmodule Megauni.SQL do
 
       { :error, %{postgres: %{code: :string_data_right_truncation, message: msg}} } ->
         case Regex.run( ~r/value too long for type character varying\((\d+)\)/, msg ) do
-          [match, raw_num] ->
+          [_match, raw_num] ->
             max = String.to_integer(raw_num)
             {:error, {:user_error, "#{prefix}: max #{max}"}}
           nil ->
