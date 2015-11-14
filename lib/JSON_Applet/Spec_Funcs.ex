@@ -25,7 +25,7 @@ defmodule JSON_Applet.Spec_Funcs do
 
   def after_each stack, [ args | prog ], env do
     # Get :after_each for the current env
-    after_each = Map.get(env, :after_each) || []
+    after_each = get(:after_each, env) || []
     env = Map.put env, :after_each, (after_each ++ args)
     {stack, prog, env}
   end # === def run_after_each
@@ -128,9 +128,8 @@ defmodule JSON_Applet.Spec_Funcs do
       Process.exit(self, "No spec found.")
     end
 
-    if Map.has_key?(env, :after_each) do
-      {_stack, _empty, env} = JSON_Applet.run(stack, env.after_each, env)
-    end
+    # == Run :after_each
+    {_stack, _empty, env} = JSON_Applet.run(stack, get(:after_each, env) || [], env)
 
     env = JSON_Applet.carry_over(env, [:it, :it_count, :spec_count])
     {stack, prog, env}
@@ -141,7 +140,8 @@ defmodule JSON_Applet.Spec_Funcs do
     [raw | prog] = prog
     {args, _empty, env} = run([], raw, env)
     expected = List.last args
-    JSON_Applet.Spec.similar_to!(actual, expected)
+    msg = "\nactual:   #{inspect actual}\nexpected: #{inspect expected}"
+    JSON_Applet.Spec.similar_to!(actual, expected, msg)
     env = Map.put env, :spec_count, get(:spec_count, env) + 1
     {stack ++ [:spec_fulfilled], prog, env}
   end

@@ -7,7 +7,7 @@
   "create_screen_name", [],
   "create_screen_name", [],
 
-  "after_each", ["Log_In.reset_all[]"],
+  "after_each", ["log_in_reset_all[]"],
 
   "desc", ["Log_In.attempt"],
 
@@ -52,7 +52,7 @@
     "bad_log_in", [ "@FAIL_LIMIT + 1" ]
   ],
   "output", [
-    "~=", ["data", ["ok", ["user_error", "log_in: screen_name locked out"]]]
+    "~=", ["data", ["error", ["user_error", "log_in: screen_name locked out"]]]
   ],
 
 
@@ -62,7 +62,7 @@
     "good_log_in[]"
   ],
   "output", [
-    "~=", ["data", ["ok", ["user_error", "log_in: screen_name locked out"]]]
+    "~=", ["data", ["error", ["user_error", "log_in: screen_name locked out"]]]
   ],
 
 
@@ -74,7 +74,7 @@
   ],
   "output", [
     "~=", [
-      "data", ["ok", {"id": "user.id"}]
+      "data", ["ok", {"id": "user[].id"}]
     ]
   ],
 
@@ -82,11 +82,11 @@
   "it", ["returns user id: fails = @FAIL_LIMIT + 1 that are 25 hours old, 1 success"],
   "input", [
     "bad_log_in", [ "@FAIL_LIMIT + 1" ],
-    "log_in_attempts aged", ["25 hrs"],
+    "log_in_attempts_aged", ["25 hrs"],
     "good_log_in[]"
   ],
   "output", [
-    "~=", ["data", ["ok",{"id": "user.id"}]]
+    "~=", ["data", ["ok",{"id": "user[].id"}]]
   ]
 
 ]

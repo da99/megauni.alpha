@@ -51,6 +51,12 @@ defmodule Megauni.SQL do
 
   def ok_rows_to_list_of_maps raws do
     case raws do
+      {:ok, %{num_rows: 0}} ->
+        {:ok, []}
+
+      {:ok, %{num_rows: 1, columns: nil, rows: nil }} ->
+        {:ok, [nil]}
+
       {:ok, %{num_rows: num_rows, columns: cols, rows: rows }} ->
         list_of_maps = Enum.map rows, fn(r) ->
           Enum.reduce(Enum.zip(cols, r), %{}, fn({col, raw_val}, map) ->

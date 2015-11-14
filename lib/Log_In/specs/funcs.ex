@@ -37,12 +37,15 @@ defmodule Log_In.Spec_Funcs do
     sn = JSON_Applet.get!(:sn, env)
 
     {stack, prog, env} = %{
-      "pass"        => "bass pass",
+      "pass"        => "bad pass word",
       "screen_name" => Map.fetch!(sn,"screen_name"),
       "ip"          => "127.0.0.1"
     } |> log_in(stack, prog, env)
 
-    {stack ++ [{:"JSON_Applet.Spec", :ignore_last_error}], prog, env}
+    last  = stack |> List.last |> JSON_Applet.to_json_to_elixir
+    stack = List.delete_at(stack, Enum.count(stack) - 1)
+
+    {stack ++ [last], prog, env}
   end
 
   def good_log_in(stack, prog, env) do
@@ -55,9 +58,9 @@ defmodule Log_In.Spec_Funcs do
   end
 
   def log_in_attempts_aged(stack, [[arg] | prog], env) do
-    {:ok, %{:num_rows=>count}} = Log_In.aged arg
+    {:ok, rows} = Log_In.aged arg
 
-    {stack ++ [count], prog, env}
+    {stack ++ [Enum.count rows], prog, env}
   end
 
   def all_log_in_attempts_old(_data, _env) do

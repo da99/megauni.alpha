@@ -5,7 +5,7 @@ defmodule JSON_Applet.Spec do
   import JSON_Applet, only: :functions
   import DA_3001, only: [color: 1, puts: 1]
 
-  def similar_to!(actual, expected) when is_map(actual) and is_map(expected) do
+  def similar_to!(actual, expected, msg) when is_map(actual) and is_map(expected) do
     key = Enum.find Map.keys(expected), fn(k) ->
       cond do
         (is_integer(actual[k]) && expected[k] == "INT") ->
@@ -24,31 +24,31 @@ defmodule JSON_Applet.Spec do
     end
   end
 
-  def similar_to!(actual, expected) when is_list(actual) and is_list(expected) do
+  def similar_to!(actual, expected, msg) when is_list(actual) and is_list(expected) do
     if Enum.count(actual) != Enum.count(expected) do
-      similar_to_fail actual, expected
+      similar_to_fail actual, expected, msg
     end
 
     Enum.find Enum.with_index(expected), fn({expected_i, i}) ->
-      ! similar_to!( Enum.at(actual,i), expected_i)
+      ! similar_to!( Enum.at(actual,i), expected_i, msg)
     end
   end
 
-  def similar_to!(actual, expected) when is_binary(actual) and is_binary(expected) do
+  def similar_to!(actual, expected, msg) when is_binary(actual) and is_binary(expected) do
     if actual != expected do
-      similar_to_fail actual, expected
+      similar_to_fail actual, expected, msg
     end
     true
   end
 
-  def similar_to!(actual, expected) when is_binary(actual) and is_map(expected) do
+  def similar_to!(actual, expected, msg) when is_binary(actual) and is_map(expected) do
     if !(actual =~ expected) do
-      similar_to_fail actual, expected
+      similar_to_fail actual, expected, msg
     end
     true
   end
 
-  def similar_to! actual, expected do
+  def similar_to! actual, expected, msg do
     if actual == expected do
       true
     else
@@ -63,12 +63,12 @@ defmodule JSON_Applet.Spec do
     end
   end
 
-  def similar_to_fail actual, expected do
+  def similar_to_fail actual, expected, msg do
     IO.puts color([
       "\n", :bright, inspect(actual),
       " needs to be similar to ",
       :reset, :red, :bright, inspect(expected),
-      :reset
+      :reset, msg
     ])
     raise "spec failed"
   end
