@@ -52,8 +52,7 @@ defmodule Log_In do
       {:ok, []} ->
         {:error, [:user_error, "log_in: screen_name not found"]}
 
-      {:ok, [rec]} ->
-        %{"id"=>user_id, "pswd_hash"=>pswd_hash, "sn_id"=>sn_id} = rec
+      {:ok, [%{"id"=>user_id, "pswd_hash"=>pswd_hash, "sn_id"=>sn_id}]} ->
         pass_match = Comeonin.Bcrypt.checkpw(pass, pswd_hash)
 
         result = Megauni.SQL.query(

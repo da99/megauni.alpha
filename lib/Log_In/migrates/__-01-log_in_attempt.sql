@@ -27,20 +27,22 @@ AS $$
     NOW_UTC        TIMESTAMP;
     START_DATE     TIMESTAMP;
     END_DATE       TIMESTAMP;
+    ip_inet        INET;
   BEGIN
 
     MAX_FAIL_COUNT := 4;
     IP_FAIL_COUNT  := 4;
-    NOW_UTC    := timezone('UTC'::text, now());
-    START_DATE := (NOW_UTC - '1 day'::interval);
-    END_DATE   := (NOW_UTC + '1 day'::interval);
+    NOW_UTC        := timezone('UTC'::text, now());
+    START_DATE     := (NOW_UTC - '1 day'::interval);
+    END_DATE       := (NOW_UTC + '1 day'::interval);
+    ip_inet        := raw_ip::inet;
 
     -- SEE IF ip is locked out
     SELECT count(ip) AS locked_out_screen_names
     INTO log_in_record
     FROM log_in
     WHERE
-      ip = raw_ip::inet
+      ip = ip_inet
       AND
       fail_count >= MAX_FAIL_COUNT
       AND
@@ -88,13 +90,13 @@ AS $$
         fail_count = fail_count + 1,
         at         = timezone('UTC'::text, now())
       WHERE
-        ip = raw_ip::inet
+        ip = ip_inet
         AND
         screen_name_id = sn_id;
 
       IF NOT FOUND THEN
-        INSERT INTO log_in (ip,           screen_name_id)
-        VALUES             (raw_ip::inet, sn_id);
+        INSERT INTO log_in (ip,      screen_name_id)
+        VALUES             (ip_inet, sn_id);
       END IF;
 
       --- FAIL

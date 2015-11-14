@@ -16,21 +16,25 @@
 --        If password is correct AND fail_count <= 4,
 --        RESET log_in for all screen_names belonging to User.
 
+-- DOWN
+DROP TABLE    log_in CASCADE;
+
+-- UP
 CREATE TABLE log_in (
-  ip                   inet         NOT NULL primary key,
+  ip                   inet         NOT NULL,
   at                   timestamp    NOT NULL DEFAULT timezone('UTC'::text, now()),
   fail_count           smallint     NOT NULL DEFAULT 1,
   screen_name_id       int          NOT NULL,
   CONSTRAINT           "log_in_unique_idx" UNIQUE (ip, screen_name_id)
 );
 
+-- UP
 CREATE INDEX log_in_screen_name_id_idx
 ON log_in (screen_name_id)
 WHERE screen_name_id > 0;
 
+CREATE INDEX log_in_ip_idx
+ON log_in (ip);
 
--- DOWN
 
-DROP INDEX    log_in_screen_name_id_idx CASCADE;
-DROP TABLE    log_in CASCADE;
 
