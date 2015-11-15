@@ -210,16 +210,6 @@ case "$action" in
     node --es_staging "$@"
     ;;
 
-  "shotgun")
-    bundle exec shotgun \
-      --server      thin                 \
-      --env         production           \
-      --public      Public/              \
-      --port        4567                 \
-      $@                                 \
-      configs/config.ru
-    ;;
-
   "js_applet")
     app_dir="Public/applets"
     mkdir -p $app_dir/$1
@@ -234,19 +224,7 @@ case "$action" in
     echo "Created: $file"
     ;;
 
-  "thin")
-    bundle exec thin \
-      --environment production           \
-      --log         tmp/log.log          \
-      --pid         tmp/4567.thin.pid    \
-      --rackup      configs/config.ru    \
-      --port        4567                 \
-      $@
-    ;;
-
   "stop")
-    # NODE app: $0 pm2 stop megauni.pm2.json5 "$@"
-
     # === Without a newline at the end of the file,
     # === last line of the file is not used in while/read:
     # === http://stackoverflow.com/questions/25318028/while-read-loop-ignoring-last-line-in-file
@@ -266,14 +244,12 @@ case "$action" in
     ;;
 
   "restart")
-    if [[ -n "$dev" && -z "$USE_SERVER" ]]; then
-      exit 0
-    fi
-    $0 pm2 restart megauni.pm2.json5 "$@"
+    echo "Not done" 1>&2
+    exit 1
     ;;
 
   "status")
-    $0 pm2 status megauni.pm2.json5 "$@"
+    pgrep -f "elixir.+megauni\.run(\s|$)" || (echo "=== No process found" 1>&2)
     ;;
 
   "start")
@@ -287,10 +263,9 @@ case "$action" in
 
     if [[ -n "$dev" ]]; then
       export PORT=4000
-      WWW_NAME="megauni" elixir --no-halt $args -S mix run # megauni dev
-    else
-      WWW_NAME="megauni" elixir --no-halt $args -S mix do compile, run
     fi
+
+    elixir --no-halt $args -S mix do compile, megauni.run
 
     ;;
 
