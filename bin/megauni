@@ -249,7 +249,7 @@ case "$action" in
     ;;
 
   "status")
-    pgrep -f "elixir.+megauni\.run(\s|$)" || (echo "=== No process found" 1>&2)
+    pgrep -f "elixir.+megauni\.run(\s|$|,)" || (echo "=== No process found" 1>&2)
     ;;
 
   "start")
