@@ -36,7 +36,7 @@ defmodule Card.Spec_Funcs do
         env = JSON_Applet.put(env, :card, map)
     end
 
-    {stack ++ [result], prog, env}
+    {stack ++ [result |> JSON_Applet.to_json_to_elixir], prog, env}
   end
 
 end # === defmodule Card.Spec_Funcs

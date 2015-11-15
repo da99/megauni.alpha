@@ -1,11 +1,12 @@
 
 defmodule JSON_Applet.Funcs do
 
-  def repeat(stack, prog, env) do
-    {[num | list], prog, env} = JSON_Applet.take(prog, 1, env)
-    {env, new_stack} = Enum.reduce 0..num, {env, []}, fn(_i, {env, _stack}) ->
-      {stack, _empty, env} = JSON_Applet.run([], list, env)
-      {stack ++ [List.last(stack)], [], env}
+  def repeat(stack, [ [raw_num | sub_prog] | prog], env) do
+    {[[num]], _empty, env} = JSON_Applet.run([], ["data", [raw_num]], env)
+
+    {new_stack, env} = Enum.reduce 1..num, {[], env}, fn(_i, {sub_stack, env}) ->
+      {results, _empty, env} = JSON_Applet.run([], sub_prog, env)
+      {sub_stack ++ [List.last(results)], env}
     end
 
     {stack ++ new_stack, prog, env}
@@ -20,8 +21,9 @@ defmodule JSON_Applet.Funcs do
     {stack ++ [arr], prog, env}
   end
 
-  def length(stack, prog, env) do
-    {stack ++ [stack |> List.last |> Enum.count], prog, env}
+  def length(stack, [[]|prog], env) do
+    num = stack |> List.last |> Enum.count
+    {stack ++ [ num ], prog, env}
   end
 
   def pluck(stack, prog, env) do

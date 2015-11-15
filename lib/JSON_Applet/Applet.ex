@@ -233,6 +233,13 @@ defmodule JSON_Applet do
     val
   end # def
 
+  def get(name, env, default) do
+    case get_with_ok(name, env) do
+      {:ok, val} -> val
+      {:not_found, nil} -> default
+    end
+  end # def
+
   def get_by_count stack, [name, [] | prog], env do
     num = JSON_Applet.get(:"#{name}_counter", env) || 0
     get_by_count(stack, [name, [num] | prog], env)

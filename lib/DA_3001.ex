@@ -59,6 +59,10 @@ defmodule DA_3001 do
     first
   end
 
+  def first({first, second, third}) when is_tuple({first, second, third}) do
+    first
+  end
+
   def ok_second({:ok, second}) do
     second
   end

@@ -5,6 +5,10 @@ defmodule JSON_Applet.Spec do
   import JSON_Applet, only: :functions
   import DA_3001, only: [color: 1, puts: 1]
 
+  def inc_spec_count env do
+    Map.put env, :spec_count, get(:spec_count, env) + 1
+  end
+
   def similar_to!(actual, expected, msg) when is_map(actual) and is_map(expected) do
     key = Enum.find Map.keys(expected), fn(k) ->
       cond do

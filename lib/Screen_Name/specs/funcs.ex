@@ -1,6 +1,10 @@
 
 defmodule Screen_Name.Spec_Funcs do
 
+  def sn stack, prog, env do
+    JSON_Applet.get_by_count(stack, [:sn | prog], env)
+  end
+
   def rand_screen_name do
     {_mega, sec, micro} = :erlang.timestamp
     "SN_#{sec}_#{micro}"
@@ -13,13 +17,13 @@ defmodule Screen_Name.Spec_Funcs do
     {stack ++ [sn], prog, env}
   end
 
-  def read_homepage(stack, prog, env) do
+  def read_homepage(stack, [[]|prog], env) do
     cards = Screen_Name.read_homepage_cards(
-      env["user"]["id"],
-      env["sn"]["screen_name"]
+      JSON_Applet.get!(:user, env)["id"],
+      JSON_Applet.get!(:sn, env)["screen_name"]
     )
-    JSON_Applet.put(env, "cards", cards);
-    {stack ++ [cards], prog, env}
+
+    {stack ++ [cards], prog, JSON_Applet.put(env, :cards, cards)}
   end
 
   def read_news_card(stack, [args | prog], env) do
@@ -53,12 +57,8 @@ defmodule Screen_Name.Spec_Funcs do
   def screen_name_create(stack, prog, env) do
     {[new_name], prog, env} = JSON_Applet.take(prog, 1, env)
 
-    user = JSON_Applet.get(:user, env)
-    user_id = if user do
-      user["id"]
-    else
-      nil
-    end
+    user_id = JSON_Applet.get(:user, env, %{"id"=>nil})
+              |> Map.get("id")
 
     result  = Screen_Name.create user_id, new_name
     case result do
@@ -88,25 +88,6 @@ defmodule Screen_Name.Spec_Funcs do
         {stack ++ [fin], prog, env}
     end
   end # === Screen_Name.read
-
-  def sn stack, [[]|prog], env do
-    i = JSON_Applet.get(:sn_counter, env) || 0
-    sn stack, [[i]|prog], env
-  end
-
-  def sn stack, prog, env do
-    [[num] | prog] = prog
-    key = String.to_atom("sn_#{num}")
-
-    map = case raw = JSON_Applet.get(key, env) do
-      {:ok, row} -> row
-      ["ok", row] -> row
-      map = %{"screen_name" => _name} -> map
-      _ -> raise("Screen name not found: #{inspect raw}")
-    end
-
-    {stack ++ [map], prog, env}
-  end
 
   def screen_name_raw!(stack, prog, env) do
     {[name], prog, env} = JSON_Applet.take(prog, 1, env)

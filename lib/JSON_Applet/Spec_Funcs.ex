@@ -18,6 +18,24 @@ defmodule JSON_Applet.Spec_Funcs do
     {stack ++ [val], prog, env}
   end
 
+  def ok_val stack, [[]|prog], env do
+    val = case List.last(stack) do
+      {:ok, val} -> val
+      ["ok", val] -> val
+    end
+    {stack ++ [val], prog, env}
+  end
+
+  def pop(stack, [raw|prog], env) when is_list(raw) do
+    {f,s,e} = result = JSON_Applet.run([], raw, env)
+
+    stack |> In.spect
+    Process.exit self, "=== stopped"
+
+    {[args], _empty, env} = result
+    {stack ++ [List.last args], prog, env}
+  end
+
   def before_all prog, env do
     { _stack, _prog, env } = JSON_Applet.run([], prog, env)
     env[:desc]
@@ -100,14 +118,13 @@ defmodule JSON_Applet.Spec_Funcs do
     {stack ++ [actual], prog, env}
   end  # === run_input
 
-  def exactly_like stack, prog, env do
+  def exactly_like stack, [new_prog|prog], env do
     actual = List.last stack
-    [new_prog | prog] = prog
     {raw_target, _empty, env} = run([], new_prog, env)
     expected = raw_target |> List.last
 
     if actual == expected do
-      {stack ++ ["the same", :spec_fulfilled], prog, env}
+      {stack, prog, JSON_Applet.Spec.inc_spec_count(env)}
     else
       IO.puts color(["\n", :bright, inspect(actual), " needs to == ", :reset, :red, :bright, inspect(expected), :reset])
       Process.exit(self, "spec failed")
@@ -118,12 +135,10 @@ defmodule JSON_Applet.Spec_Funcs do
     actual = stack |> List.last
     [output_prog | prog] = prog
 
+    spec_count = JSON_Applet.get!(:spec_count, env)
     {results, _empty, env} = run([actual], output_prog, env)
-    spec_done = results |> List.last
 
-    stack = stack ++ [spec_done]
-
-    if spec_done != :spec_fulfilled do
+    if spec_count == JSON_Applet.get!(:spec_count, env) do
       IO.puts ""
       Process.exit(self, "No spec found.")
     end
@@ -142,8 +157,7 @@ defmodule JSON_Applet.Spec_Funcs do
     expected = List.last args
     msg = "\nactual:   #{inspect actual}\nexpected: #{inspect expected}"
     JSON_Applet.Spec.similar_to!(actual, expected, msg)
-    env = Map.put env, :spec_count, get(:spec_count, env) + 1
-    {stack ++ [:spec_fulfilled], prog, env}
+    {stack, prog, JSON_Applet.Spec.inc_spec_count(env)}
   end
 
   def raw stack, prog, env do
