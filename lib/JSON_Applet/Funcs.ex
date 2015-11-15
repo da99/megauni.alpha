@@ -16,8 +16,8 @@ defmodule JSON_Applet.Funcs do
     {stack, prog, env}
   end
 
-  def array(stack, prog, env) do
-    { arr, prog, env } = JSON_Applet.take(prog, 1, env)
+  def array(stack, [raw | prog], env) when is_list(raw) do
+    { arr, _empty, env } = JSON_Applet.run([], raw, env)
     {stack ++ [arr], prog, env}
   end
 
@@ -26,11 +26,14 @@ defmodule JSON_Applet.Funcs do
     {stack ++ [ num ], prog, env}
   end
 
-  def pluck(stack, prog, env) do
-    {[key], prog, env} = JSON_Applet.take(prog, 1, env)
+  def pluck(stack, [raw | prog], env) when is_list(raw) do
+    {results, _prog, env} = JSON_Applet.run([], raw, env)
+    key = results |> List.last
+
     results = Enum.map List.last(stack), fn(x) ->
       x[key]
     end
+
     {stack ++ [results], prog, env}
   end
 

@@ -22,8 +22,9 @@ defmodule JSON_Applet do
     %{"sn"=>"my_other_name", "sn_2"=>"my_name"}
 
   """
-  def put env, name, val do
+  def put env, name, raw_val do
     name_counter = String.to_atom "#{name}_counter"
+    val = DA_3001.ok_second_if_tuple(raw_val)
 
     counter = (get(name_counter, env) || -1) + 1
     name_id = String.to_atom "#{name}_#{counter}"

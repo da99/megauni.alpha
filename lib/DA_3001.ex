@@ -67,4 +67,12 @@ defmodule DA_3001 do
     second
   end
 
+  def ok_second_if_tuple {:ok, val} do
+    val
+  end
+
+  def ok_second_if_tuple val do
+    val
+  end
+
 end # === defmodule DA_3001

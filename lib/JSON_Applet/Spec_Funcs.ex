@@ -105,7 +105,7 @@ defmodule JSON_Applet.Spec_Funcs do
 
     env = Map.put(env, :it, title)
     num = :it_count |> get(env) |> JSON_Applet.Spec.format_num
-    IO.puts color([:bright,num, ") ", :reset, get(:it, env), :reset])
+    IO.puts color([:bright, :yellow, num, ") ", :reset, get(:it, env), :reset])
 
     {stack, prog, env}
   end # === def it

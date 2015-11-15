@@ -4,13 +4,13 @@
 
   "it", ["Turns strings into array of integers."],
   "input", [
-    "query", ["SELECT name_to_type_ids('LINK | SCREEN_NAME , CARD , SCREEN_NAME') AS ids;"],
-    "pluck", ["ids"]
+    "query", ["SELECT id FROM unnest(name_to_type_ids('LINK | SCREEN_NAME , CARD , SCREEN_NAME')) t(id);"],
+    "pluck", ["id"]
   ],
-  "output" , ["array", [40, 2, 3, 2]],
+  "output" , ["===", ["array", [40, 2, 3, 2]]],
 
-  "it"     , "Has no duplicates.",
+  "it"     , ["Has no duplicates."],
   "input"  , ["type_ids[]"],
-  "output" , ["type_ids[]", "unique[]"]
+  "output" , ["===", ["type_ids[]", "unique[]"]]
 
 ]
