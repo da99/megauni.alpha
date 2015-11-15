@@ -6,6 +6,10 @@ defmodule JSON_Applet do
       |> (&(Regex.replace(~r/\s+/, &1," "))).()
   end
 
+  def stack_last_replace stack, val do
+    List.replace_at(stack, Enum.count(stack) - 1, val)
+  end
+
   @doc """
     Puts the name/val into the env.
     Also puts name_COUNTER/val into the env.
@@ -140,14 +144,29 @@ defmodule JSON_Applet do
   def run(stack, [string, arr_or_map | prog], env) when (is_binary(string) and (is_list(arr_or_map) or is_map(arr_or_map))) do
     func = get(string, env)
 
-    {stack, prog, env} = if func do
-      func.( stack, [arr_or_map | prog], env )
-    else
+    if !func do
       raise "Function not found: #{inspect string}"
-      {stack ++ [string], [ arr_or_map | prog ], env}
     end
 
-    run stack, prog, env
+    {stack, prog, env} = func.( stack, [arr_or_map | prog], env )
+
+    last = List.last stack
+
+    case last do
+      {:error, _} ->
+        raise "From: #{inspect string} Result: #{inspect last}"
+
+      {:ok, val} ->
+        run(
+          stack_last_replace(stack, last |> to_json_to_elixir),
+          prog,
+          env
+        )
+
+      _ ->
+        run stack, prog, env
+    end
+
   end
 
   def run(stack, map, env) when is_map(map) do
@@ -164,23 +183,15 @@ defmodule JSON_Applet do
   end
 
   def run(stack, [raw_string | prog], env) when is_binary(raw_string) do
-    string   = raw_string |> replace_vars(env)
-    new_prog = to_prog(string) # === e.g.: func[..].field.field.field
+    # === e.g.: func[..].field.field.field
+    string = raw_string |> replace_vars(env)
+    new_prog = string |> to_prog
 
-    {stack, prog, env} = if new_prog do
-      {new_stack, _empty, env} = run(stack, new_prog, env)
-      {stack ++ new_stack, prog, env}
+    if new_prog do
+      run(stack, new_prog ++ prog, env)
     else
-      {stack ++ [string], prog, env}
+      run(stack ++ [string], prog, env)
     end # case ==========================
-
-    last = List.last(stack)
-    case last do
-      {:error, _} ->
-        raise "From: #{inspect string} Result: #{inspect last}"
-      _ ->
-        run stack, prog, env
-    end
   end # === def run stack, prog, env
 
   def run stack, [ nil | prog ], env do

@@ -97,8 +97,8 @@ defmodule Screen_Name.Spec_Funcs do
       {:error, {:user_error, _msg}} ->
         result
 
-      {:ok, %{"screen_name"=>_sn}} ->
-        env = JSON_Applet.put(env, :sn, result)
+      {:ok, sn = %{"screen_name"=>_sn}} ->
+        env = JSON_Applet.put(env, :sn, sn)
     end
 
     {stack ++ [result |> JSON_Applet.to_json_to_elixir], prog, env}

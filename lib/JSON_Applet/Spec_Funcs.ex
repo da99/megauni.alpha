@@ -48,8 +48,8 @@ defmodule JSON_Applet.Spec_Funcs do
     {stack, prog, env}
   end # === def run_after_each
 
-  def get stack, prog, env do
-    {[name], prog, env} = JSON_Applet.take(prog, 1, env)
+  def get(stack, [ raw | prog ], env) when is_list(raw) do
+    {[[name]], prog, env} = JSON_Applet.run([], ["data", raw], env)
     val = stack |> List.last |> Map.fetch!(name)
     {stack ++ [val], prog, env}
   end
