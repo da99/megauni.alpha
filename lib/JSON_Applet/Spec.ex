@@ -134,7 +134,7 @@ defmodule JSON_Applet.Spec do
     |> IO.puts
 
     {_stack, _prog, env} = run(
-      [], (path |> File.read! |> Poison.decode!), env
+      [], (path |> File.read! |> Poison.decode! |> JSON_Applet.strings_must_be_function_calls!), env
     )
 
     if env.spec_count > 0 do

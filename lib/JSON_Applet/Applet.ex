@@ -187,6 +187,37 @@ defmodule JSON_Applet do
     run( stack ++ [nil], prog, env )
   end
 
+  def strings_must_be_function_calls!([])  do
+    []
+  end
+
+  def strings_must_be_function_calls!([num | prog]) when is_number(num) do
+    strings_must_be_function_calls! prog
+    [num | prog]
+  end
+
+  def strings_must_be_function_calls!([str, map | prog]) when is_binary(str) and is_map(map) do
+    strings_must_be_function_calls! prog
+    [str, map | prog]
+  end
+
+  def strings_must_be_function_calls!([str, arr | prog]) when is_binary(str) and is_list(arr) do
+    strings_must_be_function_calls! prog
+    [str, arr | prog]
+  end
+
+  def strings_must_be_function_calls!([str | prog]) when is_binary(str) do
+    new_prog = to_prog(str)
+    if new_prog do
+      prog =  new_prog ++ prog
+    else
+      raise "not being used as a function: #{inspect str}"
+    end
+
+    strings_must_be_function_calls! prog
+    [str | prog]
+  end
+
   def to_json_to_elixir val do
     case val do
       {:ok, val} ->
