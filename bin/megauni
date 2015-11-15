@@ -228,19 +228,13 @@ case "$action" in
     # === Without a newline at the end of the file,
     # === last line of the file is not used in while/read:
     # === http://stackoverflow.com/questions/25318028/while-read-loop-ignoring-last-line-in-file
-    echo -e "\n" >> pid.txt
 
     while read -r num; do
       if [[ -n "$num" ]]; then
-        is_erlang="$((ps -p $num -o command= || echo "") | grep erlang || :)"
-        if [[ -n "$is_erlang" ]]; then
-          echo "=== SIGTERM-ing: $num"
-          kill -SIGTERM $num
-        else
-          echo "=== Skipping: $num"
-        fi
+        echo "=== KILL-ing: $num"
+        kill $num || echo "=== kill error"
       fi
-    done <pid.txt
+    done < <(bin/megauni status)
     ;;
 
   "restart")
@@ -249,7 +243,7 @@ case "$action" in
     ;;
 
   "status")
-    pgrep -f "elixir.+megauni\.run(\s|$|,)" || (echo "=== No process found" 1>&2)
+    pgrep -f "elixir.+megauni\.server(\s|$|,)" || (echo "=== No process found" 1>&2)
     ;;
 
   "start")
@@ -265,8 +259,7 @@ case "$action" in
       export PORT=4000
     fi
 
-    elixir --no-halt $args -S mix do compile, megauni.run
-
+    elixir --no-halt $args -S mix do compile, megauni.server
     ;;
 
   "start as node app")
@@ -514,7 +507,7 @@ case "$action" in
     setup_traps
 
     echo -e "=== Watching ${BOLD_WHITE}$(basename $0)${RESET_COLOR}    (proc $$)..."
-    while read CHANGE
+    while read -r CHANGE
     do
       dir=$(echo "$CHANGE" | cut -d' ' -f 1)
       op=$(echo "$CHANGE" | cut -d' ' -f 2)

@@ -12,9 +12,6 @@ else
   config :logger, level: :warn
 end
 
-config :megauni, Megauni,
-  pid_file: "pid.txt"
-
 config :megauni, Megauni.Repos.Main,
   adapter: Ecto.Adapters.Postgres,
   database: System.get_env("DB_NAME"),
