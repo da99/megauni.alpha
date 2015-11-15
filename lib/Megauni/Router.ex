@@ -70,7 +70,7 @@ defmodule Megauni.Router do
 
   use Plug.Router
 
-  if Mix.env == :dev do
+  if System.get_env("IS_DEV") do
     use Plug.Debugger
     plug Log.Debug
     plug Megauni.File.Static, at: "/", from: "/apps/megauni.html/Public"

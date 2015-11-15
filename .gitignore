@@ -38,6 +38,7 @@ secret*
 
 
 # Ignore these files too.
+/pid.txt
 /tmp/
 /log/
 

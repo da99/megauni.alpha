@@ -18,7 +18,7 @@ if [[ -n "$IS_DEV" ]]; then
 fi
 
 export MODEL="$MODEL"
-export USE_SERVER="${USE_SERVER:-yes}"
+export USE_SERVER="$USE_SERVER"
 export MOCHA="${MOCHA}"
 export SPECS="$SPECS"
 export RUN_FAST="${RUN_FAST}"
@@ -56,7 +56,7 @@ while [[ -n "$@" ]] ; do
       export USE_SERVER=""
       ;;
 
-    use_server)
+    server)
       shift
       export USE_SERVER="yes"
       ;;
@@ -207,7 +207,7 @@ case "$action" in
     # === $ bin/megauni iojs
     # === $ bin/megauni iojs  ....
 
-    iojs --es_staging "$@"
+    node --es_staging "$@"
     ;;
 
   "shotgun")
@@ -245,7 +245,24 @@ case "$action" in
     ;;
 
   "stop")
-    $0 pm2 stop megauni.pm2.json5 "$@"
+    # NODE app: $0 pm2 stop megauni.pm2.json5 "$@"
+
+    # === Without a newline at the end of the file,
+    # === last line of the file is not used in while/read:
+    # === http://stackoverflow.com/questions/25318028/while-read-loop-ignoring-last-line-in-file
+    echo -e "\n" >> pid.txt
+
+    while read -r num; do
+      if [[ -n "$num" ]]; then
+        is_erlang="$((ps -p $num -o command= || echo "") | grep erlang || :)"
+        if [[ -n "$is_erlang" ]]; then
+          echo "=== SIGTERM-ing: $num"
+          kill -SIGTERM $num
+        else
+          echo "=== Skipping: $num"
+        fi
+      fi
+    done <pid.txt
     ;;
 
   "restart")
@@ -260,6 +277,24 @@ case "$action" in
     ;;
 
   "start")
+    export IS_RUNNING_WWW_SERVER="true"
+    export MIX_ENV="prod"
+
+    args=""
+    if [[ "$@" == *daemon* ]]; then
+      args="--detached"
+    fi
+
+    if [[ -n "$dev" ]]; then
+      export PORT=4000
+      WWW_NAME="megauni" elixir --no-halt $args -S mix run # megauni dev
+    else
+      WWW_NAME="megauni" elixir --no-halt $args -S mix do compile, run
+    fi
+
+    ;;
+
+  "start as node app")
     if [[ -n "$dev" && -z "$USE_SERVER" ]]; then
       echo "=== Not starting server."
       exit 0
@@ -516,7 +551,6 @@ case "$action" in
 
       if [[ ! -z "$file" ]]; then
 
-
         if [[ "$path" == *bin/megauni* ]]; then
           break
         fi
@@ -546,6 +580,7 @@ case "$action" in
 
       echo ""
     done < <(inotifywait --quiet --monitor --event close_write -r lib/ -r spec/ $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' '))
+
     echo ""
     echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 $action"
     exec $0 $action $@
@@ -555,7 +590,6 @@ case "$action" in
     # === watch
 
     # === temporary convenience
-    export USE_SERVER=""
     export RUN_FAST="yes"
 
     eval "$(bash_setup setup_traps)"
@@ -574,7 +608,7 @@ case "$action" in
 
     if [[ -n "$USE_SERVER" ]]; then
       ( bin/megauni __watch ) &
-      bin/megauni start --no-daemon
+      bin/megauni start
     else
       bin/megauni __watch "$@"
     fi

@@ -2,6 +2,8 @@ defmodule Megauni do
   use Application
 
   def start(_type, _args) do
+    DA_3001.write_pid! Application.get_env(:megauni, Megauni)[:pid_file]
+
     import Supervisor.Spec, warn: false
 
     Supervisor.start_link([

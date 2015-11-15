@@ -11,6 +11,16 @@ defmodule DA_3001 do
     list |> color |> IO.puts
   end
 
+  def write_pid! path do
+    File.touch! path
+    pid = to_string :os.getpid
+    content = Enum.join([File.read!(path), pid], "\n")
+              |> String.strip
+    File.write! path, content
+
+    String.to_integer pid
+  end
+
   def color(list) when is_list(list) do
     Enum.map(list, fn(string_or_atom) ->
       case string_or_atom do

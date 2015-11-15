@@ -2,7 +2,18 @@
 use Mix.Config
 
 config :logger, :console, format: "$time $metadata$message\n"
-config :logger, level: :warn
+
+is_dev = System.get_env("IS_DEV")
+is_www_server = System.get_env("IS_RUNNING_WWW_SERVER")
+
+if is_dev && is_www_server do
+  config :logger, level: :info
+else
+  config :logger, level: :warn
+end
+
+config :megauni, Megauni,
+  pid_file: "pid.txt"
 
 config :megauni, Megauni.Repos.Main,
   adapter: Ecto.Adapters.Postgres,
@@ -11,8 +22,7 @@ config :megauni, Megauni.Repos.Main,
   password: System.get_env("DB_PASSWORD"),
   hostname: "localhost"
 
-if System.get_env("IS_DEV") do
-  # config :logger, level: :warn
+if is_dev do
   config :comeonin, :bcrypt_log_rounds, 4
 else
   config :comeonin, :bcrypt_log_rounds, 13
