@@ -1,6 +1,9 @@
 
 use Mix.Config
 
+config :megauni, :main,
+  port: (System.get_env("PORT") || 4000)
+
 config :logger, :console, format: "$time $metadata$message\n"
 
 is_dev = System.get_env("IS_DEV")

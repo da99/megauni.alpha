@@ -255,10 +255,7 @@ case "$action" in
       args="--detached"
     fi
 
-    if [[ -n "$dev" ]]; then
-      export PORT=4000
-    fi
-
+    echo "=== Starting server..." 1>&2
     elixir --no-halt $args -S mix do compile, megauni.server
     ;;
 
@@ -452,8 +449,11 @@ case "$action" in
 
 
   "test")
+    file="/tmp/specs.are.running"
     # === Run all the specs of the projects.
-    mix run spec/Spec.ex $@
+    touch $file
+    PORT=4001 mix run spec/Spec.ex $@
+    rm "$file" || :
     ;;
 
   "json")
@@ -574,12 +574,24 @@ case "$action" in
       $0 jshint
     fi
 
-    if [[ -n "$USE_SERVER" ]]; then
-      ( bin/megauni __watch ) &
-      bin/megauni start
-    else
+    if [[ -z "$USE_SERVER" ]]; then
+      echo "=== Skipping server."
       bin/megauni __watch "$@"
-    fi
+
+    else
+      ( bin/megauni __watch ) &
+      sleep 1
+      exit_code=-1
+      while [[ "$exit_code" != "0" ]]
+      do
+        if [[ -f "/tmp/specs.are.running" ]]; then
+          sleep 0.5
+        else
+          bin/megauni start || exit_code=$?
+        fi
+      done
+      echo "=== Done looping server."
+    fi # === if -z $USE_SERVER
 
     ;;
 
