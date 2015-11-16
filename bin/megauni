@@ -3,6 +3,7 @@
 #
 #
 dev="$IS_DEV"
+IS_DEV="$IS_DEV"
 action="$1"
 shift
 
@@ -25,64 +26,64 @@ export RUN_FAST="${RUN_FAST}"
 
 set -u -e -o pipefail
 
-while [[ -n "$@" ]] ; do
-  current_loop="$@"
-  case $1 in
-    --mocha)
-      shift
-      mocha=""
-      while [[ -n "$@"  ]]; do
-        if [[ "$1" == '--' ]]; then
-          shift
-          break;
-        fi
-        if [[ "$1" == *\ * ]]; then
-          mocha="$mocha \"$1\""
-        else
-          mocha="$mocha $1"
-        fi
-        shift
-      done
-      export MOCHA="$mocha"
-      ;;
+# while [[ false && -n "$@" ]] ; do
+  # current_loop="$@"
+  # case $1 in
+    # --mocha)
+      # shift
+      # mocha=""
+      # while [[ -n "$@"  ]]; do
+        # if [[ "$1" == '--' ]]; then
+          # shift
+          # break;
+        # fi
+        # if [[ "$1" == *\ * ]]; then
+          # mocha="$mocha \"$1\""
+        # else
+          # mocha="$mocha $1"
+        # fi
+        # shift
+      # done
+      # export MOCHA="$mocha"
+      # ;;
 
-    fast)
-      shift
-      export RUN_FAST="yes"
-      ;;
+    # fast)
+      # shift
+      # export RUN_FAST="yes"
+      # ;;
 
-    no_server)
-      shift
-      export USE_SERVER=""
-      ;;
+    # no_server)
+      # shift
+      # export USE_SERVER=""
+      # ;;
 
-    server)
-      shift
-      export USE_SERVER="yes"
-      ;;
+    # server)
+      # shift
+      # export USE_SERVER="yes"
+      # ;;
 
-    *)
-      if [[ -d Server/$1 ]]; then
-        export MODEL="$1"
-        shift
-      fi
-      if [[ -n "$MODEL" && -n "$@" ]]; then
-        specs=(Server/$MODEL/specs/*-$1.js)
-        if [[ ! -f "${specs[0]}" ]]; then
-          specs=()
-        else
-          shift
-          export SPECS="${specs[@]}"
-        fi
-      fi
+    # *)
+      # if [[ -d Server/$1 ]]; then
+        # export MODEL="$1"
+        # shift
+      # fi
+      # if [[ -n "$MODEL" && -n "$@" ]]; then
+        # specs=(Server/$MODEL/specs/*-$1.js)
+        # if [[ ! -f "${specs[0]}" ]]; then
+          # specs=()
+        # else
+          # shift
+          # export SPECS="${specs[@]}"
+        # fi
+      # fi
 
-      ;;
-  esac
+      # ;;
+  # esac
 
-  if [[ "$@" == "$current_loop" ]]; then
-    break;
-  fi
-done # === while
+  # if [[ "$@" == "$current_loop" ]]; then
+    # break;
+  # fi
+# done # === while
 
 js_files="$(echo -e lib/*/specs/*.json Server/Megauni/*.js Server/Card/*.js Server/Root/*.js)"
 
@@ -119,7 +120,6 @@ case "$action" in
 
   help|--help)
     echo ""
-    echo "  $  start"
     echo "  $  stop"
     echo "  $  restart"
     echo "  $  watch"
@@ -202,6 +202,76 @@ case "$action" in
     fi
     ;;
 
+  "start")
+    # === bin/megauni start
+    # === bin/megauni start daemon
+    # === bin/megauni start dev!
+
+    if [[ "$@" == *watch* ]]; then
+      while read -r CHANGE
+      do
+        dir=$(echo "$CHANGE" | cut -d' ' -f 1)
+        op=$(echo "$CHANGE" | cut -d' ' -f 2)
+        file=$(echo "$CHANGE" | cut -d' ' -f 3)
+        path="${dir}$file"
+        file=$(basename $path)
+        echo -e "=== $CHANGE ($path)"
+        bin/megauni stop || :
+      done < <(inotifywait --quiet --monitor --event close_write -r lib/ ./*.ex* )
+
+    else
+
+      if [[ "$@" == "dev!" ]]; then
+        ( bin/megauni start watch ) &
+        exit_code="-1"
+        while [[ "$exit_code" != "0" ]]
+        do
+          bin/megauni start  && exit_code="0" || exit_code=$?
+          sleep 0
+        done
+      else
+        if [[ "$@" == *daemon* || -z "$IS_DEV" ]]; then
+          is_daemon="--detached"
+        else
+          is_daemon=""
+        fi
+
+        export IS_RUNNING_WWW_SERVER="true"
+        export MIX_ENV="prod"
+        echo "=== Starting server..." 1>&2
+        elixir --no-halt $is_daemon -S mix do compile, megauni.server
+      fi
+    fi
+
+    ;;
+
+  "stop")
+    pids="$(bin/megauni status)"
+    if [[ -z "$pids" ]]; then
+      echo "=== No server procs found." 1>&2
+    fi
+
+    while read -r num; do
+      if [[ -n "$num" ]]; then
+        echo "=== KILL-ing: $num"
+        kill $num || echo "=== kill error"
+      fi
+    done < <(bin/megauni status)
+    ;;
+
+  "restart")
+    bin/megauni stop
+    bin/megauni start
+    ;;
+
+  "status")
+    # === bin/megauni status
+    # === Prints a list of server OS process.
+    # === Prints to STDERR if no proces found.
+    # === Always exits w/ 0
+    pgrep -f "elixir.+megauni\.server(\s|$|,)" || (echo "=== No process found" 1>&2)
+    ;;
+
 
   "iojs")
     # === $ bin/megauni iojs
@@ -224,40 +294,6 @@ case "$action" in
     echo "Created: $file"
     ;;
 
-  "stop")
-    # === Without a newline at the end of the file,
-    # === last line of the file is not used in while/read:
-    # === http://stackoverflow.com/questions/25318028/while-read-loop-ignoring-last-line-in-file
-
-    while read -r num; do
-      if [[ -n "$num" ]]; then
-        echo "=== KILL-ing: $num"
-        kill $num || echo "=== kill error"
-      fi
-    done < <(bin/megauni status)
-    ;;
-
-  "restart")
-    echo "Not done" 1>&2
-    exit 1
-    ;;
-
-  "status")
-    pgrep -f "elixir.+megauni\.server(\s|$|,)" || (echo "=== No process found" 1>&2)
-    ;;
-
-  "start")
-    export IS_RUNNING_WWW_SERVER="true"
-    export MIX_ENV="prod"
-
-    args=""
-    if [[ "$@" == *daemon* ]]; then
-      args="--detached"
-    fi
-
-    echo "=== Starting server..." 1>&2
-    elixir --no-halt $args -S mix do compile, megauni.server
-    ;;
 
   "start as node app")
     if [[ -n "$dev" && -z "$USE_SERVER" ]]; then
