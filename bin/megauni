@@ -26,66 +26,6 @@ export RUN_FAST="${RUN_FAST}"
 
 set -u -e -o pipefail
 
-# while [[ false && -n "$@" ]] ; do
-  # current_loop="$@"
-  # case $1 in
-    # --mocha)
-      # shift
-      # mocha=""
-      # while [[ -n "$@"  ]]; do
-        # if [[ "$1" == '--' ]]; then
-          # shift
-          # break;
-        # fi
-        # if [[ "$1" == *\ * ]]; then
-          # mocha="$mocha \"$1\""
-        # else
-          # mocha="$mocha $1"
-        # fi
-        # shift
-      # done
-      # export MOCHA="$mocha"
-      # ;;
-
-    # fast)
-      # shift
-      # export RUN_FAST="yes"
-      # ;;
-
-    # no_server)
-      # shift
-      # export USE_SERVER=""
-      # ;;
-
-    # server)
-      # shift
-      # export USE_SERVER="yes"
-      # ;;
-
-    # *)
-      # if [[ -d Server/$1 ]]; then
-        # export MODEL="$1"
-        # shift
-      # fi
-      # if [[ -n "$MODEL" && -n "$@" ]]; then
-        # specs=(Server/$MODEL/specs/*-$1.js)
-        # if [[ ! -f "${specs[0]}" ]]; then
-          # specs=()
-        # else
-          # shift
-          # export SPECS="${specs[@]}"
-        # fi
-      # fi
-
-      # ;;
-  # esac
-
-  # if [[ "$@" == "$current_loop" ]]; then
-    # break;
-  # fi
-# done # === while
-
-js_files="$(echo -e lib/*/specs/*.json Server/Megauni/*.js Server/Card/*.js Server/Root/*.js)"
 
 # ==============================================================
 GREEN=$(tput setaf 2)
@@ -511,6 +451,7 @@ case "$action" in
       exit 0
     fi
 
+    js_files="$(echo -e lib/*/specs/*.json)"
     IFS=$' '
     for file in $js_files
     do
