@@ -174,8 +174,9 @@ case "$action" in
     exit_code="-1"
     while [[ "$exit_code" != "0" ]]
     do
+      echo ""
       echo "=== Starting server..." 1>&2
-      elixir --no-halt -S mix megauni.server && exit_code="0" || exit_code=$?
+      elixir --no-halt -S mix do compile, megauni.server && exit_code="0" || exit_code=$?
       sleep 0
     done
     exit 0

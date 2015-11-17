@@ -15,6 +15,23 @@ defmodule DA_3001 do
     end
   end
 
+  @doc """
+    Applies the :func_name to the first module in :mod_list
+    that has a function named == :func_name.
+    Raises an error if function is not found.
+  """
+  def apply_on_first!(mod_list, func_name, args) when is_list(mod_list) and is_atom(func_name) and is_list(args) do
+    target = Enum.find(mod_list, fn(x) ->
+      !is_nil( x.__info__(:functions)[func_name] )
+    end)
+
+    if is_nil(target) do
+      raise "Function not found: #{inspect func_name}, in #{inspect mod_list}"
+    end
+
+    apply( target, func_name, args )
+  end
+
   def puts(list) when is_list(list) do
     list |> color |> IO.puts
   end

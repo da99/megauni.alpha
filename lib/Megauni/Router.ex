@@ -68,30 +68,42 @@
 
 defmodule Megauni.Router do
 
-  use Plug.Router
+  use Plug.Builder
 
-  if System.get_env("IS_DEV") do
+  if Megauni.dev? do
     use Plug.Debugger
     plug Log.Debug
-    plug Megauni.File.Static, at: "/", from: "/apps/megauni.html/Public"
   end
 
-  plug :match
-  plug :dispatch
+  plug Megauni.Router.API
 
-  # get "/" do
-    # conn
-    # |> put_resp_content_type("text/plain")
-    # |> send_resp(200, "Hello world")
-  # end
+  if Megauni.dev? do
+    plug Megauni.Router.Static
+  end
 
-  match _ do
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(404, "Not found")
+  plug Megauni.Router.Browser
+
+
+  def fulfilled? conn do
+    Map.get(conn, :state) == :sent || !is_nil(Map.get conn, :status)
+  end
+
+  def no_404? conn do
+    Map.get(conn, :status) != Plug.Conn.Status.code(404)
+  end
+
+  def serve_file? _conn do
+    Megauni.dev?
+  end
+
+  def api_request? conn do
+    Megauni.Router.API.api_request? conn
+  end
+
+  def browser_request? conn do
+    !api_request?(conn)
   end
 
 end # === Megauni
-
 
 
