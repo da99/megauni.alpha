@@ -178,7 +178,7 @@ case "$action" in
 
         export IS_RUNNING_WWW_SERVER="true"
         export MIX_ENV="prod"
-        echo "=== Starting server..." 1>&2
+        echo "=== Starting server on PORT: $PORT" 1>&2
         elixir --no-halt $is_daemon -S mix do compile, megauni.server
       fi
     fi

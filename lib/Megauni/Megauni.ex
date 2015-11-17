@@ -14,12 +14,9 @@ defmodule Megauni do
   end
 
   def run_http_adapter do
-    {:ok, _} = Plug.Adapters.Cowboy.http Megauni.Router, [], port: port
-  end
-
-  def port do
-    Application.get_env(:megauni, :main)[:port]
-    |> String.to_integer
+    {:ok, _} = Plug.Adapters.Cowboy.http(
+      Megauni.Router, [], port: Application.get_env(:megauni, :port)
+    )
   end
 
 end # === defmodule Megauni

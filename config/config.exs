@@ -1,18 +1,15 @@
 
 use Mix.Config
 
-config :megauni, :main,
-  port: (System.get_env("PORT") || 4000)
-
-config :logger, :console, format: "$time $metadata$message\n"
+config :megauni, :port, (System.get_env("PORT") |> String.to_integer)
 
 is_dev = System.get_env("IS_DEV")
 is_www_server = System.get_env("IS_RUNNING_WWW_SERVER")
 
 if is_dev && is_www_server do
-  config :logger, level: :info
+  config :logger, :console, level: :debug, format: "[$level] $message\n"
 else
-  config :logger, level: :warn
+  config :logger, :console, level: :warn,  format: "$time [$level] $metadata$message\n"
 end
 
 config :megauni, Megauni.Repos.Main,
