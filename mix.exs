@@ -34,8 +34,7 @@ defmodule Megauni.Mixfile do
       {:poison   , "~> 1.5.0"},
       {:ecto     , "~> 1.0"},
       {:comeonin , "> 1.1.0"},
-      {:timex    , "~> 0.19.5"},
-      {:phoenix  , "~> 1.0.3"}
+      {:timex    , "~> 0.19.5"}
     ]
   end
 

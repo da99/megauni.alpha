@@ -143,9 +143,8 @@ case "$action" in
     ;;
 
   "start")
-    # === bin/megauni start
+    # === bin/megauni start  # To be used on dev machines only.
     # === bin/megauni start daemon
-    # === bin/megauni start dev!
 
     if [[ "$@" == *watch* ]]; then
       while read -r CHANGE
@@ -158,30 +157,28 @@ case "$action" in
         echo -e "=== $CHANGE ($path)"
         bin/megauni stop || :
       done < <(inotifywait --quiet --monitor --event close_write -r lib/ ./*.ex* )
-
-    else
-
-      if [[ "$@" == "dev!" ]]; then
-        ( bin/megauni start watch ) &
-        exit_code="-1"
-        while [[ "$exit_code" != "0" ]]
-        do
-          bin/megauni start  && exit_code="0" || exit_code=$?
-          sleep 0
-        done
-      else
-        if [[ "$@" == *daemon* || -z "$IS_DEV" ]]; then
-          is_daemon="--detached"
-        else
-          is_daemon=""
-        fi
-
-        export IS_RUNNING_WWW_SERVER="true"
-        export MIX_ENV="prod"
-        echo "=== Starting server..." 1>&2
-        elixir --no-halt $is_daemon -S mix do compile, megauni.server
-      fi
+      exit 0
     fi
+
+
+    export IS_RUNNING_WWW_SERVER="true"
+    export MIX_ENV="prod"
+
+    # === if on a non-dev machine:
+    if ! bash_setup dev!; then
+      elixir --no-halt --detached -S mix do compile, megauni.server
+      exit 0
+    fi
+
+    ( bin/megauni start watch ) &
+    exit_code="-1"
+    while [[ "$exit_code" != "0" ]]
+    do
+      echo "=== Starting server..." 1>&2
+      elixir --no-halt -S mix megauni.server && exit_code="0" || exit_code=$?
+      sleep 0
+    done
+    exit 0
 
     ;;
 
