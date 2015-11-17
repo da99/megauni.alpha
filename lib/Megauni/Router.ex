@@ -73,16 +73,13 @@ defmodule Megauni.Router do
   if Megauni.dev? do
     use Plug.Debugger
     plug Log.Debug
-  end
-
-  plug Megauni.Router.API
-
-  if Megauni.dev? do
     plug Megauni.Router.Static
   end
 
+  plug Megauni.Router.API
   plug Megauni.Router.Browser
 
+  # === Helpers/Miscell.: ==========================================
 
   def fulfilled? conn do
     Map.get(conn, :state) == :sent || !is_nil(Map.get conn, :status)
