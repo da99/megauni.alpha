@@ -1,7 +1,7 @@
 
 use Mix.Config
 
-config :megauni, :port, (System.get_env("PORT") |> String.to_integer)
+config :megauni, :port, ((System.get_env("PORT") || "4567") |> String.to_integer)
 
 is_dev = System.get_env("IS_DEV")
 is_www_server = System.get_env("IS_RUNNING_WWW_SERVER")

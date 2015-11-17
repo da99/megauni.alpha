@@ -1,3 +1,4 @@
+
 defmodule Megauni do
   use Application
 
@@ -14,21 +15,24 @@ defmodule Megauni do
   end
 
   def run_http_adapter do
-    {:ok, _} = Plug.Adapters.Cowboy.http(
-      Megauni.Router, [], port: Application.get_env(:megauni, :port)
+    require Logger
+
+    port = Application.get_env(:megauni, :port)
+
+    server = Plug.Adapters.Cowboy.http(
+      Megauni.Router, [], port: port
     )
+
+    case server do
+      {:ok, _} ->
+        Logger.debug("=== Server is ready on port: #{port}")
+      {:error, err} ->
+        Logger.error("=== Error in starting server:")
+        Logger.error(inspect err)
+    end
+
+    server
   end
 
 end # === defmodule Megauni
 
-
-defmodule Mix.Tasks.Megauni do
-
-  defmodule Server do
-    use Mix.Task
-    def run(args) do
-      Mix.Task.run "run", args
-    end # === def run(_)
-  end # === defmodule Run
-
-end # === defmodule Mix.Tasks.Megauni
