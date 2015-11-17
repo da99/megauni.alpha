@@ -29,8 +29,8 @@ defmodule Megauni.Mixfile do
     [
       {:cowboy   , "~> 1.0.0"},
       {:plug     , "~> 1.0.0"},
-      {:poison   , "~> 1.5.0"},
       {:postgrex , ">= 0.9.0"},
+      {:poison   , "~> 1.5.0"},
       {:ecto     , "~> 1.0"},
       {:comeonin , "> 1.1.0"},
       {:timex    , "~> 0.19.5"}

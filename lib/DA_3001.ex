@@ -7,6 +7,14 @@ defmodule DA_3001 do
   @yellow  "#{@bright}#{IO.ANSI.yellow}"
   @red     "#{@bright}#{IO.ANSI.red}"
 
+  def get! name do
+    val = System.get_env(name)
+    case val do
+      nil -> raise "System env variable not set: #{inspect name}"
+      _ -> val
+    end
+  end
+
   def puts(list) when is_list(list) do
     list |> color |> IO.puts
   end
