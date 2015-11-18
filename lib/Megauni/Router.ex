@@ -108,6 +108,38 @@ defmodule Megauni.Router do
     !api_request?(conn)
   end
 
+  def to_accepts conn do
+    Map.get(conn, :req_headers)["accept"]
+    |> String.split(";")
+    |> List.first
+    |> String.split(",")
+    |> Enum.map(&(Plug.Conn.Utils.content_type &1))
+    |> Enum.map(fn(x) ->
+      case x do
+        {:ok, _ignore, raw, _map} -> raw
+        _ -> ""
+      end
+    end)
+  end # === defp
+
+  def find_accept conn, list do
+    accepts = Map.get(conn, :req_headers)["accept"]
+              |> String.split(";")
+              |> List.first
+              |> String.split(",")
+              |> Enum.map(&(Plug.Conn.Utils.content_type &1))
+
+    Enum.map list, fn(target) ->
+      Enum.find(accepts, fn(x) ->
+        case x do
+          {:ok, _ignore, raw, _map} ->
+            (is_binary(target) && target == raw) || raw =~ target
+          _ -> false
+        end
+      end)
+    end
+  end # === defp
+
 end # === Megauni
 
 

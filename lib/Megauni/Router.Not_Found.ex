@@ -7,20 +7,20 @@ defmodule Megauni.Router.Not_Found do
   end
 
   def call conn, html_404 do
-    [is_html, is_json] = find_accept(conn, [~r/html/, ~r/json/])
+    accepts = Megauni.Router.to_accepts(conn)
 
     cond do
-      is_html ->
+      "html" in accepts ->
         conn
         |> Plug.Conn.put_resp_content_type("text/html")
         |> Plug.Conn.send_resp(404, html_404)
 
-      is_json ->
+      "json" in accepts ->
         conn
-        |> Plug.Conn.put_resp_content_type("application/x-json")
+        |> Plug.Conn.put_resp_content_type("application/json")
         |> Plug.Conn.send_resp(404, Poison.encode! %{"resp" => ["error", "Not found"]})
 
-      true    ->
+      true ->
         conn
         |> Plug.Conn.put_resp_content_type("text/plain")
         |> Plug.Conn.send_resp(404, "Not found!")
@@ -28,22 +28,5 @@ defmodule Megauni.Router.Not_Found do
 
   end
 
-  defp find_accept conn, list do
-    accepts = Map.get(conn, :req_headers)["accept"]
-              |> String.split(";")
-              |> List.first
-              |> String.split(",")
-              |> Enum.map(&(Plug.Conn.Utils.content_type &1))
-
-    Enum.map list, fn(target) ->
-      Enum.find(accepts, fn(x) ->
-        case x do
-          {:ok, _ignore, raw, _map} ->
-            (is_binary(target) && target == raw) || raw =~ target
-          _ -> false
-        end
-      end)
-    end
-  end
 
 end # === defmodule Megauni.Router.Not_Found
