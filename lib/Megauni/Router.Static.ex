@@ -2,22 +2,16 @@
 defmodule Megauni.Router.Static do
   require Logger
 
-  @static Path.expand("../megauni.html/Public")
-
-  def init [] do
-    init at: "/", from: @static
-  end
-
   def init opts do
     Plug.Static.init opts
   end
 
-  def call conn, opts do
+  def call conn,  opts = {at, from, gzip, qs_cache, et_cache, only, headers} do
     path_info = Map.get(conn,:path_info)
 
     file_path = path_info
                 |> Enum.join("/")
-                |> Path.expand(@static)
+                |> Path.expand(from)
 
     if !file?(file_path) do
       file_path = Path.join(file_path, "index.html")

@@ -68,18 +68,25 @@
 
 defmodule Megauni.Router do
 
+  @static Path.expand("../megauni.html/Public")
   use Plug.Builder
 
   if Megauni.dev? do
     use Plug.Debugger
     plug Log.Debug
-    plug Megauni.Router.Static
+    plug Megauni.Router.Static, at: "/", from: @static
   end
 
   plug Megauni.Router.API
   plug Megauni.Router.Browser
 
+  plug Megauni.Router.Not_Found, from: @static
+
   # === Helpers/Miscell.: ==========================================
+
+  def static_path do
+    @static
+  end
 
   def fulfilled? conn do
     Map.get(conn, :state) == :sent || !is_nil(Map.get conn, :status)

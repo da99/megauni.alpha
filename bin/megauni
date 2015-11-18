@@ -164,19 +164,21 @@ case "$action" in
     export IS_RUNNING_WWW_SERVER="true"
     export MIX_ENV="prod"
 
-    # === if on a non-dev machine:
+    elixir="elixir --no-halt"
+    cmd="-S mix do compile, megauni.server"
     if ! bash_setup dev!; then
-      elixir --no-halt --detached -S mix do compile, megauni.server
+      $elixir --detached $cmd
       exit 0
     fi
 
+    # === if on a non-dev machine:
     ( bin/megauni start watch ) &
     exit_code="-1"
     while [[ "$exit_code" != "0" ]]
     do
       echo ""
       echo "=== Starting server..." 1>&2
-      elixir --no-halt -S mix do compile, megauni.server && exit_code="0" || exit_code=$?
+      $elixir $cmd && exit_code="0" || exit_code=$?
       sleep 0
     done
     exit 0
