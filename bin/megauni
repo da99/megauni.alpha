@@ -155,7 +155,9 @@ case "$action" in
         path="${dir}$file"
         file=$(basename $path)
         echo -e "=== $CHANGE ($path)"
-        bin/megauni stop || :
+        if [[ ! -f /tmp/compile.megauni ]]; then
+          bin/megauni stop || :
+        fi
       done < <(inotifywait --quiet --monitor --event close_write -r lib/ ./*.ex* )
       exit 0
     fi
@@ -166,12 +168,18 @@ case "$action" in
 
     elixir="elixir --no-halt"
     cmd="-S mix do compile, megauni.server"
+
+    # === if on a non-DEV machine:
     if ! bash_setup dev!; then
       $elixir --detached $cmd
       exit 0
     fi
 
-    # === if on a non-dev machine:
+    # === DEV machine:
+    touch /tmp/erl_crash.dump
+    rm -f erl_crash.dump
+    ln -s /tmp/erl_crash.dump erl_crash.dump
+
     ( bin/megauni start watch ) &
     exit_code="-1"
     while [[ "$exit_code" != "0" ]]
@@ -179,7 +187,13 @@ case "$action" in
       echo ""
       echo "=== Starting server..." 1>&2
       $elixir $cmd && exit_code="0" || exit_code=$?
-      sleep 0
+      if [[ "$exit_code" == "1" ]]; then
+        echo -n "=== Exited: $exit_code Waiting "
+        sleep 1 && echo -n "." && sleep 1 && echo -n "." && sleep 1 && echo -n "."
+        sleep 1 && echo -n "." && sleep 1 && echo -n "."
+      else
+        sleep 0
+      fi
     done
     exit 0
 
