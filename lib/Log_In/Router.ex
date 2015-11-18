@@ -1,6 +1,5 @@
 
-defmodule User.Router do
-
+defmodule Log_In.Router do
   use Plug.Router
   plug :match
   plug :dispatch
@@ -8,5 +7,4 @@ defmodule User.Router do
   match _ do
     conn
   end
-
-end # === defmodule User.Router
+end # === defmodule Log_In.Router

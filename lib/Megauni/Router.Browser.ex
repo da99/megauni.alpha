@@ -17,6 +17,7 @@ defmodule Megauni.Router.Browser do
 
   plug User.Router
   plug Screen_Name.Router
+  plug Log_In.Router
   plug Link.Router
   plug Card.Router
 

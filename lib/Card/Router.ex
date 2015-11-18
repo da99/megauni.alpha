@@ -1,6 +1,12 @@
 
 defmodule Card.Router do
 
-  use Plug.Builder
+  use Plug.Router
+  plug :match
+  plug :dispatch
+
+  match _ do
+    conn
+  end
 
 end # === defmodule Card.Router
