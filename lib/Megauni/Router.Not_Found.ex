@@ -2,8 +2,8 @@
 defmodule Megauni.Router.Not_Found do
 
 
-  def init [from: static] do
-    File.read!("#{static}/404.html")
+  def init [html: path_to_file] do
+    File.read! path_to_file
   end
 
   def call conn, html_404 do

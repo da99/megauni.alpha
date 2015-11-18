@@ -31,7 +31,8 @@ set -u -e -o pipefail
 GREEN=$(tput setaf 2)
 RED='\e[0;31m'
 RESET_COLOR=$(tput sgr0)
-GREEN_BG=$(tput setb 2)
+GREEN_BG=$(tput setab 2)
+echo "==="
 WHITE=$(tput setaf 7)
 BOLD_WHITE_ON_GREEN=$(tput bold)${WHITE}${GREEN_BG}
 BOLD_WHITE=$(tput bold)${WHITE}

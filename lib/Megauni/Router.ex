@@ -69,6 +69,7 @@
 defmodule Megauni.Router do
 
   @static Path.expand("../megauni.html/Public")
+
   use Plug.Builder
 
   if Megauni.dev? do
@@ -80,7 +81,7 @@ defmodule Megauni.Router do
   plug Megauni.Router.API
   plug Megauni.Router.Browser
 
-  plug Megauni.Router.Not_Found, from: @static
+  plug Megauni.Router.Not_Found, html: "#{@static}/404.html"
 
   # === Helpers/Miscell.: ==========================================
 
