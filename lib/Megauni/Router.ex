@@ -109,6 +109,21 @@ defmodule Megauni.Router do
     !api_request?(conn)
   end
 
+  def respond_halt(conn, content)do
+    conn |> respond_halt(200, content)
+  end
+
+  def respond_halt(conn, status, content) when is_binary(content) do
+    conn |> respond_halt("text/plain", status, content)
+  end
+
+  def respond_halt(conn, type, status, content) when is_binary(content) do
+    conn
+    |> Plug.Conn.put_resp_content_type(type)
+    |> Plug.Conn.send_resp(status, content)
+    |> Plug.Conn.halt
+  end
+
   def to_accepts conn do
     Map.get(conn, :req_headers)["accept"]
     |> String.split(";")
