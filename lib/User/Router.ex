@@ -2,12 +2,10 @@
 defmodule User.Router do
 
   use Plug.Router
-  plug :match
-  plug :dispatch
 
-  # def call conn, _opts do
-    # conn
-  # end
+  plug :match
+  plug Megauni.Browser.Session
+  plug :dispatch
 
   get "/user" do
     conn
