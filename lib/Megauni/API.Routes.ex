@@ -1,16 +1,20 @@
 
-defmodule Megauni.Router.API do
+defmodule Megauni.API do
 
-  def api_request?(conn) do
+  def request?(conn) do
     false
   end
+
+end # === defmodule Megauni.API
+
+defmodule Megauni.API.Routes do
 
   def init(opts) do
     opts
   end
 
   def call conn, _opts do
-    if api_request?(conn) do
+    if Megauni.API.request?(conn) do
       raise "Not implemented"
     else
       conn

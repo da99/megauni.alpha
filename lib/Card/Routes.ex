@@ -1,6 +1,5 @@
 
-
-defmodule Link.Router do
+defmodule Card.Routes do
 
   use Plug.Router
 
@@ -12,4 +11,4 @@ defmodule Link.Router do
     conn
   end
 
-end # === defmodule Link.Router
+end # === defmodule Card.Routes

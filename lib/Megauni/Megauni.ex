@@ -26,7 +26,7 @@ defmodule Megauni do
     port = Application.get_env(:megauni, :port)
 
     server = Plug.Adapters.Cowboy.http(
-      Megauni.Router, [], port: port
+      Megauni.Routes, [], port: port
     )
 
     case server do

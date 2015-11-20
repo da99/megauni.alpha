@@ -1,5 +1,5 @@
 
-defmodule Megauni.Router.Not_Found do
+defmodule Megauni.Not_Found.Routes do
 
   def init [html: path_to_file] do
     File.read! path_to_file
@@ -41,4 +41,4 @@ defmodule Megauni.Router.Not_Found do
   end # === def respond
 
 
-end # === defmodule Megauni.Router.Not_Found
+end # === defmodule Megauni.Not_Found.Routes

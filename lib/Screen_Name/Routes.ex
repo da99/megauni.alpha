@@ -1,5 +1,5 @@
 
-defmodule Screen_Name.Router do
+defmodule Screen_Name.Routes do
   use Plug.Router
 
   plug :match
@@ -9,4 +9,4 @@ defmodule Screen_Name.Router do
   match _ do
     conn
   end
-end # === defmodule Screen_Name.Router
+end # === defmodule Screen_Name.Routes

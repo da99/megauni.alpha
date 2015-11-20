@@ -1,12 +1,12 @@
 
-defmodule Megauni.Router.Static do
+defmodule Megauni.Static.Router do
   require Logger
 
   def init opts do
     Plug.Static.init opts
   end
 
-  def call conn,  opts = {at, from, gzip, qs_cache, et_cache, only, headers} do
+  def call conn,  opts = {_at, from, _gzip, _qs_cache, _et_cache, _only, _headers} do
     path_info = Map.get(conn,:path_info)
 
     file_path = path_info
@@ -43,4 +43,4 @@ defmodule Megauni.Router.Static do
     end
   end
 
-end # === defmodule Megauni.Router.Static
+end # === defmodule Megauni.Static.Routes

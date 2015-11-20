@@ -3,6 +3,11 @@ defmodule Megauni.Browser.Session do
 
   use Plug.Builder
 
+  plug :put_secret_key_base
+  def put_secret_key_base(conn, _) do
+    put_in conn.secret_key_base, Application.get_env(:megauni, :session_secret_base)
+  end
+
   plug Plug.Session,
     store:           :cookie,
     key:             "_megauni_session",

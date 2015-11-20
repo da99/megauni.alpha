@@ -1,5 +1,7 @@
 
-defmodule Log_In.Router do
+
+defmodule Link.Routes do
+
   use Plug.Router
 
   plug :match
@@ -9,4 +11,5 @@ defmodule Log_In.Router do
   match _ do
     conn
   end
-end # === defmodule Log_In.Router
+
+end # === defmodule Link.Routes

@@ -68,29 +68,46 @@
 
 defmodule Megauni.Router do
 
-  @static Path.expand("../megauni.html/Public")
+  defmacro __using__(opts) do
+    quote do
+      import Megauni.Router, only: :macros
+      use Plug.Router, unquote(opts)
+    end
+  end # === defmacro
 
-  use Plug.Builder
-
-  if Megauni.dev? do
-    use Plug.Debugger
-    plug Log.Debug
-    plug Megauni.Router.Static, at: "/", from: @static
+  defmacro www_user meth, path, opts, contents \\ [] do
+    {body, _contents} = Keyword.pop(contents, :do)
+    if !body do
+      {body, opts} = Keyword.pop(opts, :do)
+    end
+    quote do
+      unquote(meth)(unquote(path), unquote(opts)) do
+        var!(conn) = Megauni.Router.logged_in!(var!(conn))
+        if Megauni.Router.fulfilled?(var!(conn)) do
+          var!(conn)
+        else
+          unquote(body)
+        end
+      end
+    end
   end
 
-  plug Megauni.Router.API
-  plug Megauni.Router.Browser
-
-  plug Megauni.Router.Not_Found, html: "#{@static}/404.html"
-
   # === Helpers/Miscell.: ==========================================
+
+  @static Path.expand("../megauni.html/Public")
 
   def static_path do
     @static
   end
 
+  def static_path path do
+    Path.join @static, path
+  end
+
   def fulfilled? conn do
-    Map.get(conn, :state) == :sent || !is_nil(Map.get conn, :status)
+    Map.get(conn, :state) == :sent ||
+    !is_nil(Map.get conn, :status) ||
+    Map.get(conn, :halted)
   end
 
   def no_404? conn do
@@ -102,27 +119,78 @@ defmodule Megauni.Router do
   end
 
   def api_request? conn do
-    Megauni.Router.API.api_request? conn
+    Megauni.API.request? conn
   end
 
   def browser_request? conn do
     !api_request?(conn)
   end
 
-  def respond_halt(conn, content)do
+  def logged_in? conn do
+    # plug Megauni.Browser.Session
+    false
+  end
+
+  def logged_in! conn do
+    if logged_in?(conn) do
+      conn
+    else
+      conn |> respond_halt(200, ["error", ["user_error", "You are not logged in."]])
+    end
+  end
+
+  @doc """
+    respond_halt conn, ["error", [err_name, "[msg]"]]
+  """
+  def respond_halt(conn, status, o = ["error", [err_name, msg]]) when is_binary(msg) do
+    accepts = conn |> to_accepts
+    cond do
+      "html" in accepts ->
+        conn |> respond_halt(status, :html, msg)
+
+      "json" in accepts ->
+        conn |> respond_halt(status, :json, Poison.encode!(o))
+
+      true ->
+        conn |> respond_halt(status, :text, "Error: #{err_name}: #{msg}")
+    end
+  end
+
+  @doc """
+    respond_halt conn, 200, "...."
+  """
+  def respond_halt(conn, status, content) when (is_number(status) or is_binary(status)) and is_binary(content) do
+    conn |> respond_halt(status, :text, content)
+  end
+
+  @doc """
+    respond_halt conn, "...."
+  """
+  def respond_halt(conn, content) when is_binary(content) do
     conn |> respond_halt(200, content)
   end
 
-  def respond_halt(conn, status, content) when is_binary(content) do
-    conn |> respond_halt("text/plain", status, content)
-  end
-
-  def respond_halt(conn, type, status, content) when is_binary(content) do
+  @doc """
+    respond_halt conn, 200, :html, "...."
+  """
+  def respond_halt(conn, status, raw_type, content) when is_binary(content) do
     conn
-    |> Plug.Conn.put_resp_content_type(type)
+    |> Plug.Conn.put_resp_content_type(raw_type |> to_content_type)
     |> Plug.Conn.send_resp(status, content)
     |> Plug.Conn.halt
   end
+
+  def to_content_type(name) when is_atom(name) do
+    case name do
+      :text -> "text/plain"
+      :html -> "text/html"
+      :json -> "application/json"
+    end
+  end # === def to_content_type
+
+  def to_content_type(name) when is_binary(name) do
+    name
+  end # === def to_content_type(name) when is_binary(name)
 
   def to_accepts conn do
     Map.get(conn, :req_headers)["accept"]
@@ -157,5 +225,8 @@ defmodule Megauni.Router do
   end # === defp
 
 end # === Megauni
+
+
+
 
 
