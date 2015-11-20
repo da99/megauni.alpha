@@ -23,20 +23,20 @@ defmodule Megauni.Not_Found.Routes do
     cond do
       "html" in accepts ->
         conn
-        |> Megauni.Router.respond_halt("text/html", 404, html_404)
+        |> Megauni.Router.respond_halt(404, :html, html_404)
 
 
       "json" in accepts ->
         conn
         |> Megauni.Router.respond_halt(
-        "application/json",
-        404,
-        Poison.encode! %{"resp" => ["error", "Not found"]}
+          404,
+          :json,
+          Poison.encode! %{"resp" => ["error", "Not found"]}
         )
 
       true ->
         conn
-        |> Megauni.Router.respond_halt("text/plain", 404, "Not found!")
+        |> Megauni.Router.respond_halt(404, :text, "Not found!")
     end
   end # === def respond
 

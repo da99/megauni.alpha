@@ -75,14 +75,20 @@ defmodule Megauni.Router do
     end
   end # === defmacro
 
-  defmacro www meth, path, opts, contents \\ [] do
-    {body, _contents} = Keyword.pop(contents, :do)
-    if !body do
-      {body, opts} = Keyword.pop(opts, :do)
-    end
+
+  # NOTE:
+  # To match with the :get macro from Plug.Builder,
+  # `:contents \\ []` would be added to the arguments.
+  # It has been left out since it was never used.
+  defmacro www meth, path, opts do
+    {body, opts} = Keyword.pop(opts, :do)
+
     quote do
       unquote(meth)(unquote(path), unquote(opts)) do
-        var!(conn) = Session.Router.logged_in!(var!(conn))
+        var!(conn) = var!(conn)
+                      |> Session.Router.get_session
+                      |> Session.Router.logged_in!
+
         if Megauni.Router.fulfilled?(var!(conn)) do
           var!(conn)
         else
