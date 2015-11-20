@@ -75,14 +75,14 @@ defmodule Megauni.Router do
     end
   end # === defmacro
 
-  defmacro www_user meth, path, opts, contents \\ [] do
+  defmacro www meth, path, opts, contents \\ [] do
     {body, _contents} = Keyword.pop(contents, :do)
     if !body do
       {body, opts} = Keyword.pop(opts, :do)
     end
     quote do
       unquote(meth)(unquote(path), unquote(opts)) do
-        var!(conn) = Megauni.Router.logged_in!(var!(conn))
+        var!(conn) = Session.Router.logged_in!(var!(conn))
         if Megauni.Router.fulfilled?(var!(conn)) do
           var!(conn)
         else
@@ -90,7 +90,7 @@ defmodule Megauni.Router do
         end
       end
     end
-  end
+  end # === defmacro
 
   # === Helpers/Miscell.: ==========================================
 
@@ -124,19 +124,6 @@ defmodule Megauni.Router do
 
   def browser_request? conn do
     !api_request?(conn)
-  end
-
-  def logged_in? conn do
-    # plug Megauni.Browser.Session
-    false
-  end
-
-  def logged_in! conn do
-    if logged_in?(conn) do
-      conn
-    else
-      conn |> respond_halt(200, ["error", ["user_error", "You are not logged in."]])
-    end
   end
 
   @doc """
