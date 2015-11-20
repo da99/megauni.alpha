@@ -75,6 +75,23 @@ defmodule Megauni.Router do
     end
   end # === defmacro
 
+  @doc """
+  Defaults to: www :get, "/path", opts
+
+  ## Examples
+
+      www "/home" do
+      end
+
+      www "/:home" when home == "home" do
+      end
+
+  """
+  defmacro www path, opts do
+    quote do
+      unquote(:www)(unquote(:get), unquote(path), unquote(opts))
+    end
+  end
 
   # NOTE:
   # To match with the :get macro from Plug.Builder,

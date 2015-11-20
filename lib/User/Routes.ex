@@ -7,7 +7,7 @@ defmodule User.Routes do
   plug :match
   plug :dispatch
 
-  get "/:user"  when user == "user"   do
+  www "/user"  do
     conn
     |> Megauni.Router.respond_halt(200, "yo yo: user")
   end
