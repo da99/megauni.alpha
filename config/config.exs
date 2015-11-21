@@ -8,6 +8,8 @@ config :megauni,  :port,                      ((System.get_env("PORT") || "4567"
 config :megauni,  :session_secret_base,       System.get_env("SESSION_SECRET") || raise("SESSION_SECRET not set")
 config :megauni,  :session_encrypt_salt,      System.get_env("ENCRYPT_SALT")   || raise("ENCRYPT_SALT not set")
 config :megauni,  :session_sign_salt,         System.get_env("SIGN_SALT")     || raise("SIGN_SALT not set")
+config :megauni,  :host,                      (is_dev && "localhost") || "www.megauni.com"
+
 
 if is_dev do
   config :logger, :console, level: :debug, format: "[$level] $message\n"

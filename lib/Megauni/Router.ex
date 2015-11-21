@@ -102,9 +102,7 @@ defmodule Megauni.Router do
 
     quote do
       unquote(meth)(unquote(path), unquote(opts)) do
-        var!(conn) = var!(conn)
-                      |> Session.Router.get_session
-                      |> Session.Router.logged_in!
+        var!(conn) = var!(conn) |> Session.Router.logged_in!
 
         if Megauni.Router.fulfilled?(var!(conn)) do
           var!(conn)
