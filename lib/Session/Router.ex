@@ -46,8 +46,9 @@ defmodule Session.Router do
   end
 
   def log_out conn do
+    # === Yes, I know the following is redundant.
+    # === But, it makes me feel better in this particular case.
     conn
-    |> Plug.Conn.delete_session(@key_current_user)
     |> Plug.Conn.clear_session
     |> Plug.Conn.configure_session(drop: true)
   end
