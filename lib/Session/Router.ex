@@ -2,6 +2,7 @@
 defmodule Session.Router do
 
   @key_has_been_setup :has_session_been_setup?
+  @key_current_user   :current_user
 
   @plug_sesson_opts Plug.Session.init(
     store:           :cookie,
@@ -16,7 +17,7 @@ defmodule Session.Router do
     key_length:      64
   )
 
-  defp setup? conn do
+  defp been_setup? conn do
     Map.get(conn.private, @key_has_been_setup, false)
   end
 
@@ -25,7 +26,7 @@ defmodule Session.Router do
     https://github.com/elixir-lang/plug/blob/v1.0.2/lib/plug/conn.ex#L755
   """
   defp setup conn do
-    if !setup?(conn) do
+    if !been_setup?(conn) do
       conn = conn
               |> Map.put(:secret_key_base, Application.get_env(:megauni, :session_secret_base))
               |> Plug.Session.call(@plug_sesson_opts)
@@ -44,8 +45,19 @@ defmodule Session.Router do
     conn |> setup |> Plug.Conn.put_session(key, val)
   end
 
+  def log_out conn do
+    conn
+    |> Plug.Conn.delete_session(@key_current_user)
+    |> Plug.Conn.clear_session
+    |> Plug.Conn.configure_session(drop: true)
+  end
+
+  def log_in(conn, user_id) when is_number(user_id) or is_binary(user_id) do
+    conn |> put(@key_current_user, user_id)
+  end
+
   def logged_in? conn do
-    conn |> get(:current_user)
+    conn |> get(@key_current_user)
   end
 
   def logged_in! conn do
