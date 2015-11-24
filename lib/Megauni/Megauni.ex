@@ -11,8 +11,8 @@ defmodule Megauni do
 
     Supervisor.start_link(
       [
-        worker(__MODULE__, [], function: :run_http_adapter),
-        worker(Megauni.Repos.Main, [])
+        supervisor(__MODULE__, [], function: :run_http_adapter),
+        supervisor(Megauni.Repos.Main, [])
       ], [
         strategy: :one_for_one,
         name:     Megauni.Supervisor

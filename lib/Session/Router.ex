@@ -21,10 +21,8 @@ defmodule Session.Router do
     Map.get(conn.private, @key_has_been_setup, false)
   end
 
-  @doc """
-    Based on Plug.Conn.fetch_session:
-    https://github.com/elixir-lang/plug/blob/v1.0.2/lib/plug/conn.ex#L755
-  """
+  # Based on Plug.Conn.fetch_session:
+  # https://github.com/elixir-lang/plug/blob/v1.0.2/lib/plug/conn.ex#L755
   defp setup conn do
     if !been_setup?(conn) do
       conn = conn
