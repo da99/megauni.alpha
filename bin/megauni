@@ -2,6 +2,7 @@
 # -*- bash -*-
 #
 #
+THIS_DIR="$(bash_setup dirname_of_bin "$0")"
 dev="$IS_DEV"
 IS_DEV="$IS_DEV"
 action="$1"
@@ -611,6 +612,13 @@ case "$action" in
     ;;
 
   *)
+    # === IF: bin/lib file:
+    func_file="$THIS_DIR/bin/lib/${action}.sh"
+    if [[ -s "$func_file" ]]; then
+      source "$func_file"
+      "$action" $@
+      exit 0
+    fi
 
     file="$( echo node_modules/*/bin/$action )"
     args="$@"

@@ -122,3 +122,4 @@ build/
 /conf/.bundle/
 /conf/vendor/
 /Public/scripts/
+/nginx
