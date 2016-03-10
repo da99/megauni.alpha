@@ -18,6 +18,7 @@ install () {
     bash_setup BOLD "=== Skipping local install: {{NGINX}}"
   else
     bash_setup BOLD "=== Installing local {{NGINX}}:"
-    nginx_setup install
+    mkdir -p tmp
+    nginx_setup install " --error-log-path=${THIS_DIR}/tmp/nginx.startup.log "
   fi
 } # === end function
