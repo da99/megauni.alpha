@@ -3,18 +3,24 @@ source "$THIS_DIR/bin/lib/nginx.sh"
 source "$THIS_DIR/bin/lib/stop.sh"
 source "$THIS_DIR/bin/lib/is-server-running.sh"
 
+homepage () {
+  local +x PORT="$(netstat -tulpn 2>/dev/null | grep "$(cat tmp/nginx.pid)/" | grep -Po ":\K(\d+)" )"
+  local +x LOCAL="http://localhost:$PORT"
+  mksh_setup BOLD "{{$LOCAL}}"
+}
+
 # === {{CMD}} start         # To be used on dev machines only.
 # === {{CMD}} start -nginx -args
 start () {
   if is-server-running; then
-    mksh_setup ORANGE "=== Server is already {{running}}."
+    mksh_setup ORANGE "=== Server is already {{running}}: $(homepage)"
     return 0
   fi
 
   nginx -t
   nginx
   mksh_setup max-wait 5s "megauni is-server-running"
-  mksh_setup GREEN "=== Server is {{running}}."
+  mksh_setup GREEN "=== Server is {{running}}: $(homepage)"
   return 0
   # ====================================================
 
