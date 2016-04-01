@@ -1,11 +1,22 @@
 
 source "$THIS_DIR/bin/lib/nginx.sh"
+source "$THIS_DIR/bin/lib/is-server-running.sh"
 
 # === {{CMD}}
 stop () {
+  if ! is-server-running; then
+    mksh_setup ORANGE "=== Server is already {{shutdown}}."
+    return 0
+  fi
+
   echo "=== Stopping..."
-  nginx -s stop || :
-  ps aux | grep megauni | grep --color=always nginx
+  nginx -s stop
+
+  if is-server-running; then
+    mksh_setup RED "!!! Something went wrong. Server is {{still running}}."
+    return 1
+  fi
+
   return 0
 
 

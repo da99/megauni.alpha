@@ -1,13 +1,20 @@
 
 source "$THIS_DIR/bin/lib/nginx.sh"
+source "$THIS_DIR/bin/lib/stop.sh"
+source "$THIS_DIR/bin/lib/is-server-running.sh"
 
 # === {{CMD}} start         # To be used on dev machines only.
 # === {{CMD}} start -nginx -args
 start () {
+  if is-server-running; then
+    mksh_setup ORANGE "=== Server is already {{running}}."
+    return 0
+  fi
 
   nginx -t
   nginx
-  mksh_setup max-wait 5s "mksh_setup is-server-running"
+  mksh_setup max-wait 5s "megauni is-server-running"
+  mksh_setup GREEN "=== Server is {{running}}."
   return 0
   # ====================================================
 
