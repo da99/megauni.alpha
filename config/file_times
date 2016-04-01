@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 // # -*- js   -*-
 // #
-
-// #!/usr/bin/env bash
-// # -*- bash -*-
 // #
 // #set -u -e -o pipefail
 

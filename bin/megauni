@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# -*- bash -*-
+#!/usr/bin/env mksh
+# -*- mksh -*-
 #
 #
 THIS_DIR="$(mksh_setup dirname_of_bin "$0")"
@@ -47,7 +47,7 @@ case "$action" in
     ;;
 
   "type_names")
-    # === bash> type_names
+    # === mksh> type_names
     # ===    ME_ONLY
     # ===    ...
     IFS=$'\n'
@@ -55,7 +55,7 @@ case "$action" in
     do
       if [[ $line =~ ^[[:space:]]+WHEN[[:space:]]+.+THEN ]]; then
         IFS="'" read -ra WORDS <<< "$line"
-        code="$(bash_setup string_to_num "${WORDS[1]}")"
+        code="$(mksh_setup string_to_num "${WORDS[1]}")"
 
         start_keeping=""
         comment=""
@@ -181,7 +181,7 @@ case "$action" in
   "__watch")
     $0 test $@ || :
 
-    eval "$(bash_setup setup_traps)"
+    eval "$(mksh_setup setup_traps)"
     setup_traps
 
     echo -e "=== Watching ${BOLD_WHITE}$(basename $0)${RESET_COLOR}    (proc $$)..."
@@ -238,7 +238,7 @@ case "$action" in
     # === temporary convenience
     export RUN_FAST="yes"
 
-    eval "$(bash_setup setup_traps)"
+    eval "$(mksh_setup setup_traps)"
     setup_traps
 
     # === Regular expression:
@@ -246,7 +246,7 @@ case "$action" in
     re='^[0-9]+$'
     # === Start server:
 
-    echo -e "=== $(basename $0): Proc: $$ Proc Group: $(bash_setup proc_group $$)"
+    echo -e "=== $(basename $0): Proc: $$ Proc Group: $(mksh_setup proc_group $$)"
 
     if [[ -z "$RUN_FAST" ]] ; then
       $0 jshint

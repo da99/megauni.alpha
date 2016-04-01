@@ -1,10 +1,10 @@
 
 # === {{CMD}}  ...
 model_list () {
-    # === bash> model_list
+    # === mksh> model_list
     # ===    User
     # ===    Screen_Name
-    # === bash> model_list rsort
+    # === mksh> model_list rsort
     # ===    Screen_Name
     # ===    User
 

@@ -1,7 +1,23 @@
 
 # === {{CMD}} start         # To be used on dev machines only.
-# === {{CMD}} start daemon
+# === {{CMD}} start -nginx -args
 start () {
+
+  if [[ -z "$IS_DEV" ]]; then
+    local +x ENV_NAME="PROD"
+  else
+    local +x ENV_NAME="DEV"
+  fi
+
+  mkdir -p logs
+  mkdir -p tmp
+  nginx_setup mkconf "$ENV_NAME" "config/nginx.conf" > progs/nginx.conf
+  local +x CMD="progs/nginx/sbin/nginx    -c $THIS_DIR/progs/nginx.conf -p $THIS_DIR"
+  $CMD -t
+  $CMD "$@"
+
+  return 0
+
     if [[ "$@" == *watch* ]]; then
       rm -f tmp/wait.for.file.change.txt
       while read -r CHANGE
@@ -28,7 +44,7 @@ start () {
     cmd="-S mix do compile, megauni.server"
 
     # === if on a non-DEV machine:
-    if ! bash_setup dev!; then
+    if ! mksh_setup dev!; then
       $elixir --detached $cmd
       exit 0
     fi

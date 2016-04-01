@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // # -*- js   -*-
 // #
-// #!/usr/bin/env bash
-// # -*- bash -*-
+// #!/usr/bin/env mksh
+// # -*- mksh -*-
 // #
 
 

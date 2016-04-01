@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# -*- bash -*-
+#!/usr/bin/env mksh
+# -*- mksh -*-
 #
 #
 

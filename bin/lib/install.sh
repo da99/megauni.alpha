@@ -1,7 +1,7 @@
 
 # === {{CMD}} ...
 install () {
-  bash_setup BOLD "=== Adding '{{git push}}' urls"
+  mksh_setup BOLD "=== Adding '{{git push}}' urls"
   ORIGIN_FETCH="$(git remote -v | grep 'origin' | grep '(fetch)' | head -n1 | cut -f2 | cut -d ' ' -f1)"
   BITBUCKET="git@bitbucket:da99/megauni.git"
 
@@ -15,9 +15,9 @@ install () {
   git remote -v
 
   if [[ -d nginx ]]; then
-    bash_setup BOLD "=== Skipping local install: {{NGINX}}"
+    mksh_setup BOLD "=== Skipping local install: {{NGINX}}"
   else
-    bash_setup BOLD "=== Installing local {{NGINX}}:"
+    mksh_setup BOLD "=== Installing local {{NGINX}}:"
     mkdir -p tmp
     nginx_setup install " --error-log-path=${THIS_DIR}/tmp/nginx.startup.log "
   fi
