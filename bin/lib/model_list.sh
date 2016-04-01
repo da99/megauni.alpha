@@ -1,4 +1,19 @@
 
+mods=(
+  Megauni
+  Screen_Name
+  User
+  Log_In
+  Card
+  Link
+)
+
+# === Create a reverse of the list.
+rev_mods=()
+for mod in $mods[@]; do
+  rev_mods+=( "${mods[idx]}" )
+done
+# ===============================================
 # === {{CMD}}  ...
 model_list () {
     # === mksh> model_list
