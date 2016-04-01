@@ -1,26 +1,19 @@
 
+source "$THIS_DIR/bin/lib/nginx.sh"
+
 # === {{CMD}} start         # To be used on dev machines only.
 # === {{CMD}} start -nginx -args
 start () {
 
-  if [[ -z "$IS_DEV" ]]; then
-    local +x ENV_NAME="PROD"
-  else
-    local +x ENV_NAME="DEV"
-  fi
-
-  mkdir -p logs
-  mkdir -p tmp
-  nginx_setup mkconf "$ENV_NAME" "config/nginx.conf" > progs/nginx.conf
-  local +x CMD="progs/nginx/sbin/nginx    -c $THIS_DIR/progs/nginx.conf -p $THIS_DIR"
-  $CMD -t
-  $CMD "$@"
-
+  nginx -t
+  nginx
+  mksh_setup max-wait 5s "mksh_setup is-server-running"
   return 0
+  # ====================================================
 
     if [[ "$@" == *watch* ]]; then
       rm -f tmp/wait.for.file.change.txt
-      while read -r CHANGE
+      inotifywait --quiet --monitor --event close_write -r lib/ ./*.ex*  | while read -r CHANGE
       do
         dir=$(echo "$CHANGE" | cut -d' ' -f 1)
         op=$(echo "$CHANGE" | cut -d' ' -f 2)
@@ -32,7 +25,7 @@ start () {
         if [[ ! -f /tmp/compile.megauni ]]; then
           bin/megauni stop || :
         fi
-      done < <(inotifywait --quiet --monitor --event close_write -r lib/ ./*.ex* )
+      done
       exit 0
     fi
 

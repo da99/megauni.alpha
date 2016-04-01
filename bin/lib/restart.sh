@@ -1,11 +1,10 @@
 
 
+source "$THIS_DIR/bin/lib/stop.sh"
 source "$THIS_DIR/bin/lib/start.sh"
 
 # === {{CMD}}
 restart () {
-  echo "=== Stopping..."
-  start -s stop
-  echo "=== Starting..."
+  stop
   start
 } # === end function

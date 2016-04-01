@@ -1,10 +1,11 @@
 
-source "$THIS_DIR/bin/lib/start.sh"
+source "$THIS_DIR/bin/lib/nginx.sh"
 
 # === {{CMD}}
 stop () {
   echo "=== Stopping..."
-  start -s stop
+  nginx -s stop || :
+  ps aux | grep megauni | grep --color=always nginx
   return 0
 
 
