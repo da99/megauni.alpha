@@ -2,16 +2,11 @@
 # -*- bash -*-
 #
 #
-THIS_DIR="$(bash_setup dirname_of_bin "$0")"
-dev="$IS_DEV"
+THIS_DIR="$(mksh_setup dirname_of_bin "$0")"
+PORT="${PORT:-4567}"
+action="$1"; shift
+
 IS_DEV="$IS_DEV"
-action="$1"
-shift
-
-if [[ -z "$PORT" ]]; then
-  export PORT=4567
-fi
-
 if [[ -n "$IS_DEV" ]]; then
   dir="$(pwd)"
   export JAR="$dir/tmp/cookies.txt"
@@ -26,19 +21,6 @@ export SPECS="$SPECS"
 export RUN_FAST="${RUN_FAST}"
 
 set -u -e -o pipefail
-
-
-# ==============================================================
-GREEN=$(tput setaf 2)
-RED='\e[0;31m'
-RESET_COLOR=$(tput sgr0)
-GREEN_BG=$(tput setab 2)
-WHITE=$(tput setaf 7)
-BOLD_WHITE_ON_GREEN=$(tput bold)${WHITE}${GREEN_BG}
-BOLD_WHITE=$(tput bold)${WHITE}
-ORANGE='\e[0;33m'
-BG_RED='\e[1;31m'
-# ===============================================
 
 mods=(
   Megauni
@@ -60,33 +42,7 @@ done
 case "$action" in
 
   help|--help)
-    echo ""
-    echo "  $  stop"
-    echo "  $  restart"
-    echo "  $  watch"
-    echo ""
-    echo "  $  migrate"
-    echo "  $  migrate   up"
-    echo "  $  migrate   down"
-    echo "  $  migrate   reset"
-    echo "  $  migrate   reset   MODEL"
-    echo "  $  migrate   default_data"
-    echo "  $  migrate   create  MODEL name"
-    echo "  $  migrate   status"
-    echo ""
-    echo "  $  test"
-    echo "  $  test reset"
-    echo "  $  test Model spec"
-    echo ""
-    echo "  $  npm  ...."
-    echo "  $  npm  --save ...."
-    echo ""
-    echo "  $  render name"
-    echo "  $  render file_name"
-    echo ""
-    echo "  $  POST  \"{.. JSON .. }\"  /path"
-    echo ""
-    bash_setup print_help $0
+    mksh_setup print_help $0
     exit 0
     ;;
 
@@ -122,125 +78,6 @@ case "$action" in
     done
     ;;
 
-  "model_list")
-    # === bash> model_list
-    # ===    User
-    # ===    Screen_Name
-    # === bash> model_list rsort
-    # ===    Screen_Name
-    # ===    User
-
-    if [[ "$@" == "rsort" ]]; then
-      for (( idx=${#mods[@]}-1 ; idx >= 0 ; idx-- ))
-      do
-        echo "${mods[idx]}"
-      done
-    else
-      for i in ${mods[@]}
-      do
-        echo "$i"
-      done
-    fi
-    ;;
-
-  "start")
-    # === bin/megauni start  # To be used on dev machines only.
-    # === bin/megauni start daemon
-
-    if [[ "$@" == *watch* ]]; then
-      rm -f tmp/wait.for.file.change.txt
-      while read -r CHANGE
-      do
-        dir=$(echo "$CHANGE" | cut -d' ' -f 1)
-        op=$(echo "$CHANGE" | cut -d' ' -f 2)
-        file=$(echo "$CHANGE" | cut -d' ' -f 3)
-        path="${dir}$file"
-        file=$(basename $path)
-        echo -e "=== $CHANGE ($path)"
-        rm -f tmp/wait.for.file.change.txt
-        if [[ ! -f /tmp/compile.megauni ]]; then
-          bin/megauni stop || :
-        fi
-      done < <(inotifywait --quiet --monitor --event close_write -r lib/ ./*.ex* )
-      exit 0
-    fi
-
-
-    export IS_RUNNING_WWW_SERVER="true"
-    export MIX_ENV="prod"
-
-    elixir="elixir --no-halt"
-    cmd="-S mix do compile, megauni.server"
-
-    # === if on a non-DEV machine:
-    if ! bash_setup dev!; then
-      $elixir --detached $cmd
-      exit 0
-    fi
-
-    # === DEV machine:
-    touch /tmp/erl_crash.dump
-    rm -f erl_crash.dump
-    ln -s /tmp/erl_crash.dump erl_crash.dump
-
-    ( bin/megauni start watch ) &
-    exit_code="-1"
-    while [[ "$exit_code" != "0" ]]
-    do
-      echo ""
-      echo "=== Starting server..." 1>&2
-      $elixir $cmd && exit_code="0" || exit_code=$?
-      if [[ "$exit_code" == "1" ]]; then
-        echo -n "=== Exited: $exit_code Waiting..."
-        touch tmp/wait.for.file.change.txt
-        while [[ -f tmp/wait.for.file.change.txt ]]
-        do
-          sleep 3
-          echo -n "."
-        done
-      else
-        sleep 0
-      fi
-    done
-    exit 0
-
-    ;;
-
-  "stop")
-    pids="$(bin/megauni status)"
-    if [[ -z "$pids" ]]; then
-      echo "=== No server procs found." 1>&2
-    fi
-
-    while read -r num; do
-      if [[ -n "$num" ]]; then
-        echo "=== KILL-ing: $num"
-        kill $num || echo "=== kill error"
-      fi
-    done < <(bin/megauni status)
-    ;;
-
-  "restart")
-    bin/megauni stop
-    bin/megauni start
-    ;;
-
-  "status")
-    # === bin/megauni status
-    # === Prints a list of server OS process.
-    # === Prints to STDERR if no proces found.
-    # === Always exits w/ 0
-    pgrep -f "elixir.+megauni\.server(\s|$|,)" || (echo "=== No process found" 1>&2)
-    ;;
-
-
-  "iojs")
-    # === $ bin/megauni iojs
-    # === $ bin/megauni iojs  ....
-
-    node --es_staging "$@"
-    ;;
-
   "js_applet")
     app_dir="Public/applets"
     mkdir -p $app_dir/$1
@@ -254,7 +91,6 @@ case "$action" in
 
     echo "Created: $file"
     ;;
-
 
   "start as node app")
     if [[ -n "$dev" && -z "$USE_SERVER" ]]; then
@@ -310,108 +146,6 @@ case "$action" in
       --static-files-dir      $dir/../Public
     ;;
 
-  "migrate")
-    if [[ -z "$@" ]]; then
-      sub_action="up"
-    else
-      sub_action="$1"
-      shift
-    fi
-
-    case "$sub_action" in
-      "create")
-        model="$1"
-        name="$2"
-        shift
-        shift
-        cd lib
-        duck_duck_duck create $model $name
-        ;;
-
-      "reset")
-        model="$@"
-
-        bin/megauni migrate down "$model"
-        bin/megauni migrate up   "$model"
-        echo ""
-        # if [[ -z "$model" ]]; then
-          # ALLOW_BANNED_SCREEN_NAME=true bin/megauni migrate default_data
-        # fi
-        # echo -e "\n===== DONE =====\n"
-        ;;
-
-      "default_data")
-        bin/migrate_default_data
-        ;;
-
-      "status")
-        script="
-          require 'sequel'
-          DB = Sequel.connect('$DATABASE_URL')
-          if DB.table_exists?(:_schema)
-            rows = []
-            DB.from(:_schema).each { |r|
-              rows << r
-              puts r.inspect
-            }
-            puts '== No records found.' if rows.empty?
-          else
-            puts '== Table not found.'
-          end
-        "
-        ruby -e "$script"
-        ;;
-
-      "up")
-        model="$@"
-
-        if [[ -z "$model" ]]
-        then
-          for m in ${mods[@]}
-          do
-            bin/megauni migrate up $m
-          done
-          echo -e "\n=== Done.\n"
-        else
-          cd lib
-          echo ""
-          duck_duck_duck up $model
-        fi
-        ;;
-
-      "down")
-        model="$@"
-
-        if [[ -z "$model" ]]
-        then
-
-          # === Ensure dev machine.
-          if [ ! -n "${IS_DEV+x}" ]
-          then
-            echo "This is not a dev machine."
-            exit 1
-          fi
-
-          # === Reverse list
-          for m in ${rev_mods[@]}
-          do
-            bin/megauni migrate down $m
-          done
-
-        else
-          cd lib
-          echo ""
-          duck_duck_duck down $model
-        fi
-        ;;
-
-      *)
-        echo "Unknown command for migrate: $sub_action"
-        exit 1
-        ;;
-    esac # === sub_action
-    ;;
-
   "highlight_ruby")
     while read i
     do
@@ -442,60 +176,6 @@ case "$action" in
         fi
       fi
     done # === while read output
-    ;;
-
-
-  "test")
-    file="/tmp/specs.are.running"
-    # === Run all the specs of the projects.
-    touch $file
-    PORT=4001 mix run specs/Spec.ex $@
-    rm "$file" || :
-    ;;
-
-  "json")
-    node_modules/json/lib/json.js "$@"
-    ;;
-
-  "running?")
-    stat="$(bin/megauni pm2 jlist | bin/megauni json '[0].pm2_env.status')"
-    if [[ "$stat" == 'online' ]]; then
-      exit 0
-    else
-      exit 1
-    fi
-    ;;
-
-  jshint)
-    if [[ -n "$@" ]]; then
-      js_setup jshint! $@
-      exit 0
-    fi
-
-    js_files="$(echo -e lib/*/specs/*.json)"
-    IFS=$' '
-    for file in $js_files
-    do
-      if [[ -f $file ]]; then
-        js_setup jshint $file
-      fi
-    done
-    ;;
-
-  "run_specs")
-    if [[ -z "$dev" ]]; then
-      exit 0
-    fi
-
-    if [[ -z "$@" ]]; then
-      args="$SPECS"
-    else
-      args="$@"
-    fi
-
-    if [[ -n "$args" ]]; then
-      eval $0 mocha "$MOCHA" "$args" || echo -e "=== ${RED}FAIL${RESET_COLOR} ==="
-    fi
     ;;
 
   "__watch")
@@ -591,11 +271,6 @@ case "$action" in
       echo "=== Done looping server."
     fi # === if -z $USE_SERVER
 
-    ;;
-
-  "POST")
-    curl -k -X POST --header "Content-Type:application/json" -d "$1" http://localhost:4567$2
-    echo ""
     ;;
 
   "deploy")
