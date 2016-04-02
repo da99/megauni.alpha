@@ -2,10 +2,10 @@
 source "$THIS_DIR/bin/lib/nginx.sh"
 source "$THIS_DIR/bin/lib/stop.sh"
 source "$THIS_DIR/bin/lib/is-server-running.sh"
-source "$THIS_DIR/bin/lib/VAR.sh"
+source "$THIS_DIR/bin/lib/server-pid.sh"
 
 homepage () {
-  local +x PORT="$(netstat -tulpn 2>/dev/null | grep "$(cat $(VAR PID))/" | grep -Po ":\K(\d+)" )"
+  local +x PORT="$(netstat -tulpn 2>/dev/null | grep "$(server-pid)/" | grep -Po ":\K(\d+)" )"
   local +x LOCAL="http://localhost:$PORT"
   mksh_setup BOLD "{{$LOCAL}}"
 }
