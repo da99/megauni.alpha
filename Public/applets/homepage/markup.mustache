@@ -1,0 +1,120 @@
+<!-- PUBLIC FILE
+  /index.html
+-->
+<!-- title
+  megaUNI Home
+-->
+<!-- scripts
+  <script src="/applets/homepage/script.babel.js"></script>
+-->
+<!-- meta
+  <meta name="Description" CONTENT="Sign-In or Create an Account if you don't have one." />
+-->
+
+
+    <div id="loading" data-hide_if="page_loaded?">
+      Loading...
+    </div>
+
+    <mustache data-render_if="logged_in?">
+      <div class="hidden block" data-show_if="logged_in?">
+        <p>You are logged in.</p>
+      </div>
+    </mustache><!-- if logged_in? -->
+
+    <mustache data-render_if="!logged_in?">
+
+      <div class="block form">
+        <h3>Log-In</h3>
+        <div class="content">
+          <form
+             action="/sign-in"
+             id="sign_in"
+             method="post"
+             data-on_send="hide_buttons"
+             data-on_respond_ok="reset, wait_a_few, reload"
+             >
+            <div class="fields">
+              <div class="field screen_name"><label>Screen name:</label><input name="screen_name" type="text" value="" /></div>
+              <div class="field passphrase"><label>Pass phrase:</label><input name="pswd" type="password" value="" /></div>
+
+              <mustache data-render_if="logged_in?">
+                <div class="success_msg">You are now logged in. Loading...</div>
+              </mustache>
+
+              <mustache data-render_if="error /sign-in">
+                <div class="error_msg">{{msg}}</div>
+              </mustache>
+
+              <div class="field buttons"><button class="submit">Log-In</button></div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="block form">
+        <h3>Create a New Account</h3>
+        <div class="content">
+          <form
+            action="/user"
+            id="create_account"
+            method="post"
+            data-on_send="hide_buttons"
+            data-on_respond_ok="reset, wait_a_few, reload"
+            >
+            <div class="fields">
+
+              <div class="field screen_name">
+                <label>Screen name:</label>
+                <input name="screen_name" type="text" value="" />
+              </div>
+
+              <div class="field pswd">
+                <label>
+                  <span class="main">Pass phrase</span>
+                  <span class="sub"> (for better security, use spaces and words)</span>
+                  <span class="main">:</span>
+                </label>
+                <input name="pswd" type="password" value="" />
+              </div>
+
+              <div class="field confirm_pass_phrase">
+                <label><span class="main">Re-type the pass phrase:</span></label>
+                <input name="confirm_pass_word" type="password" value="" />
+              </div>
+
+              <mustache data-render_if="logged_in?">
+                <div class="success_msg">You account has been created. Loading...</div>
+              </mustache>
+
+              <mustache data-render_if="error /user">
+                <div class="error_msg">{{msg}}</div>
+              </mustache>
+
+              <div class="buttons"><button class="submit">Create Account</button></div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </mustache><!-- text/mustache !logged_in? -->
+
+
+    <div class="block" id="intro">
+      <h1 class="site"><span class="main">mega</span><span class="sub">UNI</span></h1>
+      <p><a href="/home">/home</a></p>
+      <p><a href="/@da99">/@da99</a></p>
+      <p><a href="/!4567">/!4567</a></p>
+      <p><a href="/nowhere">/nowhere</a></p>
+      <div class="disclaimer">
+        <p>
+          (c) 2012-<span id="copyright_year_today">2015</span> megauni.com. Some rights reserved.
+        </p>
+        <p>All other copyrights belong to their respective owners, who have no association to this site:</p>
+        <p><span>Logo font: </span><a href="http://openfontlibrary.org/en/font/otfpoc">Aghja</a></p>
+        <p><span>Palettes: </span><a href="http://www.colourlovers.com/lover/dvdcpd">dvdcpd</a><a href="http://www.colourlovers.com/palette/154398/bedouin">shari_foru</a></p>
+      </div>
+    </div>
+
+
+

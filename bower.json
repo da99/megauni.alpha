@@ -1,0 +1,35 @@
+{
+  "name": "megauni.js",
+  "version": "2.0.0",
+  "authors": [
+    "da99 <i-hate-spam-1234567@mailinator.com>"
+  ],
+  "description": "Client for megauni.com",
+  "main": "scripts/megauni.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "megauni"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/da99/megauni.html",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "Public/scripts/vendor/",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "jasmine": ">2.0.0"
+  },
+  "dependencies": {
+    "da99.applet.js": "da99/applet.js",
+    "jquery": "^2",
+    "lodash": "^3",
+    "jquery.serializeJSON": "^2",
+    "mustache": "^2"
+  }
+}

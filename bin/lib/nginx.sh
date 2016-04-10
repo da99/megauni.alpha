@@ -1,7 +1,6 @@
 
 source "$THIS_DIR/bin/lib/server-env.sh"
 
-# === {{CMD}}  -nginx  -args
 nginx () {
 
   mkdir -p logs

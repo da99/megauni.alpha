@@ -14,6 +14,7 @@ secret*
 # A few more files used only for development
 # and not important.
 
+tsd-debug.log
 /webrat.log
 /configs/config.ru.rb
 /doc/*
@@ -54,13 +55,10 @@ secret*
 
 *.pyc
 
-
-
 # Ignore Emacs backup files.
 \#*
 
 # Ignore Shoes and Shotgun
-
 shoes2.run
 shoes-and-a-shotgun.rb
 
@@ -121,6 +119,13 @@ build/
 /nginx.root.conf
 /conf/.bundle/
 /conf/vendor/
-/Public/scripts/
 /nginx
+/node_modules
+/Public/vendor/bower
+/Public/tmp
+/Public/bower_components
+/Public/scripts/types
+/nginx
+/luajit
+/lapis
 /progs
