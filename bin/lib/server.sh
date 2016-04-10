@@ -1,33 +1,48 @@
 
+source "$THIS_DIR/bin/lib/nginx.sh"
+
 # === {{CMD}} start
 # === {{CMD}} pid    # prints pid number. Exits 1 if no pid found.
 # === {{CMD}} reload
 # === {{CMD}} quit   # (graceful shutdown)
+homepage () {
+  local +x PORT="$(netstat -tulpn 2>/dev/null | grep "$(server-pid)/" | grep -Po ":\K(\d+)" )"
+  local +x LOCAL="http://localhost:$PORT"
+  mksh_setup BOLD "{{$LOCAL}}"
+} # === homepage
+
 server () {
-  local CONF="$PWD/config/nginx.conf"
-  local CMD="nginx/sbin/nginx -c "$CONF""
   case "$1" in
     start)
-      $CMD -t
-
-      if ! $0 server pid >/dev/null; then
-        $CMD
-        bash_setup BOLD "=== NGINX has {{started}}."
+      if server is-server-running; then
+        mksh_setup ORANGE "=== Server is already {{running}}: $(homepage)"
         return 0
       fi
 
-      $0 server reload
+      nginx -t
+      nginx
+
+      mksh_setup max-wait 5s "$0 is-server-running"
+      mksh_setup GREEN "=== Server is {{running}}: $(homepage)"
+      return 0
       ;;
 
+    restart)
+      server stop
+      server start
+      ;;
+
+
     pid)
-      found=""
-      while read FILE; do
+      local +x found=""
+      local +x IFS=$'\n'
+      for FILE in $(find progs -type f -iname "*.pid" ! -size 0) ; do
         cat "$FILE"
         found="yes"
-      done < <(find nginx -type f -iname "*.pid" ! -size 0)
+      done
 
       if [[ -z "$found" ]]; then
-        exit 1
+        return 1
       fi
       ;;
 
@@ -37,12 +52,39 @@ server () {
         return 0
       fi
 
-      $CMD  -s reload
+      nginx  -s reload
       bash_setup BOLD "=== NGINX .conf has been {{reloaded}}."
       ;;
 
     quit)
-      $CMD  -s quit
+      if ! server is-server-running; then
+        mksh_setup ORANGE "=== Server is already {{shutdown}}."
+        return 0
+      fi
+
+      echo "=== Quitting (ie graceful shutdown)..."
+      nginx -s quit
+
+      if server is-server-running; then
+        mksh_setup RED "!!! Something went wrong. Server is {{still running}}."
+        return 1
+      fi
+      ;;
+
+    server-env)
+      if [[ -z "${IS_DEV:-}" ]] ; then
+        echo "PROD"
+      else
+        echo "DEV"
+      fi
+      ;;
+
+    is-server-running)
+      # pgrep -f "elixir.+megauni\.server(\s|$|,)" || (echo "=== No process found" 1>&2)
+      if [[ ! -z "$(server pid || :)" ]] &&  ( ps aux | grep megauni | grep --color=always nginx ) >/dev/null ; then
+        return 0
+      fi
+      return 1
       ;;
 
     *)

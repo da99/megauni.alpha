@@ -1,6 +1,18 @@
 
 # === {{CMD}} ...
 install () {
+
+  echo ""
+  echo "# === Installing PGCRYPTO extension."
+  sudo -u postgres psql "$DATABASE_NAME" -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
+
+  echo ""
+
+  bin/install_nodejs
+  bin/install_nginx_conf
+  bin/install_pg
+  bin/install_gems
+
   mksh_setup BOLD "=== Adding '{{git push}}' urls"
   ORIGIN_FETCH="$(git remote -v | grep 'origin' | grep '(fetch)' | head -n1 | cut -f2 | cut -d ' ' -f1)"
   BITBUCKET="git@bitbucket:da99/megauni.git"
