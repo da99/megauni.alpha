@@ -1,6 +1,6 @@
 {
-  "name": "megauni.js",
-  "version": "0.0.1",
+  "name": "megauni",
+  "version": "6.0.0",
   "description": "Client for megauni.com on the browser.",
   "main": "megauni.js",
   "bin": {
