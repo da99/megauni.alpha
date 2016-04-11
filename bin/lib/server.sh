@@ -6,7 +6,7 @@ source "$THIS_DIR/bin/lib/nginx.sh"
 # === {{CMD}} reload
 # === {{CMD}} quit   # (graceful shutdown)
 homepage () {
-  local +x PORT="$(netstat -tulpn 2>/dev/null | grep "$(server-pid)/" | grep -Po ":\K(\d+)" )"
+  local +x PORT="$(netstat -tulpn 2>/dev/null | grep "$(server pid)/" | grep -Po ":\K(\d+)" )"
   local +x LOCAL="http://localhost:$PORT"
   mksh_setup BOLD "{{$LOCAL}}"
 } # === homepage
@@ -14,7 +14,7 @@ homepage () {
 server () {
   case "$1" in
     start)
-      if server is-server-running; then
+      if server is-running; then
         mksh_setup ORANGE "=== Server is already {{running}}: $(homepage)"
         return 0
       fi
@@ -22,13 +22,13 @@ server () {
       nginx -t
       nginx
 
-      mksh_setup max-wait 5s "$0 is-server-running"
+      mksh_setup max-wait 5s "$0 server is-running"
       mksh_setup GREEN "=== Server is {{running}}: $(homepage)"
       return 0
       ;;
 
     restart)
-      server stop
+      server quit
       server start
       ;;
 
@@ -57,7 +57,7 @@ server () {
       ;;
 
     quit)
-      if ! server is-server-running; then
+      if ! server is-running; then
         mksh_setup ORANGE "=== Server is already {{shutdown}}."
         return 0
       fi
@@ -65,7 +65,7 @@ server () {
       echo "=== Quitting (ie graceful shutdown)..."
       nginx -s quit
 
-      if server is-server-running; then
+      if server is-running; then
         mksh_setup RED "!!! Something went wrong. Server is {{still running}}."
         return 1
       fi
@@ -79,7 +79,7 @@ server () {
       fi
       ;;
 
-    is-server-running)
+    is-running)
       # pgrep -f "elixir.+megauni\.server(\s|$|,)" || (echo "=== No process found" 1>&2)
       if [[ ! -z "$(server pid || :)" ]] &&  ( ps aux | grep megauni | grep --color=always nginx ) >/dev/null ; then
         return 0

@@ -36,21 +36,6 @@ case "$action" in
     exit 0
     ;;
 
-  "js_files")
-    # === $ js_files
-    while read FILE
-    do
-      babel="$(dirname $FILE)/$(basename $FILE .js).babel.js"
-      if [[ ! -f "$babel" ]]; then
-        echo $FILE
-      fi
-    done < <( find ./Public/ ./specs/ -type f -regex ".*\.js\$" -and -not -regex ".*/vendor/.*" -printf "%p\n" )
-    ;;
-
-  "json_files")
-    find ./Public/ ./specs/ -type f -regex ".*\.json\$" -and -not -regex ".*/vendor/.*" -printf "%p\n"
-    ;;
-
   "typescript_files")
     # === $ typescript_files
     find ./Public ./specs       \
@@ -61,20 +46,13 @@ case "$action" in
       -printf "%p\n"
     ;;
 
-  "validate_json")
-    while read -r $FILE
-    do
-      $0 validate_js $FILE
-    done < <(json_files)
-    ;;
-
   "validate_js")
     # ===  $ bin/megauni.js  validate_js   file/path/file.js
 
     cmd="js_setup jshint! "
     file="$1"
     shift
-    if [[ "$file" =~ "bin/" ]]; then
+    if echo "$file" | grep "bin/" >/dev/null ; then
       echo "=== Skipping bin fie: $file" 1>&2
       exit 0
     fi
@@ -123,10 +101,9 @@ case "$action" in
     # === Turns .ts file into temp file for compile_babel
 
     if [[ -z "$@" ]]; then
-      while read file
-      do
+      $0 typescript_files | while read file; do
         $0 compile_typescript "$file"
-     done < <($0 typescript_files)
+      done
       exit 0
     fi # ================================================
 
@@ -170,10 +147,9 @@ case "$action" in
     # ==> Creates: file.babel.js, file.babel.js.map
 
     if [[ -z "$@" ]]; then
-      while read -r FILE
-      do
+      js_files | while read -r FILE; do
         $0 compile_babel $FILE
-      done < <(js_files)
+      done
     fi
 
     orig="$1"
@@ -224,18 +200,17 @@ case "$action" in
     # === Render all mustache files if:
     if [[ -z "$@" ]]; then
       IFS=$' '
-      while read -r file
-      do
+      echo Public/applets/*/*.mustache | while read -r file ; do
         echo ""
         $0 compile_mustache $file
-      done < <(echo Public/applets/*/*.mustache)
+      done
       exit 0
     fi
 
     file="$1"
     shift
 
-    if [[ "$file" =~ "layout.mustache" ]]; then
+    if echo "$file" | grep "layout.mustache" >/dev/null ; then
       echo "=== Skipping: $file"
       exit 0
     fi
@@ -268,7 +243,7 @@ case "$action" in
     # ===  $ bin/megauni.js  watch
     # ===  $ bin/megauni.js  watch   fast
 
-    if [[ ! "$@" =~ "fast" ]]; then
+    if ! ( echo "$@" | grep "fast" >/dev/null ) ; then
       $0 render || :
     fi
 
@@ -295,7 +270,7 @@ case "$action" in
         break
       fi
 
-      if [[ "${error_files[@]}" =~ "$path" ]]; then
+      if echo "${error_files[@]}" | grep "$path" >/dev/null ; then
         echo "=== Validating in 2s to let gvim detect change: $path "
         sleep 2s
         $0 validate_html $path
