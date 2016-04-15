@@ -1,26 +1,19 @@
-<!-- PUBLIC FILE
-  /index.html
--->
-<!-- title
-  megaUNI Home
--->
-<!-- scripts
-  <script src="/applets/homepage/script.babel.js"></script>
--->
-<!-- meta
+<!-- PUBLIC FILE /index.html -->
+
+<local name="TITLE" value="megaUNI Home" />
+<local name="meta">
   <meta name="Description" CONTENT="Sign-In or Create an Account if you don't have one." />
--->
+</local>
 
-
-    <div id="loading" data-hide_if="page_loaded?">
+    <div id="loading" data-do="hide page_loaded?">
       Loading...
     </div>
 
-    <mustache data-render_if="logged_in?">
+    <template data-do="template logged_in?">
       <div class="hidden block" data-show_if="logged_in?">
         <p>You are logged in.</p>
       </div>
-    </mustache><!-- if logged_in? -->
+    </template><!-- if logged_in? -->
 
     <mustache data-render_if="!logged_in?">
 
