@@ -1,21 +1,24 @@
-<!-- PUBLIC FILE /index.html -->
+<!-- /index.html -->
 
-<local name="TITLE" value="megaUNI Home" />
-<local name="meta">
-  <meta name="Description" CONTENT="Sign-In or Create an Account if you don't have one." />
-</local>
+<global name="PAGE_TITLE" value="{{SITE_NAME}} Home" />
+<paste src="/Server/MUE/_.layout.html" />
 
+<head>
+  <meta name="Description" CONTENT="Sign-In or Create an Account if you don't have one.">
+</head>
+
+<body>
     <div id="loading" data-do="hide page_loaded?">
       Loading...
     </div>
 
     <template data-do="template logged_in?">
-      <div class="hidden block" data-show_if="logged_in?">
+      <div class="hidden block" data-do="show logged_in?">
         <p>You are logged in.</p>
       </div>
-    </template><!-- if logged_in? -->
+    </template>
 
-    <mustache data-render_if="!logged_in?">
+    <template data-do="template !logged_in?">
 
       <div class="block form">
         <h3>Log-In</h3>
@@ -24,20 +27,20 @@
              action="/sign-in"
              id="sign_in"
              method="post"
-             data-on_send="hide_buttons"
-             data-on_respond_ok="reset, wait_a_few, reload"
+             data-do="on_send hide_buttons"
+             data-do="on_respond_ok reset, wait_a_few, reload"
              >
             <div class="fields">
               <div class="field screen_name"><label>Screen name:</label><input name="screen_name" type="text" value="" /></div>
               <div class="field passphrase"><label>Pass phrase:</label><input name="pswd" type="password" value="" /></div>
 
-              <mustache data-render_if="logged_in?">
+              <template data-do="template logged_in?">
                 <div class="success_msg">You are now logged in. Loading...</div>
-              </mustache>
+              </template>
 
-              <mustache data-render_if="error /sign-in">
+              <template data-do="template error-/sign-in">
                 <div class="error_msg">{{msg}}</div>
-              </mustache>
+              </template>
 
               <div class="field buttons"><button class="submit">Log-In</button></div>
             </div>
@@ -52,8 +55,8 @@
             action="/user"
             id="create_account"
             method="post"
-            data-on_send="hide_buttons"
-            data-on_respond_ok="reset, wait_a_few, reload"
+            data-do="on_send hide_buttons"
+            data-do="on_respond_ok reset, wait_a_few, reload"
             >
             <div class="fields">
 
@@ -76,13 +79,13 @@
                 <input name="confirm_pass_word" type="password" value="" />
               </div>
 
-              <mustache data-render_if="logged_in?">
+              <template data-do="template logged_in?">
                 <div class="success_msg">You account has been created. Loading...</div>
-              </mustache>
+              </template>
 
-              <mustache data-render_if="error /user">
+              <template data-do="template error-/user">
                 <div class="error_msg">{{msg}}</div>
-              </mustache>
+              </template>
 
               <div class="buttons"><button class="submit">Create Account</button></div>
             </div>
@@ -90,7 +93,7 @@
         </div>
       </div>
 
-    </mustache><!-- text/mustache !logged_in? -->
+    </template><!-- text/mustache !logged_in? -->
 
 
     <div class="block" id="intro">
@@ -108,6 +111,7 @@
         <p><span>Palettes: </span><a href="http://www.colourlovers.com/lover/dvdcpd">dvdcpd</a><a href="http://www.colourlovers.com/palette/154398/bedouin">shari_foru</a></p>
       </div>
     </div>
+</body>
 
 
 
