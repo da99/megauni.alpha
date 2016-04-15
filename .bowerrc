@@ -1,7 +1,3 @@
 {
-<<<<<<< HEAD
-  "directory": "Public/scripts/"
-=======
-  "directory": "Public/vendor/bower"
->>>>>>> cd91f8d237f091bc06520143594f170a033fc1a9
+  "directory": "Public/bower_components"
 }

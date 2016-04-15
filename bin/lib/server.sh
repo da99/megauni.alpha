@@ -56,6 +56,12 @@ server () {
       bash_setup BOLD "=== NGINX .conf has been {{reloaded}}."
       ;;
 
+
+    stop)
+      mksh_setup GREEN "=== You want {{quit}} (graceful shutdown) not RED{{stop}} (immediate stop)." 1>&2
+      exit 1
+      ;;
+
     quit)
       if ! server is-running; then
         mksh_setup ORANGE "=== Server is already {{shutdown}}."

@@ -121,8 +121,8 @@ build/
 /conf/vendor/
 /nginx
 /node_modules
-/Public/vendor/bower
 /Public/tmp
+/Public/vendor/bower
 /Public/bower_components
 /Public/scripts/types
 /nginx

@@ -13,7 +13,7 @@
     "megauni"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/da99/megauni.html",
+  "homepage": "https://github.com/da99/megauni",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -23,13 +23,8 @@
     "tests"
   ],
   "devDependencies": {
-    "jasmine": ">2.0.0"
   },
   "dependencies": {
-    "da99.applet.js": "da99/applet.js",
-    "jquery": "^2",
-    "lodash": "^3",
-    "jquery.serializeJSON": "^2",
-    "mustache": "^2"
+    "da99.dum_dum_boom_boom.js": "da99/dum_dum_boom_boom"
   }
 }
