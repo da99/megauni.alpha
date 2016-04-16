@@ -16,7 +16,17 @@ build () {
   if [[ -z "$@" ]]; then
     reset-dir Public/applets/
     cp -f Server/Megauni/browser/*.js Public/applets/
+
     build "Homepage"
+    build "MUE"
+
+    local +x JS_FILES=$(find Public/applets -type f -name "*.js")
+    mksh_setup ORANGE "=== {{eslinting}}: $JS_FILES"
+    js_setup eslint browser $JS_FILES
+    tput cuu1; tput el
+    mksh_setup GREEN "=== {{Passed}} eslint: $JS_FILES"
+
+    mksh_setup GREEN "=== Done {{building}}."
     return 0
   fi # =====================================================
 
@@ -37,6 +47,6 @@ build () {
 
   # === Finish. Print results:
   tput cuu1; tput el
-  mksh_setup GREEN "-n" "=== output in: {{$OUTPUT}}: "
+  mksh_setup GREEN "-n" "=== Output in: {{$OUTPUT}}: "
   echo $OUTPUT/*.html
 } # === end function
