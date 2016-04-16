@@ -1,7 +1,8 @@
 <!-- /index.html -->
 
-<global name="PAGE_TITLE" value="{{SITE_NAME}} Home" />
-<paste src="../MUE/_.layout.html" />
+<run src="../MUE/_.layout.html">
+  <local name="PAGE_TITLE">{{SITE_NAME}} Home</local>
+</run>
 
 <head>
   <meta name="Description" CONTENT="Sign-In or Create an Account if you don't have one.">
@@ -104,13 +105,14 @@
       <p><a href="/nowhere">/nowhere</a></p>
       <div class="disclaimer">
         <p>
-          (c) 2012-<span id="copyright_year_today">2015</span> megauni.com. Some rights reserved.
+          (c) 2012-<span id="copyright_year_today">2016</span> megauni.com. Some rights reserved.
         </p>
         <p>All other copyrights belong to their respective owners, who have no association to this site:</p>
         <p><span>Logo font: </span><a href="http://openfontlibrary.org/en/font/otfpoc">Aghja</a></p>
         <p><span>Palettes: </span><a href="http://www.colourlovers.com/lover/dvdcpd">dvdcpd</a><a href="http://www.colourlovers.com/palette/154398/bedouin">shari_foru</a></p>
       </div>
     </div>
+
 </body>
 
 
