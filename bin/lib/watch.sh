@@ -3,52 +3,73 @@
 # === {{CMD}}   "my command --with --args"
 # === {{CMD}}   "bash       /tmp/lots-of-cmds-with-quotes.sh"
 watch () {
-    cmd () {
-      if [[ -z "$@" ]]; then
-        path="some.file"
-      else
-        path="$1"
-        shift
-      fi
-    }
-    cmd
+  local +x CMD=""
+  if [[ ! -z "$@" ]]; then
+    CMD="$1"; shift
+    $CMD
+  fi
+  # $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' ' 
 
-    echo -e "\n=== Watching: $files"
-    inotifywait --quiet --monitor --event close_write -r lib/ -r specs/ $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' ' | while read -r CHANGE; do
-      dir=$(echo "$CHANGE" | cut -d' ' -f 1)
-      path="${dir}$(echo "$CHANGE" | cut -d' ' -f 3)"
-      file="$(basename $path)"
 
-      # Make sure this is not a temp/swap file:
-      { [[ ! -f "$path" ]] && continue; } || :
+  mksh_setup BOLD "\n=== Watching: "
 
-        if [[ "$path" == *bin/megauni* ]]; then
-          break
-        fi
+  inotifywait --quiet --monitor --event close_write -r config/ -r lib/ Server/ bin/ | while read -r CHANGE; do
+    dir=$(echo "$CHANGE" | cut -d' ' -f 1)
+    path="${dir}$(echo "$CHANGE" | cut -d' ' -f 3)"
+    file="$(basename $path)"
 
-        if [[ "$file" == *.sql ]]; then
-          ( bin/megauni migrate up "$(basename $(dirname $(dirname "$path")))" && $0 test $@ ) || :
-        else
-          if [[ "$file" == *.js ]]; then
-            js_pass="true"
-            js_setup jshint! $path || js_pass=""
+    # Make sure this is not a temp/swap file:
+    if [[ ! -f "$path" ]]; then
+      mksh_setup BOLD "=== Skipping: $path"
+      continue
+    fi
 
-            if [[ -n "$js_pass" ]]; then
-              $0 run_specs $@ || :
-              bin/megauni restart
-            fi # === if $js_pass
-          else
-            if [[ "$path" == *.json ]]; then
-              (js_setup jshint! $path && $0 test $@)  || :
-            else
-              $0 test $@ || :
-            fi
-          fi # === if $file == *.js
-        fi
-    done
+    mksh_setup BOLD "=== {{CHANGE}}: $CHANGE  {{PATH}}: {{$path}}"
+    if [[ ! -z "$CMD" ]]; then
+      $CMD
+    fi
 
-    echo ""
-    echo "=== ${GREEN}Reloading${RESET_COLOR} this script: $0 $action"
-    $0 watch $THE_ARGS
+    if [[ "$path" == bin/megauni* || "$path" == bin/lib/watch.sh ]]; then
+      mksh_setup ORANGE "\n=== {{Reloading}} this script: $0 $THE_ARGS"
+      exec $0 $THE_ARGS
+    fi
+
+    if [[ "$file" == *.sql ]]; then
+      ( bin/megauni migrate up "$(basename $(dirname $(dirname "$path")))" && $0 test $@ ) || :
+      continue
+    fi
+
+    if [[ "$path" == config/* ]]; then
+      megauni server restart && \
+      mksh_setup BOLD "-n" "=== Reloading browser: " && \
+      { gui_setup reload-browser &&  \
+      wget -q -S -O- http://localhost:4567/ 2>&1 | grep HTTP; } || :
+      continue
+    fi
+
+    if [[ "$path" == *Server/*/*.html ]]; then
+      $0 build $(echo "$path" | cut -d'/' -f2)
+      mksh_setup BOLD "=== Reloading browser: "
+      gui_setup reload-browser || :
+      continue
+    fi
+
+    if [[ "$file" == *.js ]]; then
+      js_pass="true"
+      js_setup jshint! $path || js_pass=""
+
+      if [[ -n "$js_pass" ]]; then
+        $0 run_specs $@ || :
+        bin/megauni restart
+      fi # === if $js_pass
+      continue
+    fi
+
+    if [[ "$path" == *.json ]]; then
+      (js_setup jshint! $path && $0 test $@)  || :
+      continue
+    fi
+  done # === watch
+
 } # === end function
 

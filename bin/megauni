@@ -2,6 +2,7 @@
 # -*- mksh -*-
 #
 #
+THE_ARGS="$@"
 IS_DEPLOY="$IS_DEPLOY"
 THIS_DIR="$(mksh_setup dirname_of_bin "$0")"
 PORT="${PORT:-4567}"
@@ -238,84 +239,6 @@ case "$action" in
     $0 compile_babel
     $0 validate_json
     ;;
-
-  "watch")
-    # ===  $ bin/megauni.js  watch
-    # ===  $ bin/megauni.js  watch   fast
-
-    if ! ( echo "$@" | grep "fast" >/dev/null ) ; then
-      $0 render || :
-    fi
-
-    echo -e "\n=== Watching ${ORANGE}$(basename $0)${RESET_COLOR} (proc ${$})..."
-
-    inotifywait \
-      --quiet   \
-      --monitor \
-      --event close_write \
-      "$0"        \
-      -r Public/  \
-      -r specs/   \
-      *.js        \
-      --exclude "/vendor/" | while read CHANGE
-    do
-      dir=$(echo "$CHANGE" | cut -d' ' -f 1)
-      op=$(echo "$CHANGE" | cut -d' ' -f 2)
-      path="${dir}$(echo "$CHANGE" | cut -d' ' -f 3)"
-      file="$(basename $path)"
-
-
-      if [[ "$path" == "$0" ]]; then
-        echo "=== ${GREEN}Reloading${RESET_COLOR}: $0 ${orig_args[@]}"
-        break
-      fi
-
-      if echo "${error_files[@]}" | grep "$path" >/dev/null ; then
-        echo "=== Validating in 2s to let gvim detect change: $path "
-        sleep 2s
-        $0 validate_html $path
-        continue
-      fi
-
-      if [[ "$file" == *.mustache ]]; then
-        if [[ "$file" == "layout.mustache" ]]; then
-          $0 compile_mustache
-        else
-          $0 compile_mustache "$path"
-        fi
-        continue
-      fi
-
-      if [[ "$file" == *.styl ]]; then
-        $0 compile_stylus "$path"
-        continue
-      fi
-
-      if [[ "$path" == *.ts ]]; then
-        $0 compile_typescript $path || :
-        continue
-      fi
-
-      if [[ "$path" == *.json ]]; then
-        $0 validate_js $path || :
-        continue
-      fi
-
-      if [[ "$path" == *.js ]]; then
-        $0 compile_babel $path || :
-        continue
-      fi
-
-      if [[ "$path" == *.babel.js.map ]]; then
-        echo -e "=== $CHANGE (${path})"
-        continue
-      fi
-
-      echo -e "\n=== $CHANGE (${path})"
-    done
-
-    ;;
-
 
   *)
     export PATH="$PWD/progs/bin:$PATH"

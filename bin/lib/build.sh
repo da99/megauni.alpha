@@ -1,22 +1,42 @@
 
 # === {{CMD}}
 # === {{CMD}}  "NAME"
+
+reset-dir () {
+  local +x DIR="$1"; shift
+  if [[ "$DIR" != Public/applets/* ]]; then
+    mksh_setup RED "!!! Invalid directory to reset: $DIR"
+    exit 1
+  fi
+  rm -rf "$DIR"
+  mkdir -p "$DIR"
+}
+
 build () {
   if [[ -z "$@" ]]; then
-    mksh_setup ORANGE "=== {{Building}}..." >&2
+    reset-dir Public/applets/
+    cp -f Server/Megauni/browser/*.js Public/applets/
     build "Homepage"
-    mksh_setup GREEN "=== Done {{building}}." >&2
     return 0
-  fi
+  fi # =====================================================
 
   local +x NAME="$1"; shift
   local +x INPUT="Server/$NAME"
   local +x OUTPUT="Public/applets/$NAME"
-  mkdir -p "$OUTPUT"
 
+  # === Reset OUTPUT  dir:
+  reset-dir "$OUTPUT"
+
+  # === Build it:
   cd "$THIS_DIR"
+  mksh_setup ORANGE "=== {{Building}} $INPUT ..."
   dum_dum_boom_boom html           \
     --input-dir  "$INPUT"           \
     --output-dir "$OUTPUT"           \
     --public-dir "Public/"
+
+  # === Finish. Print results:
+  tput cuu1; tput el
+  mksh_setup GREEN "-n" "=== output in: {{$OUTPUT}}: "
+  echo $OUTPUT/*.html
 } # === end function
