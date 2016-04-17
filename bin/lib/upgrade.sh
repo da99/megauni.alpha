@@ -4,6 +4,30 @@
 
 # === {{CMD}}
 upgrade () {
+
+  local +x ORIGIN="/lib/browser/build/browser.js"
+  local +x FILE="Public/vendor/dum_dum_boom_boom.js"
+
+  mkdir -p Public/vendor
+
+
+  if [[ -d /apps/dum_dum_boom_boom ]]; then
+    cp -vf /apps/dum_dum_boom_boom$ORIGIN "$FILE"
+    return 0
+  fi
+
+  if [[ -d /progs/dum_dum_boom_boom ]]; then
+    cd /progs/dum_dum_boom_boom
+    git pull
+    cp -vf /progs/dum_dum_boom_boom$ORIGIN "$FILE"
+    return 0
+  fi
+
+  cd Public/vendor
+  wget -q -O "$FILE" https://github.com/da99/dum_dum_boom_boom/raw/master$ORIGIN
+} # === upgrade ()
+
+old-upgrade () {
   flips="$@"
   js="Public/js"
   base_file="$js/vendor/all.js"
