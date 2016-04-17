@@ -15,10 +15,10 @@ reset-dir () {
 build () {
   if [[ -z "$@" ]]; then
     reset-dir Public/applets/
-    cp -f Server/Megauni/browser/*.js Public/applets/
 
     build "Homepage"
     build "MUE"
+    build "Browser"
 
     local +x JS_FILES=$(find Public/applets -type f -name "*.js")
     mksh_setup ORANGE "=== {{eslinting}}: $JS_FILES"

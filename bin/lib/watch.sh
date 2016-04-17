@@ -2,6 +2,13 @@
 # === {{CMD}}
 # === {{CMD}}   "my command --with --args"
 # === {{CMD}}   "bash       /tmp/lots-of-cmds-with-quotes.sh"
+
+reload-browser () {
+  mksh_setup BOLD "=== Reloading browser: "
+  gui_setup reload-browser
+  wget -q -S -O- http://localhost:4567/ 2>&1 | grep HTTP
+}
+
 watch () {
   local +x CMD=""
   if [[ ! -z "$@" ]]; then
@@ -40,30 +47,23 @@ watch () {
     fi
 
     if [[ "$path" == config/* ]]; then
-      megauni server restart && \
-      mksh_setup BOLD "-n" "=== Reloading browser: " && \
-      { gui_setup reload-browser &&  \
-      wget -q -S -O- http://localhost:4567/ 2>&1 | grep HTTP; } || :
+      megauni server restart && reload-browser || :
       continue
     fi
 
     if [[ "$path" == *Server/*/*.html ]]; then
       $0 build $(echo "$path" | cut -d'/' -f2)
-      mksh_setup BOLD "=== Reloading browser: "
-      gui_setup reload-browser || :
+      reload-browser
       continue
     fi
 
     if [[ "$file" == *.js ]]; then
-      js_pass="true"
-      js_setup jshint! $path || js_pass=""
+      js_setup jshint! $path && {
+        $0 build Browser && reload-browser || :
+      }
 
-      if [[ -n "$js_pass" ]]; then
-        $0 run_specs $@ || :
-        bin/megauni restart
-      fi # === if $js_pass
       continue
-    fi
+    fi # === if *.js
 
     if [[ "$path" == *.json ]]; then
       (js_setup jshint! $path && $0 test $@)  || :
