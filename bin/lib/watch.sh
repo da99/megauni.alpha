@@ -52,7 +52,11 @@ watch () {
     fi
 
     if [[ "$path" == *Server/*/*.html ]]; then
-      $0 build $(echo "$path" | cut -d'/' -f2)
+      if [[ "$path" == *_.layout.html ]]; then
+        $0 build || :
+      else
+        $0 build $(echo "$path" | cut -d'/' -f2) || :
+      fi
       reload-browser
       continue
     fi

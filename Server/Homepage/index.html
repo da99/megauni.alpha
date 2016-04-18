@@ -1,5 +1,10 @@
 <!-- /index.html -->
 
+<script>
+  /* global App */
+  App("send message", {"page-loaded?": true});
+</script>
+
 <run src="../MUE/_.layout.html">
   <local name="PAGE_TITLE">{{SITE_NAME}} Home</local>
 </run>
@@ -13,109 +18,105 @@
 </bottom>
 
 <body>
-    <div id="loading" data-do="hide page_loaded?">
-      Loading...
+
+  <div id="loading" data-do="hide page-loaded?">
+    Loading...
+  </div>
+
+  <template data-do="template logged_in?">
+    <div class="hidden block" data-do="show_if logged_in?">
+      <p>You are logged in.</p>
+    </div>
+  </template>
+
+  <template data-do="template !logged_in?">
+    <div class="block form" id="log_in">
+      <h3>Log-In</h3>
+      <div class="content">
+        <form action="/log-in" method="post" data-do="send_form this submit; remove_if logged_in?">
+          <div class="fields">
+            <div class="field screen_name"><label>Screen name:</label><input name="screen_name" type="text" value="" /></div>
+            <div class="field passphrase"><label>Pass phrase:</label><input name="pswd" type="password" value="" /></div>
+
+            <template data-do="template logged_in?">
+              <div class="success_msg">You are now logged in. Loading...</div>
+            </template>
+
+            <template data-do="template error-/log-in">
+              <div class="error_msg">{{msg}}</div>
+            </template>
+
+            <div class="field buttons" data-do="hide_if form submit"><button class="submit" data-do="on_click send_msg form submit">Log-In</button></div>
+            <div class="loading"       data-do="hidden; show_if form submit;    hide     form is_response">Loading...</div>
+            <div class="errors"        data-do="hidden; show_if form error_msg; print_if form error_msg"></div>
+          </div>
+        </form>
+      </div><!-- div.content -->
+    </div><!-- div.block.form -->
+
+    <div class="block form">
+      <h3>Create a New Account</h3>
+      <div class="content">
+        <form
+          action="/user"
+          id="create_account"
+          method="post"
+          data-do="on_send hide_buttons"
+          data-do="on_respond_ok reset, wait_a_few, reload"
+          >
+          <div class="fields">
+
+            <div class="field screen_name">
+              <label>Screen name:</label>
+              <input name="screen_name" type="text" value="" />
+            </div>
+
+            <div class="field pswd">
+              <label>
+                <span class="main">Pass phrase</span>
+                <span class="sub"> (for better security, use spaces and words)</span>
+                <span class="main">:</span>
+              </label>
+              <input name="pswd" type="password" value="" />
+            </div>
+
+            <div class="field confirm_pass_phrase">
+              <label><span class="main">Re-type the pass phrase:</span></label>
+              <input name="confirm_pass_word" type="password" value="" />
+            </div>
+
+            <template data-do="template logged_in?">
+              <div class="success_msg">You account has been created. Loading...</div>
+            </template>
+
+            <template data-do="template error-/user">
+              <div class="error_msg">{{msg}}</div>
+            </template>
+
+            <div class="buttons"><button class="submit">Create Account</button></div>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <template data-do="template logged_in?">
-      <div class="hidden block" data-do="show logged_in?">
-        <p>You are logged in.</p>
-      </div>
-    </template>
-
-    <template data-do="template !logged_in?">
-
-      <div class="block form">
-        <h3>Log-In</h3>
-        <div class="content">
-          <form
-             action="/sign-in"
-             id="sign_in"
-             method="post"
-             data-do="on_send hide_buttons"
-             data-do="on_respond_ok reset, wait_a_few, reload"
-             >
-            <div class="fields">
-              <div class="field screen_name"><label>Screen name:</label><input name="screen_name" type="text" value="" /></div>
-              <div class="field passphrase"><label>Pass phrase:</label><input name="pswd" type="password" value="" /></div>
-
-              <template data-do="template logged_in?">
-                <div class="success_msg">You are now logged in. Loading...</div>
-              </template>
-
-              <template data-do="template error-/sign-in">
-                <div class="error_msg">{{msg}}</div>
-              </template>
-
-              <div class="field buttons"><button class="submit">Log-In</button></div>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <div class="block form">
-        <h3>Create a New Account</h3>
-        <div class="content">
-          <form
-            action="/user"
-            id="create_account"
-            method="post"
-            data-do="on_send hide_buttons"
-            data-do="on_respond_ok reset, wait_a_few, reload"
-            >
-            <div class="fields">
-
-              <div class="field screen_name">
-                <label>Screen name:</label>
-                <input name="screen_name" type="text" value="" />
-              </div>
-
-              <div class="field pswd">
-                <label>
-                  <span class="main">Pass phrase</span>
-                  <span class="sub"> (for better security, use spaces and words)</span>
-                  <span class="main">:</span>
-                </label>
-                <input name="pswd" type="password" value="" />
-              </div>
-
-              <div class="field confirm_pass_phrase">
-                <label><span class="main">Re-type the pass phrase:</span></label>
-                <input name="confirm_pass_word" type="password" value="" />
-              </div>
-
-              <template data-do="template logged_in?">
-                <div class="success_msg">You account has been created. Loading...</div>
-              </template>
-
-              <template data-do="template error-/user">
-                <div class="error_msg">{{msg}}</div>
-              </template>
-
-              <div class="buttons"><button class="submit">Create Account</button></div>
-            </div>
-          </form>
-        </div>
-      </div>
-
-    </template><!-- template !logged_in? -->
+  </template><!-- template !logged_in? -->
 
 
-    <div class="block" id="intro">
-      <h1 class="site"><span class="main">mega</span><span class="sub">UNI</span></h1>
-      <p><a href="/home">/home</a></p>
-      <p><a href="/@da99">/@da99</a></p>
-      <p><a href="/!4567">/!4567</a></p>
-      <p><a href="/nowhere">/nowhere</a></p>
-      <div class="disclaimer">
-        <p>
-          (c) 2012-<span id="copyright_year_today">2016</span> megauni.com. Some rights reserved.
-        </p>
-        <p>All other copyrights belong to their respective owners, who have no association to this site:</p>
-        <p><span>Logo font: </span><a href="http://openfontlibrary.org/en/font/otfpoc">Aghja</a></p>
-        <p><span>Palettes: </span><a href="http://www.colourlovers.com/lover/dvdcpd">dvdcpd</a><a href="http://www.colourlovers.com/palette/154398/bedouin">shari_foru</a></p>
-      </div>
+  <div class="block" id="intro">
+    <h1 class="site"><span class="main">mega</span><span class="sub">UNI</span></h1>
+    <p><a href="/home">/home</a></p>
+    <p><a href="/@da99">/@da99</a></p>
+    <p><a href="/!4567">/!4567</a></p>
+    <p><a href="/nowhere">/nowhere</a></p>
+    <div class="disclaimer">
+      <p>
+        (c) 2012-<span id="copyright_year_today">2016</span> megauni.com. Some rights reserved.
+      </p>
+      <p>All other copyrights belong to their respective owners, who have no association to this site:</p>
+      <p><span>Logo font: </span><a href="http://openfontlibrary.org/en/font/otfpoc">Aghja</a></p>
+      <p><span>Palettes: </span><a href="http://www.colourlovers.com/lover/dvdcpd">dvdcpd</a><a href="http://www.colourlovers.com/palette/154398/bedouin">shari_foru</a></p>
     </div>
+  </div>
 
 </body>
 

@@ -1,4 +1,6 @@
-<!-- /index.html -->
+<bottom><script type="application/javascript" src="/applets/Homepage/index.script.js"></script></bottom><!-- /index.html -->
+
+
 
 
   
@@ -18,100 +20,102 @@
 </head>
 
   <body>
-    <div id="loading" data-do="hide page_loaded?">
-      Loading...
-    </div>
 
-    <script data-do="template logged_in?" type="application/template">
-      &#x3C;div class=&#x22;hidden block&#x22; data-do=&#x22;show logged_in?&#x22;&#x3E;
-        &#x3C;p&#x3E;You are logged in.&#x3C;/p&#x3E;
-      &#x3C;/div&#x3E;
-    </script>
+  <div id="loading" data-do="hide page-loaded?">
+    Loading...
+  </div>
 
-    <script data-do="template !logged_in?" type="application/template">
+  <script data-do="template logged_in?" type="application/template">
+    &#x3C;div class=&#x22;hidden block&#x22; data-do=&#x22;show_if logged_in?&#x22;&#x3E;
+      &#x3C;p&#x3E;You are logged in.&#x3C;/p&#x3E;
+    &#x3C;/div&#x3E;
+  </script>
 
-      &#x3C;div class=&#x22;block form&#x22;&#x3E;
-        &#x3C;h3&#x3E;Log-In&#x3C;/h3&#x3E;
-        &#x3C;div class=&#x22;content&#x22;&#x3E;
-          &#x3C;form action=&#x22;/sign-in&#x22; id=&#x22;sign_in&#x22; method=&#x22;post&#x22; data-do=&#x22;on_send hide_buttons&#x22;&#x3E;
-            &#x3C;div class=&#x22;fields&#x22;&#x3E;
-              &#x3C;div class=&#x22;field screen_name&#x22;&#x3E;&#x3C;label&#x3E;Screen name:&#x3C;/label&#x3E;&#x3C;input name=&#x22;screen_name&#x22; type=&#x22;text&#x22; value=&#x22;&#x22;&#x3E;&#x3C;/div&#x3E;
-              &#x3C;div class=&#x22;field passphrase&#x22;&#x3E;&#x3C;label&#x3E;Pass phrase:&#x3C;/label&#x3E;&#x3C;input name=&#x22;pswd&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;&#x3C;/div&#x3E;
+  <script data-do="template !logged_in?" type="application/template">
+    &#x3C;div class=&#x22;block form&#x22; id=&#x22;log_in&#x22;&#x3E;
+      &#x3C;h3&#x3E;Log-In&#x3C;/h3&#x3E;
+      &#x3C;div class=&#x22;content&#x22;&#x3E;
+        &#x3C;form action=&#x22;/log-in&#x22; method=&#x22;post&#x22; data-do=&#x22;send_form this submit; remove_if logged_in?&#x22;&#x3E;
+          &#x3C;div class=&#x22;fields&#x22;&#x3E;
+            &#x3C;div class=&#x22;field screen_name&#x22;&#x3E;&#x3C;label&#x3E;Screen name:&#x3C;/label&#x3E;&#x3C;input name=&#x22;screen_name&#x22; type=&#x22;text&#x22; value=&#x22;&#x22;&#x3E;&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;field passphrase&#x22;&#x3E;&#x3C;label&#x3E;Pass phrase:&#x3C;/label&#x3E;&#x3C;input name=&#x22;pswd&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;&#x3C;/div&#x3E;
 
-              &#x3C;script data-do=&#x22;template logged_in?&#x22; type=&#x22;application/template&#x22;&#x3E;
-                &#x26;#x3C;div class=&#x26;#x22;success_msg&#x26;#x22;&#x26;#x3E;You are now logged in. Loading...&#x26;#x3C;/div&#x26;#x3E;
-              &#x3C;/script&#x3E;
+            &#x3C;script data-do=&#x22;template logged_in?&#x22; type=&#x22;application/template&#x22;&#x3E;
+              &#x26;#x3C;div class=&#x26;#x22;success_msg&#x26;#x22;&#x26;#x3E;You are now logged in. Loading...&#x26;#x3C;/div&#x26;#x3E;
+            &#x3C;/script&#x3E;
 
-              &#x3C;script data-do=&#x22;template error-/sign-in&#x22; type=&#x22;application/template&#x22;&#x3E;
-                &#x26;#x3C;div class=&#x26;#x22;error_msg&#x26;#x22;&#x26;#x3E;&#x26;#123;&#x26;#123;msg&#x26;#125;&#x26;#125;&#x26;#x3C;/div&#x26;#x3E;
-              &#x3C;/script&#x3E;
+            &#x3C;script data-do=&#x22;template error-/log-in&#x22; type=&#x22;application/template&#x22;&#x3E;
+              &#x26;#x3C;div class=&#x26;#x22;error_msg&#x26;#x22;&#x26;#x3E;&#x26;#123;&#x26;#123;msg&#x26;#125;&#x26;#125;&#x26;#x3C;/div&#x26;#x3E;
+            &#x3C;/script&#x3E;
 
-              &#x3C;div class=&#x22;field buttons&#x22;&#x3E;&#x3C;button class=&#x22;submit&#x22;&#x3E;Log-In&#x3C;/button&#x3E;&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;field buttons&#x22; data-do=&#x22;hide_if form submit&#x22;&#x3E;&#x3C;button class=&#x22;submit&#x22; data-do=&#x22;on_click send_msg form submit&#x22;&#x3E;Log-In&#x3C;/button&#x3E;&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;loading&#x22; data-do=&#x22;hidden; show_if form submit;    hide     form is_response&#x22;&#x3E;Loading...&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;errors&#x22; data-do=&#x22;hidden; show_if form error_msg; print_if form error_msg&#x22;&#x3E;&#x3C;/div&#x3E;
+          &#x3C;/div&#x3E;
+        &#x3C;/form&#x3E;
+      &#x3C;/div&#x3E;&#x3C;!-- div.content --&#x3E;
+    &#x3C;/div&#x3E;&#x3C;!-- div.block.form --&#x3E;
+
+    &#x3C;div class=&#x22;block form&#x22;&#x3E;
+      &#x3C;h3&#x3E;Create a New Account&#x3C;/h3&#x3E;
+      &#x3C;div class=&#x22;content&#x22;&#x3E;
+        &#x3C;form action=&#x22;/user&#x22; id=&#x22;create_account&#x22; method=&#x22;post&#x22; data-do=&#x22;on_send hide_buttons&#x22;&#x3E;
+          &#x3C;div class=&#x22;fields&#x22;&#x3E;
+
+            &#x3C;div class=&#x22;field screen_name&#x22;&#x3E;
+              &#x3C;label&#x3E;Screen name:&#x3C;/label&#x3E;
+              &#x3C;input name=&#x22;screen_name&#x22; type=&#x22;text&#x22; value=&#x22;&#x22;&#x3E;
             &#x3C;/div&#x3E;
-          &#x3C;/form&#x3E;
-        &#x3C;/div&#x3E;
-      &#x3C;/div&#x3E;
 
-      &#x3C;div class=&#x22;block form&#x22;&#x3E;
-        &#x3C;h3&#x3E;Create a New Account&#x3C;/h3&#x3E;
-        &#x3C;div class=&#x22;content&#x22;&#x3E;
-          &#x3C;form action=&#x22;/user&#x22; id=&#x22;create_account&#x22; method=&#x22;post&#x22; data-do=&#x22;on_send hide_buttons&#x22;&#x3E;
-            &#x3C;div class=&#x22;fields&#x22;&#x3E;
-
-              &#x3C;div class=&#x22;field screen_name&#x22;&#x3E;
-                &#x3C;label&#x3E;Screen name:&#x3C;/label&#x3E;
-                &#x3C;input name=&#x22;screen_name&#x22; type=&#x22;text&#x22; value=&#x22;&#x22;&#x3E;
-              &#x3C;/div&#x3E;
-
-              &#x3C;div class=&#x22;field pswd&#x22;&#x3E;
-                &#x3C;label&#x3E;
-                  &#x3C;span class=&#x22;main&#x22;&#x3E;Pass phrase&#x3C;/span&#x3E;
-                  &#x3C;span class=&#x22;sub&#x22;&#x3E; (for better security, use spaces and words)&#x3C;/span&#x3E;
-                  &#x3C;span class=&#x22;main&#x22;&#x3E;:&#x3C;/span&#x3E;
-                &#x3C;/label&#x3E;
-                &#x3C;input name=&#x22;pswd&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;
-              &#x3C;/div&#x3E;
-
-              &#x3C;div class=&#x22;field confirm_pass_phrase&#x22;&#x3E;
-                &#x3C;label&#x3E;&#x3C;span class=&#x22;main&#x22;&#x3E;Re-type the pass phrase:&#x3C;/span&#x3E;&#x3C;/label&#x3E;
-                &#x3C;input name=&#x22;confirm_pass_word&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;
-              &#x3C;/div&#x3E;
-
-              &#x3C;script data-do=&#x22;template logged_in?&#x22; type=&#x22;application/template&#x22;&#x3E;
-                &#x26;#x3C;div class=&#x26;#x22;success_msg&#x26;#x22;&#x26;#x3E;You account has been created. Loading...&#x26;#x3C;/div&#x26;#x3E;
-              &#x3C;/script&#x3E;
-
-              &#x3C;script data-do=&#x22;template error-/user&#x22; type=&#x22;application/template&#x22;&#x3E;
-                &#x26;#x3C;div class=&#x26;#x22;error_msg&#x26;#x22;&#x26;#x3E;&#x26;#123;&#x26;#123;msg&#x26;#125;&#x26;#125;&#x26;#x3C;/div&#x26;#x3E;
-              &#x3C;/script&#x3E;
-
-              &#x3C;div class=&#x22;buttons&#x22;&#x3E;&#x3C;button class=&#x22;submit&#x22;&#x3E;Create Account&#x3C;/button&#x3E;&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;field pswd&#x22;&#x3E;
+              &#x3C;label&#x3E;
+                &#x3C;span class=&#x22;main&#x22;&#x3E;Pass phrase&#x3C;/span&#x3E;
+                &#x3C;span class=&#x22;sub&#x22;&#x3E; (for better security, use spaces and words)&#x3C;/span&#x3E;
+                &#x3C;span class=&#x22;main&#x22;&#x3E;:&#x3C;/span&#x3E;
+              &#x3C;/label&#x3E;
+              &#x3C;input name=&#x22;pswd&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;
             &#x3C;/div&#x3E;
-          &#x3C;/form&#x3E;
-        &#x3C;/div&#x3E;
+
+            &#x3C;div class=&#x22;field confirm_pass_phrase&#x22;&#x3E;
+              &#x3C;label&#x3E;&#x3C;span class=&#x22;main&#x22;&#x3E;Re-type the pass phrase:&#x3C;/span&#x3E;&#x3C;/label&#x3E;
+              &#x3C;input name=&#x22;confirm_pass_word&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;
+            &#x3C;/div&#x3E;
+
+            &#x3C;script data-do=&#x22;template logged_in?&#x22; type=&#x22;application/template&#x22;&#x3E;
+              &#x26;#x3C;div class=&#x26;#x22;success_msg&#x26;#x22;&#x26;#x3E;You account has been created. Loading...&#x26;#x3C;/div&#x26;#x3E;
+            &#x3C;/script&#x3E;
+
+            &#x3C;script data-do=&#x22;template error-/user&#x22; type=&#x22;application/template&#x22;&#x3E;
+              &#x26;#x3C;div class=&#x26;#x22;error_msg&#x26;#x22;&#x26;#x3E;&#x26;#123;&#x26;#123;msg&#x26;#125;&#x26;#125;&#x26;#x3C;/div&#x26;#x3E;
+            &#x3C;/script&#x3E;
+
+            &#x3C;div class=&#x22;buttons&#x22;&#x3E;&#x3C;button class=&#x22;submit&#x22;&#x3E;Create Account&#x3C;/button&#x3E;&#x3C;/div&#x3E;
+          &#x3C;/div&#x3E;
+        &#x3C;/form&#x3E;
       &#x3C;/div&#x3E;
+    &#x3C;/div&#x3E;
 
-    </script><!-- template !logged_in? -->
+  </script><!-- template !logged_in? -->
 
 
-    <div class="block" id="intro">
-      <h1 class="site"><span class="main">mega</span><span class="sub">UNI</span></h1>
-      <p><a href="/home">/home</a></p>
-      <p><a href="/@da99">/@da99</a></p>
-      <p><a href="/!4567">/!4567</a></p>
-      <p><a href="/nowhere">/nowhere</a></p>
-      <div class="disclaimer">
-        <p>
-          (c) 2012-<span id="copyright_year_today">2016</span> megauni.com. Some rights reserved.
-        </p>
-        <p>All other copyrights belong to their respective owners, who have no association to this site:</p>
-        <p><span>Logo font: </span><a href="http://openfontlibrary.org/en/font/otfpoc">Aghja</a></p>
-        <p><span>Palettes: </span><a href="http://www.colourlovers.com/lover/dvdcpd">dvdcpd</a><a href="http://www.colourlovers.com/palette/154398/bedouin">shari_foru</a></p>
-      </div>
+  <div class="block" id="intro">
+    <h1 class="site"><span class="main">mega</span><span class="sub">UNI</span></h1>
+    <p><a href="/home">/home</a></p>
+    <p><a href="/@da99">/@da99</a></p>
+    <p><a href="/!4567">/!4567</a></p>
+    <p><a href="/nowhere">/nowhere</a></p>
+    <div class="disclaimer">
+      <p>
+        (c) 2012-<span id="copyright_year_today">2016</span> megauni.com. Some rights reserved.
+      </p>
+      <p>All other copyrights belong to their respective owners, who have no association to this site:</p>
+      <p><span>Logo font: </span><a href="http://openfontlibrary.org/en/font/otfpoc">Aghja</a></p>
+      <p><span>Palettes: </span><a href="http://www.colourlovers.com/lover/dvdcpd">dvdcpd</a><a href="http://www.colourlovers.com/palette/154398/bedouin">shari_foru</a></p>
     </div>
+  </div>
 
 </body>
-  <script src="/bower_components/da99.dum_dum_boom_boom.js/lib/browser/build/browser.js"></script>
+  <script src="/vendor/dum_dum_boom_boom.js"></script>
 
   <script type="text/javascript" src="/applets/Browser/Megauni.js"></script>
 </html>

@@ -25,48 +25,31 @@ upgrade () {
 
   cd Public/vendor
   wget -q -O "$FILE" https://github.com/da99/dum_dum_boom_boom/raw/master$ORIGIN
+
+  return 0 # ===================================================================
+
+  local +x js="Public/vendor"
+  local +x base_file="$js/all.js"
+
+  rm -f "$base_file"
+  re_download "$js/jquery.cookie.js" "https://raw.github.com/carhartl/jquery-cookie/master/jquery.cookie.js"
+  re_download "$js/doT.js"           "https://raw.github.com/olado/doT/master/doT.min.js"
+  re_download "$js/promise.js"       "https://raw.github.com/stackp/promisejs/master/promise.min.js"
+  re_download "$js/form2json.js"     "https://raw.github.com/marioizquierdo/jquery.serializeJSON/master/jquery.serializeJSON.min.js"
+  # re_download "$js/Hyper_JS.js"    "https://raw.github.com/da99/Hyper_JS/master/Hyper_JS.js"
+  # re_download "jquery.sortElements.js" "https://raw.github.com/padolsey/jQuery-Plugins/master/sortElements/jquery.sortElements.js"
+
 } # === upgrade ()
 
-old-upgrade () {
-  flips="$@"
-  js="Public/js"
-  base_file="$js/vendor/all.js"
-
-  if [[ ! "$@" == *skip_os* ]]
+function re_download {
+  if [[ ! "$flips" == *skip_download* ]]
   then
-    sudo apt-get update
-    sudo apt-get upgrade
-    sudo npm update
+    rm -f "$1"
+    wget -O "$1" "$2"
   fi
-
-  function re_download {
-    if [[ ! "$flips" == *skip_download* ]]
-    then
-      rm -f "$1"
-      wget -O "$1" "$2"
-    fi
-    cat  "$1" >> "$base_file"
-    echo ""   >> "$base_file"
-  }
-
-  echo "" > "$base_file"
-  re_download "$js/vendor/underscore.js"  "http://underscorejs.org/underscore-min.js"
-  re_download "$js/vendor/jquery.js"      "http://code.jquery.com/jquery-1.10.2.min.js"
-  re_download "$js/vendor/jquery.cookie.js" "https://raw.github.com/carhartl/jquery-cookie/master/jquery.cookie.js"
-  re_download "$js/vendor/backbone.js"    "http://backbonejs.org/backbone-min.js"
-  re_download "$js/vendor/doT.js"         "https://raw.github.com/olado/doT/master/doT.min.js"
-  re_download "$js/vendor/promise.js"     "https://raw.github.com/stackp/promisejs/master/promise.min.js"
-  re_download "$js/vendor/form2json.js"   "https://raw.github.com/marioizquierdo/jquery.serializeJSON/master/jquery.serializeJSON.min.js"
-
-  # re_download "$js/Hyper_JS.js"    "https://raw.github.com/da99/Hyper_JS/master/Hyper_JS.js"
-
-  # re_download "$js/Sammy.js"       "https://raw.github.com/quirkey/sammy/master/lib/sammy.js"
-  # re_download "$js/handlebars.js"  "https://raw.github.com/wycats/handlebars.js/master/dist/handlebars.js"
-  # "https://raw.github.com/padolsey/jQuery-Plugins/master/sortElements/jquery.sortElements.js"
-  # rm -f "$js/jquery.sortElements.js"
-  # rm -f "$js/underscore-min.js"
+  cat  "$1" >> "$base_file"
+  echo ""   >> "$base_file"
+} # === re_download
 
 
-  is_done="true"
-}
 
