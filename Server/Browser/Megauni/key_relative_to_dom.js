@@ -22,27 +22,3 @@ function key_relative_to_dom(target, str) {
   var DOM_ID = dom_id(PARENT);
   return DOM_ID + '_' + KEY;
 } // === mu_key
-
-
-function not_ready_yet(name) {
-  "use strict";
-
-  function _not_ready_yet_(data) {
-    log("Not ready: " +  name);
-    return data;
-  }
-
-  return _not_ready_yet_;
-}
-
-
-
-function hide(data) {
-  "use strict";
-  if (is_empty(data.args)) {
-    $('#' + data.dom_id).hide();
-    return;
-  }
-
-  return Dum_Dum_Boom_Boom.browser.dom.hide(data);
-} // === mu_hide

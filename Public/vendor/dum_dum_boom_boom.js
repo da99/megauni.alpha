@@ -2854,6 +2854,10 @@ function html_unescape(raw) {
 /* jshint strict: true, undef: true */
 /* globals msg_match, has_length, is_string, be, is_array, and, window, is_function, $ */
 
+/*
+   <button data-do="on_click my_func">Click Me</button>
+   --> my_func({dom_id: dom_id});
+*/
 function on_click(msg) {
   "use strict";
 
@@ -2861,7 +2865,11 @@ function on_click(msg) {
     return;
 
   var dom_id = msg.dom_id;
-  var func = be(is_function, window[msg.args[0]]);
+  var func   = describe_reduce(
+    "Getting function for on_click",
+    window[msg.args[0]],
+    be(is_function)
+  );
 
   if (!on_click.processed)
     on_click.processed = {};
@@ -2871,12 +2879,11 @@ function on_click(msg) {
 
   on_click.processed[dom_id] = true;
 
-
   $('#' + msg.dom_id).on("click", function (e) {
     e.stopPropagation();
     func({dom_id: dom_id});
   });
-}
+} // === function
 /* jshint browser: true, strict: true, undef: true */
 /* globals spec, is_string, to_string, _ */
 
@@ -3069,6 +3076,11 @@ function is_localhost() {
 /* globals msg_match, is_string, $, dom_id, alite, formToObj, is_plain_object, log, is_blank_string */
 /* globals App */
 
+/*
+   <button onclick="return false;" data-do="on_click submit_form">
+     Submit
+   </button>
+*/
 function submit_form(msg) {
   "use strict";
 

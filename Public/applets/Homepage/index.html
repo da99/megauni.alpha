@@ -1,4 +1,4 @@
-<bottom><script type="application/javascript" src="/applets/Homepage/index.script.js"></script></bottom><!-- /index.html -->
+<!-- /index.html -->
 
 
 
@@ -21,36 +21,36 @@
 
   <body>
 
-  <div id="loading" data-do="hide page-loaded?">
+  <div id="loading" data-do="hidden">
     Loading...
   </div>
 
-  <script data-do="template logged_in?" type="application/template">
-    &#x3C;div class=&#x22;hidden block&#x22; data-do=&#x22;show_if logged_in?&#x22;&#x3E;
+  <script data-do="template logged-in?" type="application/template">
+    &#x3C;div class=&#x22;hidden block&#x22; data-do=&#x22;show_if logged-in?&#x22;&#x3E;
       &#x3C;p&#x3E;You are logged in.&#x3C;/p&#x3E;
     &#x3C;/div&#x3E;
   </script>
 
-  <script data-do="template !logged_in?" type="application/template">
+  <script data-do="template !logged-in?" type="application/template">
     &#x3C;div class=&#x22;block form&#x22; id=&#x22;log_in&#x22;&#x3E;
       &#x3C;h3&#x3E;Log-In&#x3C;/h3&#x3E;
       &#x3C;div class=&#x22;content&#x22;&#x3E;
-        &#x3C;form action=&#x22;/log-in&#x22; method=&#x22;post&#x22; data-do=&#x22;send_form this submit; remove_if logged_in?&#x22;&#x3E;
+        &#x3C;form action=&#x22;/log-in&#x22; method=&#x22;post&#x22; data-do=&#x22;send_form this submit; remove_if logged-in?&#x22;&#x3E;
           &#x3C;div class=&#x22;fields&#x22;&#x3E;
             &#x3C;div class=&#x22;field screen_name&#x22;&#x3E;&#x3C;label&#x3E;Screen name:&#x3C;/label&#x3E;&#x3C;input name=&#x22;screen_name&#x22; type=&#x22;text&#x22; value=&#x22;&#x22;&#x3E;&#x3C;/div&#x3E;
             &#x3C;div class=&#x22;field passphrase&#x22;&#x3E;&#x3C;label&#x3E;Pass phrase:&#x3C;/label&#x3E;&#x3C;input name=&#x22;pswd&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;&#x3C;/div&#x3E;
 
-            &#x3C;script data-do=&#x22;template logged_in?&#x22; type=&#x22;application/template&#x22;&#x3E;
+            &#x3C;script data-do=&#x22;template logged-in?&#x22; type=&#x22;application/template&#x22;&#x3E;
               &#x26;#x3C;div class=&#x26;#x22;success_msg&#x26;#x22;&#x26;#x3E;You are now logged in. Loading...&#x26;#x3C;/div&#x26;#x3E;
             &#x3C;/script&#x3E;
 
-            &#x3C;script data-do=&#x22;template error-/log-in&#x22; type=&#x22;application/template&#x22;&#x3E;
+            &#x3C;script data-do=&#x22;template FORM.error_msg&#x22; type=&#x22;application/template&#x22;&#x3E;
               &#x26;#x3C;div class=&#x26;#x22;error_msg&#x26;#x22;&#x26;#x3E;&#x26;#123;&#x26;#123;msg&#x26;#125;&#x26;#125;&#x26;#x3C;/div&#x26;#x3E;
             &#x3C;/script&#x3E;
 
-            &#x3C;div class=&#x22;field buttons&#x22; data-do=&#x22;hide_if form submit&#x22;&#x3E;&#x3C;button class=&#x22;submit&#x22; data-do=&#x22;on_click send_msg form submit&#x22;&#x3E;Log-In&#x3C;/button&#x3E;&#x3C;/div&#x3E;
-            &#x3C;div class=&#x22;loading&#x22; data-do=&#x22;hidden; show_if form submit;    hide     form is_response&#x22;&#x3E;Loading...&#x3C;/div&#x3E;
-            &#x3C;div class=&#x22;errors&#x22; data-do=&#x22;hidden; show_if form error_msg; print_if form error_msg&#x22;&#x3E;&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;field buttons&#x22; data-do=&#x22;hide_if FORM.submit&#x22;&#x3E;&#x3C;button class=&#x22;submit&#x22; data-do=&#x22;on_click send_msg FORM.submit&#x22;&#x3E;Log-In&#x3C;/button&#x3E;&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;loading&#x22; data-do=&#x22;hidden; show_if FORM.submit;    hide     FORM.is_response&#x22;&#x3E;Loading...&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;errors&#x22; data-do=&#x22;hidden; show_if FORM.error_msg; print_if FORM.error_msg&#x22;&#x3E;&#x3C;/div&#x3E;
           &#x3C;/div&#x3E;
         &#x3C;/form&#x3E;
       &#x3C;/div&#x3E;&#x3C;!-- div.content --&#x3E;
@@ -81,7 +81,7 @@
               &#x3C;input name=&#x22;confirm_pass_word&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;
             &#x3C;/div&#x3E;
 
-            &#x3C;script data-do=&#x22;template logged_in?&#x22; type=&#x22;application/template&#x22;&#x3E;
+            &#x3C;script data-do=&#x22;template logged-in?&#x22; type=&#x22;application/template&#x22;&#x3E;
               &#x26;#x3C;div class=&#x26;#x22;success_msg&#x26;#x22;&#x26;#x3E;You account has been created. Loading...&#x26;#x3C;/div&#x26;#x3E;
             &#x3C;/script&#x3E;
 
@@ -95,7 +95,7 @@
       &#x3C;/div&#x3E;
     &#x3C;/div&#x3E;
 
-  </script><!-- template !logged_in? -->
+  </script><!-- template !logged-in? -->
 
 
   <div class="block" id="intro">
@@ -118,7 +118,7 @@
   <script src="/vendor/dum_dum_boom_boom.js"></script>
 
   <script type="text/javascript" src="/applets/Browser/Megauni.js"></script>
-</html>
+<script type="application/javascript" src="/applets/Homepage/index.script.js"></script></html>
 
 
 

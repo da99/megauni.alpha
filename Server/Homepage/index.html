@@ -2,7 +2,7 @@
 
 <script>
   /* global App */
-  App("send message", {"page-loaded?": true});
+  App("send message", {"logged-in?":false});
 </script>
 
 <run src="../MUE/_.layout.html">
@@ -19,36 +19,36 @@
 
 <body>
 
-  <div id="loading" data-do="hide page-loaded?">
+  <div id="loading" data-do="hide">
     Loading...
   </div>
 
-  <template data-do="template logged_in?">
-    <div class="hidden block" data-do="show_if logged_in?">
+  <template data-do="template logged-in?">
+    <div class="hidden block" data-do="show_if logged-in?">
       <p>You are logged in.</p>
     </div>
   </template>
 
-  <template data-do="template !logged_in?">
+  <template data-do="template !logged-in?">
     <div class="block form" id="log_in">
       <h3>Log-In</h3>
       <div class="content">
-        <form action="/log-in" method="post" data-do="send_form this submit; remove_if logged_in?">
+        <form action="/log-in" method="post" data-do="send_form this submit; remove_if logged-in?">
           <div class="fields">
             <div class="field screen_name"><label>Screen name:</label><input name="screen_name" type="text" value="" /></div>
             <div class="field passphrase"><label>Pass phrase:</label><input name="pswd" type="password" value="" /></div>
 
-            <template data-do="template logged_in?">
+            <template data-do="template logged-in?">
               <div class="success_msg">You are now logged in. Loading...</div>
             </template>
 
-            <template data-do="template error-/log-in">
+            <template data-do="template FORM.error_msg">
               <div class="error_msg">{{msg}}</div>
             </template>
 
-            <div class="field buttons" data-do="hide_if form submit"><button class="submit" data-do="on_click send_msg form submit">Log-In</button></div>
-            <div class="loading"       data-do="hidden; show_if form submit;    hide     form is_response">Loading...</div>
-            <div class="errors"        data-do="hidden; show_if form error_msg; print_if form error_msg"></div>
+            <div class="field buttons" data-do="hide_if FORM.submit"><button class="submit" data-do="on_click send_msg FORM.submit">Log-In</button></div>
+            <div class="loading"       data-do="hidden; show_if FORM.submit;    hide     FORM.is_response">Loading...</div>
+            <div class="errors"        data-do="hidden; show_if FORM.error_msg; print_if FORM.error_msg"></div>
           </div>
         </form>
       </div><!-- div.content -->
@@ -85,7 +85,7 @@
               <input name="confirm_pass_word" type="password" value="" />
             </div>
 
-            <template data-do="template logged_in?">
+            <template data-do="template logged-in?">
               <div class="success_msg">You account has been created. Loading...</div>
             </template>
 
@@ -99,7 +99,7 @@
       </div>
     </div>
 
-  </template><!-- template !logged_in? -->
+  </template><!-- template !logged-in? -->
 
 
   <div class="block" id="intro">

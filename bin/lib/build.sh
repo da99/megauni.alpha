@@ -19,6 +19,7 @@ build () {
     build "Homepage"
     build "MUE"
     build "Browser"
+    $0 build-browser "Browser/Megauni"
 
     local +x JS_FILES=$(find Public/applets -type f -name "*.js")
     mksh_setup ORANGE "=== {{eslinting}}: $JS_FILES"
