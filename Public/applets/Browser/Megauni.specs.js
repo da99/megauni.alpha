@@ -8,6 +8,8 @@ App("send message", {"dom-change": true});
 
 
 
+
+
 function hide(data) {
   "use strict";
   if (is_empty(data.args)) {
@@ -17,6 +19,9 @@ function hide(data) {
 
   return Dum_Dum_Boom_Boom.browser.dom.hide(data);
 } // === mu_hide
+
+
+
 
 function key_relative_to_dom(target, str) {
   "use strict";
@@ -41,6 +46,9 @@ function key_relative_to_dom(target, str) {
   return DOM_ID + '_' + KEY;
 } // === mu_key
 
+
+
+
 function not_ready_yet(name) {
   "use strict";
 
@@ -51,5 +59,6 @@ function not_ready_yet(name) {
 
   return _not_ready_yet_;
 }
+
 
 

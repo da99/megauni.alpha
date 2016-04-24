@@ -1,7 +1,5 @@
 
 # === {{CMD}}
-# === {{CMD}}  "NAME"
-
 reset-dir () {
   local +x DIR="$1"; shift
   if [[ "$DIR" != Public/applets/* ]]; then
@@ -13,41 +11,27 @@ reset-dir () {
 }
 
 build () {
-  if [[ -z "$@" ]]; then
-    reset-dir Public/applets/
-
-    build "Homepage"
-    build "MUE"
-    build "Browser"
-    $0 build-browser "Browser/Megauni"
-
-    local +x JS_FILES=$(find Public/applets -type f -name "*.js")
-    mksh_setup ORANGE "=== {{eslinting}}: $JS_FILES"
-    js_setup eslint browser $JS_FILES
-    tput cuu1; tput el
-    mksh_setup GREEN "=== {{Passed}} eslint: $JS_FILES"
-
-    mksh_setup GREEN "=== Done {{building}}."
-    return 0
+  if [[ ! -z "$@" ]]; then
+    mksh_setup RED "!!! Unknown options: $@"
+    exit 1
   fi # =====================================================
 
-  local +x NAME="$1"; shift
-  local +x INPUT="Server/$NAME"
-  local +x OUTPUT="Public/applets/$NAME"
+  reset-dir Public/applets/
 
-  # === Reset OUTPUT  dir:
-  reset-dir "$OUTPUT"
+  $0 build-html "Server/Homepage"
+  dum_dum_boom_boom copy-files  Server/Homepage  Public/applets/Homepage
 
-  # === Build it:
-  cd "$THIS_DIR"
-  mksh_setup ORANGE "=== {{Building}} $INPUT ..."
-  dum_dum_boom_boom html           \
-    --input-dir  "$INPUT"           \
-    --output-dir "$OUTPUT"           \
-    --public-dir "Public/"
+  $0 build-html "Server/MUE"
+  dum_dum_boom_boom copy-files  Server/MUE  Public/applets/MUE
 
-  # === Finish. Print results:
-  tput cuu1; tput el
-  mksh_setup GREEN "-n" "=== Output in: {{$OUTPUT}}: "
-  echo $OUTPUT/*.html
+  $0 build-js   "Server/Browser/Megauni"
+
+  local +x JS_FILES=$(find Public/applets -type f -name "*.js")
+  # mksh_setup ORANGE "=== {{eslinting}}: $JS_FILES"
+
+  js_setup eslint browser $JS_FILES
+  # tput cuu1; tput el
+  # mksh_setup GREEN "=== {{Passed}} eslint: $JS_FILES"
+
+  mksh_setup GREEN "=== Done {{building}}."
 } # === end function
