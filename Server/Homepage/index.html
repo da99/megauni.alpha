@@ -1,13 +1,11 @@
 <!-- /index.html -->
 
 <bottom>
+  <run>
+    send_message !logged-in?
+  </run>
   <script type="text/javascript" src="/applets/Browser/Megauni.js"></script>
 </bottom>
-
-<script>
-  /* global App */
-  App("send message", {"logged-in?":false});
-</script>
 
 <run src="../MUE/_.layout.html">
   <local name="PAGE_TITLE">{{SITE_NAME}} Home</local>
@@ -19,7 +17,7 @@
 
 <body>
 
-  <div id="loading" data-do="hide">
+  <div id="loading" data-do="key_exists logged-in? hide">
     Loading...
   </div>
 

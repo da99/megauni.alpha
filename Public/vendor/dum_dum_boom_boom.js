@@ -128,53 +128,35 @@ function formToObj(e){function t(e){for(var t=e.querySelectorAll("input, textare
 //# sourceMappingURL=form-to-obj.min.js.map
 function alite(e){function t(){}function a(e){var t=e&&e.responseText,a=/^[\{\[]/.test(t);return a?JSON.parse(t):t}return new Promise(function(n,r){var s=(e.xhr||t)()||new XMLHttpRequest,o=e.data;if(s.onreadystatechange=function(){4==s.readyState&&(s.status>=200&&s.status<300?n(a(s)):r(a(s)),(alite.ajaxStop||t)(s,e))},s.open(e.method,e.url),!e.raw&&s.setRequestHeader("Content-Type","application/json"),e.headers)for(var i in e.headers)s.setRequestHeader(i,e.headers[i]);(alite.ajaxStart||t)(s,e),(e.ajaxStart||t)(s),s.send(e.raw?o:o?JSON.stringify(o):void 0)})}"undefined"!=typeof module&&module.exports&&(module.exports=alite);
 //# sourceMappingURL=alite.min.js.map
-/* jshint strict: true, undef: true */
 
-if (typeof exports === 'undefined') {
-  var module  = {};
-  var exports = module.exports = {};
-}
-
+var Dum_Dum_Boom_Boom = (function Scope_Dum_Dum_Boom_Boom(category) {
+  "use strict";
+  var exports = {};
+  var non_exports = {};
+  var funcs   = {};
 
 /* jshint browser: true, undef: true */
 
 if (typeof window === 'undefined')
   throw new Error('No window defined.');
 
-/* jshint strict: true, undef: true */
-/* globals exports */
-/* globals be, reduce, is_string, not, is_empty, _ */
 
-exports.read_key = read_key;
+funcs.common     = {};
 
+funcs.common.base = {};
+
+funcs.common.base.read_key=read_key;
 function read_key(o, k) {
-  "use strict";
 
   if (!o.hasOwnProperty(k))
     throw new Error("Key not defined: " + to_string(k));
 
   return o[k];
 } // === function
-/* jshint strict: true, undef: true */
-/* globals to_string, setTimeout */
-/* globals exports, spec */
 
-spec(5, function stops_on_return_true(fin) {
-  "use strict";
-  var i = 0;
-  wait_max(2, function () {
-    i = i + 1;
-    if (i === 5) {
-      fin(i);
-      return true;
-    }
-    return false;
-  });
-});
 
-exports.wait_max = wait_max;
+funcs.common.base.wait_max=wait_max;
 function wait_max(seconds, func) {
-  "use strict";
 
   var ms       = seconds * 1000;
   var total    = 0;
@@ -191,19 +173,16 @@ function wait_max(seconds, func) {
   }
   setTimeout(reloop, interval);
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
-
-exports.to_arg = to_arg;
-function to_arg(val) { "use strict"; return function (f) { return f(val); }; }
-/* jshint strict: true, undef: true */
-/* globals arguments_are, is_positive, is_function */
-/* globals exports */
 
 
-exports.do_it = do_it;
+funcs.common.base.to_arg=to_arg;
+function to_arg(val) {
+  return function (f) { return f(val); };
+}
+
+
+funcs.common.base.do_it=do_it;
 function do_it(num, func) {
-  "use strict";
 
   arguments_are(arguments, is_positive, is_function);
   for (var i = 0; i < num; i++) {
@@ -211,43 +190,27 @@ function do_it(num, func) {
   }
   return true;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, to_string, or, is_null, is_undefined */
-/* globals exports */
 
 
-spec(is_nothing, [null],      true);
-spec(is_nothing, [undefined], true);
-spec(is_nothing, [[]],       false);
-spec(is_nothing, [{}],       false);
-spec(is_nothing, [{a: "c"}], false);
-
-exports.is_nothing = is_nothing;
+funcs.common.base.is_nothing=is_nothing;
 function is_nothing(v) {
-  "use strict";
 
   if (arguments.length !== 1)
     throw new Error("arguments.length !== 1: " + to_string(v));
 
   return or(is_null, is_undefined)(v);
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
-exports.is_true = is_true;
+
+funcs.common.base.is_true=is_true;
 function is_true(v) {
-  "use strict";
 
   return v === true;
 }
-/* jshint strict: true, undef: true */
-/* globals _, length */
-/* globals exports */
 
 
-exports.and = and;
+funcs.common.base.and=and;
 function and(_funcs) {
-  "use strict";
 
   var funcs = _.toArray(arguments);
   return function (v) {
@@ -258,24 +221,10 @@ function and(_funcs) {
     return true;
   };
 }
-/* jshint strict: true, undef: true */
-/* globals spec, return_arguments, _, to_string */
-/* globals exports, log */
 
-spec(is_empty, [[]], true);
-spec(is_empty, [{}], true);
-spec(is_empty, [""], true);
-spec(is_empty, [{a: "c"}], false);
-spec(is_empty, [[1]],      false);
-spec(is_empty, ["a"],      false);
-spec(is_empty, [return_arguments()],      true);
-spec(is_empty, [return_arguments(1,2,3)], false);
-spec(is_empty, [null], new Error('invalid value: null'));
-spec(is_empty, [undefined], new Error('invalid value: undefined'));
 
-exports.is_empty = is_empty;
+funcs.common.base.is_empty=is_empty;
 function is_empty(v) {
-  "use strict";
 
   if (arguments.length !== 1)
     throw new Error("arguments.length !== 1: " + to_string(v));
@@ -294,16 +243,10 @@ function is_empty(v) {
 
   return l === 0;
 } // === func
-/* jshint strict: true, undef: true */
-/* globals be, is_enumerable, is_function, eachs */
-/* globals exports */
 
-/*
-  each_x(function (x) { });
- */
-exports.each_x = each_x;
+
+funcs.common.base.each_x=each_x;
 function each_x(coll, f) {
-  "use strict";
 
   be(is_enumerable, coll);
   be(is_function, f);
@@ -313,17 +256,10 @@ function each_x(coll, f) {
   });
 
 }
-/* jshint strict: true, undef: true */
-/* globals length */
-/* globals exports */
 
-spec(to_default, [1,undefined], 1);
-spec(to_default, [2,null], 2);
-spec(to_default, [3,[]], []);
 
-exports.to_default = to_default;
+funcs.common.base.to_default=to_default;
 function to_default(valid) {
-  "use strict";
 
   if (length(arguments) === 2) {
     var v = arguments[1];
@@ -334,24 +270,17 @@ function to_default(valid) {
 
   return function (v) { return to_default(valid, v); };
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
 
-exports.is_num = is_num;
+funcs.common.base.is_num=is_num;
 function is_num(v) {
-  "use strict";
 
   return typeof v === 'number' && isFinite(v);
 }
-/* jshint strict: true, undef: true */
-/* globals set_function_string_name */
-/* globals exports */
 
 
-exports.has_property_of = has_property_of;
+funcs.common.base.has_property_of=has_property_of;
 function has_property_of(name, type) {
-  "use strict";
 
   var f = function has_property_of(o) {
     return typeof o[name] === type;
@@ -359,27 +288,10 @@ function has_property_of(name, type) {
 
   return set_function_string_name(f, arguments);
 }
-/* jshint strict: true, undef: true */
-/* globals _, spec, reduce, be, is_string, not, is_empty */
-/* globals exports */
 
-spec(key_to_bool, ['time', {time: 'morning'}], true); // it 'returns true if key is "truthy"'
-spec(key_to_bool, ['!time', {time: false}], true); // it 'returns true if: !key , key is !truthy'
-spec(key_to_bool, ['!first.second.third', {first: {second: { third: true}}}], true); // it 'handles nested keys'
-spec(key_to_bool, ['!!!first', {first: false}], true); // it 'handles multiple exclamation marks'
-spec(key_to_bool, ['first', {}], undefined); // it 'returns undefined if one non-nested key is specified, but not found'
-spec(key_to_bool, ['is_factor', {is_factor: true}], true);
-spec(key_to_bool, ['!is_factor', {is_factor: false}], true);
-spec(key_to_bool, ['is_factor', {is_ruby: false}], undefined);
-spec(key_to_bool, ['is_happy', {is_happy: true}], true);
-spec(key_to_bool, ['!is_happy', {is_happy: true}], false);
-spec(key_to_bool, ['is_happy',  {is_happy: false}], false);
-spec(key_to_bool, ['!is_happy', {is_happy: false}], true);
-spec(key_to_bool, [['is_factor'], {}], new Error("[\"is_factor\"] should be: is_string (function)"));
 
-exports.key_to_bool = key_to_bool;
+funcs.common.base.key_to_bool=key_to_bool;
 function key_to_bool(raw_key, data) {
-  "use strict";
 
   var FRONT_BANGS = /^\!+/;
 
@@ -419,45 +331,33 @@ function key_to_bool(raw_key, data) {
 
   return ans;
 } // === func
-/* jshint strict: true, undef: true */
-/* globals be, is_enumerable, is_function, _ */
-/* globals exports */
 
 
-exports.map_x = map_x;
+funcs.common.base.map_x=map_x;
 function map_x(coll, f) {
-  "use strict";
 
   be(is_enumerable, coll);
   be(is_function,   f);
   return _.map(coll, function (x) { return f(x); });
 }
-/* jshint strict: true, undef: true */
-/* globals is_string, length, _  */
-/* globals exports */
 
-exports.is_whitespace = is_whitespace;
+
+funcs.common.base.is_whitespace=is_whitespace;
 function is_whitespace(v) {
-  "use strict";
 
   return is_string(v) && length(_.trim(v)) === 0;
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
-exports.is_null_or_undefined = is_null_or_undefined;
+
+funcs.common.base.is_null_or_undefined=is_null_or_undefined;
 function is_null_or_undefined(v) {
-  "use strict";
 
   return v === null || v === undefined;
 }
-/* jshint strict: true, undef: true */
-/* globals and, length */
-/* globals exports */
 
-exports.all = all;
+
+funcs.common.base.all=all;
 function all(_funcs) {
-  "use strict";
   var _and = and.apply(null, arguments);
   return function (arr) {
     for(var i = 0; i < length(arr); i++){
@@ -467,61 +367,34 @@ function all(_funcs) {
     return true;
   };
 }
-/* jshint strict: true, undef: true */
-/* globals _, to_string, function_to_name */
-/* globals exports */
 
 
-exports.function_sig = function_sig;
+funcs.common.base.function_sig=function_sig;
 function function_sig(f, args) {
-  "use strict";
 
   return function_to_name(f) + '(' + _.map(args, to_string).join(',')  + ')';
 }
-/* jshint strict: true, undef: true */
-/* globals spec, to_string */
-/* globals exports */
 
-spec(is_something, [null],      false);
-spec(is_something, [undefined], false);
-spec(is_something, [[]],       true);
-spec(is_something, [{}],       true);
-spec(is_something, [{a: "c"}], true);
 
-exports.is_something = is_something;
+funcs.common.base.is_something=is_something;
 function is_something(v) {
-  "use strict";
 
   if (arguments.length !== 1)
     throw new Error("arguments.length !== 1: " + to_string(v));
   return v !== null && v !== undefined;
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
 
-exports.is_function = is_function;
+funcs.common.base.is_function=is_function;
 function is_function(v) {
-  "use strict";
-
   if (arguments.length !== 1)
     throw new Error("Invalid: arguments.length must === 1");
   return typeof v === 'function';
 }
-/* jshint strict: true, undef: true */
-/* globals spec, to_string */
-/* globals exports */
 
-spec(3, function own_property_returns_own_property() {
-  "use strict";
 
-  return own_property('num')({num: 3});
-});
-spec(own_property('num'), [{n:4}], new Error('Key not found: "num" in {"n":4}'));
-
-exports.own_property = own_property;
+funcs.common.base.own_property=own_property;
 function own_property(name) {
-  "use strict";
 
   return function _own_property_(o) {
     if (!o.hasOwnProperty(name))
@@ -529,35 +402,17 @@ function own_property(name) {
     return o[name];
   };
 } // === func own_property
-/* jshint strict: true, undef: true */
-/* globals function_to_name, _, to_string */
-/* globals exports */
 
 
-exports.to_function_string = to_function_string;
+funcs.common.base.to_function_string=to_function_string;
 function to_function_string(f, args) {
-  "use strict";
 
   return function_to_name(f) + '(' + _.map(args, to_string).join(', ') + ')';
 }
-/* jshint strict: true, undef: true */
-/* globals spec, is_string, _, is_plain_object, is_empty, is_function, be, is_boolean */
-/* globals exports */
 
 
-spec(msg_match, [1,1], true);
-spec(msg_match, ["a", "a"], true);
-spec(msg_match, [[1],[1]], true);
-spec(msg_match, [[1,[2]],[1,[2]]], true);
-spec(msg_match, [{a:"b"}, {a:"b",c:"d"}], true);
-spec(msg_match, [{a:is_string}, {a:"b"}], true);
-spec(msg_match, [{}, {a:"b"}], false);
-spec(msg_match, [{}, {}], true);
-spec(msg_match, [[], []], true);
-
-exports.msg_match = msg_match;
+funcs.common.base.msg_match=msg_match;
 function msg_match(pattern, msg) {
-  "use strict";
 
   if (_.isEqual(pattern, msg))
     return true;
@@ -578,52 +433,25 @@ function msg_match(pattern, msg) {
 
   return false;
 }
-/* jshint strict: true, undef: true */
-/* globals _ */
-/* globals exports */
 
 
-exports.reduce = reduce;
+funcs.common.base.reduce=reduce;
 function reduce(value, _functions) {
-  "use strict";
 
   var funcs = _.toArray(arguments);
   var v     = funcs.shift();
   return _.reduce(funcs, function (acc, f) { return f(acc); }, v);
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
-exports.to_arg = to_arg;
 
-/*
- * Returns the arguments passed to it as an arguments object:
- * to_arguments(1,2,3) -> non-array, arguments: [1,2,3]
- * to_arguments("a", "b", "c") -> non-array, arguments: ["a", "b", "c"]
- */
+funcs.common.base.to_arguments=to_arguments;
 function to_arguments() {
-  "use strict";
   return arguments;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, arguments_are, is_something, is_boolean, is_array, _, is_plain_object, reduce_eachs, to_string */
-/* globals exports, is_arguments, is_function, length, log */
 
 
-spec({a:{b:"c"}, b:true}, function () { // Does not alter orig.
-  "use strict";
-
-  var orig = {a:{b:"c"}, b:true};
-  var copy = copy_value(orig);
-  copy.a.b = "1";
-  return orig;
-});
-
-spec(copy_value, [[1, copy_value], is_function], [1, copy_value]);
-
-exports.copy_value = copy_value;
+funcs.common.base.copy_value=copy_value;
 function copy_value(v) {
-  "use strict";
 
   var allow_these = [];
 
@@ -653,38 +481,10 @@ function copy_value(v) {
   return v;
   // throw new Error('Value can\'t be copied: ' + to_string(v));
 }
-/* jshint strict: true, undef: true */
-/* globals spec, spec, is_function, arguments_are, is_something, to_string */
-/* globals exports */
 
 
-spec(true, function has_length_returns_function() {
-  "use strict";
-  return is_function(has_length(1));
-});
-
-spec(true, function has_length_returns_function_comparing_length() {
-  "use strict";
-  return has_length(1)([1]);
-});
-
-spec(true, function has_length_returns_function_comparing_length_of_function() {
-  "use strict";
-  return has_length(2)(function (a,b) {});
-});
-
-spec(
-  function () { // returns function that returns false on length mismatch
-    "use strict";
-    return has_length(3)([1,2]);
-  },
-  [],
-  new Error("[1, 2].length !== 3")
-);
-
-exports.has_length = has_length;
+funcs.common.base.has_length=has_length;
 function has_length(num) {
-  "use strict";
 
   return function _has_length_(val) {
     arguments_are(arguments, is_something);
@@ -693,27 +493,18 @@ function has_length(num) {
     throw new Error(to_string(val) + '.length !== ' + to_string(num));
   };
 }
-/* jshint strict: true, undef: true */
-/* globals spec */
-/* globals exports */
 
-spec(true,  function () { "use strict"; return is(5)(5); });
-spec(false, function () { "use strict"; return is("a")("b"); });
-exports.is = is;
+
+funcs.common.base.is=is;
 function is(target) {
-  "use strict";
 
   return function (val) { return val === target; };
 }
-/* jshint strict: true, undef: true */
-/* globals is_plain_object, _ */
-/* globals exports */
 
 
-exports.keys_or_indexes = keys_or_indexes;
+funcs.common.base.keys_or_indexes=keys_or_indexes;
 function keys_or_indexes(v) {
-  "use strict";
-
+  
   if (is_plain_object(v))
     return _.keys(v);
 
@@ -723,26 +514,10 @@ function keys_or_indexes(v) {
   }
   return a;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, be, is_something, to_string, not, is_empty */
-/* globals exports */
 
 
-spec('"4"', function to_value_returns_a_value() {
-  "use strict";
-
-  return to_value(4, to_string, to_string);
-});
-
-spec(5, function to_value_returns_first_value_if_no_funcs() {
-  "use strict";
-
-  return to_value(5);
-});
-
-exports.to_value = to_value;
+funcs.common.base.to_value=to_value;
 function to_value(val, _funcs) {
-  "use strict";
 
   be(is_something, val);
   be(not(is_empty), arguments);
@@ -754,78 +529,43 @@ function to_value(val, _funcs) {
   }
   return val;
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
-/* globals be, reduce, is_string, not, is_empty, _ */
 
-exports.create_key = create_key;
 
+funcs.common.base.create_key=create_key;
 function create_key(o, k, v) {
-  "use strict";
 
   if (o.hasOwnProperty(k))
     throw new Error("Key already defined: " + to_string(k) + " value: " + to_string(v));
 
   return create_or_update_key.apply(null, arguments);
 } // === function
-/* jshint strict: true, undef: true */
-/* globals spec, _, is_arguments, is_plain_object, is_function */
-/* globals exports, log */
 
 
-
-spec(to_array, [[1,2,3]], [1,2,3]);
-spec(to_array, [to_arguments(1,2,3)], [1,2,3]);
-spec(to_array, [1,2,3], /Invalid value for /);
-
-exports.to_array = to_array;
-
+funcs.common.base.to_array=to_array;
 function to_array(val) {
-  "use strict";
   if (!_.isArray(val) && val.constructor != arguments.constructor)
     throw new Error("Invalid value for to_array: " + to_string(val));
 
   return _.toArray(val);
 } // === func
 
-/* jshint strict: true, undef: true */
-/* globals _ */
-/* globals exports */
 
-exports.is_array = is_array;
+
+funcs.common.base.is_array=is_array;
 function is_array(v) {
-  "use strict";
 
   return _.isArray(v);
 }
-/* jshint strict: true, undef: true */
-/* globals spec */
-/* globals exports */
 
 
-spec(is_null, [null], true);
-spec(is_null, [undefined], false);
-exports.is_null = is_null;
+funcs.common.base.is_null=is_null;
 function is_null(v) {
-  "use strict";
-
   return v === null;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, _, is_arguments, is_plain_object, is_function */
-/* globals exports, log */
 
 
-
-spec(to_string, [null], 'null');
-spec(to_string, [undefined], 'undefined');
-spec(to_string, [[1]], '[1]');
-spec(to_string, ['yo yo'], '"yo yo"');
-spec(to_string, [{a:'b', c:'d'}], '{"a":"b","c":"d"}');
-
-exports.to_string = to_string;
+funcs.common.base.to_string=to_string;
 function to_string(val) {
-  "use strict";
 
   if (val === null)      return 'null';
   if (val === undefined) return 'undefined';
@@ -870,36 +610,27 @@ function to_string(val) {
 
 } // === func
 
-/* jshint strict: true, undef: true */
-/* globals to_string, function_sig */
-/* globals exports */
 
 
-exports.set_function_string_name = set_function_string_name;
+funcs.common.base.set_function_string_name=set_function_string_name;
 function set_function_string_name(f, args) {
-  "use strict";
 
   if (f.to_string_name)
     throw new Error('.to_string_name alread set: ' + to_string(f.to_string_name));
   f.to_string_name = function_sig(f, args);
   return f;
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
-exports.is_string = is_string;
+
+funcs.common.base.is_string=is_string;
 function is_string(v) {
-  "use strict";
 
   return typeof v === "string";
 }
-/* jshint strict: true, undef: true */
-/* globals exports, _ */
 
-exports.or = or;
 
+funcs.common.base.or=or;
 function or(_funcs) {
-  "use strict";
 
   var funcs = _.toArray(arguments);
 
@@ -907,35 +638,24 @@ function or(_funcs) {
     return !!_.find(funcs, function (f) { return f(v) === true; });
   };
 }
-/* jshint strict: true, undef: true */
-/* globals length */
-/* globals exports */
 
 
-
-
-exports.sort_by_length = sort_by_length;
+funcs.common.base.sort_by_length=sort_by_length;
 function sort_by_length(arr) {
-  "use strict";
+  
 
   return arr.sort(function (a,b) {
     return length(a) - length(b);
   });
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
 
+funcs.common.base.return_arguments=return_arguments;
+function return_arguments() { return arguments; }
 
-exports.return_arguments = return_arguments;
-function return_arguments() { "use strict"; return arguments; }
-/* jshint strict: true, undef: true */
-/* globals _, all, is_plain_object, is_array, to_string */
-/* globals exports */
 
-exports.combine = combine;
+funcs.common.base.combine=combine;
 function combine(_vals) {
-  "use strict";
 
   var vals = _.toArray(arguments);
 
@@ -948,20 +668,11 @@ function combine(_vals) {
 
   throw new Error("Only Array of Arrays or Plain Objects allowed: " + to_string(arguments));
 }
-/* jshint strict: true, undef: true */
-/* globals spec, is_something, reduce, length, length_gt, is_something, to_string, is_function, is_null */
-/* globals be, is_boolean, is */
-/* globals exports */
 
-spec(true, function () { "use strict"; return not(is_something)(null); });
-spec(true, function () { "use strict"; return not(length_gt(2))([1]); });
-spec(false, function () { "use strict"; return not(is_something)(1); });
-spec(false, function () { "use strict"; return not(is(1))(1); });
-spec(not, [is_something, is_null], /should be/);
 
-exports.not = not;
+funcs.common.base.not=not;
 function not(func) {
-  "use strict";
+
 
   reduce(arguments, length, be(is(1)));
   var l = arguments.length;
@@ -977,25 +688,17 @@ function not(func) {
     return !result;
   };
 }
-/* jshint strict: true, undef: true */
-/* globals _ */
-/* globals exports */
 
-exports.is_plain_object = is_plain_object;
+
+funcs.common.base.is_plain_object=is_plain_object;
 function is_plain_object(v) {
-  "use strict";
 
   return _.isPlainObject(v);
 }
-/* jshint strict: true, undef: true */
-/* globals spec, identity, to_string, is_function, _, apply_function */
-/* globals exports */
 
 
-exports.to_slot = to_slot;
-
+funcs.common.base.to_slot=to_slot;
 function to_slot(func, _args) {
-  "use strict";
 
   var ARGS = to_array(arguments).slice(1);
 
@@ -1023,15 +726,10 @@ function to_slot(func, _args) {
   }; // === return
 
 } // === function to_slot
-/* jshint strict: true, undef: true */
-/* globals length */
-/* globals exports */
 
 
-
-exports.replace = replace;
+funcs.common.base.replace=replace;
 function replace(pattern, new_value) {
-  "use strict";
 
   if (length(arguments) === 3) {
     return arguments[2].replace(arguments[0], arguments[1]);
@@ -1041,14 +739,10 @@ function replace(pattern, new_value) {
     return v.replace(pattern, new_value);
   };
 }
-/* jshint strict: true, undef: true */
-/* globals is_something, has_property_of, to_string */
-/* globals exports */
 
 
-exports.length_of = length_of;
+funcs.common.base.length_of=length_of;
 function length_of(num) {
-  "use strict";
 
   return function (v) {
     if (!is_something(v) && has_property_of('length', 'number')(v))
@@ -1056,55 +750,32 @@ function length_of(num) {
     return v.length === num;
   };
 }
-/* jshint strict: true, undef: true */
-/* globals spec, _, to_string */
-/* globals exports */
 
-spec(length,        [[1]], 1);
-spec(length,        [function () {}], 0);
-spec(length,        [function (a) { "use strict"; return a;}], 1);
-spec(length,        [{length: 3}], 3);
-spec(length, [3],  new Error('Invalid value for length: 3'));
 
-exports.length = length;
+funcs.common.base.length=length;
 function length(raw_v) {
-  "use strict";
 
   if (raw_v === null || raw_v === undefined || !_.isFinite(raw_v.length))
     throw new Error("Invalid value for length: " + to_string(raw_v));
   return raw_v.length;
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
-/* globals be, reduce, is_string, not, is_empty, _ */
 
-exports.to_key = to_key;
 
+funcs.common.base.to_key=to_key;
 function to_key(str) {
-  "use strict";
   return reduce(str, be(is_string), be(not(is_empty)), _.trim);
 }
-/* jshint strict: true, undef: true */
-/* globals spec */
-/* globals exports */
 
 
-spec(is_undefined, [undefined], true);
-spec(is_undefined, [null], false);
-
-exports.is_undefined = is_undefined;
+funcs.common.base.is_undefined=is_undefined;
 function is_undefined(v) {
-  "use strict";
 
   return v === undefined;
 }
-/* jshint strict: true, undef: true */
-/* globals _ */
-/* globals exports */
 
-exports.conditional = conditional;
+
+funcs.common.base.conditional=conditional;
 function conditional(name, funcs) {
-  "use strict";
 
   if (funcs.length < 2)
     throw new Error("Called with too few arguments: " + arguments.length);
@@ -1116,15 +787,10 @@ function conditional(name, funcs) {
     return _[name](funcs, function (f) { return f(v); });
   };
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
-/* globals be, reduce, to_key, is_string, not, is_empty, _ */
 
-exports.to_var_name = to_var_name;
 
-// Removes begining slash, if any.
+funcs.common.base.to_var_name=to_var_name;
 function to_var_name(val, delim) {
-  "use strict";
 
   if (length(arguments) == 1)
     delim = "_";
@@ -1134,24 +800,17 @@ function to_var_name(val, delim) {
   .replace(/[^a-zA-Z-0-9\_\-]+/g, delim);
 }
 
-/* jshint strict: true, undef: true */
-/* globals _ */
-/* globals exports */
 
-exports.all_funcs = all_funcs;
+
+funcs.common.base.all_funcs=all_funcs;
 function all_funcs(arr) {
-  "use strict";
   var l = arr.length;
   return _.isFinite(l) && l > 0 && _.all(arr, _.isFunction);
 }
-/* jshint strict: true, undef: true */
-/* globals set_function_string_name */
-/* globals exports */
 
 
-exports.has_own_property = has_own_property;
+funcs.common.base.has_own_property=has_own_property;
 function has_own_property(name) {
-  "use strict";
 
   var f = function __has_own_property(o) {
     return o.hasOwnProperty(name);
@@ -1159,14 +818,10 @@ function has_own_property(name) {
 
   return set_function_string_name(f, arguments);
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
-/* globals be, reduce, is_string, not, is_empty, _ */
 
-exports.update_key = update_key;
 
+funcs.common.base.update_key=update_key;
 function update_key(o, k, v) {
-  "use strict";
 
   if (!o.hasOwnProperty(k))
     throw new Error("Key not defined: " + to_string(k) + " in: " + to_string(o));
@@ -1177,21 +832,10 @@ function update_key(o, k, v) {
   return new_o;
 } // === function
 
-/* jshint strict: true, undef: true */
-/* globals spec */
-/* globals exports */
 
 
-
-
-spec(is_anything, [false], true);
-spec(is_anything, [true], true);
-spec(is_anything, [null], new Error('null found.'));
-spec(is_anything, [undefined], new Error('undefined found.'));
-
-exports.is_anything = is_anything;
+funcs.common.base.is_anything=is_anything;
 function is_anything(v) {
-  "use strict";
 
   if (arguments.length !== 1)
     throw new Error("Invalid: arguments.length must === 1");
@@ -1202,27 +846,20 @@ function is_anything(v) {
 
   return true;
 }
-/* jshint strict: true, undef: true */
-/* globals console */
-/* globals exports */
 
-exports.log = log;
+
+funcs.common.base.log=log;
 function log(_args) {
-  "use strict";
 
   if (typeof console !== 'undefined' && console.log)
     return console.log.apply(console, arguments);
 
   return false;
 } // === func
-/* jshint strict: true, undef: true */
-/* globals _, to_string */
-/* globals exports */
 
 
-exports.find_key = find_key;
+funcs.common.base.find_key=find_key;
 function find_key(k, _args) {
-  "use strict";
 
   var args = _.toArray(arguments);
   args.shift();
@@ -1233,12 +870,10 @@ function find_key(k, _args) {
 
   return o[k];
 }
-/* jshint strict: true, undef: true */
 
-exports.describe_reduce = describe_reduce;
 
+funcs.common.base.describe_reduce=describe_reduce;
 function describe_reduce(INFO, val, _args) {
-  "use strict";
 
   var funcs = to_array(arguments).slice(2);
   try {
@@ -1248,18 +883,10 @@ function describe_reduce(INFO, val, _args) {
     throw e;
   }
 } // === function
-/* jshint strict: true, undef: true */
-/* globals spec, identity, _, is_undefined, to_string, be, is_function */
-/* globals exports, log, to_function */
 
 
-spec(dot('num'),    [{num: 3}],         3);
-spec(dot('html()'), [{html: to_function('hyper')}], 'hyper');
-spec(dot('num'),    [{n:4}],            new Error('Property not found: "num" in {"n":4}'));
-
-exports.dot = dot;
+funcs.common.base.dot=dot;
 function dot(raw_name) {
-  "use strict";
 
   var name = _.trimEnd(raw_name, '()');
 
@@ -1275,51 +902,31 @@ function dot(raw_name) {
       return o[name];
   };
 } // === func dot
-/* jshint strict: true, undef: true */
-/* globals exports */
 
 
-exports.length_gt = length_gt;
+funcs.common.base.length_gt=length_gt;
 function length_gt(num) {
-  "use strict";
 
   return function (v) { return v.length > num;};
 }
-/* jshint strict: true, undef: true */
-/* globals exports, _ */
 
-exports.is_regexp = is_regexp;
+
+funcs.common.base.is_regexp=is_regexp;
 function is_regexp(val) {
-  "use strict";
   return _.isRegExp(val);
 }
-/* jshint strict: true, undef: true */
-/* globals spec, be, is_string, length, _ */
-/* globals exports */
 
-spec(is_blank_string, [""],     true);
-spec(is_blank_string, ["   "],  true);
-spec(is_blank_string, [" a  "], false);
 
-exports.is_blank_string = is_blank_string;
+funcs.common.base.is_blank_string=is_blank_string;
 function is_blank_string(v) {
-  "use strict";
 
   be(is_string, v);
   return length(_.trim(v)) < 1;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, is_array, eachs, to_string, is_plain_object */
-/* globals exports */
 
 
-spec(merge, [{a: [1]}, {a: [2,3]}], {a: [1,2,3]});
-spec(merge, [[1], [2,3]], [1,2,3]);
-spec(merge, [{a: 1}, {b: 2}, {c: 3}], {a: 1, b: 2, c: 3});
-
-exports.merge = merge;
+funcs.common.base.merge=merge;
 function merge(_args) {
-  "use strict";
 
   if (arguments.length === 0)
     throw new Error('Arguments misisng.');
@@ -1359,37 +966,23 @@ function merge(_args) {
 
   return fin;
 }
-/* jshint strict: true, undef: true */
-/* globals length */
-/* globals exports */
 
-exports.is_length_zero = is_length_zero;
+
+funcs.common.base.is_length_zero=is_length_zero;
 function is_length_zero(v) {
-  "use strict";
   return length(v) === 0;
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
-exports.is_boolean = is_boolean;
+
+funcs.common.base.is_boolean=is_boolean;
 function is_boolean(v) {
-  "use strict";
 
   return typeof v === 'boolean';
 }
-/* jshint strict: true, undef: true */
-/* globals spec, to_string, is_something */
-/* globals exports, is_plain_object, is_string */
 
-spec(is_error, [new Error('anything')], true);
-spec(is_error, ['anything'],            false);
 
-exports.is_error = is_error;
-spec(is_error, [new Error('meh')], true);
-spec(is_error, [new TypeError('meow')], true);
-spec(is_error, [{stack: "", message: ""}], false);
+funcs.common.base.is_error=is_error;
 function is_error(v) {
-  "use strict";
 
   return is_something(v) &&
     (
@@ -1398,32 +991,10 @@ function is_error(v) {
     )
     ;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, to_string, _, is_enumerable, is_undefined, length, keys_or_indexes */
-/* globals exports */
 
 
-// TODO: spec: does not modify arr
-spec(reduce_eachs, [
-  [], [1,2], function (v, kx, x) { "use strict"; v.push("" + kx + x); return v; }
-], ["01", "12"]);
-
-spec(reduce_eachs, [
-  [], [1,2], ["a", "b"], function (v, kx, x, ky, y) { "use strict"; v.push("" + x + y); return v; }
-], ["1a", "1b", "2a", "2b"]);
-
-spec(reduce_eachs, [
-  [], {one: 1, two: 2}, ["a"], function (v, kx, x, ky, y) { "use strict"; v.push("" + kx + y); return v; }
-], ["onea", "twoa"]);
-
-spec(reduce_eachs, [
-  [], {one: 1, two: 2}, [], ["a"], function (v, kx, x, ky, y, kz, z) { "use strict"; v.push("" + kx + y); return v; }
-], []);
-
-exports.reduce_eachs = reduce_eachs;
+funcs.common.base.reduce_eachs=reduce_eachs;
 function reduce_eachs() {
-  "use strict";
-
   var args = _.toArray(arguments);
   if (args.length < 3)
     throw new Error("Not enough args: " + to_string(args));
@@ -1470,32 +1041,18 @@ function reduce_eachs() {
     return row[0];
   }
 } // === function: reduce_eachs
-/* jshint strict: true, undef: true */
-/* globals spec */
-/* globals exports */
 
 
-spec(function_to_name, ["function my_name() {}"], "my_name");
-
-exports.function_to_name = function_to_name;
+funcs.common.base.function_to_name=function_to_name;
 function function_to_name(f) {
-  "use strict";
 
   var WHITESPACE = /\s+/g;
   return f.to_string_name || f.toString().split('(')[0].split(WHITESPACE)[1] || f.toString();
 }
-/* jshint strict: true, undef: true */
-/* globals spec, is_array, is_string, is_plain_object, _, is_arguments */
-/* globals exports */
 
 
-spec(is_enumerable, [[]], true);
-spec(is_enumerable, [{}], true);
-spec(is_enumerable, [{}], true);
-
-exports.is_enumerable = is_enumerable;
+funcs.common.base.is_enumerable=is_enumerable;
 function is_enumerable(v) {
-  "use strict";
 
   return is_string(v) ||
   is_array(v)         ||
@@ -1503,36 +1060,18 @@ function is_enumerable(v) {
   _.isFinite(v.length) ||
     is_arguments(v);
 }
-/* jshint strict: true, undef: true */
-/* globals spec, _ */
-/* globals exports */
 
 
-spec(standard_name, ['NAME NAME'], "name name");     // it 'lowercases names'
-spec(standard_name, ['  name  '],  'name');          // it 'trims string'
-spec(standard_name, ['n   aME'],   'n ame');         // it 'squeezes whitespace'
-
-exports.standard_name = standard_name;
+funcs.common.base.standard_name=standard_name;
 function standard_name(str) {
-  "use strict";
 
   var WHITESPACE = /\s+/g;
   return _.trim(str).replace(WHITESPACE, ' ').toLowerCase();
 }
-/* jshint strict: true, undef: true */
-/* globals spec, is_arguments, to_arguments, is_num, _, to_string */
-/* globals exports */
 
-spec(
-  arguments_are,
-  [to_arguments(1), is_num, is_num],
-  new Error('Wrong # of arguments: expected: 2 actual: 1')
-);
 
-exports.arguments_are = arguments_are;
-
+funcs.common.base.arguments_are=arguments_are;
 function arguments_are(args_o, _funcs) {
-  "use strict";
 
   if (!is_arguments(args_o))
     throw new Error('not arguments: ' + to_string(args_o));
@@ -1551,33 +1090,27 @@ function arguments_are(args_o, _funcs) {
 
   return _.toArray(args);
 }
-/* jshint strict: true, undef: true */
-/* globals _, to_string */
-/* globals exports */
 
 
-exports.to_match_string = to_match_string;
+funcs.common.base.to_match_string=to_match_string;
 function to_match_string(actual, expect) {
-  "use strict";
 
   if (_.isEqual(actual, expect))
     return to_string(actual) + ' === ' + to_string(expect);
   else
     return to_string(actual) + ' !== ' + to_string(expect);
 }
-/* jshint strict: true, undef: true */
-/* globals spec, arguments_are, is_something, is_string, _, is_empty, map_x, is_blank_string */
-/* globals exports */
 
 
-
-spec(split_on, [/;/, "a;b;c"], ['a', 'b', 'c']);
-spec(split_on, [/;/, "a;b;c"], ['a', 'b', 'c']);
-spec(split_on, [/;/, "a; ;c"], ['a', 'c']);
-
-exports.split_on = split_on;
+funcs.common.base.split_on=split_on;
 function split_on(pattern, str) {
-  "use strict";
+
+  function _split_on_(str) {
+    return split_on(pattern, str);
+  }
+
+  if (length(arguments) === 1)
+    return _split_on_;
 
   arguments_are(arguments, is_something, is_string);
   var trim = _.trim(str);
@@ -1587,14 +1120,10 @@ function split_on(pattern, str) {
     return !is_blank_string(x) && _.trim(x);
   }));
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
-/* globals be, reduce, is_string, not, is_empty, _ */
 
-exports.create_or_update_key = create_or_update_key;
 
+funcs.common.base.create_or_update_key=create_or_update_key;
 function create_or_update_key(orig_o, name, val) {
-  "use strict";
   var o = copy_value(orig_o);
   var k = reduce(
     name,
@@ -1606,13 +1135,10 @@ function create_or_update_key(orig_o, name, val) {
   o[k] = be(is_something, val);
   return o;
 }
-/* jshint strict: true, undef: true */
-/* globals is_array, is_arguments, to_string, function_to_name */
-/* globals exports */
 
-exports.apply_function = apply_function;
+
+funcs.common.base.apply_function=apply_function;
 function apply_function(f, args) {
-  "use strict";
 
   if (arguments.length !== 2)
     throw new Error('Wrong # of argumments: expected: ' + 2 + ' actual: ' + arguments.length);
@@ -1625,82 +1151,19 @@ function apply_function(f, args) {
 
   return f.apply(null, args);
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
-exports.identity = identity;
+
+funcs.common.base.identity=identity;
 function identity(x) {
-  "use strict";
 
   if (arguments.length !== 1)
     throw new Error("arguments.length !== 0");
   return x;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, _, to_string, is_enumerable, length, keys_or_indexes */
-/* globals exports */
 
 
-// TODO: spec :eachs does not alter inputs
-spec(
-  ["01", "12"],
-  function eachs_passes_key_and_val() {
-    "use strict";
-
-    var v = [];
-    eachs( [1,2], function (kx, x) { v.push("" + kx + x); });
-    return v;
-  }
-);
-
-spec(
-  ["1a", "1b", "2a", "2b"],
-  function eachs_passes_vals_of_multiple_colls() {
-    "use strict";
-
-    var v = [];
-    eachs( [1,2], ["a", "b"], function (kx, x, ky, y) { v.push("" + x + y); });
-    return v;
-  }
-);
-
-spec(
-  ["onea", "twoa"],
-  function eachs_passes_keys_and_vals_of_arrays_and_plain_objects() {
-    "use strict";
-
-    var v = [];
-    eachs({one: 1, two: 2}, ["a"], function (kx, x, ky, y) { v.push("" + kx + y); });
-    return v;
-  }
-);
-
-spec(
-  ["1a", "1b", "2a", "2b"],
-  function eachs_passes_vals_of_plain_object_and_array() {
-    "use strict";
-
-    var v = [];
-    eachs({one: 1, two: 2}, ["a", "b"], function (kx, x, ky, y) { v.push("" + x + y); });
-    return v;
-  }
-);
-
-spec( [],
-  function eachs_returns_empty_array_if_one_array_is_empty() {
-    "use strict";
-
-    var v = [];
-    eachs({one: 1, two: 2}, [], ["a"], function (kx, x, ky, y, kz, z) {
-      v.push("" + kx + y);
-    });
-    return v;
-  }
-);
-
-exports.eachs = eachs;
+funcs.common.base.eachs=eachs;
 function eachs() {
-  "use strict";
 
   var args = _.toArray(arguments);
 
@@ -1744,57 +1207,24 @@ function eachs() {
     return;
   }
 }
-/* jshint strict: true, undef: true */
-/* globals exports */
 
-exports.is_positive = is_positive;
+
+funcs.common.base.is_positive=is_positive;
 function is_positive(v) {
-  "use strict";
 
   return typeof v === 'number' && isFinite(v) && v > 0;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, _, length_gt */
-/* globals exports, log */
 
 
-spec(is_array_of_functions, [[function () {}]], true);
-spec(is_array_of_functions, [[]], false);
-spec(is_array_of_functions, [[1]], false);
-spec(is_array_of_functions, [1], false);
-
-exports.is_array_of_functions = is_array_of_functions;
+funcs.common.base.is_array_of_functions=is_array_of_functions;
 function is_array_of_functions(a) {
-  "use strict";
 
   return _.isArray(a) && length_gt(0)(a) > 0 && _.every(a, _.isFunction);
 } // === func
-/* jshint strict: true, undef: true */
-/* globals spec, identity, to_string, is_function, _, apply_function */
-/* globals exports */
 
-spec(true, function to_function_returns_sole_function() {
-  "use strict";
 
-  var f = function () {};
-  return to_function(f) === f;
-});
-
-spec(2, function to_function_returns_an_identity_function() {
-  "use strict";
-
-  return to_function(2)();
-});
-
-spec('"3"', function to_function_returns_a_function() {
-  "use strict";
-
-  return to_function(identity, to_string, to_string)(3);
-});
-
-exports.to_function = to_function;
+funcs.common.base.to_function=to_function;
 function to_function() {
-  "use strict";
 
   if (arguments.length === 1) {
     if (is_function(arguments[0])) {
@@ -1833,35 +1263,20 @@ function to_function() {
     return val;
   }; // return
 }
-/* jshint strict: true, undef: true */
-/* globals spec, return_arguments, is_something, or, is, is_positive */
-/* globals exports, _, log */
 
-spec(is_arguments, [return_arguments()], true);
-spec(is_arguments, [[]], false);
-spec(is_arguments, [{}], false);
 
-exports.is_arguments = is_arguments;
+funcs.common.base.is_arguments=is_arguments;
 function is_arguments(v) {
-  "use strict";
 
   return is_something(v) &&
     v.constructor === arguments.constructor &&
       _.isFinite(v.length) &&
         !_.isPlainObject(v);
 }
-/* jshint strict: true, undef: true */
-/* globals spec, is_string, is_function, is_num, is_something, is_null, _, length, to_string */
-/* globals exports */
 
 
-spec(be, [is_num, 1],    1);
-spec(be, [is_num, '1'],  /"1" should be: is_num/);
-spec(be, [is_string, 2], /2 should be: is_string/);
-
-exports.be = be;
+funcs.common.base.be=be;
 function be(func, val) {
-  "use strict";
 
   switch(length(arguments)) {
     case 2:
@@ -1879,13 +1294,10 @@ function be(func, val) {
   throw new Error("Invalid arguments.");
 }
 
-/* jshint strict: true, undef: true */
-/* globals _, and */
-/* globals exports */
 
-exports.find = find;
+
+funcs.common.base.find=find;
 function find(_funcs) {
-  "use strict";
 
   var funcs = _.toArray(arguments);
 
@@ -1893,14 +1305,12 @@ function find(_funcs) {
     return _.find(v, and.apply(null, funcs));
   };
 }
-/* jshint strict: true, undef: true */
-/* globals to_string, length, setTimeout, be, is_specs */
-/* globals exports */
 
 
-exports.spec_next = spec_next;
+funcs.common.spec = {};
+
+funcs.common.spec.spec_next=spec_next;
 function spec_next(specs) {
-  "use strict";
 
   be(is_specs, specs);
 
@@ -1952,15 +1362,10 @@ function spec_next(specs) {
 
   throw new Error('Function has invalid arguments: ' + to_string(func));
 }
-/* jshint strict: true, undef: true */
-/* globals be, is, not, is_empty, or, is_plain_object, is_positive */
-/* globals exports */
 
 
-exports.is_specs = is_specs;
+funcs.common.spec.is_specs=is_specs;
 function is_specs(specs) {
-  "use strict";
-
   var is_valid_specs_i = or(is('init'), is(0), is_positive);
 
   be(is_plain_object,  specs);
@@ -1969,17 +1374,10 @@ function is_specs(specs) {
   be(is_plain_object,  specs.dones);
   return true;
 }
-/* jshint strict: true, undef: true */
-/* globals $, to_string */
-/* globals exports */
 
 
-// Specification function:
-// Accepts:
-//   string : 'reset'  => Reset dom for next test.
-exports.spec_dom = spec_dom;
+funcs.common.spec.spec_dom=spec_dom;
 function spec_dom(cmd) {
-  "use strict";
 
   switch (cmd) {
     case 'reset':
@@ -1997,64 +1395,10 @@ function spec_dom(cmd) {
 
   return $('#Spec_Stage');
 }
-/* jshint strict: true, undef: true */
-/* globals _, App, to_match_string, log, to_string, to_function_string */
-/* globals exports, is_empty, length, is_function, is_plain_object */
-/* globals $, process */
-/* globals window, _, is_empty, function_to_name, spec_dom */
-/* globals _, is_array, to_string, to_function_string, to_match_string, log */
-/* globals exports, wait_max, is_error, is_string, is_regexp, spec */
 
 
-// === Expect:
-// spec(my_func,             ["my args"],           "my expected value");
-// spec("my expected value", function my_custom_spec() {
-//   return "a value";
-// });
-//
-// === Throws:
-// spec(my_func, ["my args"], new Error("my expected thrown error"));
-// spec(
-//   new Error("my expected thrown error"),
-//   function my_custom_spec() {
-//     throw new Error("something");
-//   }
-// );
-//
-// === Run specs:
-// spec('send message');
-// spec(function (msg) {
-//  log('Finished specs: ' + msg.total);
-// });
-//
-// === Used by other functions to continue running specs:
-// spec({
-//    list: [],
-//    i:"init"|0|positive,
-//    on_finish: my_callback
-// });
-//
-
-exports.spec = spec;
-
-// === Is there a specific spec to run?
-(function () {
-  "use strict";
-
-  if (typeof window === 'undefined')
-    return;
-  var href = window.location.href;
-  var target = _.trim(href.split('?').pop() || '');
-  if (!is_empty(target) && target !== href  && target !== function_to_name("str_or_func"))
-    return false;
-
-  // === Reset DOM:
-  spec_dom('reset');
-  spec.target = target;
-})();
-
+funcs.common.spec.spec=spec;
 function spec() {
-  "use strict";
 
   var is_allowed = (
     ( typeof(window) !== 'undefined' && $('#Spec_Stage').length === 1) ||
@@ -2185,23 +1529,18 @@ function spec() {
 } // === function spec
 
 spec.default_msg = function default_msg(msg) {
-  "use strict";
   log('      ======================================');
   log('      Specs Finish: ' + to_string(msg.total) + ' tests');
   log('      ======================================');
 };
 
 
-/* jshint node: true, strict: true, undef: true */
-/* globals Computer, is_empty */
 
 
-// === Examples:
-// App()
-// App(..args for underlying Computer)
-exports.App = App;
+funcs.common.state = {};
+
+funcs.common.state.App=App;
 function App() {
-  "use strict";
 
   if (!App._computer) {
     App._computer = new Computer();
@@ -2209,55 +1548,12 @@ function App() {
 
   return App._computer.apply(null, arguments);
 }
-/* jshint strict: true, undef: true */
-/* globals is_array, spec, arguments_are, reduce_eachs, copy_value, do_it, and, is, is_plain_object */
-/* globals is_string, be, not, to_string, apply_function, has_length, is_function, msg_match, function_to_name */
-/* globals reduce, log, exports, is_something, is_empty, _ */
-/* globals or, is_num, is_array_of_functions, to_key, is_null, is_undefined, is_regexp, is_error, is_arguments */
 
-spec(function throws_on_invalid() {
-  "use strict";
-  var comp = new Computer();
-  comp('create', 'a number', 1, function (msg) { return be(is_num, msg.value); });
-  comp('update', 'a number', '2');
-}, [], /2. should be: is_num /);
+funcs.App = App;
 
-spec(2, function increments_counter() {
-  "use strict";
-  var comp = new Computer();
-  comp('create', 'counter', 0);
-  comp('+1', 'counter');
-  comp('+1', 'counter');
-  return comp('read', 'counter');
-});
 
-spec(-4, function decrements_counter() {
-  "use strict";
-  var comp = new Computer();
-  comp('create', 'counter', -2);
-  comp('-1', 'counter');
-  comp('-1', 'counter');
-  return comp('read', 'counter');
-});
-
-spec(3, function runs_message_function() {
-  "use strict";
-
-  var counter = 0;
-  var data = {my_name: 'happy'};
-  var state = new Computer();
-  state('create message function', function (msg) {
-    if (!msg_match({my_name: 'happy'}, msg))
-      return;
-    ++counter;
-  });
-  do_it(3, function () { state('send message', data); });
-  return counter;
-});
-
-exports.Computer = Computer;
+funcs.common.state.Computer=Computer;
 function Computer() {
-  "use strict";
 
   ME.values     = {};
   ME.msg_funcs  = [];
@@ -2418,49 +1714,24 @@ function Computer() {
   } // === return function State;
 
 } // === function Computer =====================================================
-/* jshint strict: true, undef: true */
-/* globals spec, is_string, window, is_function */
-/* globals exports */
 
 
-spec(is_function_name, ['is_function'], true);
-spec(is_function_name, ['none none'], false);
-spec(is_function_name, [is_function_name], false);
+funcs.browser     = {};
 
-exports.is_function_name = is_function_name;
+funcs.browser.dom = {};
+
+funcs.browser.dom.is_function_name=is_function_name;
 function is_function_name(v) {
-  "use strict";
 
   if (!is_string(v))
     return false;
 
-  return is_function(window[v]);
+  return is_function(exports[v]);
 }
-/* jshint strict: true, undef: true */
-/* globals App, be, is_string, key_to_bool, is_boolean, $, spec_dom, spec */
 
 
-
-spec('', function () { // show: shows element when key is true
-  "use strict";
-
-  spec_dom().html('<div data-do="show is_factor" style="display: none;">Factor</div>');
-  App('send message', {'dom-change': true});
-  App('send message', {is_factor: true});
-  return spec_dom().find('div').attr('style');
-});
-
-spec('display: none;', function () { // does not alter element msg is missing key
-  "use strict";
-
-  spec_dom().html('<div data-do="show is_pearl" style="display: none;">Pearl</div>');
-  App('send message', {'dom-change': true});
-  App('send message', {is_factor: true});
-  return spec_dom().find('div').attr('style');
-});
-
+funcs.browser.dom.show=show;
 function show(msg) {
-  "use strict";
 
   var dom_id = be(is_string, msg.dom_id);
   var key    = be(is_string, msg.args[0]);
@@ -2473,31 +1744,10 @@ function show(msg) {
     return 'show: ' + dom_id;
   });
 }
-/* jshint strict: true, undef: true */
-/* globals spec, spec_dom, $, _, is_empty, new_id */
 
-spec('has id', function dom_id_adds_id_attr_to_element() {
-  "use strict";
 
-  spec_dom().html('<div>has id</div>');
-  var id = dom_id(spec_dom().find('div:first'));
-  return $('#' + id).html();
-});
-
-spec('dom_id_does_not_override_original_id', function dom_id_does_not_override_original_id() {
-  "use strict";
-
-  spec_dom().html('<div id="dom_id_does_not_override_original_id">override id</div>');
-  return dom_id(spec_dom().find('div:first'));
-});
-
-// Returns id.
-// Sets id of element if no id is set.
-//
-// .dom_id(raw_or_jquery)
-// .dom_id('prefix', raw_or_jquer)
+funcs.browser.dom.dom_id=dom_id;
 function dom_id() {
-  "use strict";
 
   var args   = _.toArray(arguments);
   var o      = _.find(args, _.negate(_.isString));
@@ -2511,22 +1761,17 @@ function dom_id() {
   o.attr('id', str);
   return str;
 } // === id
-/* jshint strict: true, undef: true */
-/* jshint strict: true, undef: true */
-
-function is_partial($) { "use strict"; return $('html').length === 0; }
-/* jshint strict: true, undef: true */
-/* globals spec, is_num, is_empty */
 
 
-spec(false, function () { // next_id returns a different value than previous
-  "use strict";
+funcs.browser.dom.is_partial=is_partial;
+function is_partial($) {
+  return $('html').length === 0;
+}
 
-  return next_id() === next_id();
-});
 
+
+funcs.browser.dom.next_id=next_id;
 function next_id() {
-  "use strict";
 
   if (!is_num(next_id.count))
     next_id.count = -1;
@@ -2535,32 +1780,10 @@ function next_id() {
     return next_id.count;
   return arguments[0] + '_' + next_id.count;
 }
-/* jshint strict: true, undef: true */
-/* globals is_plain_object, be, $, spec_dom, spec, App, is_string, key_to_bool, is_boolean */
 
 
-
-
-spec('', function _show_hide() { // === show_hide shows element if key = true
-  "use strict";
-
-  spec_dom().html('<div data-do="show_hide is_ruby" style="display: none;">Ruby</div>');
-  App('send message', {'dom-change': true});
-  App('send message', {is_ruby: true});
-  return spec_dom().find('div').attr('style');
-});
-
-spec('display: none;', function _show_hide() { // === show_hide hides element if key = false
-  "use strict";
-
-  spec_dom().html('<div data-do="show_hide is_ruby" style="">Perl</div>');
-  App('send message', {'dom-change': true});
-  App('send message', {is_ruby: false});
-  return spec_dom().find('div').attr('style');
-});
-
+funcs.browser.dom.show_hide=show_hide;
 function show_hide(msg) {
-  "use strict";
 
   var dom_id = be(is_string, msg.dom_id);
   var key    = be(is_string, msg.args[0]);
@@ -2579,32 +1802,10 @@ function show_hide(msg) {
       return $('#' + dom_id).hide();
   });
 }
-/* jshint strict: true, undef: true */
-/* globals spec, _, $, dom_attrs, spec */
 
 
-
-// it 'returns an Array when passed a String'
-spec(node_array, ['<div id="111" show_if="happy?"><span></span></div>'], [
-  {
-    tag:   'DIV',
-    attrs:  {id: '111', show_if: 'happy?'},
-    custom: {},
-    childs: [
-      {tag: 'SPAN', attrs: {}, custom: {}, childs: []}
-    ]
-  }
-]);
-
-spec(['a', undefined, 'b'], function node_array_returns_raw_text_nodes() {
-  "use strict";
-
-  var arr = node_array('<div><span>a<span></span>b</span></div>');
-  return _.map(arr[0].childs[0].childs, 'nodeValue');
-});
-
+funcs.browser.dom.node_array=node_array;
 function node_array(unknown) {
-  "use strict";
 
   var arr = [];
   _.each($(unknown), function (dom) {
@@ -2621,14 +1822,10 @@ function node_array(unknown) {
 
   return arr;
 }
-/* jshint strict: true, undef: true */
-/* globals arguments_are, spec, $, has_property_of, _ */
 
-spec(dom_attrs, [$('<div id="000" img=".png"></div>')[0]], {id: "000", img: ".png"});
-spec(dom_attrs, [$('<div class="is_happy"></div>')[0]], {"class": 'is_happy'});
 
+funcs.browser.dom.dom_attrs=dom_attrs;
 function dom_attrs(dom) {
-  "use strict";
 
   arguments_are(arguments, has_property_of('attributes', 'object'));
 
@@ -2641,82 +1838,33 @@ function dom_attrs(dom) {
     {}
   );
 } // === attrs
-/* jshint strict: true, undef: true */
-/* globals spec, _ */
 
 
-
-spec(html_escape, ['<p>{{a}}</p>'], '&lt;p&gt;&#123;&#123;a&#125;&#125;&lt;/p&gt;');
-
+funcs.browser.dom.html_escape=html_escape;
 function html_escape(str) {
-  "use strict";
 
   return _.escape(str).replace(/\{/g, '&#123;').replace(/\}/g, '&#125;');
 }
-/* jshint strict: true, undef: true */
 
 
-
+funcs.browser.dom.is_$=is_$;
 function is_$(v) {
-  "use strict";
-
   return v && typeof v.html === 'function' && typeof v.attr === 'function';
 }
-/* jshint strict: true, undef: true */
 
 
-
-// Examples:
-//
-//   .new_id()           ->  Integer
-//   .new_id('prefix_')  ->  String
-//
+funcs.browser.dom.new_id=new_id;
 function new_id(prefix) {
-  "use strict";
 
   if (!new_id.hasOwnProperty('_id'))
     new_id._id = -1;
   new_id._id = new_id._id + 1;
   return (prefix) ? prefix + new_id._id : new_id._id;
 } // === func
-/* jshint strict: true, undef: true */
-/* globals spec, spec_dom, _, next_id, $ */
 
 
-
-spec('top_descendents_returns_self_if_selector_matches', function top_descendents_returns_self_if_selector_matches() {
-  "use strict";
-
-  spec_dom().html('<div id="top_descendents_returns_self_if_selector_matches" template="num"></div>');
-  return top_descendents(spec_dom().children(), '*[template]')[0].attr('id');
-});
-
-spec(['SPAN', 'SPAN'], function () { // it 'returns first children matching selector'
-  "use strict";
-
-  spec_dom().html('<div><span class="top"></span><span class="top"></span></div>');
-  return _.map(
-    top_descendents(spec_dom().children(), '.top'),
-    function (n) { return n[0].tagName; }
-  );
-});
-
-
-spec([['DIV', 'top_descendents_1']], function () { // does not return nested matching descendants if ancestor matches selector'
-  "use strict";
-
-  var id = next_id();
-  spec_dom().html(
-    '<div><div id="top_descendents_1" class="top"><span class="top"></span><span class="top"></span></div><div>'
-  );
-  return _.map(
-    top_descendents(spec_dom().children(), '.top'),
-    function (n) { return [n[0].tagName, n.attr('id')]; }
-  );
-});
-
+funcs.browser.dom.top_descendents=top_descendents;
 function top_descendents(dom, selector) {
-  "use strict";
 
   var arr = [];
   _.each($(dom), function (node) {
@@ -2728,48 +1876,19 @@ function top_descendents(dom, selector) {
 
   return arr;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, spec_dom, _, $ */
 
 
-
-
-// it 'returns value of the attribute'
-spec('one', function remove_attr_returns_value_of_the_attribute() {
-  "use strict";
-
-  spec_dom().html('<div show_if="one"></div>');
-  return remove_attr(spec_dom().find('div:first'), 'show_if');
-});
-
-// it 'removes attribute from node'
-spec({id: 'remove_attr_1'}, function remove_attr_removes_attribute_from_node() {
-  "use strict";
-
-  spec_dom().html('<div id="remove_attr_1" show_if="one"></div>');
-  remove_attr(spec_dom().find('div:first'), 'show_if');
-  return _.reduce(
-    spec_dom().find('div:first')[0].attributes,
-    function (a, v) { a[v.name] = v.value; return a; },
-    {}
-  );
-});
-
+funcs.browser.dom.remove_attr=remove_attr;
 function remove_attr(node, name) {
-  "use strict";
 
   var val = $(node).attr(name);
   $(node).removeAttr(name);
   return val;
 }
-/* jshint strict: true, undef: true */
-/* globals spec, window */
 
 
-spec(is_dev, [], window.location.href.indexOf('/specs.html') > 0);
-
+funcs.browser.dom.is_dev=is_dev;
 function is_dev() {
-  "use strict";
 
   var addr = window.location.href;
   return window.console && (addr.indexOf("localhost") > -1 ||
@@ -2777,30 +1896,10 @@ function is_dev() {
     addr.indexOf("127.0.0.1") > -1)
   ;
 } // === func
-/* jshint strict: true, undef: true */
-/* globals App, is_string, key_to_bool, is_string, $, spec_dom, spec, be */
 
 
-spec('display: none;', function () { // hide: hides element when key is true
-  "use strict";
-
-  spec_dom().html('<div data-do="hide is_factor">Factor</div>');
-  App('send message', {'dom-change': true});
-  App('send message', {is_factor: true});
-  return spec_dom().find('div').attr('style');
-});
-
-spec('', function () { // does not alter element if msg has missing key
-  "use strict";
-
-  spec_dom().html('<div data-do="hide is_dog" style="">Dog</div>');
-  App('send message', {'dom-change': true});
-  App('send message', {is_cat: true});
-  return spec_dom().find('div').attr('style');
-});
-
+funcs.browser.dom.hide=hide;
 function hide(msg) {
-  "use strict";
 
   var dom_id = be(is_string, msg.dom_id);
   var key    = be(is_string, msg.args[0]);
@@ -2811,55 +1910,37 @@ function hide(msg) {
     return 'hide: ' + msg.dom_id;
   });
 }
-/* jshint strict: true, undef: true */
-/* globals $ */
 
 
-function to_$(x) { "use strict"; return $(x); }
-/* jshint strict: true, undef: true */
-/* globals $ */
+funcs.browser.dom.to_$=to_$;
+function to_$(x) {
+  return $(x);
+}
 
 
+funcs.browser.dom.outer_html=outer_html;
 function outer_html(raw) {
-  "use strict";
 
   return raw.map(function () {
     return $(this).prop('outerHTML');
   }).toArray().join('');
 }
-/* jshint strict: true, undef: true */
-/* globals spec, spec, to_value, html_escape, DOMParser */
 
 
-spec(html_unescape, ["&lt;p&gt;&#123;&#123;1&#125;&#125;&lt;/p&gt;"], '<p>{{1}}</p>');
-
-spec('<p>{{1}}</p>', function html_unescape_multiple_times() {
-  "use strict";
-
-  return to_value(
-    '<p>{{1}}</p>',
-    html_escape, html_escape, html_escape,
-    html_unescape, html_unescape, html_unescape
-  );
-});
-
+funcs.browser.dom.html_unescape=html_unescape;
 function html_unescape(raw) {
-  "use strict";
 
   // From: http://stackoverflow.com/questions/1912501/unescape-html-entities-in-javascript
   return (new DOMParser().parseFromString(raw, "text/html"))
   .documentElement
   .textContent;
 }
-/* jshint strict: true, undef: true */
-/* globals msg_match, has_length, is_string, be, is_array, and, window, is_function, $ */
 
-/*
-   <button data-do="on_click my_func">Click Me</button>
-   --> my_func({dom_id: dom_id});
-*/
+
+funcs.browser.data_do = {};
+
+funcs.browser.data_do.on_click=on_click;
 function on_click(msg) {
-  "use strict";
 
   if (!msg_match({dom_id: is_string, args: and(is_array, has_length(1))}, msg))
     return;
@@ -2884,15 +1965,10 @@ function on_click(msg) {
     func({dom_id: dom_id});
   });
 } // === function
-/* jshint browser: true, strict: true, undef: true */
-/* globals spec, is_string, to_string, _ */
 
 
-spec(name_to_function, ["name_to_function"], name_to_function);
-
-exports.name_to_function = name_to_function;
+funcs.browser.data_do.name_to_function=name_to_function;
 function name_to_function(raw) {
-  "use strict";
 
   /* globals window, global */
 /* globals exports */
@@ -2904,98 +1980,10 @@ function name_to_function(raw) {
     throw new Error('Function not found: ' + to_string(raw));
   return (typeof 'window' !== 'undefined') ? window[str] : global[str];
 }
-/* jshint strict: true, undef: true */
-/* globals App, html_escape, to_function, dot, map_x, to_$, $, msg_match, key_to_bool, be */
-/* globals is_string, eachs, html_unescape, Mustache, dom_id */
-/* globals spec, spec_dom, _, describe_reduce, is_plain_object, is_array */
 
-spec(['SCRIPT', 'SPAN', 'P'], function template_replaces_elements_by_default() {
-  "use strict";
-  spec_dom().html(
-    '<script type="application/template" data-do="template is_text">' +
-      html_escape('<span>{{a1}}</span>') +
-      html_escape('<p>{{a2}}</p>') +
-        '</script>'
-  );
 
-  App('send message', {'dom-change': true});
-  App('send message', {is_text: true, data: {a1: '1', a2: '2'}});
-  App('send message', {is_text: true, data: {a1: '3', a2: '4'}});
-  return _.map(spec_dom().children(), dot('tagName'));
-});
-
-spec(['SCRIPT','P','DIV'], function template_renders_elements_below_by_default() {
-  "use strict";
-  spec_dom().html(
-    '<script type="application/template" data-do="template is_text replace">' +
-      html_escape('<p>one</p>') +
-      html_escape('<div>two</div>') +
-        '</script>'
-  );
-
-  App('send message', {'dom-change': true});
-  App('send message', {is_text: true});
-  return _.map(spec_dom().children(), dot('tagName'));
-});
-
-spec('123', function template_renders_nested_vars() {
-  "use strict";
-  spec_dom().html(
-    '<script type="application/template" data-do="template is_text replace">'+
-      html_escape('<p>{{a}}</p>') +
-      html_escape('<p>{{b}}</p>') +
-
-      html_escape('<script type="application/template" data-do="template is_val replace">') +
-        html_escape(html_escape('<p>{{c}}</p>')) +
-      html_escape('</script>') +
-    '</script>'
-  );
-  App('send message', {'dom-change': true});
-  App('send message', {is_text: true, data: {a: 1, b: 2}});
-  App('send message', {is_val: true, data: {c:'3'}});
-
-  return map_x(spec_dom().find('p'), to_function(to_$, dot('html()'))).join('');
-});
-
-spec(['P', 'P', 'SCRIPT'], function template_renders_above() {
-  "use strict";
-  spec_dom().html(
-    '<script type="application/template" data-do="template is_text above">'+
-      html_escape('<p>{{a}}</p>') + html_escape('<p>{{b}}</p>') +
-    '</script>'
-  );
-  App('send message', {'dom-change': true});
-  App('send message', {is_text: true, data: {a: 4, b: 5}});
-  return map_x(spec_dom().children(), dot('tagName'));
-});
-
-spec(['SCRIPT', 'SPAN', 'P'], function template_renders_below() {
-  "use strict";
-  spec_dom().html(
-    '<script type="application/template" data-do="template is_text bottom">'+
-      html_escape('<span>{{a}}</span>') + html_escape('<p>{{b}}</p>') +
-    '</script>'
-  );
-  App('send message', {'dom-change': true});
-  App('send message', {is_text: true, data: {a: 6, b: 7}});
-  return map_x(spec_dom().children(), dot('tagName'));
-});
-
-spec('none', function template_renders_dum_functionality() {
-  "use strict";
-  spec_dom().html(
-    '<script type="application/template" data-do="template render_template replace">' +
-      html_escape('<div><span id="template_1" data-do="hide is_num">{{num.word}}</span></div>') +
-      '</script>'
-  );
-  App('send message', {'dom-change': true});
-  App('send message', {render_template: true});
-  App('send message', {is_num: true, data: {num: {word: 'one'}}});
-  return $('#template_1').css('display');
-});
-
+funcs.browser.data_do.template=template;
 function template(msg) {
-  "use strict";
   if (!msg_match({dom_id: is_string}, msg))
     return;
 
@@ -3054,15 +2042,10 @@ function template(msg) {
 } // ==== funcs: template ==========
 
 
-/* jshint strict: true, undef: true */
-/* globals spec, window */
 
 
-spec(is_localhost, [], window.location.href.indexOf('/specs.html') > 0);
-
-
+funcs.browser.data_do.is_localhost=is_localhost;
 function is_localhost() {
-  "use strict";
 
   var addr = window.location.href;
 
@@ -3072,17 +2055,10 @@ function is_localhost() {
   ;
 
 } // === func
-/* jshint strict: true, undef: true */
-/* globals msg_match, is_string, $, dom_id, alite, formToObj, is_plain_object, log, is_blank_string */
-/* globals App */
 
-/*
-   <button onclick="return false;" data-do="on_click submit_form">
-     Submit
-   </button>
-*/
+
+funcs.browser.data_do.submit_form=submit_form;
 function submit_form(msg) {
-  "use strict";
 
   if (!msg_match({dom_id: is_string}, msg))
     return;
@@ -3138,8 +2114,6 @@ function submit_form(msg) {
   );
 } // === function submit_form
 
-
-
 /* jshint strict: true, undef: true */
 /* globals spec, spec_dom, html_escape, App, wait_max, $, msg_match, length */
 /* globals eachs, split_on, is_empty, to_string, name_to_function, apply_function, dom_id */
@@ -3147,7 +2121,6 @@ function submit_form(msg) {
 // ==== Integration tests =====================================================
 // ============================================================================
 spec('yo mo', function button_submit(fin) {
-  "use strict";
   spec_dom().html(
     '<form id="the_form" action="/repeat">' +
       '<script type="application/template" data-do="template ok_the_form replace">' +
@@ -3171,7 +2144,6 @@ spec('yo mo', function button_submit(fin) {
 // === Adds functionality:
 //     <div data-do="my_func arg1 arg2">content</div>
 App('create message function', function process_data_dos(msg) {
-  "use strict";
   var WHITESPACE = /\s+/g;
   // The other functions
   // may alter the DOM. So to prevent unprocessed DOM
@@ -3218,3 +2190,9 @@ App('create message function', function process_data_dos(msg) {
 
 
 
+
+
+
+
+  return funcs;
+})(); // Scope_Dum_Dum_Boom_Boom

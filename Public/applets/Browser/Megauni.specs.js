@@ -2,23 +2,49 @@
 /* jshint strict: true, undef: true */
 /* global Dum_Dum_Boom_Boom, App, log, $, dom_id, is_empty, split_on, describe_reduce  */
 
+
+window.template = Dum_Dum_Boom_Boom.browser.data_do.template;
+window.is_empty = Dum_Dum_Boom_Boom.common.base.is_empty;
+window.log      = Dum_Dum_Boom_Boom.common.base.log;
+
 var on_send = not_ready_yet("on_send");
 var on_respond_ok = not_ready_yet("on_respond_ok");
-App("send message", {"dom-change": true});
+var App = Dum_Dum_Boom_Boom.App;
 
+App("send message", {"dom-change": true});
 
 
 
 
 function hide(data) {
   "use strict";
-  if (is_empty(data.args)) {
+  if (Dum_Dum_Boom_Boom.common.base.is_empty(data.args)) {
     $('#' + data.dom_id).hide();
     return;
   }
 
   return Dum_Dum_Boom_Boom.browser.dom.hide(data);
 } // === mu_hide
+
+
+
+function key_exists(data) {
+  "use strict";
+
+  var copy_value = Dum_Dum_Boom_Boom.common.base.copy_value;
+  var KEY = data.args[0];
+  var FUNC = data.args[1];
+  var ON_TRUE = copy_value(data);
+  var ON_FALSE = copy_value(data);
+
+  ON_TRUE.args = [KEY];
+  ON_FALSE.args = ['!' + KEY];
+
+  window[FUNC](ON_TRUE);
+  window[FUNC](ON_FALSE);
+
+  return true;
+} // === key_exists
 
 
 
@@ -52,6 +78,7 @@ function key_relative_to_dom(target, str) {
 function not_ready_yet(name) {
   "use strict";
 
+  log(name);
   function _not_ready_yet_(data) {
     log("Not ready: " +  name);
     return data;
@@ -60,5 +87,27 @@ function not_ready_yet(name) {
   return _not_ready_yet_;
 }
 
+
+
+
+function send_form(data) {
+  return not_ready_yet("send_form")(data);
+} // === send_form
+
+
+
+function send_message(data) {
+  var KEY       = data.args[0];
+  var CLEAN_KEY = _.trimStart(KEY, '!');
+  var msg       = {};
+
+  if (CLEAN_KEY !== KEY) // "KEY" !== "!KEY"
+    msg[CLEAN_KEY] = false;
+  else
+    msg[CLEAN_KEY] = true;
+
+  App("send message", msg);
+  App("create message function", _send_message_);
+} // send_message
 
 

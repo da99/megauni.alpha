@@ -2,7 +2,7 @@
 
 function hide(data) {
   "use strict";
-  if (is_empty(data.args)) {
+  if (Dum_Dum_Boom_Boom.common.base.is_empty(data.args)) {
     $('#' + data.dom_id).hide();
     return;
   }

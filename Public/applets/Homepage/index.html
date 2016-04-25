@@ -2,8 +2,6 @@
 
 
 
-
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -19,7 +17,7 @@
 
   <body>
 
-  <div id="loading" data-do="hide">
+  <div id="loading" data-do="key_exists logged-in? hide">
     Loading...
   </div>
 
@@ -115,5 +113,6 @@
 </body>
   <script src="/vendor/dum_dum_boom_boom.js"></script>
 
+  <script type="application/data-do" data-do="send_message !logged-in?;"></script>
   <script type="text/javascript" src="/applets/Browser/Megauni.js"></script>
-<script type="application/javascript" src="/applets/Homepage/index.script.js"></script></html>
+</html>
