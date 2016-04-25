@@ -51,23 +51,12 @@ watch () {
       continue
     fi
 
-    if [[ "$path" == *Server/*/*.html ]]; then
-      if [[ "$path" == *_.layout.html ]]; then
-        $0 build || :
-      else
-        $0 build $(echo "$path" | cut -d'/' -f2) || :
-      fi
+    if echo "$path" | grep -P "Server/.+?\.(css|js|html|styl|sass)$" >/dev/null; then
+      mksh_setup ORANGE "=== {{Rebuilding}}..."
+      $0 build || :
       reload-browser
       continue
     fi
-
-    if [[ "$file" == *.js ]]; then
-      js_setup jshint! $path && {
-        $0 build Browser && reload-browser || :
-      }
-
-      continue
-    fi # === if *.js
 
     if [[ "$path" == *.json ]]; then
       (js_setup jshint! $path && $0 test $@)  || :
