@@ -26,7 +26,7 @@ CREATE TABLE log_in (
   fail_count           smallint     NOT NULL DEFAULT 1,
   screen_name_id       int          NOT NULL,
   CONSTRAINT           "log_in_unique_idx" UNIQUE (ip, screen_name_id)
-);
+) engine=TokuDB;
 
 -- UP
 CREATE INDEX log_in_screen_name_id_idx

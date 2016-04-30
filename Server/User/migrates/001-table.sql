@@ -4,7 +4,7 @@ CREATE TABLE "user" (
   pswd_hash            bytea        NOT NULL,
   created_at           timestamp with time zone NOT NULL DEFAULT timezone('UTC'::text, now()),
   trashed_at           timestamp with time zone
-);
+) engine=TokuDB;
 
 
 -- DOWN

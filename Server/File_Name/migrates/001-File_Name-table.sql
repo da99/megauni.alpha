@@ -6,7 +6,7 @@ CREATE TABLE file_name (
 
   CONSTRAINT "file_name_unique_idx"
     UNIQUE (file_name)
-);
+) engine=TokuDB;
 
 
 

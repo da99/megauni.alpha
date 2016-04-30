@@ -19,7 +19,7 @@ CREATE TABLE card (
   created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('UTC'::text, now()),
   updated_at     TIMESTAMP WITH TIME ZONE
 
-);
+) engine=TokuDB;
 
 
 -- DOWN

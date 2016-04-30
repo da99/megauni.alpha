@@ -34,7 +34,7 @@ CREATE TABLE link (
       b_id,      b_type_id
     )
 
-); -- CREATE TABLE link
+) engine=TokuDB; -- CREATE TABLE link
 
 -- DOWN
 

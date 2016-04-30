@@ -8,7 +8,7 @@ CREATE TABLE label (
 
   CONSTRAINT "label_unique_idx"
     UNIQUE (owner_id, label)
-);
+) engine=TokuDB;
 
 
 
