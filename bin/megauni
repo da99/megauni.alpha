@@ -29,6 +29,8 @@ fi
 
 set -u -e -o pipefail
 
+export LUA_PATH="$THIS_DIR/progs/share/lua/5.1/?.lua;$THIS_DIR/progs/share/lua/5.1/?/init.lua;./?.lua;$THIS_DIR/progs/share/luajit-2.0.4/?.lua"
+export LUA_CPATH='$THIS_DIR/progs/lib/lua/5.1/?.so;./?.so'
 
 case "$action" in
 

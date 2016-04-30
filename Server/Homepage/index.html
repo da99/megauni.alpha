@@ -22,16 +22,14 @@
   </div>
 
   <template data-do="template logged-in?">
-    <div class="hidden block" data-do="show_if logged-in?">
-      <p>You are logged in.</p>
-    </div>
+    <div><p>You are logged in.</p></div>
   </template>
 
   <template data-do="template !logged-in?">
     <div class="block form" id="log_in">
       <h3>Log-In</h3>
       <div class="content">
-        <form action="/log-in" method="post" data-do="send_form this submit; remove_if logged-in?">
+        <form action="/log-in" method="post" data-do="send_form this submit;">
           <div class="fields">
             <div class="field screen_name"><label>Screen name:</label><input name="screen_name" type="text" value="" /></div>
             <div class="field passphrase"><label>Pass phrase:</label><input name="pswd" type="password" value="" /></div>
@@ -44,9 +42,9 @@
               <div class="error_msg">{{msg}}</div>
             </template>
 
-            <div class="field buttons" data-do="hide_if FORM.submit"><button class="submit" data-do="on_click send_msg FORM.submit">Log-In</button></div>
-            <div class="loading"       data-do="hidden; show_if FORM.submit;    hide     FORM.is_response">Loading...</div>
-            <div class="errors"        data-do="hidden; show_if FORM.error_msg; print_if FORM.error_msg"></div>
+            <div class="field buttons" data-do="hide FORM.submit"><button class="submit" data-do="on_click send_msg FORM.submit">Log-In</button></div>
+            <div class="loading"       data-do="hide; show_if FORM.submit;    hide     FORM.is_response">Loading...</div>
+            <div class="errors"        data-do="hide; show_if FORM.error_msg; print_if FORM.error_msg"></div>
           </div>
         </form>
       </div><!-- div.content -->

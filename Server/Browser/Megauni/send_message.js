@@ -10,5 +10,4 @@ function send_message(data) {
     msg[CLEAN_KEY] = true;
 
   App("send message", msg);
-  App("create message function", _send_message_);
 } // send_message

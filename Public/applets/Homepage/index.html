@@ -22,16 +22,14 @@
   </div>
 
   <script data-do="template logged-in?" type="application/template">
-    &#x3C;div class=&#x22;hidden block&#x22; data-do=&#x22;show_if logged-in?&#x22;&#x3E;
-      &#x3C;p&#x3E;You are logged in.&#x3C;/p&#x3E;
-    &#x3C;/div&#x3E;
+    &#x3C;div&#x3E;&#x3C;p&#x3E;You are logged in.&#x3C;/p&#x3E;&#x3C;/div&#x3E;
   </script>
 
   <script data-do="template !logged-in?" type="application/template">
     &#x3C;div class=&#x22;block form&#x22; id=&#x22;log_in&#x22;&#x3E;
       &#x3C;h3&#x3E;Log-In&#x3C;/h3&#x3E;
       &#x3C;div class=&#x22;content&#x22;&#x3E;
-        &#x3C;form action=&#x22;/log-in&#x22; method=&#x22;post&#x22; data-do=&#x22;send_form this submit; remove_if logged-in?&#x22;&#x3E;
+        &#x3C;form action=&#x22;/log-in&#x22; method=&#x22;post&#x22; data-do=&#x22;send_form this submit;&#x22;&#x3E;
           &#x3C;div class=&#x22;fields&#x22;&#x3E;
             &#x3C;div class=&#x22;field screen_name&#x22;&#x3E;&#x3C;label&#x3E;Screen name:&#x3C;/label&#x3E;&#x3C;input name=&#x22;screen_name&#x22; type=&#x22;text&#x22; value=&#x22;&#x22;&#x3E;&#x3C;/div&#x3E;
             &#x3C;div class=&#x22;field passphrase&#x22;&#x3E;&#x3C;label&#x3E;Pass phrase:&#x3C;/label&#x3E;&#x3C;input name=&#x22;pswd&#x22; type=&#x22;password&#x22; value=&#x22;&#x22;&#x3E;&#x3C;/div&#x3E;
@@ -44,9 +42,9 @@
               &#x26;#x3C;div class=&#x26;#x22;error_msg&#x26;#x22;&#x26;#x3E;&#x26;#123;&#x26;#123;msg&#x26;#125;&#x26;#125;&#x26;#x3C;/div&#x26;#x3E;
             &#x3C;/script&#x3E;
 
-            &#x3C;div class=&#x22;field buttons&#x22; data-do=&#x22;hide_if FORM.submit&#x22;&#x3E;&#x3C;button class=&#x22;submit&#x22; data-do=&#x22;on_click send_msg FORM.submit&#x22;&#x3E;Log-In&#x3C;/button&#x3E;&#x3C;/div&#x3E;
-            &#x3C;div class=&#x22;loading&#x22; data-do=&#x22;hidden; show_if FORM.submit;    hide     FORM.is_response&#x22;&#x3E;Loading...&#x3C;/div&#x3E;
-            &#x3C;div class=&#x22;errors&#x22; data-do=&#x22;hidden; show_if FORM.error_msg; print_if FORM.error_msg&#x22;&#x3E;&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;field buttons&#x22; data-do=&#x22;hide FORM.submit&#x22;&#x3E;&#x3C;button class=&#x22;submit&#x22; data-do=&#x22;on_click send_msg FORM.submit&#x22;&#x3E;Log-In&#x3C;/button&#x3E;&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;loading&#x22; data-do=&#x22;hide; show_if FORM.submit;    hide     FORM.is_response&#x22;&#x3E;Loading...&#x3C;/div&#x3E;
+            &#x3C;div class=&#x22;errors&#x22; data-do=&#x22;hide; show_if FORM.error_msg; print_if FORM.error_msg&#x22;&#x3E;&#x3C;/div&#x3E;
           &#x3C;/div&#x3E;
         &#x3C;/form&#x3E;
       &#x3C;/div&#x3E;&#x3C;!-- div.content --&#x3E;

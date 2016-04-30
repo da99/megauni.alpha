@@ -1,11 +1,15 @@
 
 /* jshint strict: true, undef: true */
-/* global Dum_Dum_Boom_Boom, App, log, $, dom_id, is_empty, split_on, describe_reduce  */
+/* global Dum_Dum_Boom_Boom, _, App, log, $, dom_id, is_empty, split_on, describe_reduce  */
+/* global be, is_function, combine */
 
 
-window.template = Dum_Dum_Boom_Boom.browser.data_do.template;
-window.is_empty = Dum_Dum_Boom_Boom.common.base.is_empty;
-window.log      = Dum_Dum_Boom_Boom.common.base.log;
+window.template    = Dum_Dum_Boom_Boom.browser.data_do.template;
+window.is_empty    = Dum_Dum_Boom_Boom.common.base.is_empty;
+window.log         = Dum_Dum_Boom_Boom.common.base.log;
+window.be          = Dum_Dum_Boom_Boom.common.base.be;
+window.is_function = Dum_Dum_Boom_Boom.common.base.is_function;
+window.combine     = Dum_Dum_Boom_Boom.common.base.combine;
 
 var on_send = not_ready_yet("on_send");
 var on_respond_ok = not_ready_yet("on_respond_ok");
@@ -78,6 +82,22 @@ function not_ready_yet(name) {
 }
 
 
+function on_click(data) {
+  var ARGS = data.args.slice(1);
+
+  var FUNC = describe_reduce(
+    "Getting function for on_click",
+    window[data.args[0]],
+    be(is_function)
+  );
+
+  $('#' + data.dom_id).on('click', function _on_click_(e) {
+    e.stopPropagation();
+    FUNC(combine(data, {args: ARGS}));
+  });
+
+} // === function
+
 function send_form(data) {
   return not_ready_yet("send_form")(data);
 } // === send_form
@@ -93,6 +113,5 @@ function send_message(data) {
     msg[CLEAN_KEY] = true;
 
   App("send message", msg);
-  App("create message function", _send_message_);
 } // send_message
 

@@ -53,8 +53,7 @@ watch () {
 
     if echo "$path" | grep -P "Server/.+?\.(css|js|html|styl|sass)$" >/dev/null; then
       mksh_setup ORANGE "=== {{Rebuilding}}..."
-      $0 build || :
-      reload-browser
+      $0 build && reload-browser || :
       continue
     fi
 
