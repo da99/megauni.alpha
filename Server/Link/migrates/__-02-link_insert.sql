@@ -2,25 +2,25 @@
 
 
 -- BOTH
-SELECT drop_megauni_func('link_insert');
+DROP PROCEDURE IF EXISTS link_insert;
 
 -- UP
-CREATE OR REPLACE FUNCTION link_insert (
-  IN USER_ID        INT,
-  IN TYPE_NAME      VARCHAR,
-  IN A_SCREEN_NAME  VARCHAR,
-  IN B_SCREEN_NAME  VARCHAR
-) RETURNS TABLE(id INT)
-AS $$
-DECLARE
-  IDS SMALLINT[];
+DELIMITER //
+
+CREATE PROCEDURE link_insert (
+  IN  USER_ID        INT,
+  IN  TYPE_NAME      VARCHAR(255),
+  IN  A_SCREEN_NAME  VARCHAR(255),
+  IN  B_SCREEN_NAME  VARCHAR(255),
+  OUT LINK_ID        INT
+)
 BEGIN
-  IDS := name_to_type_ids(TYPE_NAME);
+  DECLARE IDS SMALLINT ARRAY[4];
+  -- SELECT name_to_type_ids(TYPE_NAME);
 
   CASE IDS
   WHEN name_to_type_ids('FOLLOW | SCREEN_NAME, SCREEN_NAME') THEN
 
-    RETURN QUERY
     INSERT INTO link (
       type_id,
       owner_type_id, owner_id,
@@ -39,12 +39,10 @@ BEGIN
 
       -- B_ID
       IDS[4], screen_name_id_or_fail(USER_ID, B_SCREEN_NAME)
-    ) RETURNING link.id;
-
+    ) ;
 
   WHEN name_to_type_ids('LINK | CARD, SCREEN_NAME') THEN
 
-    RETURN QUERY
     INSERT INTO link (
       type_id,
       owner_type_id, owner_id,
@@ -63,27 +61,25 @@ BEGIN
     RAISE EXCEPTION 'programmer_error: unknown link_insert type: %', TYPE_NAME;
 
   END CASE;
-END
-$$ LANGUAGE plpgsql;
+
+  SELECT id AS LAST_INSERT_ID() INTO LINK_ID;
+END //
 
 
-
-CREATE OR REPLACE FUNCTION link_insert (
-  IN USER_ID      INT,
-  IN TYPE_NAME    VARCHAR,
-  IN A_ID         INT,
-  IN SCREEN_NAME  VARCHAR
-) RETURNS TABLE(id INT)
-AS $$
-DECLARE
-  IDS SMALLINT[];
+CREATE PROCEDURE link_insert (
+  IN  USER_ID      INT,
+  IN  TYPE_NAME    VARCHAR,
+  IN  A_ID         INT,
+  IN  SCREEN_NAME  VARCHAR
+  OUT LINK_ID      INT
+)
 BEGIN
+  DECLARE IDS SMALLINT[];
   IDS := name_to_type_ids(TYPE_NAME);
 
   CASE IDS
   WHEN name_to_type_ids('LINK | CARD, SCREEN_NAME') THEN
 
-    RETURN QUERY
     INSERT INTO link (
       type_id,
       owner_type_id, owner_id,
@@ -102,8 +98,9 @@ BEGIN
     RAISE EXCEPTION 'programmer_error: unknown link_insert type: %', TYPE_NAME;
 
   END CASE;
-END
-$$ LANGUAGE plpgsql;
 
+  SELECT id AS LAST_INSERT_ID() INTO LINK_ID;
+END //
 
+DELIMITER ;
 
