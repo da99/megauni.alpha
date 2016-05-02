@@ -1,37 +1,43 @@
 
-
-
-
 -- BOTH
-SELECT drop_megauni_func('can_read_card_or_fail');
-SELECT drop_megauni_func('can_read_card');
+DROP FUNCTION IF EXISTS `can_read_card_or_fail`;
 
 -- UP
 
-CREATE OR REPLACE FUNCTION can_read_card_or_fail (
-  IN SN_ID INT, IN CARD_ID INT
+DELIMITER //
+
+CREATE FUNCTION can_read_card_or_fail (
+  SN_ID   INT,
+  CARD_ID INT
 )
-RETURNS BOOLEAN AS $$
-DECLARE
-  answer BOOLEAN;
+RETURNS BOOLEAN
+NOT DETERMINISTIC
+READS SQL DATA
 BEGIN
   IF can_read_card(SN_ID, CARD_ID) THEN
     RETURN TRUE;
   END IF;
 
-  RAISE EXCEPTION 'user_error: no permission read: card';
-END
-$$ LANGUAGE plpgsql;
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'user_error: no permission read: card';
+END //
 
 
-CREATE OR REPLACE FUNCTION can_read_card (IN SN_ID INT, IN CARD_ID INT)
-RETURNS BOOLEAN AS $$
-DECLARE
-  rec RECORD;
+-- BOTH
+DROP FUNCTION IF EXISTS `can_read_card`;
+
+-- UP
+CREATE FUNCTION can_read_card (
+  SN_ID   INT,
+  CARD_ID INT
+)
+RETURNS BOOLEAN
+NOT DETERMINISTIC
+READS SQL DATA
 BEGIN
+  DECLARE WAS_FOUND BOOLEAN DEFAULT FALSE;
   SELECT
     true AS answer
-  INTO rec
+  INTO WAS_FOUND
   FROM
     card
   WHERE
@@ -48,12 +54,13 @@ BEGIN
   LIMIT 1
   ;
 
-  IF FOUND THEN
+  IF WAS_FOUND THEN
     RETURN TRUE;
   END IF;
 
   RETURN FALSE;
-END
-$$ LANGUAGE plpgsql;
+END //
+
+DELIMITER ;
 
 
