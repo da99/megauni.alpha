@@ -1,17 +1,15 @@
 
 -- BOTH
-SELECT drop_megauni_func('card_insert');
+DROP FUNCTION IF EXISTS `card_insert`;
 
 -- UP
-
+DELIMITER //
 CREATE FUNCTION card_insert (
-  IN USER_ID      INT,
-  IN RAW_SN       VARCHAR,
-  IN PRIVACY_NAME VARCHAR,
-  IN CODE         VARCHAR
+  USER_ID      INT,
+  RAW_SN       VARCHAR(255),
+  PRIVACY_NAME VARCHAR(255),
+  CODE         VARCHAR(255)
 ) RETURNS TABLE( id INT )
-AS $$
-DECLARE
 BEGIN
   RETURN QUERY
   INSERT INTO card (
@@ -25,5 +23,5 @@ BEGIN
     CODE::JSONB
   ) RETURNING card.id;
 
-END
-$$ LANGUAGE plpgsql;
+END //
+DELIMITER ;

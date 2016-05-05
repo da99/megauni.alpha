@@ -4,6 +4,11 @@ snapshot () {
 
   local +x DIR="$THIS_DIR/config/mariadb_snapshot"
 
+  if [[ -z "$IS_DEV" ]]; then
+    mksh_setup RED "!!! Snapshot tried to be made in non-{{DEV}} machine."
+    exit 1
+  fi
+
   if [[ -d "$DIR" ]]; then
     local +x INVALID_FILES="$(find "$DIR" -type f | grep -v ".sql")"
     if [[ ! -z "$INVALID_FILES" ]]; then
@@ -18,3 +23,10 @@ snapshot () {
   mariadb_setup snapshot "$DIR"
 
 } # === end function
+
+
+specs () {
+  IS_DEV=""    should-exit 1 "megauni snapshot"
+  IS_DEV="yes" should-exit 0 "megauni snapshot"
+} # === specs ()
+

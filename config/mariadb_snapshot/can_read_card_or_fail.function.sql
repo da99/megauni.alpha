@@ -1,0 +1,2 @@
+Function	sql_mode	Create Function	character_set_client	collation_connection	Database Collation
+can_read_card_or_fail	NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION	CREATE DEFINER=`megauni`@`localhost` FUNCTION `can_read_card_or_fail`(\n  SN_ID   INT,\n  CARD_ID INT\n) RETURNS tinyint(1)\n    READS SQL DATA\nBEGIN\n  IF can_read_card(SN_ID, CARD_ID) THEN\n    RETURN TRUE;\n  END IF;\n  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'user_error: no permission read: card';\nEND	utf8	utf8_general_ci	utf8_general_ci

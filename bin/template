@@ -82,7 +82,7 @@ case "$action" in
     ;; # ===================================================
 
   migrate)
-    . bin/model_list
+    . bin/lib/list-models
     if [[ ! "${mods[@]}" == *"$class"* ]]
     then
       echo "$class not in list."
