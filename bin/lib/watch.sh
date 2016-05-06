@@ -12,15 +12,14 @@ reload-browser () {
 watch () {
   local +x CMD=""
   if [[ ! -z "$@" ]]; then
-    CMD="$1"; shift
+    CMD="$@"
     $CMD
   fi
   # $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' ' 
 
-
   mksh_setup BOLD "\n=== Watching: "
 
-  inotifywait --quiet --monitor --event close_write -r config/ -r lib/ Server/ bin/ | while read -r CHANGE; do
+  inotifywait --quiet --monitor --event close_write -r config/ Public/ Server/ bin/ | while read -r CHANGE; do
     dir=$(echo "$CHANGE" | cut -d' ' -f 1)
     path="${dir}$(echo "$CHANGE" | cut -d' ' -f 3)"
     file="$(basename $path)"
@@ -32,13 +31,16 @@ watch () {
     fi
 
     mksh_setup BOLD "=== {{CHANGE}}: $CHANGE  {{PATH}}: {{$path}}"
-    if [[ ! -z "$CMD" ]]; then
-      $CMD
+
+    if [[ "$path" == */migrates/build/* ]]; then
+      mksh_setup ORANGE "\n=== {{Skipping}}: BOLD{{$path}}"
+      continue
     fi
 
     if [[ "$path" == bin/megauni* || "$path" == bin/lib/watch.sh ]]; then
       mksh_setup ORANGE "\n=== {{Reloading}} this script: $0 $THE_ARGS"
-      exec $0 $THE_ARGS
+      $0 $THE_ARGS
+      exit 0
     fi
 
     if [[ "$file" == *.sql ]]; then
@@ -60,6 +62,10 @@ watch () {
     if [[ "$path" == *.json ]]; then
       (js_setup jshint! $path && $0 test $@)  || :
       continue
+    fi
+
+    if [[ ! -z "$CMD" ]]; then
+      $CMD
     fi
   done # === watch
 

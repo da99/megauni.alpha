@@ -4,6 +4,7 @@ list-types () {
   echo "File_Name"
   echo "Megauni"
   echo "Label"
+  echo "Link"
 
   return 0
   echo "Screen_Name"

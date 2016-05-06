@@ -252,7 +252,7 @@ case "$action" in
     func_file="$THIS_DIR/bin/lib/${action}.sh"
     if [[ -s "$func_file" ]]; then
       source "$func_file"
-      "$action" $@
+      "$action" "$@"
       exit 0
     fi
 
