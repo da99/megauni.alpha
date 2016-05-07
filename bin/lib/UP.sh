@@ -47,6 +47,7 @@ UP () {
   # === DEV machine:
   if [[ -n "$IS_DEV" ]]; then
     $0 snapshot
+    mksh_setup BOLD "=== Snapshot made."
   fi
 
   for NAME in $TYPES ; do

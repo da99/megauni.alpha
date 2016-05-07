@@ -30,22 +30,17 @@ watch () {
       continue
     fi
 
-    mksh_setup BOLD "=== {{CHANGE}}: $CHANGE  {{PATH}}: {{$path}}"
-
-    if [[ "$path" == */migrates/build/* ]]; then
+    if [[ "$path" == */migrates/*/build/*.sql || "$path" == */config/mariadb_snapshot/* ]]; then
       mksh_setup ORANGE "\n=== {{Skipping}}: BOLD{{$path}}"
       continue
     fi
 
+    mksh_setup BOLD "=== {{CHANGE}}: $CHANGE  {{PATH}}: {{$path}}"
+
     if [[ "$path" == bin/megauni* || "$path" == bin/lib/watch.sh ]]; then
       mksh_setup ORANGE "\n=== {{Reloading}} this script: $0 $THE_ARGS"
-      $0 $THE_ARGS
+      $0 watch "$CMD"
       exit 0
-    fi
-
-    if [[ "$file" == *.sql ]]; then
-      ( bin/megauni migrate up "$(basename $(dirname $(dirname "$path")))" && $0 test $@ ) || :
-      continue
     fi
 
     if [[ "$path" == config/* ]]; then
