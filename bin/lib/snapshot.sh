@@ -21,6 +21,7 @@ snapshot () {
   fi
 
   mariadb_setup snapshot "$DIR"
+  echo "$(echo "SHOW GRANTS FOR 'megauni'@'localhost' ;" | mysql | tail -n+3)" > "$DIR/megauni.localhost.grants.sql"
 
 } # === end function
 
