@@ -1,0 +1,16 @@
+
+-- BOTH
+DROP VIEW IF EXISTS link_read;
+
+-- UP
+
+CREATE OR REPLACE
+ALGORITHM = MERGE
+SQL SECURITY INVOKER
+VIEW link_read
+AS
+  SELECT *
+  FROM link ;
+
+
+

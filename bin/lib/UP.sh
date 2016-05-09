@@ -61,7 +61,7 @@ UP () {
           trash-put "$BUILD"
         fi
         mkdir -p "$BUILD"
-        cp -i "$OUTPUT" "$BUILD/"
+        echo "$OUTPUT" | xargs -I FILE cp -i FILE "$BUILD/"
       fi
     done
   done # === each $TYPES

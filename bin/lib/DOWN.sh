@@ -1,10 +1,11 @@
 
 source "$THIS_DIR/bin/lib/list-types.sh"
+source "$THIS_DIR/bin/lib/is-dev.sh"
 
 # === {{CMD}}
 # === {{CMD}} Type_Name Another_Type ...
 DOWN () {
-  if [[ -n "$IS_DEV" ]]; then
+  if ! is-dev; then
     mksh_setup RED "!!! Running {{DOWN}} on a non-{{DEV}} machine."
     exit 1
   fi

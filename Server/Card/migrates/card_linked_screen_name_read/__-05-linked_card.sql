@@ -1,20 +1,11 @@
 
 
-
-
 -- BOTH
-SELECT drop_megauni_func('linked_card');
+DROP VIEW IF EXISTS `linked_card`;
 
 -- UP
-CREATE FUNCTION linked_card(IN SN_ID INT)
-RETURNS TABLE (
-  card_id        INT,
-  publication_id INT,
-  linked_at      TIMESTAMP WITH TIME ZONE
-)
-AS $$
-BEGIN
-  RETURN QUERY
+CREATE OR REPLACE VIEW linked_card
+AS
   SELECT
   card.id         AS card_id,
   link.b_id       AS publication_id,
@@ -31,8 +22,8 @@ BEGIN
     can_read_card(SN_ID, card.id) AND
     can_read_card(link.b_id, card.id)
   ;
-END
-$$ LANGUAGE plpgsql;
+
+
 
 
 

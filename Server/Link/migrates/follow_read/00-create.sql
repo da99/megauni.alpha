@@ -1,9 +1,7 @@
 
 
-
-
--- BOTH
-SELECT drop_megauni_func('follow');
+-- DOWN
+DROP VIEW IF EXISTS `follow_read`;
 
 -- UP
 -- 'follow' always provide all screen names, including
@@ -12,15 +10,8 @@ SELECT drop_megauni_func('follow');
 -- precedence over the privacy setting of the publication/sn.
 -- For example: a SN may be entirely private, but some cards
 -- can be marked 'world readable bypassing sn privacy'.
-CREATE FUNCTION follow(IN SN_ID INT)
-RETURNS TABLE (
-  mask_id        INT,
-  publication_id INT,
-  created_at     TIMESTAMP WITH TIME ZONE
-)
-AS $$
-BEGIN
-  RETURN QUERY
+CREATE OR REPLACE VIEW `follow`
+AS
   SELECT
     link.a_id AS mask_id,
     link.b_id AS publication_id,
@@ -30,12 +21,7 @@ BEGIN
   WHERE
     type_id = name_to_type_id('FOLLOW')
     AND owner_id = a_id -- 'follows' can only be made by sn
-    AND owner_id IN (SELECT sn.id FROM screen_name_ids(SN_ID) sn)
   ;
-END
-$$ LANGUAGE plpgsql;
-
-
 
 
 
