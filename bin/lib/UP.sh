@@ -1,5 +1,6 @@
 
 source "$THIS_DIR/bin/lib/list-types.sh"
+source "$THIS_DIR/bin/lib/is-dev.sh"
 
 # === {{CMD}}
 # === {{CMD}} Type_Name Another_Type ...
@@ -30,7 +31,7 @@ UP () {
       for SQL_FILE in $FILES; do
         mariadb_setup sql UP   "$SQL_FILE" | mysql && mksh_setup GREEN "=== SQL: {{$SQL_FILE}}" || {
           local +x STAT="$?"
-          mksh_setup RED "!!! SQL failed: {{$STAT}} BOLD{{$SQL_FILE}}"
+          mksh_setup RED "!!! SQL failed: exit {{$STAT}} in BOLD{{$SQL_FILE}}"
           exit "$STAT"
         }
       done # === each SQL File
@@ -40,12 +41,12 @@ UP () {
 
 
   # === IF not a DEV machine:
-  if [[ ! -n "$IS_DEV" ]]; then
+  if ! is-dev; then
     return 0
   fi
 
   # === DEV machine:
-  if [[ -n "$IS_DEV" ]]; then
+  if is-dev; then
     $0 snapshot
     mksh_setup BOLD "=== Snapshot made."
   fi
