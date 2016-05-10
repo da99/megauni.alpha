@@ -10,57 +10,69 @@ reload-browser () {
 }
 
 watch () {
+  mkdir -p /tmp/watch
+
   local +x CMD=""
+  local +x CMD_FILE="$(mktemp /tmp/watch/XXXXXXXXXXXXXXXXX)"
+
   if [[ ! -z "$@" ]]; then
     CMD="$@"
-    $CMD
+    echo "$@" > "$CMD_FILE"
+    bash "$CMD_FILE" || :
   fi
-  # $(git ls-files | grep -E "\.js$|bin\/megauni" | tr '\n' ' ' 
 
   mksh_setup BOLD "\n=== Watching: "
 
   inotifywait --quiet --monitor --event close_write -r config/ Public/ Server/ bin/ | while read -r CHANGE; do
-    dir=$(echo "$CHANGE" | cut -d' ' -f 1)
-    path="${dir}$(echo "$CHANGE" | cut -d' ' -f 3)"
-    file="$(basename $path)"
+    local +x DIR=$(echo "$CHANGE" | cut -d' ' -f 1)
+    local +x FILE="${DIR}$(echo "$CHANGE" | cut -d' ' -f 3)"
+    local +x FILE_NAME="$(basename $PATH)"
 
-    # Make sure this is not a temp/swap file:
-    if [[ ! -f "$path" ]]; then
-      mksh_setup BOLD "=== Skipping: $path"
+    # Temp/swap file:
+    if [[ ! -f "$FILE" ]]; then
+      mksh_setup BOLD "=== Skipping {{non-file}}: $FILE"
       continue
     fi
 
-    if [[ "$path" == */migrates/*/build/*.sql || "$path" == */config/mariadb_snapshot/* ]]; then
-      mksh_setup ORANGE "\n=== {{Skipping}}: BOLD{{$path}}"
+    # SQL generated:
+    if [[ "$FILE" == */migrates/*/build/*.sql || "$FILE" == */config/mariadb_snapshot/* ]]; then
+      mksh_setup BOLD "\n=== Skipping {{generated sql file}}: BOLD{{$FILE}}"
       continue
     fi
 
-    mksh_setup BOLD "=== {{CHANGE}}: $CHANGE  {{PATH}}: {{$path}}"
+    mksh_setup BOLD "=== {{CHANGE}}: $CHANGE  {{FILE}}: {{$FILE}}"
 
-    if [[ "$path" == bin/megauni* || "$path" == bin/lib/watch.sh ]]; then
+    if [[ "$FILE" == bin/megauni* || "$FILE" == bin/lib/watch.sh ]]; then
       mksh_setup ORANGE "\n=== {{Reloading}} this script: $0 $THE_ARGS"
       $0 watch "$CMD"
       exit 0
     fi
 
-    if [[ "$path" == config/* ]]; then
+    if [[ "$FILE" == config/* ]]; then
       megauni server restart && reload-browser || :
       continue
     fi
 
-    if echo "$path" | grep -P "Server/.+?\.(css|js|html|styl|sass)$" >/dev/null; then
+    if echo "$FILE" | grep -P "Server/.+?\.(css|js|html|styl|sass)$" >/dev/null; then
       mksh_setup ORANGE "=== {{Rebuilding}}..."
       $0 build && reload-browser || :
       continue
     fi
 
-    if [[ "$path" == *.json ]]; then
-      (js_setup jshint! $path && $0 test $@)  || :
+    if [[ "$FILE" == *.json ]]; then
+      (js_setup jshint! $FILE && $0 test $@)  || :
       continue
     fi
 
+    if mksh_setup is-dev && [[ "$FILE" == *.sql ]]; then
+      if [[ -z "$CMD" ]]; then
+        $0 DOWN
+        $0 UP
+      fi
+    fi
+
     if [[ ! -z "$CMD" ]]; then
-      $CMD
+      bash "$CMD_FILE" || :
     fi
   done # === watch
 
