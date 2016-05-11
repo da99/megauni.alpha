@@ -1,0 +1,2 @@
+View	Create View	character_set_client	collation_connection
+link_read	CREATE ALGORITHM=MERGE DEFINER=`megauni`@`localhost` SQL SECURITY INVOKER VIEW `link_read` AS select `link`.`id` AS `id`,`link`.`type_id` AS `type_id`,`link`.`owner_id` AS `owner_id`,`link`.`owner_type_id` AS `owner_type_id`,`link`.`a_id` AS `a_id`,`link`.`a_type_id` AS `a_type_id`,`link`.`b_id` AS `b_id`,`link`.`b_type_id` AS `b_type_id`,`link`.`created_at` AS `created_at`,`link`.`updated_at` AS `updated_at` from `link`	utf8	utf8_general_ci
