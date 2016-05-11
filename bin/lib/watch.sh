@@ -35,8 +35,8 @@ watch () {
     fi
 
     # SQL generated:
-    if [[ "$FILE" == */migrates/*/build/*.sql || "$FILE" == */config/mariadb_snapshot/* ]]; then
-      mksh_setup BOLD "\n=== Skipping {{generated sql file}}: BOLD{{$FILE}}"
+    if [[ "$FILE" == */migrates/*/build/*.sql || "$FILE" == */mariadb_snapshot/* ]]; then
+      mksh_setup BOLD "=== Skipping {{generated sql file}}: $FILE"
       continue
     fi
 
@@ -50,24 +50,27 @@ watch () {
 
     if [[ "$FILE" == config/* ]]; then
       megauni server restart && reload-browser || :
-      continue
+      echo "" && continue
     fi
 
     if echo "$FILE" | grep -P "Server/.+?\.(css|js|html|styl|sass)$" >/dev/null; then
       mksh_setup ORANGE "=== {{Rebuilding}}..."
       $0 build && reload-browser || :
-      continue
+      echo "" && continue
     fi
 
     if [[ "$FILE" == *.json ]]; then
       (js_setup jshint! $FILE && $0 test $@)  || :
-      continue
+      echo "" && continue
     fi
 
     if mksh_setup is-dev && [[ "$FILE" == *.sql ]]; then
-      if [[ -z "$CMD" ]]; then
-        $0 DOWN
-        $0 UP
+      if [[ -z "$CMD" ]] && mksh_setup is-dev; then
+        {
+          mariadb_setup drop-everything
+          $0 UP $(echo "$FILE" | cut -d'/' -f2)
+        } || :
+        echo "" && continue
       fi
     fi
 

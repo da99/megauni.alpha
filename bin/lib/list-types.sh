@@ -4,11 +4,11 @@ list-types () {
   echo "File_Name"
   echo "Megauni"
   echo "Label"
-  echo "Link"
+  echo "User"
+  echo "Screen_Name"
 
   return 0
-  echo "Screen_Name"
-  echo "User"
+  echo "Link"
   echo "Log_In"
   echo "Card"
   echo "Link"
