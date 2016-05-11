@@ -30,11 +30,26 @@ UP () {
       fi
 
       for SQL_FILE in $FILES; do
-        mariadb_setup sql UP   "$SQL_FILE" | mysql && mksh_setup GREEN "=== SQL: {{$SQL_FILE}}" || {
-          local +x STAT="$?"
-          mksh_setup RED "!!! SQL failed: exit {{$STAT}} in BOLD{{$SQL_FILE}}"
-          exit "$STAT"
-        }
+        local +x SQL_IF="$(mariadb_setup sql UP-IF "$SQL_FILE")"
+        local +x SQL_DO="yes"
+        local +x RESULT=""
+
+        if [[ -n "$(echo -n $SQL_IF)" ]]; then
+          RESULT="$(echo "$SQL_IF" | mysql --skip-column-names)"
+          if [[ -z "$RESULT" || "$(echo $RESULT)" == "0" ]]; then
+            SQL_DO=""
+          fi
+        fi
+
+        if [[ -z "$SQL_DO" ]]; then
+          mksh_setup ORANGE "=== Skipping because UP-IF == \"{{$RESULT}}\" : $SQL_FILE"
+        else
+          mariadb_setup sql UP "$SQL_FILE" | mysql && mksh_setup GREEN "=== SQL: {{$SQL_FILE}}" || {
+            local +x STAT="$?"
+            mksh_setup RED "!!! SQL failed: exit {{$STAT}} in BOLD{{$SQL_FILE}}"
+            exit "$STAT"
+          }
+        fi
       done # === each SQL File
     done # === DIR of sql file groups
 
@@ -58,11 +73,12 @@ UP () {
   # === file, you can see the total completed output in one file.
   local +x ALL_MIGRATE_FOLDERS="$(find Server/*/migrates -mindepth 1 -maxdepth 1 -type d -print | sort -V)"
   for SQL_FILE in $(find "config/mariadb_snapshot" -mindepth 1 -maxdepth 1 -type f -name "*.sql" -print) ; do
-    local NAME="$(basename "$SQL_FILE" | cut -d'.' -f1)"
-    test -d "$DIR/build" && trash-put "$DIR/build" || :
+    local +x NAME="$(basename "$SQL_FILE" | cut -d'.' -f1)"
     for DIR in $(echo "$ALL_MIGRATE_FOLDERS" | grep -P  "/migrates/[\d\-]+${NAME}$"); do
+      local +x DIR="$(dirname "$SQL_FILE")"
+      test -d "$DIR/build" && trash-put "$DIR/build" || :
       mkdir -p "$DIR/build"
-      cp -i "SQL_FILE" "$DIR/build"
+      cp -i "$SQL_FILE" "$DIR/build"
     done
   done
 
