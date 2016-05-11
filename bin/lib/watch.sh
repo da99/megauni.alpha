@@ -17,7 +17,8 @@ watch () {
 
   if [[ ! -z "$@" ]]; then
     CMD="$@"
-    echo "$@" > "$CMD_FILE"
+    echo "set -u -e -o pipefail" >  "$CMD_FILE"
+    echo "$@"                    >> "$CMD_FILE"
     bash "$CMD_FILE" || :
   fi
 

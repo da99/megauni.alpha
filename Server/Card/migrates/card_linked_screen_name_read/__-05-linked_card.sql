@@ -1,6 +1,6 @@
 
 
--- BOTH
+-- DOWN
 DROP VIEW IF EXISTS `linked_card`;
 
 -- UP

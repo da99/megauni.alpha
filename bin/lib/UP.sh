@@ -6,13 +6,14 @@ source "$THIS_DIR/bin/lib/is-dev.sh"
 # === {{CMD}} Type_Name Another_Type ...
 UP () {
   local +x TYPES="$@"
+  local +x ORIGINAL_ARGS="$@"
   if [[ -z "$TYPES" ]]; then
     TYPES="$(list-types | tr '\n' ' ')"
   fi
 
   for NAME in $TYPES ; do
 
-    local +x MIGRATE_DIRS="$(find "Server/$NAME/migrates" -mindepth 1 -maxdepth 1 -type d)"
+    local +x MIGRATE_DIRS="$(find "Server/$NAME/migrates" -mindepth 1 -maxdepth 1 -type d | sort -V)"
 
     if [[ -z "$MIGRATE_DIRS" ]]; then
       mksh_setup ORANGE "=== No migrate dirs found in: {{$NAME}}"
@@ -41,7 +42,7 @@ UP () {
 
 
   # === IF not a DEV machine:
-  if ! is-dev; then
+  if [[ ! -z "$ORIGINAL_ARGS" ]] || ! is-dev; then
     return 0
   fi
 

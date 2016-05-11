@@ -19,7 +19,7 @@ DOWN () {
 
   local +x IFS=$'\n'
   for NAME in $TYPES; do
-    local +x MIGRATE_DIRS="$(find "Server/$NAME/migrates" -mindepth 1 -maxdepth 1 -type d)"
+    local +x MIGRATE_DIRS="$(find "Server/$NAME/migrates" -mindepth 1 -maxdepth 1 -type d | sort -V)"
     if [[ -z "$MIGRATE_DIRS" ]]; then
       mksh_setup ORANGE "=== No migrate dirs found in: {{$NAME}}"
       continue
