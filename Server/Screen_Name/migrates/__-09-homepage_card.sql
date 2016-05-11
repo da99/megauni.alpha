@@ -12,7 +12,7 @@
 --   ORDER BY link.created_at DESC
 --
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('homepage_card');
 
 -- UP

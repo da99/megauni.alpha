@@ -2,7 +2,7 @@
 
 
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('in_card_read_list');
 
 -- UP

@@ -1,5 +1,5 @@
 
--- BOTH
+-- DOWN
 DROP VIEW IF EXISTS link_read;
 
 -- UP

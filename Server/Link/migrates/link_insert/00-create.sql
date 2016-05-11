@@ -1,6 +1,6 @@
 
 
--- BOTH
+-- DOWN
 DROP PROCEDURE IF EXISTS link_insert;
 
 -- UP

@@ -1,5 +1,5 @@
 
--- BOTH
+-- DOWN
 DROP FUNCTION IF EXISTS `card_id_or_fail`;
 
 -- UP

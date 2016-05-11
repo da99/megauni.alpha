@@ -1,5 +1,5 @@
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('screen_name_canonize');
 
 -- UP

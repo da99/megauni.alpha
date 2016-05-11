@@ -1,5 +1,5 @@
 
--- BOTH
+-- DOWN
 DROP FUNCTION IF EXISTS `can_read_card_or_fail`;
 
 -- UP
@@ -22,7 +22,7 @@ BEGIN
 END //
 
 
--- BOTH
+-- DOWN
 DROP FUNCTION IF EXISTS `can_read_card`;
 
 -- UP

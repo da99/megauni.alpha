@@ -1,5 +1,5 @@
 
--- BOTH
+-- DOWN
 
 SELECT drop_megauni_func('log_in_attempt');
 

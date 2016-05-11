@@ -1,5 +1,5 @@
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('top_level_screen_name');
 
 -- UP

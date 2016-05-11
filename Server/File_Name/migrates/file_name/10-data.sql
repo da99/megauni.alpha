@@ -3,7 +3,8 @@
 DELETE FROM file_name WHERE id <= 1000;
 
 -- UP
-REPLACE INTO file_name (id, file_name) VALUES
+IF NOT EXISTS (SELECT count(id) AS count FROM file_name WHERE id <= 1000) THEN
+  INSERT INTO file_name (id, file_name) VALUES
   (1, 'customer'),
   (2, 'screen_name'),
   (3, 'main'),
@@ -14,6 +15,6 @@ REPLACE INTO file_name (id, file_name) VALUES
   (8, 'semi-friend'),
   (9, 'friend-enemy'),
   (1000, 'blank') -- Placeholder/marker.
-;
+  ;
 
 

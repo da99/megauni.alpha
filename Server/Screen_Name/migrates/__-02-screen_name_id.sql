@@ -1,5 +1,5 @@
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('screen_name_id_if_owns_or_fail');
 -- UP
 CREATE OR REPLACE FUNCTION  screen_name_id_if_owns_or_fail (
@@ -27,7 +27,7 @@ END
 $$ LANGUAGE plpgsql STABLE; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('screen_name_id_or_fail');
 
 -- UP
@@ -61,7 +61,7 @@ END
 $$ LANGUAGE plpgsql STABLE; -- ||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('screen_name_id');
 
 -- RETURNS SN id if USER_ID can read it.

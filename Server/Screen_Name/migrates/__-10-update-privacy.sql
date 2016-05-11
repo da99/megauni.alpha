@@ -1,5 +1,5 @@
 
--- BOTH
+-- DOWN
 SELECT drop_megauni_func('update_screen_name_privacy');
 
 -- UP

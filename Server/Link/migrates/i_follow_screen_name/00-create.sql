@@ -1,6 +1,6 @@
 
 
--- BOTH
+-- DOWN
 DROP PROCEDURE IF EXISTS i_follow_screen_name;
 
 -- UP
