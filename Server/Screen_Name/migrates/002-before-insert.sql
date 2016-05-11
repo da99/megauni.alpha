@@ -1,4 +1,16 @@
 
+-- DOWN
+
+DROP TRIGGER IF EXISTS clean
+  ON screen_name
+  CASCADE;
+
+DROP FUNCTION IF EXISTS screen_name_before_insert ()
+  CASCADE;
+
+
+
+-- UP
 -- For tips on triggers:
 -- http://hsqldb.org/doc/guide/triggers-chapt.html
 
@@ -62,13 +74,5 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER clean
   BEFORE INSERT OR UPDATE ON screen_name
   FOR EACH ROW EXECUTE PROCEDURE screen_name_before_insert();
--- DOWN
-
-DROP TRIGGER IF EXISTS clean
-  ON screen_name
-  CASCADE;
-
-DROP FUNCTION IF EXISTS screen_name_before_insert ()
-  CASCADE;
 
 
