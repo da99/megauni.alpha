@@ -10,8 +10,8 @@ SQL SECURITY INVOKER
 VIEW `screen_name_read`
 AS
   SELECT
-    user.id AS audience_id,
-    screen_name.screen_name_id,
+    user.id        AS audience_id,
+    screen_name.id AS screen_name_id,
     screen_name.screen_name,
     screen_name.nick_name
   FROM

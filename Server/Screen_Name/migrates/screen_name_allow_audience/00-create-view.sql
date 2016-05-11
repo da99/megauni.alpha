@@ -15,10 +15,9 @@ AS
     audience_screen_name.screen_name AS audience_screen_name
   FROM
     link INNER JOIN screen_name
-    ON ( -- ensure screen name owner created link:
-      owner_id = screen_name.owner_id
-      AND
-      screen_name.id = a_id
+    ON (
+      -- ensure screen name owner created link:
+      screen_name.id = a_id AND link.owner_id = screen_name.owner_id
       AND
       type_id = name_to_type_id('LIST ONLY')
       AND

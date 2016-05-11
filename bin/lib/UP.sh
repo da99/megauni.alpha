@@ -52,21 +52,19 @@ UP () {
     mksh_setup BOLD "=== Snapshot made."
   fi
 
-  for NAME in $TYPES ; do
-    for SQL_TARGET in $(find "Server/$NAME/migrates" -mindepth 1 -maxdepth 1 -type d); do
-      local +x SQL_NAME="$(basename "$SQL_TARGET")"
-      local +x MIGRATES="Server/$NAME/migrates/$SQL_NAME"
-      local +x BUILD="$MIGRATES/build"
-      local +x OUTPUT="$(find "config/mariadb_snapshot" -mindepth 1 -maxdepth 1 -type f -name "${SQL_NAME}.*.sql" -print)"
-      if [[ ! -z "$OUTPUT" ]]; then
-        if [[ -d "$BUILD" ]]; then
-          trash-put "$BUILD"
-        fi
-        mkdir -p "$BUILD"
-        echo "$OUTPUT" | xargs -I FILE cp -i FILE "$BUILD/"
-      fi
+  # === Copy mariadb snapshot files over to their respective migrate/ counterparts
+  # === This helps in development if the logic of an DB object is spread out.
+  # === For example: a table as a create and alter files. By copying to the migrate/*/build
+  # === file, you can see the total completed output in one file.
+  local +x ALL_MIGRATE_FOLDERS="$(find Server/*/migrates -mindepth 1 -maxdepth 1 -type d -print | sort -V)"
+  for SQL_FILE in $(find "config/mariadb_snapshot" -mindepth 1 -maxdepth 1 -type f -name "*.sql" -print) ; do
+    local NAME="$(basename "$SQL_FILE" | cut -d'.' -f1)"
+    test -d "$DIR/build" && trash-put "$DIR/build" || :
+    for DIR in $(echo "$ALL_MIGRATE_FOLDERS" | grep -P  "/migrates/[\d\-]+${NAME}$"); do
+      mkdir -p "$DIR/build"
+      cp -i "SQL_FILE" "$DIR/build"
     done
-  done # === each $TYPES
+  done
 
 } # === end function
 
