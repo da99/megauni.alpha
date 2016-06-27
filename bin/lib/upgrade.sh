@@ -12,19 +12,26 @@ upgrade () {
   fi
 
   local +x ORIGIN="/lib/browser/build/browser.js"
+  local +x LOCAL_PATH="/apps/dum_dum_boom_boom$ORIGIN"
   local +x FILE="Public/vendor/dum_dum_boom_boom.js"
 
   mkdir -p Public/vendor
-  rm -f "$FILE"
+  touch "$FILE"
 
-  # === If we're on a dev machine
-  if [[ -d /apps/dum_dum_boom_boom ]]; then
-    mksh_setup BOLD "=== Copying: {{$ORIGIN}} -> {{$FILE}}"
-    cp -f /apps/dum_dum_boom_boom$ORIGIN "$FILE"
-    return 0
+  # === Copy dum_dum_boom_boom runtime:
+  if [[ -d /apps/dum_dum_boom_boom ]] ; then
+    if diff "$LOCAL_PATH" "$FILE" ; then
+      mksh_setup BOLD "=== Already up to date: {{$FILE}}"
+    else
+      mksh_setup BOLD "=== Copying: {{$ORIGIN}} -> {{$FILE}}"
+      cp -f "$LOCAL_PATH" "$FILE"
+    fi
+  else # === Copy from online git repo:
+    rm -f "$FILE"
+    wget -q -O "$FILE" https://github.com/da99/dum_dum_boom_boom/raw/master$ORIGIN
   fi
 
-  wget -q -O "$FILE" https://github.com/da99/dum_dum_boom_boom/raw/master$ORIGIN
+  lua_setup upgrade-openresty
 
 } # === upgrade ()
 
