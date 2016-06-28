@@ -4,8 +4,13 @@ nginx () {
 
   mkdir -p logs
   mkdir -p tmp
-  nginx_setup mkconf "$($0 server server-env)" "config/nginx.conf" > progs/nginx.conf
-  local +x CMD="progs/nginx/sbin/nginx  -c $THIS_DIR/progs/nginx.conf  -p $THIS_DIR"
+
+  # === We render all possible ENV conf files to make sure they have all
+  # === specified variables written in each ENV.
+  mksh_setup template-render "config/DEV"  "config/nginx.conf"   > progs/nginx.DEV.conf
+  mksh_setup template-render "config/PROD" "config/nginx.conf"   > progs/nginx.PROD.conf
+
+  local +x CMD="progs/nginx/sbin/nginx  -c $THIS_DIR/progs/nginx.$($0 server server-env).conf  -p $THIS_DIR"
   echo "$CMD $@" >&2
   $CMD "$@"
 
