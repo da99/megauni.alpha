@@ -43,7 +43,7 @@ watch () {
 
     mksh_setup BOLD "=== {{CHANGE}}: $CHANGE  {{FILE}}: {{$FILE}}"
 
-    if [[ "$FILE" == bin/megauni* || "$FILE" == bin/lib/watch.sh ]]; then
+    if [[ "$FILE" == bin/megauni* || "$FILE" == bin/public/watch/_.sh ]]; then
       mksh_setup ORANGE "\n=== {{Reloading}} this script: $0 $THE_ARGS"
       $0 watch "$CMD"
       exit 0

@@ -1,6 +1,6 @@
 
-source "$THIS_DIR/bin/lib/list-types.sh"
-source "$THIS_DIR/bin/lib/is-dev.sh"
+source "$THIS_DIR/bin/public/list-types/_.sh"
+source "$THIS_DIR/bin/public/is-dev/_.sh"
 
 # === {{CMD}}
 # === {{CMD}} Type_Name Another_Type ...

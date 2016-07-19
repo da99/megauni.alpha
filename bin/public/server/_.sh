@@ -1,5 +1,5 @@
 
-source "$THIS_DIR/bin/lib/nginx.sh"
+source "$THIS_DIR/bin/public/nginx/_.sh"
 
 # === {{CMD}} start
 # === {{CMD}} pid    # prints pid number. Exits 1 if no pid found.

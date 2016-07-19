@@ -1,6 +1,6 @@
 
-source "$THIS_DIR/bin/lib/list-types.sh"
-source "$THIS_DIR/bin/lib/is-dev.sh"
+source "$THIS_DIR/bin/public/list-types/_.sh"
+source "$THIS_DIR/bin/public/is-dev/_.sh"
 
 # === {{CMD}}
 # === {{CMD}} Type_Name Another_Type ...
@@ -50,14 +50,6 @@ DOWN () {
   fi
 } # === end function
 
-specs () {
-  local + SNAPSHOT="config/mariadb_snapshot"
-  mkdir "$SNAPSHOT"
-  $0 megauni DOWN
-  should-not-exist "$SNAPSHOT"
-
-  IS_DEV="" should-exit 1 "megauni DOWN"
-} # === specs ()
 
 
 

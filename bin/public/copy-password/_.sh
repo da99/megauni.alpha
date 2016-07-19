@@ -1,5 +1,5 @@
 
-source "$THIS_DIR/bin/lib/is-dev.sh"
+source "$THIS_DIR/bin/public/is-dev/_.sh"
 
 # === {{CMD}}
 copy-password () {

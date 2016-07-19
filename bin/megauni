@@ -249,12 +249,8 @@ case "$action" in
     fi
 
     # === IF: bin/lib file:
-    func_file="$THIS_DIR/bin/lib/${action}.sh"
-    if [[ -s "$func_file" ]]; then
-      source "$func_file"
-      "$action" "$@"
-      exit 0
-    fi
+    source "$THIS_DIR/../mksh_setup/source/name-to-func.sh"
+    name-to-func "$action"  "$@"
 
     # === $ bin/megauni bower ...
     file="$( echo node_modules/*/bin/$action )"
