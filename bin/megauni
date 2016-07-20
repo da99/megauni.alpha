@@ -250,7 +250,7 @@ case "$action" in
 
     # === IF: bin/lib file:
     source "$THIS_DIR/../mksh_setup/source/name-to-func.sh"
-    name-to-func "$action"  "$@"
+    name-to-func "$0" "$action"  "$@"
 
     # === $ bin/megauni bower ...
     file="$( echo node_modules/*/bin/$action )"
