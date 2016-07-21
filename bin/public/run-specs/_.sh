@@ -1,14 +1,22 @@
 
 # === {{CMD}}  Name  type
 run-specs () {
-  local +x COMPUTER="$1"; shift
-  local +x SPEC_TYPE="$1"; shift
-  local +x DIR="Server/$COMPUTER/specs/$SPEC_TYPE"
-  local +x IFS=$'\n'
+  if [[ -z "$@" ]]; then
+    local +x SEARCH="/specs/[^/]+$"
+  else
+    local +x SEARCH="$1"; shift
+  fi
+
   echo ""
-  for SPEC in $(sh_specs ls-specs "$DIR"); do
-    mksh_setup BOLD "Server/{{$COMPUTER}}/specs/{{$SPEC_TYPE}}/{{$(basename "$SPEC")}}"
-    sh_specs run-file "$SPEC"
-    echo ""
+
+  local +x IFS=$'\n'
+  for DIR in $(find Server/ -mindepth 3 -maxdepth 3 -type d -path "*/specs/*" | sort --human-numeric-sort | grep -P "$SEARCH"); do
+    for SPEC in $(sh_specs ls-specs "$DIR"); do
+      local +x COMPUTER="$(basename "$(dirname "$(dirname "$DIR")")")"
+      local +x SPEC_TYPE="$(basename $(dirname "$SPEC"))"
+      mksh_setup BOLD "Server/ORANGE{{$COMPUTER}}/specs/{{$SPEC_TYPE}}/BOLD{{$(basename "$SPEC")}}"
+      sh_specs run-file "$SPEC"
+      echo ""
+    done
   done
 } # === end function
