@@ -9,8 +9,5 @@ for f in $files
 do
   echo "$f" "$(stat -c %Y "$f")"
 done
-#!/usr/bin/env node
-# -*- js   -*-
-#
 
 

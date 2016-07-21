@@ -1,5 +1,6 @@
 
-# === {{CMD}}  Name  type
+# === {{CMD}}
+# === {{CMD}}  My_PERL_RegExp
 run-specs () {
   if [[ -z "$@" ]]; then
     local +x SEARCH="/specs/[^/]+$"

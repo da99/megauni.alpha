@@ -1,7 +1,0 @@
-#!/usr/bin/env mksh
-# -*- mksh -*-
-#
-set -u -e -o pipefail
-
-. bin/env
-bundle "$@"
