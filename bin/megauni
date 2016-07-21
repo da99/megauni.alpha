@@ -248,10 +248,6 @@ case "$action" in
       eval $($LUAJIT/bin/luarocks path --bin)
     fi
 
-    # === IF: bin/lib file:
-    source "$THIS_DIR/../mksh_setup/bin/source/name-to-func.sh"
-    name-to-func "$action"  "$@"
-
     # === $ bin/megauni bower ...
     file="$( echo node_modules/*/bin/$action )"
 
@@ -265,8 +261,10 @@ case "$action" in
       exit 0
     fi
 
-    echo "Unknown action: $action" 1>&2
-    exit 1
+
+    # === IF: bin/lib file:
+    source "$THIS_DIR/../mksh_setup/bin/source/name-to-func/_.sh"
+    name-to-func "$action"  "$@"
     ;;
 
 esac # === case $action
