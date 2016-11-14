@@ -5,8 +5,11 @@ core services
     - one time fee
     - temporal access to fixes and updates
 
-Diary Access
- - storage bin of content in temporal order
+Uni. Console
+ - components
+ - FM DJs
+ - games & activities
+ - discovery
 
 SNRR
  - scarcity
@@ -21,6 +24,12 @@ publishers
  - in leiu of ads & "marketing"
 
 FM DJs
+  - Diary Access & media "goods"
+   - storage bin of content in temporal order
 
 
 The Future: Editable Universes
+
+Factory-Made Tribes, DJs, etc.
+
+
