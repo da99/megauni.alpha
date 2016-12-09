@@ -16,7 +16,7 @@ build-html () {
 
   # === Finish. Print results:
   # tput cuu1; tput el
-  # mksh_setup GREEN "-n" "=== Output in: {{$OUTPUT}}: "
+  # sh_color GREEN "-n" "=== Output in: {{$OUTPUT}}: "
   # echo $OUTPUT/*.html
 } # === end function
 

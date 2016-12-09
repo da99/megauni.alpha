@@ -8,21 +8,21 @@ specs () {
   $0 server reload
 
   PAGE="/no-exist"
-  bash_setup BOLD "--- '404 Not Found' on {{$PAGE}}: " "-n"
+  sh_color BOLD "--- '404 Not Found' on {{$PAGE}}: " "-n"
   curl --head --silent "$URL/no-exist" | grep -P "^HTTP/[\d\.]+ 404 Not Found"
 
-  bash_setup BOLD "--- '200 OK' on {{/}}: " "-n"
+  sh_color BOLD "--- '200 OK' on {{/}}: " "-n"
   curl --head --silent "$URL/" | grep -P "^HTTP/[\d\.]+ 200 OK"
 
-  bash_setup BOLD "--- Renders {{/}} as {{/index.html}}: " "-n"
+  sh_color BOLD "--- Renders {{/}} as {{/index.html}}: " "-n"
   [[ "$(curl --silent "$URL/")" == "$(cat Public/index.html)" ]] && echo "equal"
 
 
   file="$(find Public -type f -iname "*.js" -print -quit | cut -d'/' -f2- )"
-  bash_setup BOLD "--- '200 OK' on JS files (eg {{$file}}): " "-n"
+  sh_color BOLD "--- '200 OK' on JS files (eg {{$file}}): " "-n"
   curl --head --silent "$URL/$file" | grep -P "^HTTP/[\d\.]+ 200 OK"
 
-  bash_setup BOLD "--- Renders JS files (eg {{$file}}): " "-n"
+  sh_color BOLD "--- Renders JS files (eg {{$file}}): " "-n"
   [[ "$(curl --silent "$URL/$file")" == "$(cat "Public/$file")" ]] && echo "equal"
 } # === end function specs
 

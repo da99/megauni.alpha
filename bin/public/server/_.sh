@@ -8,14 +8,14 @@ source "$THIS_DIR/bin/public/nginx/_.sh"
 homepage () {
   local +x PORT="$(netstat -tulpn 2>/dev/null | grep "$(server pid)/" | grep -Po ":\K(\d+)" )"
   local +x LOCAL="http://localhost:$PORT"
-  mksh_setup BOLD "{{$LOCAL}}"
+  sh_color BOLD "{{$LOCAL}}"
 } # === homepage
 
 server () {
   case "$1" in
     start)
       if server is-running; then
-        mksh_setup ORANGE "=== Server is already {{running}}: $(homepage)"
+        sh_color ORANGE "=== Server is already {{running}}: $(homepage)"
         return 0
       fi
 
@@ -23,7 +23,7 @@ server () {
       nginx
 
       mksh_setup max-wait 5s "$0 server is-running"
-      mksh_setup GREEN "=== Server is {{running}}: $(homepage)"
+      sh_color GREEN "=== Server is {{running}}: $(homepage)"
       return 0
       ;;
 
@@ -53,18 +53,18 @@ server () {
       fi
 
       nginx  -s reload
-      bash_setup BOLD "=== NGINX .conf has been {{reloaded}}."
+      sh_color BOLD "=== NGINX .conf has been {{reloaded}}."
       ;;
 
 
     stop)
-      mksh_setup GREEN "=== You want {{quit}} (graceful shutdown) not RED{{stop}} (immediate stop)." 1>&2
+      sh_color GREEN "=== You want {{quit}} (graceful shutdown) not RED{{stop}} (immediate stop)." 1>&2
       exit 1
       ;;
 
     quit)
       if ! server is-running; then
-        mksh_setup ORANGE "=== Server is already {{shutdown}}."
+        sh_color ORANGE "=== Server is already {{shutdown}}."
         return 0
       fi
 
@@ -72,7 +72,7 @@ server () {
       nginx -s quit
 
       if server is-running; then
-        mksh_setup RED "!!! Something went wrong. Server is {{still running}}."
+        sh_color RED "!!! Something went wrong. Server is {{still running}}."
         return 1
       fi
       ;;

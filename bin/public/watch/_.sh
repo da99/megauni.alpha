@@ -4,7 +4,7 @@
 # === {{CMD}}   "bash       /tmp/lots-of-cmds-with-quotes.sh"
 
 reload-browser () {
-  mksh_setup BOLD "=== Reloading browser: "
+  sh_color BOLD "=== Reloading browser: "
   gui_setup reload-browser
   wget -q -S -O- http://localhost:4567/ 2>&1 | grep HTTP
 }
@@ -22,7 +22,7 @@ watch () {
     bash "$CMD_FILE" || :
   fi
 
-  mksh_setup BOLD "\n=== Watching: "
+  sh_color BOLD "\n=== Watching: "
 
   inotifywait --quiet --monitor --event close_write -r config/ Public/ Server/ bin/ | while read -r CHANGE; do
     local +x DIR=$(echo "$CHANGE" | cut -d' ' -f 1)
@@ -31,20 +31,20 @@ watch () {
 
     # Temp/swap file:
     if [[ ! -f "$FILE" ]]; then
-      mksh_setup BOLD "=== Skipping {{non-file}}: $FILE"
+      sh_color BOLD "=== Skipping {{non-file}}: $FILE"
       continue
     fi
 
     # SQL generated:
     if [[ "$FILE" == */migrates/*/build/*.sql || "$FILE" == */mariadb_snapshot/* ]]; then
-      mksh_setup BOLD "=== Skipping {{generated sql file}}: $FILE"
+      sh_color BOLD "=== Skipping {{generated sql file}}: $FILE"
       continue
     fi
 
-    mksh_setup BOLD "=== {{CHANGE}}: $CHANGE  {{FILE}}: {{$FILE}}"
+    sh_color BOLD "=== {{CHANGE}}: $CHANGE  {{FILE}}: {{$FILE}}"
 
     if [[ "$FILE" == bin/megauni* || "$FILE" == bin/public/watch/_.sh ]]; then
-      mksh_setup ORANGE "\n=== {{Reloading}} this script: $0 $THE_ARGS"
+      sh_color ORANGE "\n=== {{Reloading}} this script: $0 $THE_ARGS"
       $0 watch "$CMD"
       exit 0
     fi
@@ -55,7 +55,7 @@ watch () {
     fi
 
     if echo "$FILE" | grep -P "Server/.+?\.(css|js|html|styl|sass)$" >/dev/null; then
-      mksh_setup ORANGE "=== {{Rebuilding}}..."
+      sh_color ORANGE "=== {{Rebuilding}}..."
       $0 build && reload-browser || :
       echo "" && continue
     fi

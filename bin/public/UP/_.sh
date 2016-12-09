@@ -16,16 +16,16 @@ UP () {
     local +x MIGRATE_DIRS="$(find "Server/$NAME/migrates" -mindepth 1 -maxdepth 1 -type d | sort -V)"
 
     if [[ -z "$MIGRATE_DIRS" ]]; then
-      mksh_setup ORANGE "=== No migrate dirs found in: {{$NAME}}"
+      sh_color ORANGE "=== No migrate dirs found in: {{$NAME}}"
       continue
     fi
 
     for SQL_TARGET in $MIGRATE_DIRS; do
-      mksh_setup BOLD "=== in: {{$SQL_TARGET}}"
+      sh_color BOLD "=== in: {{$SQL_TARGET}}"
       local +x FILES="$(find "$SQL_TARGET" -mindepth 1 -maxdepth 1 -type f -name "*.sql" | sort -V)"
 
       if [[ -z "$FILES" ]]; then
-        mksh_setup ORANGE "=== No sql files found in: {{$NAME}}"
+        sh_color ORANGE "=== No sql files found in: {{$NAME}}"
         continue
       fi
 
@@ -42,11 +42,11 @@ UP () {
         fi
 
         if [[ -z "$SQL_DO" ]]; then
-          mksh_setup ORANGE "=== Skipping because UP-IF == \"{{$RESULT}}\" : $SQL_FILE"
+          sh_color ORANGE "=== Skipping because UP-IF == \"{{$RESULT}}\" : $SQL_FILE"
         else
-          mariadb_setup sql UP "$SQL_FILE" | mysql && mksh_setup GREEN "=== SQL: {{$SQL_FILE}}" || {
+          mariadb_setup sql UP "$SQL_FILE" | mysql && sh_color GREEN "=== SQL: {{$SQL_FILE}}" || {
             local +x STAT="$?"
-            mksh_setup RED "!!! SQL failed: exit {{$STAT}} in BOLD{{$SQL_FILE}}"
+            sh_color RED "!!! SQL failed: exit {{$STAT}} in BOLD{{$SQL_FILE}}"
             exit "$STAT"
           }
         fi
@@ -64,7 +64,7 @@ UP () {
   # === DEV machine:
   if is-dev; then
     $0 snapshot
-    mksh_setup BOLD "=== Snapshot made."
+    sh_color BOLD "=== Snapshot made."
   fi
 
   # === Copy mariadb snapshot files over to their respective migrate/ counterparts

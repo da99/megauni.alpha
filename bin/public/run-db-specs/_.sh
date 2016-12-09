@@ -3,7 +3,7 @@
 # === {{CMD}} reset
 run-db-specs () {
   if ! mksh_setup is-dev ; then
-    mksh_setup RED "!!! NOt a {{DEV}} machine."
+    sh_color RED "!!! NOt a {{DEV}} machine."
     exit 1
   fi
 
@@ -16,7 +16,7 @@ run-db-specs () {
   local +x SPEC_FILES="$(find Server/*/db-specs -mindepth 1 -maxdepth 1 -type f -name "*.sql" -print | sort -V)"
 
   if [[ -z "$SPEC_FILES" ]]; then
-    mksh_setup RED "!!! {{No files found}}."
+    sh_color RED "!!! {{No files found}}."
     exit 1
   fi
 
@@ -26,7 +26,7 @@ run-db-specs () {
     local +x COMMENT="$(mariadb_setup sql TOP-COMMENT "$SPEC_FILE")"
     local +x EXPECT="$(cat "$SPEC_FILE" | mksh_setup lines-after "-- EXPECT" | mariadb_setup sql UNCOMMENT || :)"
     if [[ -z "$EXPECT" ]]; then
-      mksh_setup RED "!!! No {{expect}} found: $SPEC_FILE"
+      sh_color RED "!!! No {{expect}} found: $SPEC_FILE"
       exit 1
     fi
 
@@ -43,19 +43,19 @@ run-db-specs () {
 
     # === Compare results:
     if [[ "$ACTUAL" != "$EXPECT" || "$STAT" -ne 0  ]]; then
-      mksh_setup BOLD "$COMMENT"
+      sh_color BOLD "$COMMENT"
       if [[ "$STAT" -eq 0 ]];
-      then mksh_setup RED "Exit: BOLD{{$STAT}}";
-      else mksh_setup RED "Exit: {{$STAT}}"
+      then sh_color RED "Exit: BOLD{{$STAT}}";
+      else sh_color RED "Exit: {{$STAT}}"
       fi
-      mksh_setup RED    "{{MISMATCH}}:"
-      mksh_setup ORANGE "BOLD{{ACTUAL}}:"
-      mksh_setup ORANGE "$ACTUAL"
+      sh_color RED    "{{MISMATCH}}:"
+      sh_color ORANGE "BOLD{{ACTUAL}}:"
+      sh_color ORANGE "$ACTUAL"
 
-      mksh_setup ORANGE "BOLD{{EXPECT}}:"
-      mksh_setup ORANGE "$EXPECT"
+      sh_color ORANGE "BOLD{{EXPECT}}:"
+      sh_color ORANGE "$EXPECT"
     else
-      mksh_setup GREEN "=== {{Passed}}: BOLD{{$SPEC_FILE}}"
+      sh_color GREEN "=== {{Passed}}: BOLD{{$SPEC_FILE}}"
     fi
   done
 

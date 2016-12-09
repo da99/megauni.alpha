@@ -15,7 +15,7 @@ run-specs () {
     for SPEC in $(sh_specs ls-specs "$DIR"); do
       local +x COMPUTER="$(basename "$(dirname "$(dirname "$DIR")")")"
       local +x SPEC_TYPE="$(basename $(dirname "$SPEC"))"
-      mksh_setup BOLD "Server/ORANGE{{$COMPUTER}}/specs/{{$SPEC_TYPE}}/BOLD{{$(basename "$SPEC")}}"
+      sh_color BOLD "Server/ORANGE{{$COMPUTER}}/specs/{{$SPEC_TYPE}}/BOLD{{$(basename "$SPEC")}}"
       sh_specs run-file "$SPEC"
       echo ""
     done

@@ -3,7 +3,7 @@
 reset-dir () {
   local +x DIR="$1"; shift
   if [[ "$DIR" != Public/applets/* ]]; then
-    mksh_setup RED "!!! Invalid directory to reset: $DIR"
+    sh_color RED "!!! Invalid directory to reset: $DIR"
     exit 1
   fi
   rm -rf "$DIR"
@@ -12,7 +12,7 @@ reset-dir () {
 
 build () {
   if [[ ! -z "$@" ]]; then
-    mksh_setup RED "!!! Unknown options: $@"
+    sh_color RED "!!! Unknown options: $@"
     exit 1
   fi # =====================================================
 
@@ -27,11 +27,11 @@ build () {
   $0 build-js   "Server/Browser/Megauni"
 
   local +x JS_FILES=$(find Public/applets -type f -name "*.js")
-  # mksh_setup ORANGE "=== {{eslinting}}: $JS_FILES"
+  # sh_color ORANGE "=== {{eslinting}}: $JS_FILES"
 
   js_setup eslint browser $JS_FILES
   # tput cuu1; tput el
-  # mksh_setup GREEN "=== {{Passed}} eslint: $JS_FILES"
+  # sh_color GREEN "=== {{Passed}} eslint: $JS_FILES"
 
-  mksh_setup GREEN "=== Done {{building}}."
+  sh_color GREEN "=== Done {{building}}."
 } # === end function

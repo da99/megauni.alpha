@@ -6,7 +6,7 @@ source "$THIS_DIR/bin/public/is-dev/_.sh"
 # === {{CMD}} Type_Name Another_Type ...
 DOWN () {
   if ! is-dev; then
-    mksh_setup RED "!!! Running {{DOWN}} on a non-{{DEV}} machine."
+    sh_color RED "!!! Running {{DOWN}} on a non-{{DEV}} machine."
     exit 1
   fi
 
@@ -21,23 +21,23 @@ DOWN () {
   for NAME in $TYPES; do
     local +x MIGRATE_DIRS="$(find "Server/$NAME/migrates" -mindepth 1 -maxdepth 1 -type d | sort -V)"
     if [[ -z "$MIGRATE_DIRS" ]]; then
-      mksh_setup ORANGE "=== No migrate dirs found in: {{$NAME}}"
+      sh_color ORANGE "=== No migrate dirs found in: {{$NAME}}"
       continue
     fi
 
     for SQL_TARGET in $MIGRATE_DIRS; do
-      mksh_setup BOLD "=== in: {{$SQL_TARGET}}"
+      sh_color BOLD "=== in: {{$SQL_TARGET}}"
       local +x FILES="$(find "$SQL_TARGET" -mindepth 1 -maxdepth 1 -type f -name "*.sql" | sort -V | tac)"
 
       if [[ -z "$FILES" ]]; then
-        mksh_setup ORANGE "=== No sql files found in: {{$NAME}}"
+        sh_color ORANGE "=== No sql files found in: {{$NAME}}"
         continue
       fi
 
       for SQL_FILE in $FILES; do
-        mariadb_setup sql DOWN  "$SQL_FILE" | mysql && mksh_setup GREEN "=== SQL {{DOWN}}: BOLD{{$SQL_FILE}}" || {
+        mariadb_setup sql DOWN  "$SQL_FILE" | mysql && sh_color GREEN "=== SQL {{DOWN}}: BOLD{{$SQL_FILE}}" || {
           local +x STAT="$?"
-          mksh_setup RED "!!! {{SQL DOWN failed}}: exit {{$STAT}} in BOLD{{$SQL_FILE}}"
+          sh_color RED "!!! {{SQL DOWN failed}}: exit {{$STAT}} in BOLD{{$SQL_FILE}}"
           exit "$STAT"
         }
       done # === each SQL File
