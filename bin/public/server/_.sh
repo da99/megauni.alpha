@@ -94,7 +94,7 @@ server () {
       ;;
 
     *)
-      bash_setup RED "!!! Unknown server command: {{$@}}"
+      sh_color RED "!!! Unknown server command: {{$@}}"
       exit 1
   esac
 } # === end function

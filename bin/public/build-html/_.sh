@@ -26,6 +26,6 @@ reset-dir () {
     return 0
   fi
 
-  set -x
+  set "-x"
   rm -rf "$FILES"
 }
