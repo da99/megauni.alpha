@@ -4,7 +4,7 @@
 #
 THE_ARGS="$@"
 IS_DEPLOY="$IS_DEPLOY"
-THIS_DIR="$(mksh_setup dirname_of_bin "$0")"
+THIS_DIR="$(dirname "$(dirname "$0")")"
 PORT="${PORT:-4567}"
 PROGS="$THIS_DIR/progs"
 LUAJIT="$THIS_DIR/progs"
@@ -263,8 +263,21 @@ case "$action" in
 
 
     # === IF: bin/lib file:
-    source "$THIS_DIR/../mksh_setup/bin/source/name-to-func/_.sh"
-    name-to-func "$action"  "$@"
+    local +x file="$THIS_DIR"/bin/public/$action/_.sh
+    if [[ -f "$file" ]] ; then
+      source "$file"
+      name-to-func "$action" "$@"
+      exit 0
+    fi
+
+    local +x file="$THIS_DIR"/sh/$action/_
+    if [[ -f "$file" ]] ; then
+      source "$file"
+      exit 0
+    fi
+
+    echo "!!! Invalid arguments: $action $@"
+    exit 1
     ;;
 
 esac # === case $action
