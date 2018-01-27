@@ -4,3 +4,4 @@
 cd "$THIS_DIR"
 git push ssh://github/da99/megauni.git
 git push ssh://bitbucket/da99/megauni.git
+git push origin master
