@@ -16,7 +16,7 @@ BEGIN
   SELECT *
   FROM top_level_screen_name() SN
   WHERE
-  SN.screen_name = screen_name_canonize(RAW_SN);
+  SN.screen_name = screen_name_canonical(RAW_SN);
 END
 $$ LANGUAGE plpgsql;
 

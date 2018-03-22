@@ -1,9 +1,9 @@
 
 -- DOWN
-SELECT drop_megauni_func('screen_name_canonize');
+SELECT drop_megauni_func('screen_name_canonical');
 
 -- UP
-CREATE OR REPLACE FUNCTION screen_name_canonize(inout sn varchar)
+CREATE OR REPLACE FUNCTION screen_name_canonical(inout sn varchar)
 AS $$
   BEGIN
     -- screen_name

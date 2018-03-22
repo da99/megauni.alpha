@@ -18,7 +18,7 @@ BEGIN
   WHERE
   parent_id = 0
   AND
-  "screen_name".screen_name = screen_name_canonize(raw_screen_name)
+  "screen_name".screen_name = screen_name_canonical(raw_screen_name)
   ;
 END
 $$ LANGUAGE plpgsql;

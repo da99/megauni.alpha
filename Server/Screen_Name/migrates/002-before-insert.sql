@@ -26,7 +26,7 @@ RETURNS trigger AS $$
     END IF;
 
     -- screen_name
-    NEW.screen_name := screen_name_canonize(NEW.screen_name);
+    NEW.screen_name := screen_name_canonical(NEW.screen_name);
 
     IF char_length(NEW.screen_name) > 30 THEN
       RAISE EXCEPTION 'user_error: screen_name: max 30';
