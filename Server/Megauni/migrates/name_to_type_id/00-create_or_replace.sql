@@ -1,6 +1,6 @@
 
 -- DOWN
-DROP FUNCTION IF EXISTS name_to_type_id;
+-- DROP FUNCTION IF EXISTS name_to_type_id;
 
 -- UP
 
