@@ -1,0 +1,201 @@
+/**
+Reminders:
+		Win MSIE -  no whitespace can be left between images and surrounding elements or a bottom gap
+								will appear. Ex.:  "<div><img /></div>"  VS. "<div>   <img />   </div>"
+**/
+/**
+	keep the LVHA order, as decribed by
+	http://www.positioniseverything.net/articles/common.html
+**/
+a:link { color: #583444; font-weight: bold; }
+a:visited { color: #583444;  font-weight: bold;  }
+a:hover { color: #FF0000; }
+a:active { color: #FF0000;}
+h1, h2, h3, h4, h5 { margin:0; padding:0;}
+h4 { font-size: 9pt;}
+img.contact {vertical-align: middle;} /** gif image used to show email  **/
+span.alert_msg { text-decoration:underline; color: #583444; font-weight: bold; cursor: pointer; }
+span.empty_msg { display:block; padding-bottom:10px; }
+/*********************************************************************************************/
+/****************** Don't worry about old browsers from the 4 generation and below. **********/
+/********************** They are too poor to afford anything on the site.  *******************/
+#old_browsers {
+	display:none;
+}
+
+/** CSS Vertical Stretch solution from: http://www.reinspire.net/blog/2005/10/11/ **/
+html, body {
+    height: 100%;
+}
+#container {
+	min-height: 100%;
+	height:auto;
+}
+	/* Hack for IE, Reset to 100% height */
+	* html #container {
+		height: 100%;
+	}
+	/* End IE Hack */
+/** end CSS Vertical Stretch solution **/
+
+
+/***************************************************************************/
+/******************************* start body ********************************/
+body {
+	background:  #638FA0 url("../images/bg/blog_bg.gif?timestamp=1178640400") repeat 0 0; 
+	padding: 0;
+	margin:0;
+	font-size:9pt;
+	font-family: arial, verdana, sans-serif;
+	text-align:center;
+}
+
+#container { 
+	width:704px;
+	margin:auto; 
+	background:#5B8797 url("../images/bg/container_blog_bg.gif?timestamp=1178640400") repeat-x; 
+	border:1px solid #405E68; 
+	border-width: 0 1px 0 1px;
+}
+	
+#container_hack { /** used for margin or padding only **/
+	padding: 4px 0 10px 6px;
+	text-align:left;
+	height: 100%;
+}
+/********************************* end body ********************************/
+
+
+
+/***************************************************************************/
+/********************************* start logo header ***********************/
+#header {
+	width: 465px;
+	height: 35px;
+	background:transparent url("../images/nav_menu/logo_top.gif?timestamp=1178640400") no-repeat top left;
+	padding:0;
+	margin:0;
+	float: left;
+}
+
+	#header h1,
+	#header h2  {
+      display:none;
+    }
+/********************************* end logo header *************************/
+
+
+/***************************************************************************/
+/*************************** star nav_menu *********************************/
+	#site_menu {
+		margin:0;
+		padding:0;
+		height: 30px;
+		width: 465px;
+		background: transparent url("../images/nav_menu/logo_bottom.gif?timestamp=1178640400") no-repeat top left;
+		text-align:left;
+		float:left;
+	}
+
+	#site_menu ul {
+		display: inline;
+		margin: 2px 0 0 175px;
+		padding:0;
+		float:left;
+		
+	}
+	#site_menu li
+	{
+		display: inline;
+		margin:0 5px 0 0;
+		padding:0;
+		float:left;
+	}
+    #site_menu li.selected a {cursor:default;}
+    
+	#site_menu a
+	{
+		display:block;
+		height: 13px;
+		text-decoration: none;
+		margin-top: 0;
+        font-size: x-small;
+        overflow:hidden;
+        float:left;
+        background:transparent url("../images/nav_menu/links.gif?timestamp=1178640400") no-repeat 0 0;
+	}
+	#site_menu a span { visibility: hidden; }
+		#site_home a { width: 30px; background-position: 0 -13px; }
+            #site_home a:hover, 
+            #site_home.selected a { 
+                background-position: 0 0; 
+            }
+		
+
+		#site_photosets a { width: 53px; background-position: -201px -13px; }
+            #site_photosets a:hover, 
+            #site_photosets.selected a {
+                background-position: -201px 0; 
+            }
+        
+        #site_blog a {width: 29px; background-position: -30px -13px; }
+            #site_blog a:hover, 
+            #site_blog.selected a {
+                background-position: -30px 0; 
+            }
+        
+        #site_apply a {width:34px; background-position: -59px -13px; }
+            #site_apply a:hover, 
+            #site_apply.selected a {
+                background-position: -59px 0; 
+            }
+        
+        #site_about a {width:34px; background-position: -342px -13px; }
+            #site_about a:hover, 
+            #site_about.selected a {
+                background-position: -342px 0; 
+            }
+		
+        
+
+		
+		#site_settings {margin-right:68px;}
+		#site_settings a {
+			width: 47px;
+			background-position: -254px -13px;
+
+		}
+		#site_settings a:hover, #site_settings.selected a { background-position:-254px 0px; }
+		
+
+		
+		#site_logout {margin-left:35px;}
+		#site_logout a {
+			width: 39px;
+			background-position: -128px -13px;
+		}
+		#site_logout a:hover { background-position:-128px 0px; }
+
+		
+/*************************** end nav_menu **********************************/
+
+/*************************************************************************************************/
+/************ main_column ************/
+#main_column { 
+    float:left;
+    width:459px; 
+}
+/*************************************************************************************************/
+
+.nav_block { border: 1px solid #000; background-color:#B6BBD1; padding:5px 7px 7px 7px; margin-bottom:5px; }
+
+/***************************************************************************************/
+/**************** extra divs used for superfluous eye candy ****************************/
+#extra1 { clear:both;}
+#extra2 {}
+#extra3 {}
+#extra4 {}
+#extra5 {}
+#extra6 {}
+/******************************** end superfluous eye candy **************************/
+

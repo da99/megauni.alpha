@@ -1,0 +1,51 @@
+/************************** member categories titles *******************************/
+/* Note: Font size has to be as small as possible to control height for MSIE 6/Win */
+h4.photographers { 
+  	font-size: xx-small;
+	text-indent:-2000px; 
+	width:85px;
+	height:10px;
+	
+	background:transparent url("../images/text/member_categories.gif?timestamp=1178640400") no-repeat -85px -9px;
+}
+h4.model {
+  	font-size: xx-small;
+	text-indent:-2000px; 
+	width:85px;
+	height:10px;
+	background:transparent url("../images/text/member_categories.gif?timestamp=1178640400") no-repeat;
+}
+h4.models { 
+  	font-size: xx-small;
+	text-indent:-2000px; 
+	width:85px;
+	height:10px;
+	background:transparent url("../images/text/member_categories.gif?timestamp=1178640400") no-repeat -85px 1px;
+}
+
+
+
+/***************************************************************************************/
+/***************** titles - for people connections in mem. profiles ********************/
+/************************* and cast members of mediasets *******************************/
+.title_model span,
+.title_photographer span,
+.title_designer span,
+.title_make_up span,
+.title_muse_of span,
+.title_friend_of span,
+.title_comments  span {
+   display:none;
+}
+
+.title_model        { padding-top:5px;height: 10px; background: #EFE4E9 url("../../images/content_block/titles_block.gif?timestamp=1178640400") no-repeat 0 -271px; }
+.title_photographer { padding-top:5px;height: 10px; background: #EFE4E9 url("../../images/content_block/titles_block.gif?timestamp=1178640400") no-repeat 0 -288px; }
+.title_designer     { padding-top:5px;height: 10px; background: #EFE4E9 url("../../images/content_block/titles_block.gif?timestamp=1178640400") no-repeat 0 -305px; }
+.title_make_up      { padding-top:5px;height: 10px; background: #EFE4E9 url("../../images/content_block/titles_block.gif?timestamp=1178640400") no-repeat 0 -322px; }
+.title_muse_of      { padding-top:5px;height: 10px; background: #EFE4E9 url("../../images/content_block/titles_block.gif?timestamp=1178640400") no-repeat 0 -339px; }
+.title_friend_of    { padding-top:5px;height: 10px; background: #EFE4E9 url("../../images/content_block/titles_block.gif?timestamp=1178640400") no-repeat 0px -356px; }
+.title_comments     { padding-top:5px;height: 10px; background: #EFE4E9 url("../../images/content_block/titles_block.gif?timestamp=1178640400") no-repeat 0px -373px; }
+
+/** handle blocks so rest of background images in the montage file are not shown because of the titles **/
+#people .body .profile_small { padding-top:0; background-position: 2px -249px;  }
+/************************** end titles in blocks ****************************************/

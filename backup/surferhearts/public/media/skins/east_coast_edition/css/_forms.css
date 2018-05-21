@@ -1,0 +1,111 @@
+/***************************************************************************************/
+/********************************* start form elements *********************************/
+form { padding:0; margin:0; }
+button {font-size: 9pt;}
+/** DIV that replaces TEXTAREA **/
+
+div.textarea { 
+    border:1px solid #7F9DB9; 
+    background-color:#fff; 
+    padding:3px 5px 5px 5px; 
+    overflow:auto;
+    height: 200px;
+}
+
+#text_editor {  display:none; position:absolute; top:0; left:0; border:1px solid #7F9DB9; height: 208px; }
+
+
+/** .edit_block CSS **/
+.edit_block {
+    display:none; 
+    position:absolute; 
+    width:300px; 
+    z-index:3; 
+    background: transparent url("../images/sprites/edit_this.gif?timestamp=1178640400") no-repeat 3px 0; 
+    }
+
+.edit_block .errors,
+.edit_block .success { 
+    border: 1px solid #000; 
+    margin-left:45px; 
+    padding:2px 5px 4px 5px;
+    background-color:#B6BBD1;  
+    color:#FF0000;  
+    display:none;
+    }
+.edit_block .loading { 
+    margin-left:45px;  
+    background-color:#B6BBD1;   
+    border:1px solid #000; 
+    text-indent: 0; 
+    text-align: center; 
+    padding:4px 0; 
+    }
+.edit_block .header {
+    display: none; 
+    margin-left:45px; 
+    background-color:#D8DBE0; 
+    border:1px solid #000000; 
+    border-width:1px 1px 0 1px; 
+    text-align:right;
+    }
+.edit_block .body { 
+    margin-left:45px; 
+    padding:5px 6px 5px 6px;
+    background-color:#B6BBD1;  
+    border:1px solid #000000; 
+    border-width:0 1px 1px 1px;
+    }
+
+
+select, option { font-size:8pt; }
+
+form input {
+  font-size:8pt;
+}
+
+
+
+
+.fld_menu .title     { display:block; width: 60px;  float:left; }
+.fld_title .title    { display:block; width: 60px;  float:left; }
+.fld_title input     { border: 1px solid #B6BBD1;   height: 12px;  font-size:8pt; width:150px; }
+.fld_body .title { display: block; }
+.fld_file .title {display:block;}
+
+.fld_date .title    { display:block; width: 60px;  float:left; }
+.fld_date input     { border: 1px solid #B6BBD1;   height: 12px;  font-size:8pt; width:135px; }
+
+.fld_menu {
+  padding-bottom:2px;
+}
+
+
+.fld_menu select { width: 120px; }
+
+/** Clearing float fix from: http://www.positioniseverything.net/easyclearing.html **/
+.fld_menu:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.fld_menu {
+  display: inline-block;
+}
+
+/* Hides from IE-mac \*/
+* html .fld_menu {height: 1%;}
+
+.fld_menu {display: block;}
+/* End hide from IE-mac */
+/********************************* end clearing float fix *****************************/
+/********************************* end form elements ***********************************/
+/***************************************************************************************/
+
+
+
+/****************** JS calendar ********************************************************/
+div.calendar { z-index:5; }

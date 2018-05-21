@@ -1,0 +1,29 @@
+#photosets .body {padding:6px 0 5px 10px;}
+
+.photoset { padding: 0 0 10px 0;}
+
+.photoset .medium_preview { float:left;  margin-right:6px; padding:5px 0 0 0;}
+.photoset .medium_preview img { border:1px solid #323750; }
+.photoset .info { float: left;}
+.photoset .info h4 { font-family:serif; font-size:14pt;}
+.photoset .info .datetime { text-align:right;}
+.photoset .info .permalink { text-align:right; width:228px;}
+
+
+/********************************* end clearing float fix *****************************/
+/** Clearing float fix from: http://www.positioniseverything.net/easyclearing.html **/
+.photoset:after {
+    content: "."; 
+    display: block; 
+    height: 0; 
+    clear: both; 
+    visibility: hidden;
+}
+
+.photoset {display: inline-block;}
+
+/* Hides from IE-mac \*/
+* html .photoset {height: 1%;}
+.photoset {display: block;}
+/* End hide from IE-mac */
+/********************************* end clearing float fix *****************************/

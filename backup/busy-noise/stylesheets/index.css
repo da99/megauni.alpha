@@ -1,0 +1,328 @@
+a:link, a:visited {
+  color: #F00919;
+  font: bold 14px helvetica, arial, sans-serif; }
+
+a:hover, a:active {
+  color: #fff;
+  background: #F00919; }
+
+html, body, div, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, p, blockquote, pre, form, fieldset, table, th, td {
+  margin: 0;
+  padding: 0; }
+
+#busy_body {
+  text-align: center;
+  background-color: #a2d3e0; }
+
+#content {
+  margin: 0 auto;
+  text-align: left;
+  width: 800px;
+  background-image: url("http://busynoise.s3.amazonaws.com/css/images/logo_top.gif");
+  background-repeat: no-repeat; }
+
+h1 {
+  overflow: hidden;
+  margin-left: 228px;
+  text-indent: -500px;
+  height: 34px;
+  background-color: #ffbe2c;
+  background-image: url("http://busynoise.s3.amazonaws.com/css/images/nav_bg.gif");
+  background-repeat: repeat-x;
+  font-size: x-small;
+  font-weight: normal; }
+
+h2 {
+  overflow: hidden;
+  color: #b0c460;
+  text-indent: -500px;
+  height: 17px;
+  background-color: #b0c460;
+  background-image: url("http://busynoise.s3.amazonaws.com/css/images/tag_line.gif");
+  background-repeat: no-repeat;
+  font-size: x-small;
+  font-weight: normal; }
+
+ul.nav {
+  margin: -42px 0 0 656px;
+  padding: 0; }
+  ul.nav li {
+    margin: 0;
+    padding: 0;
+    list-style: none; }
+  ul.nav li.egg a:link, ul.nav li.egg a:visited {
+    display: block;
+    overflow: hidden;
+    text-indent: -200px;
+    width: 127px;
+    height: 42px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/nav_egg.gif");
+    background-repeat: no-repeat;
+    background-position: -127px 0; }
+  ul.nav li.egg a:hover, ul.nav li.egg a:active {
+    background-position: 0 0; }
+
+#main_content {
+  padding-top: 36px;
+  padding-left: 10px;
+  background-image: url("http://busynoise.s3.amazonaws.com/css/images/logo_bottom.gif");
+  background-repeat: no-repeat;
+  background-position: top right; }
+
+#footer {
+  color: #374307;
+  background-color: #ffbe2c;
+  padding: 5px 5px 15px 10px;
+  border-top: 15px solid #fff;
+  border-top-color: #b0c460;
+  font-family: verdana, arial, sans-serif;
+  font-weight: bold;
+  font-size: 10px; }
+  #footer a {
+    font-size: 11px; }
+
+div.busy_form div.error_msg {
+  display: none;
+  color: #F00919;
+  font: bold 14px helvetica, arial, sans-serif;
+  border: 2px solid #fff;
+  border-color: #f00919;
+  background-color: #ffc;
+  padding: 2px 5px 3px 5px; }
+div.busy_form form div.loading {
+  display: none; }
+div.busy_form div.success_msg {
+  color: #ff9;
+  font: bold 14px helvetica, arial, sans-serif;
+  border: 2px dashed #fff;
+  border-color: #ff477c;
+  border-width: 2px 0;
+  background-color: transparent;
+  padding: 2px 5px 3px 5px;
+  text-align: center; }
+
+div.busy_form_loading form fieldset.buttons {
+  display: none; }
+div.busy_form_loading form div.loading {
+  display: block; }
+
+div.busy_form_error div.error_msg {
+  display: block; }
+
+#opening {
+  margin-bottom: 25px;
+  text-align: center;
+  font-family: helvetica, sans-serif;
+  font-weight: bold;
+  background-color: #E8F4F7;
+  background-image: url("http://busynoise.s3.amazonaws.com/css/images/example_results.gif");
+  background-repeat: no-repeat;
+  background-position: bottom right; }
+  #opening #opening_title {
+    padding: 15px 50px 0 50px;
+    color: #073d6f;
+    font-weight: bolder;
+    font-size: 25px; }
+  #opening #opening_sub_title {
+    text-transform: uppercase;
+    color: #f00919;
+    font-weight: bolder;
+    font-size: 15px; }
+  #opening #opening_sub_sub_title {
+    padding-bottom: 340px;
+    color: #073d6f;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/example_email.gif");
+    background-repeat: no-repeat;
+    background-position: bottom left; }
+
+#plant_how_to_summary {
+  height: 203px;
+  background-image: url("http://busynoise.s3.amazonaws.com/css/images/icon_border_bottom.gif");
+  background-repeat: no-repeat;
+  background-position: -7px 180px;
+  background-color: #E9F4F7; }
+  #plant_how_to_summary div.step {
+    overflow: hidden;
+    text-indent: -500px;
+    font-size: xx-small;
+    font-family: sans-serif;
+    height: 180px;
+    float: left; }
+  #plant_how_to_summary div.step_one {
+    width: 292px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/icon_record.png");
+    background-repeat: no-repeat; }
+  #plant_how_to_summary div.step_two {
+    width: 260px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/icon_export.png");
+    background-repeat: no-repeat; }
+  #plant_how_to_summary div.step_three {
+    width: 238px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/icon_copy_paste.png");
+    background-repeat: no-repeat; }
+
+#plant_how_to_examples {
+  height: 265px;
+  color: #E9F4F7; }
+  #plant_how_to_examples h3 {
+    overflow: hidden;
+    text-indent: -200px;
+    font-size: xx-small;
+    height: 29px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/title_examples.gif");
+    background-repeat: no-repeat; }
+  #plant_how_to_examples div.step {
+    overflow: hidden;
+    text-indent: -500px;
+    font-size: xx-small;
+    color: #f00919;
+    height: 211px;
+    float: left; }
+  #plant_how_to_examples div.step_one {
+    width: 249px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/example_record.png");
+    background-repeat: no-repeat; }
+  #plant_how_to_examples div.step_two {
+    width: 276px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/example_export.png");
+    background-repeat: no-repeat; }
+  #plant_how_to_examples div.step_three {
+    width: 265px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/example_copy_paste.png");
+    background-repeat: no-repeat; }
+
+#signup {
+  overflow: auto;
+  width: 790px;
+  background-color: #073d6f; }
+  #signup div.price {
+    color: #fff;
+    font-family: helvetica, arial, sans-serif;
+    font-weight: bold;
+    width: 390px;
+    float: left; }
+    #signup div.price p {
+      padding: 10px 20px; }
+    #signup div.price ul {
+      padding: 10px 20px 10px 40px; }
+  #signup div.trial {
+    padding: 15px 0 30px 0;
+    width: 390px;
+    float: left; }
+    #signup div.trial h4 {
+      text-align: center;
+      color: #ff477c;
+      font-size: 22px;
+      font-weight: bold;
+      font-family: helvetica, arial, sans-serif; }
+    #signup div.trial div.error_msg {
+      width: 358px; }
+    #signup div.trial div.success_msg {
+      width: 358px;
+      margin: 18px 0 0 0; }
+    #signup div.trial form div.loading {
+      color: #FF273F;
+      color: #ff9;
+      font-weight: bold;
+      font-family: verdana, arial, sans-serif;
+      font-size: 14px;
+      background: transparent url("http://busynoise.s3.amazonaws.com/css/images/loader.gif") no-repeat;
+      padding: 0 0 0 20px; }
+    #signup div.trial form fieldset {
+      border-width: 0;
+      padding: 5px 0; }
+      #signup div.trial form fieldset label {
+        display: block;
+        color: #fff;
+        text-transform: uppercase;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: helvetica, arial, sans-serif; }
+        #signup div.trial form fieldset label span.optional {
+          text-transform: none;
+          font-weight: normal;
+          font-size: 14px;
+          color: #ffc; }
+      #signup div.trial form fieldset input {
+        width: 360px;
+        font-family: courier, serif;
+        font-size: 22px;
+        font-weight: bold; }
+      #signup div.trial form fieldset select {
+        font-size: 16px;
+        font-weight: bold; }
+      #signup div.trial form fieldset.buttons a:link, #signup div.trial form fieldset.buttons a:visited {
+        border: 2px solid #fff;
+        border-color: #f00919;
+        background-color: #ffc;
+        padding: 2px 5px 3px 5px; }
+      #signup div.trial form fieldset.buttons a:hover, #signup div.trial form fieldset.buttons a:active {
+        background-color: #f00919;
+        color: #fff;
+        padding: 2px 5px 3px 5px; }
+
+#plant_how_to {
+  padding: 25px 0 0 0;
+  width: 790px; }
+  #plant_how_to h3 {
+    overflow: hidden;
+    text-indent: -200px;
+    font-size: xx-small;
+    height: 29px;
+    background-image: url("http://busynoise.s3.amazonaws.com/css/images/title_the_complete.gif");
+    background-repeat: no-repeat; }
+  #plant_how_to div.steps {
+    padding-top: 20px;
+    overflow: auto;
+    width: 790px; }
+    #plant_how_to div.steps div.step {
+      width: 720px;
+      overflow: auto;
+      padding: 0 0 0 35px; }
+      #plant_how_to div.steps div.step div.text {
+        width: 315px;
+        float: left;
+        padding: 8px 0 65px 0;
+        background-color: #073d6f;
+        background-image: url("http://busynoise.s3.amazonaws.com/css/images/how_to_step_bg.gif");
+        background-repeat: no-repeat;
+        background-position: bottom left; }
+        #plant_how_to div.steps div.step div.text div.title {
+          padding: 5px 10px 0 15px;
+          color: #ff477c;
+          font-weight: bold;
+          font-family: helvetica, arial, sans-serif;
+          font-size: 20px; }
+        #plant_how_to div.steps div.step div.text div.body {
+          padding: 0 15px;
+          font-weight: bold;
+          font-family: helvetica, arial, sans-serif;
+          color: #fff; }
+      #plant_how_to div.steps div.step div.example {
+        overflow: auto;
+        padding: 0 0 20px 0;
+        width: 405px;
+        float: left;
+        background-image: url("http://busynoise.s3.amazonaws.com/css/images/how_to_step_pointer.gif");
+        background-repeat: no-repeat;
+        background-position: 0 10px; }
+        #plant_how_to div.steps div.step div.example div.body {
+          margin: 0 0 0 50px;
+          padding: 10px 20px 12px 20px;
+          font-family: courier, monospaced;
+          color: #073d6f;
+          border: 3px dashed #fff;
+          border-color: #f00919;
+          min-height: 120px;
+          background-color: #ffc; }
+          #plant_how_to div.steps div.step div.example div.body div.divider {
+            color: #f00919;
+            font-weight: bold; }
+    #plant_how_to div.steps #step_12, #plant_how_to div.steps #step_13, #plant_how_to div.steps #step_47 {
+      padding-bottom: 20px; }
+      #plant_how_to div.steps #step_12 div.text,       #plant_how_to div.steps #step_13 div.text,       #plant_how_to div.steps #step_47 div.text {
+        width: 720px;
+        padding-bottom: 20px;
+        background-image: none; }
+      #plant_how_to div.steps #step_12 div.example,       #plant_how_to div.steps #step_13 div.example,       #plant_how_to div.steps #step_47 div.example {
+        display: none; }

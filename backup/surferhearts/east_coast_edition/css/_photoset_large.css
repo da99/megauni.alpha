@@ -1,0 +1,18 @@
+#photoset h3 { 
+    background: transparent url("../images/sprites/preview_main_title_bar.gif?timestamp=1178640400") no-repeat  0 0; 
+    width: auto;
+    }
+#photoset .body {
+    background: #FFFFCC url("../images/sprites/preview_bottom_title_bar.gif?timestamp=1178640400") no-repeat bottom left;
+    padding: 8px 0 20px 0;
+    text-align: center;
+    }
+#photoset .body img {
+    border: 1px solid #734459;
+    margin-bottom:6px;
+    }
+#photoset .body .text {
+    padding: 0 90px;
+    
+    }
+    

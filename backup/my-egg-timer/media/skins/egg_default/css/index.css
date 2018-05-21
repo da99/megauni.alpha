@@ -1,0 +1,164 @@
+h1, h2, h3, h4, h5, h6, h7 {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+}
+
+form { padding:0; margin: 0;}
+button { font-size: large;}
+
+body {
+	background: #fff url("../images/bg.png") repeat-x;
+	text-align: center;
+	padding: 0;
+	margin: 0;
+	background-color: #000;
+}
+
+label {
+	font-weight: bold;
+	color: #CCCCCC;
+	font-size: 17px;
+	font-family: serif;
+}
+
+#loading_app {
+	padding-top: 80px;
+}
+
+#container { 
+	display: none;
+}
+
+
+
+.block {
+	font-family: sans-serif;
+	color: #CCCCCC;
+}
+	.block p {
+		padding: 0 10px;
+	}
+	.block h3 {
+		font-size: 23px;
+		color: #CCCCCC;
+		padding-top: 5px;
+		font-family: serif;
+	}
+	
+	.block .time {
+		color: #FFFFCC;
+		font-weight: bold; 
+		font-size: 18pt;
+	}
+	
+	.block .event_name {
+		color: #FF9900;
+		font-weight: bold;
+		font-size: 9pt;
+	}
+	
+	.block .date {
+		color: #fff;
+		font-size: 10pt;
+		font-weight: bold;
+	}
+	
+.sidebar .block {
+	background: transparent url("../images/sidebar_block_bg.png") no-repeat center top;
+	width: 190px;
+	height: 130px;
+	margin: auto;
+}
+
+/**
+.column .block {
+	background: #ffc url("../images/main_block_bg.png") no-repeat center top;
+	width: 275px;
+	height: 106px;
+}
+**/
+	.column .block .time {
+		font-size: 24pt;
+	}
+
+#add_new_event.block {
+	background: transparent url("../images/main_block_bg.png?t=thur12062007") no-repeat center top;
+	width: 374px;
+	height: 200px;
+}
+	#add_new_event.block div.panel {
+		
+	}
+
+.fld_title input { font-size: large;}
+#main_column {
+	padding: 40px 50px 0 50px;
+	margin: auto;
+	width:300px;
+}
+	#right_now { display: none; }
+	#alarm_player { padding-left: 45px;  display: none;}
+	#alarm_player_holder { padding-bottom: 20px; background: transparent url("../images/add_new_event_bg.png?t=thur12062007") no-repeat center top; width: 275px; height: 133px;}
+	#alarm_player_holder button { margin-top: 28px;}
+	#add_event_confirmation { padding-top: 20px;}
+	#add_events_console { padding-top: 16px; display: none; }
+	#add_alarm_console { display: none; }
+	#add_countdown_console { padding-top: 10px; }
+		#add_countdown_console div.fld_title {
+			padding-top: 20px;
+		}
+		#add_countdown_console input.minutes {
+			width: 60px;
+			text-align: center;
+			font-size: large;
+		}
+	#add_new_event {
+		
+		height: 275px;
+		padding-top: 7px;
+	}
+	
+
+
+#countdown {
+	padding: 15px 0 30px 0;
+}
+	#countdown h3 {
+		color: #FFFFCC;
+		font-size: 11pt;
+	}
+	
+	#countdown_time {
+		color: #FF0000;
+		font-size: 40pt;
+		font-family: sans-serif;
+		font-weight: bold;
+	}
+	
+#site_info_sidebar {
+	background: transparent url("../images/site_info_bg.png") repeat-y;
+	width: 170px;
+	font-family: sans-serif;
+	text-align: left;
+	padding-bottom: 10px;
+	position: absolute;
+	right: 0;
+	top: 128px;
+	display: none;
+}
+.info_block {
+	padding: 10px 10px 5px 10px;
+}
+
+	.info_block h3 {
+		color: #FFCC00;
+		font-size: 9pt;
+	}
+	
+	.info_block .body {
+		color: #fff;
+		font-size: 9pt;
+	}
+	
+	

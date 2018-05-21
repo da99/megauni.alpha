@@ -1,0 +1,6 @@
+@import url("main.css?timestamp=1178640400");
+@import url("admin_sidebar.css?timestamp=1178640400");
+#main_column { width: 465px;}
+#main_column .block { margin-right: 6px; }
+#text_editor { width: 446px; height: 500px; }
+#edit_heart_link h3 { background-position: 0 -285px; }

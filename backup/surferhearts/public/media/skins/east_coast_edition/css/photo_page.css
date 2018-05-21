@@ -1,0 +1,102 @@
+#header {display:none;}
+#site_menu {display:none;}
+
+#container_hack {text-align:center;}
+#photo_container {
+  padding-top:65px;
+  background:transparent url(../images/sprites/brought_to_you_by.gif) no-repeat top center;
+
+  text-align:center;
+  margin-right:6px;
+}
+#photo_container .body {
+  border:1px solid #000000;
+  background-color:#EFE4E9;
+
+}
+#photo_container .photo img { border:1px solid #000 }
+
+h3, h4 {
+  padding: 0;
+  margin: 0;
+
+
+}
+
+
+
+    h3 { font-size:9pt; padding-top: 5px; }
+    h4 { font-size:8pt; padding-bottom: 5px; }
+
+
+#top_photo_nav,
+#bottom_photo_nav {
+  background-color: #BCC4D5;
+  border:1px solid #000000;
+  border-width: 1px 1px 0 1px;
+}
+    #bottom_photo_nav {
+      border-width: 0 1px 1px 1px;
+    }
+
+    #top_photo_nav ul,
+    #bottom_photo_nav ul {
+      border: 1px solid #FFFFCC;
+      border-width: 1px 0 0 1px;
+      margin: 0;
+      padding: 2px 0 0 150px;
+	  height:17px;
+    }
+    
+    #top_photo_nav ul li,
+    #bottom_photo_nav ul li {
+      display: block;
+      float:   left;
+      margin:  0;
+      
+    }
+    
+    
+    #top_photo_nav ul li .link span,
+    #bottom_photo_nav ul li .link span {
+      display:none;
+    }
+        
+        #top_photo_nav ul li .link,
+        #bottom_photo_nav ul li .link {
+          display: block;
+          height:  13px;
+          float:   left;
+        }
+
+        .nav_previous { padding-right: 95px;}
+        .nav_previous .link {
+          width:68px;
+          background: transparent url(../images/text/photo_page_nav_menu.gif) no-repeat 0 0;
+        }
+        .nav_previous a:hover {
+          background: transparent url(../images/text/photo_page_nav_menu.gif) no-repeat 0 -13px;
+        }
+        
+        .nav_mediaset { padding-right: 85px; }
+        .nav_mediaset .link {
+          width:71px;
+          background: transparent url(../images/text/photo_page_nav_menu.gif) no-repeat -68px 0;
+        }
+        .nav_mediaset a:hover {
+          background: transparent url(../images/text/photo_page_nav_menu.gif) no-repeat -68px -13px;
+        }
+        
+        .nav_next .link {
+          width:68px;
+          background: transparent url(../images/text/photo_page_nav_menu.gif) no-repeat -139px 0;
+        }
+        .nav_next a:hover {
+          background: transparent url(../images/text/photo_page_nav_menu.gif) no-repeat -139px -13px;
+        }
+        
+    #top_photo_nav ul,
+    #bottom_photo_nav ul {
+      display:block;
+    }
+    

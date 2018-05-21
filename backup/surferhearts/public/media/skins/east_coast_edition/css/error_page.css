@@ -1,0 +1,6 @@
+
+#error_msg { width:459px;}
+
+#error_msg h3 {background-image:url("../images/sprites/error_block_title.gif?timestamp=1178640400");}
+#error_msg .body { background-color:#B6BBD1;}
+body { padding:70px 0 0 6px;}

@@ -1,0 +1,130 @@
+@import url("main.css?timestamp=1178640400");
+
+#container { width:471px;}
+#header, #site_menu {
+  width: 459px; 
+}
+/* CSS for h3 headers */
+#hearts { width: 459px; float:left;}
+#hearts h3 { background-position:  0 -525px; }
+#hearts .body {padding: 0 0 10px 0;  }
+
+
+/* CSS for individual heart link */
+.heart_link { margin: 0 15px; padding-top:5px; background:transparent url("../images/sprites/archive_heart_link.gif?timestamp=1178640400") no-repeat 12px 20px;}
+.preview_medium { width:201px; float:left; padding-bottom:20px;}
+.preview_medium img {border: 1px solid #000;}
+.heart_link h4 { margin:0; padding:0; font-size:8pt; color:#3C4C52; }
+.heart_link .summary {  float:left; width:200px;  padding:0 0 0 20px; margin-top:-4px; }
+.heart_link h5 {  font-size:13pt; font-family: serif; }
+
+
+/* CSS for monthly heart date nav menu */
+.sort_nav {
+  background-color:#CCCCCC;
+  border-width: 1px;
+  border-color: #F0F0CC #F0F0CC #000 #F0F0CC;
+  border-style: solid none solid solid;
+  padding:0;
+  height:15px;
+}
+
+.sort_nav ul  {
+  display:block;
+
+  margin:0;
+  padding:0 0 0 300px;
+}
+
+.sort_nav ul li {
+  list-style:none;
+  margin:0;
+  padding:0;
+  float:left;
+}
+
+#sort_title span { display: none; }
+#sort_title { 
+	width:45px;  
+	height:13px;
+	background: transparent url("../images/text/date_text.gif?timestamp=1178640400") no-repeat -214px -217px;
+}
+
+#by_set a span {display:none;}
+#by_set a:hover {background-position: -122px -202px;}
+#by_set a {
+  	display:block;
+	width:22px;  
+	height:13px;
+	background: transparent url("../images/text/date_text.gif?timestamp=1178640400") no-repeat -81px -202px;
+
+}
+#by_set.current a {background-position: -162px -202px; cursor: default;}
+#by_set.current a:hover {background-position: -162px -202px; cursor: default;}
+
+
+#by_name a span {display:none;}
+#by_name a:hover {background-position:-122px -187px;}
+#by_name a {
+  	display:block;
+	width:32px;  
+	height:13px;
+	background: transparent url("../images/text/date_text.gif?timestamp=1178640400") no-repeat -81px -187px;
+
+}
+#by_name.current a {background-position:-162px -187px; cursor: default;}
+#by_name.current a:hover {background-position:-162px -187px; cursor: default;}
+
+
+#by_premiere a span {display:none;}
+#by_premiere a:hover {background-position: -121px -217px;}
+#by_premiere a {
+  	display:block;
+	width:45px;  
+	height:13px;
+	background: transparent url("../images/text/date_text.gif?timestamp=1178640400") no-repeat -75px -217px;
+
+}
+#by_premiere.current a {background-position: -167px -217px; cursor: default;}
+#by_premiere.current a:hover {background-position: -167px -217px; cursor: default;}
+
+/** Clearing float fix from: http://www.positioniseverything.net/easyclearing.html **/
+.heart_link:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.heart_link {
+  display: inline-table;
+}
+
+/* Hides from IE-mac \*/
+* html  .heart_link {height: 1%;}
+
+.heart_link  {display: block;}
+/* End hide from IE-mac */
+/********************************* end clearing float fix *****************************/
+
+/** Clearing float fix from: http://www.positioniseverything.net/easyclearing.html **/
+#archives .body:after{
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+#archives .body {
+  display: inline-table;
+}
+
+/* Hides from IE-mac \*/
+* html #archives .body{height: 1%;}
+
+#archives .body {display: block;}
+/* End hide from IE-mac */
+/********************************* end clearing float fix *****************************/
+

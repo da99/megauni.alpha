@@ -1,0 +1,450 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='en-US' xml:lang='en-US' xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta content='text/javascript' http-equiv='Content-Script-Type' />
+    <meta content='text/css' http-equiv='Content-Style-Type' />
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type' />
+    <meta content='en-US' http-equiv='Content-Language' />
+    <meta content='My egg timer. online egg timer countdown alarm mini to-do list.' name='KEYWORDS' />
+    <meta content='Formerly myEggTimer.com - New and improved for Dec. 2009. egg timer + alarm + sound buzzer. Keep track of multiple tasks at the same time using countdowns. Stop watch coming soon.' name='DESCRIPTION' />
+    <link href='http://www.busynoise.com/favicon.ico' rel='shortcut icon' type='image/x-icon' />
+    <link href='/stylesheets/eggtimer_index.css?v1228738051' media='screen' rel='stylesheet' type='text/css' />
+    <script src='/javascripts/vendor/mootools-1.2.js?v1228738051' type='text/javascript'>    </script>
+    <script src='/javascripts/swiss.js?v1228738051' type='text/javascript'>    </script>
+    <script src='/javascripts/egg_clock.js?v1228738051' type='text/javascript'>    </script>
+    <script src='/javascripts/chicken.js?v1228738051' type='text/javascript'>    </script>
+    <script src='/javascripts/pages/eggtimer_index.js?v1228738051' type='text/javascript'>    </script>
+    <title>Online Egg Timer by BusyNoise.com</title>
+  </head>
+  <body id='busy_body'>
+    <div id='content'>
+      <div id='current_time'>
+        <div id='big_datetime'>
+          <div id='big_date'>------</div>
+          <div id='big_time'>
+            <span id='big_hour'>Loading</span>
+            <span id='big_seconds'>...</span>
+          </div>
+        </div>
+      </div>
+      <h1>Online Egg Timer by busynoise.com</h1>
+      <h2>Track multiple events on one web page.</h2>
+      <div class='column' id='work'></div>
+      <div class='column' id='add_stuff'>
+        <ul class='binder'>
+          <li class='instructions selected_link'>
+            <a href='#instructions' onclick="Swiss.show_folder(  $(this).getParent('li'), '#add_stuff ul li', '#folders div.island' ); return false;">
+              Instructions:
+            </a>
+          </li>
+          <li class='create_countdown'>
+            <a href='#create_countdown' onclick="Swiss.show_folder(  $(this).getParent('li'), '#add_stuff ul li', '#folders div.island' ); return false;">
+              Add Egg Timer:
+            </a>
+          </li>
+          <li class='create_alarm'>
+            <a href='#create_alarm' onclick="Swiss.show_folder(  $(this).getParent('li'), '#add_stuff ul li', '#folders div.island' ); return false;">
+              Add Alarm:
+            </a>
+          </li>
+          <li class='create_note'>
+            <a href='#create_note' onclick="Swiss.show_folder(  $(this).getParent('li'), '#add_stuff ul li', '#folders div.island' ); return false;">
+              Add Note:
+            </a>
+          </li>
+        </ul>
+        <div id='folders'>
+          <div class='island selected_folder' id='instructions'>
+            <ol>
+              <li class='step step_1'>
+                <div class='title'>Create a new alarm, note or egg timer.</div>
+              </li>
+              <li class='step step_2'>
+                <div class='title'>Turn up speaker volumn.</div>
+                <div class='body'>
+                  <a class='test_buzzer' href='#test_sound' onclick="EggClock.start_buzzer('test');  return false;">Click here to test your speakers.</a>
+                  <a class='stop_buzzer' href='#stop_test_sound' onclick="EggClock.stop_buzzer('test');  return false;">Stop test.</a>
+                </div>
+              </li>
+              <li class='step step_3'>
+                <div class='title'>Repeat step 1.</div>
+                <div class='body'>
+                  <span>You can add multiple countdowns/alarms/notes.</span>
+                </div>
+              </li>
+            </ol>
+            <div class='about'>
+              <p class='contact'>
+                <span>Found a bug? Contact Diego:</span>
+                <span class='addr'>support [at] busynoise [dot] com</span>
+                <span>or post comments at: </span>
+                <a href='http://da01.posterous.com/'>http://da01.posterous.com/</a>
+              </p>
+            </div>
+          </div>
+          <div class='island' id='create_note'>
+            <div class='land'>
+              <form action='/' class='create_egg' id='form_note' method='post'>
+                <div class='fieldset_block headline'>
+                  <fieldset>
+                    <label>Title:</label>
+                    <input class='text name' maxlength='200' name='headline' type='text' value='' />
+                  </fieldset>
+                </div>
+                <div class='fieldset_block details'>
+                  <fieldset>
+                    <label>Details:</label>
+                    <textarea class='text name' cols='10' name='details' rows='5'></textarea>
+                  </fieldset>
+                </div>
+                <div class='buttons'>
+                  <button class='save'>Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class='island' id='create_countdown'>
+            <div class='land'>
+              <form action='/' class='create_egg' id='form_countdown' method='post'>
+                <div class='fieldset_block time_units_block'>
+                  <div class='title'>Type in units:</div>
+                  <fieldset class='days'>
+                    <input maxlength='3' name='days' type='text' value='0' />
+                    <label>Days</label>
+                  </fieldset>
+                  <fieldset>
+                    <input maxlength='3' name='hours' type='text' value='0' />
+                    <label>Hrs.</label>
+                  </fieldset>
+                  <fieldset>
+                    <input maxlength='3' name='minutes' type='text' value='15' />
+                    <label>Mins.</label>
+                  </fieldset>
+                  <fieldset>
+                    <input maxlength='3' name='seconds' type='text' value='0' />
+                    <label>Secs.</label>
+                  </fieldset>
+                </div>
+                <div class='fieldset_block headline'>
+                  <fieldset>
+                    <label>Title:</label>
+                    <input class='text name' maxlength='200' name='headline' type='text' value='' />
+                  </fieldset>
+                </div>
+                <div class='fieldset_block details'>
+                  <fieldset>
+                    <label>Details:</label>
+                    <textarea class='text name' cols='10' name='details' rows='5'></textarea>
+                  </fieldset>
+                </div>
+                <div class='buttons'>
+                  <button class='save'>Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class='island' id='create_alarm'>
+            <div class='land'>
+              <form action='/' class='create_egg' id='form_alarm' method='post'>
+                <div class='fieldset_block time_units_block'>
+                  <div class='title'>Select Time:</div>
+                  <fieldset>
+                    <select class='hours' name='hours'>
+                      <option selected='selected' value='1'>1</option>
+                      <option value='2'>2</option>
+                      <option value='3'>3</option>
+                      <option value='4'>4</option>
+                      <option value='5'>5</option>
+                      <option value='6'>6</option>
+                      <option value='7'>7</option>
+                      <option value='8'>8</option>
+                      <option value='9'>9</option>
+                      <option value='10'>10</option>
+                      <option value='0'>12</option>
+                    </select>
+                  </fieldset>
+                  <fieldset>
+                    <select class='minutes' name='minutes'>
+                      <option selected='selected' value='0'>00</option>
+                      <option value='15'>15</option>
+                      <option value='30'>30</option>
+                      <option value='45'>45</option>
+                    </select>
+                  </fieldset>
+                  <fieldset>
+                    <select class='am_pm' name='am_pm'>
+                      <option selected='selected' value='am'>AM</option>
+                      <option value='pm'>PM</option>
+                    </select>
+                  </fieldset>
+                </div>
+                <div class='fieldset_block headline'>
+                  <fieldset>
+                    <label>Title:</label>
+                    <input class='text name' maxlength='200' name='headline' type='text' value='' />
+                  </fieldset>
+                </div>
+                <div class='fieldset_block details'>
+                  <fieldset>
+                    <label>Details:</label>
+                    <textarea class='text name' cols='10' name='details' rows='5'></textarea>
+                  </fieldset>
+                </div>
+                <div class='buttons'>
+                  <button class='save' id='set_date_countdown'>Save</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='dom_templates'>
+        <div class='task countdown egg_template_countdown egg'>
+          <div class='undo'>
+            <div>
+              <span>You have deleted egg timer:&nbsp;</span>
+              <span class='short_headline'>---</span>
+            </div>
+            <div>
+              <a class='undo' href='#egg_undelete'>Undo deletion.</a>
+            </div>
+          </div>
+          <div class='control_panel'>
+            <div class='buttons'>
+              <a class='pause' href='#egg_paused'>Pause</a>
+              <a class='play' href='#egg_at_play'>Play</a>
+              <a class='check_mark' href='#egg_check_marked'>Check Mark This</a>
+              <a class='x_mark' href='#egg_x_marked'>X Mark This</a>
+              <a class='ready_to_start' href='#egg_ready_to_start'>Start All Over</a>
+              <a class='edit' href='#egg_edit'>Edit / Delete</a>
+            </div>
+          </div>
+          <div class='status'>
+            <div class='time_status'>
+              <div class='number'>* * * *</div>
+            </div>
+            <div class='buzzer_option selected_buzzer'>
+              <input checked='checked' name='sound_alarm' type='checkbox' value='true' />
+              <span>Ring when done.</span>
+            </div>
+            <div class='time_status_in_words'>---</div>
+          </div>
+          <div class='summary'>
+            <h4>[title]</h4>
+            <div class='setting'>[x mins]</div>
+            <div class='details_control_panel'>
+              <a class='show' href='#egg_show_details'>View Details</a>
+              <a class='hide' href='#egg_hide_details'>Hide Details</a>
+            </div>
+            <div class='details'>[details]</div>
+          </div>
+        </div>
+        <div class='task alarm egg_template_alarm egg'>
+          <div class='undo'>
+            <div>
+              <span>You have deleted alarm:&nbsp;</span>
+              <span class='short_headline'>--</span>
+            </div>
+            <div>
+              <a class='undo' href='#egg_undelete'>Undo deletion.</a>
+            </div>
+          </div>
+          <div class='control_panel'>
+            <div class='buttons'>
+              <a class='play' href='#egg_at_play'>Play</a>
+              <a class='check_mark' href='#egg_check_marked'>Check Mark This</a>
+              <a class='x_mark' href='#egg_x_marked'>X Mark This</a>
+              <a class='ready_to_start' href='#egg_ready_to_start'>Start All Over</a>
+              <a class='edit' href='#egg_edit'>Edit / Delete</a>
+            </div>
+          </div>
+          <div class='status'>
+            <div class='time_status'>
+              <span class='number'>* * * *</span>
+            </div>
+            <div class='buzzer_option selected_buzzer'>
+              <input checked='checked' name='sound_alarm' type='checkbox' value='true' />
+              <span>Ring when done.</span>
+            </div>
+            <div class='time_status_in_words'>---</div>
+          </div>
+          <div class='summary'>
+            <h4>[title]</h4>
+            <div class='setting'>[x mins]</div>
+            <div class='details_control_panel'>
+              <a class='show' href='#egg_show_details'>View Details</a>
+              <a class='hide' href='#egg_hide_details'>Hide Details</a>
+            </div>
+            <div class='details'>[details]</div>
+          </div>
+        </div>
+        <div class='task note egg_template_note egg'>
+          <div class='undo'>
+            <div>
+              <span>You have deleted note:&nbsp;</span>
+              <span class='short_headline'>---</span>
+            </div>
+            <div>
+              <a class='undo' href='#egg_undelete'>Undo deletion.</a>
+            </div>
+          </div>
+          <div class='control_panel'>
+            <div class='buttons'>
+              <a class='ready_to_start' href='#egg_ready_to_start'>Start All Over</a>
+              <a class='check_mark' href='#egg_check_marked'>Check Mark This</a>
+              <a class='x_mark' href='#egg_x_marked'>X Mark This</a>
+              <a class='edit' href='#egg_edit'>Edit / Delete</a>
+            </div>
+          </div>
+          <div class='status'></div>
+          <div class='summary'>
+            <h4>[title]</h4>
+            <div class='setting'>Note</div>
+            <div class='details_control_panel'>
+              <a class='show' href='#egg_show_details'>View Details</a>
+              <a class='hide' href='#egg_hide_details'>Hide Details</a>
+            </div>
+            <div class='details'>[details]</div>
+          </div>
+        </div>
+        <div class='create_note edit_egg'>
+          <div class='short_headline'>
+            <span>Editing:&nbsp;</span>
+            <span class='short_headline'></span>
+          </div>
+          <div class='land'>
+            <form action='/' class='create_egg' method='post'>
+              <div class='fieldset_block headline'>
+                <fieldset>
+                  <label>Headline:</label>
+                  <input class='text name' maxlength='200' name='headline' type='text' value='' />
+                </fieldset>
+              </div>
+              <div class='fieldset_block details'>
+                <fieldset>
+                  <label>Details:</label>
+                  <textarea class='text name' cols='10' name='details' rows='5'></textarea>
+                </fieldset>
+              </div>
+              <div class='buttons'>
+                <button class='save'>Save</button>
+                <button class='cancel'>Cancel</button>
+                <button class='delete'>Delete Note</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class='create_countdown edit_egg'>
+          <div class='short_headline'>
+            <span>Editing:&nbsp;</span>
+            <span class='short_headline'></span>
+          </div>
+          <div class='land'>
+            <form action='/' class='create_egg' method='post'>
+              <div class='fieldset_block time_units_block'>
+                <div class='title'>Type in units:</div>
+                <fieldset>
+                  <input maxlength='3' name='days' type='text' value='0' />
+                  <label>Days</label>
+                </fieldset>
+                <fieldset>
+                  <input maxlength='3' name='hours' type='text' value='0' />
+                  <label>Hrs.</label>
+                </fieldset>
+                <fieldset>
+                  <input maxlength='3' name='minutes' type='text' value='15' />
+                  <label>Mins.</label>
+                </fieldset>
+                <fieldset>
+                  <input maxlength='3' name='seconds' type='text' value='0' />
+                  <label>Secs.</label>
+                </fieldset>
+              </div>
+              <div class='fieldset_block headline'>
+                <fieldset>
+                  <label>Title:</label>
+                  <input class='text name' maxlength='200' name='headline' type='text' value='' />
+                </fieldset>
+              </div>
+              <div class='fieldset_block details'>
+                <fieldset>
+                  <label>Details:</label>
+                  <textarea class='text name' cols='10' name='details' rows='5'></textarea>
+                </fieldset>
+              </div>
+              <div class='buttons'>
+                <button class='save'>Save</button>
+                <button class='cancel'>Cancel</button>
+                <button class='delete'>Delete Egg Timer</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class='create_alarm edit_egg'>
+          <div class='short_headline'>
+            <span>Editing: &nbsp;</span>
+            <span class='short_headline'></span>
+          </div>
+          <div class='land'>
+            <form action='/' class='create_egg' method='post'>
+              <div class='fieldset_block time_units_block'>
+                <div class='title'>Select Time:</div>
+                <fieldset>
+                  <select class='hours' name='hours'>
+                    <option value='1'>1</option>
+                    <option value='2'>2</option>
+                    <option value='3'>3</option>
+                    <option value='4'>4</option>
+                    <option value='5'>5</option>
+                    <option value='6'>6</option>
+                    <option value='7'>7</option>
+                    <option value='8'>8</option>
+                    <option value='9'>9</option>
+                    <option value='10'>10</option>
+                    <option value='0'>12</option>
+                  </select>
+                </fieldset>
+                <fieldset>
+                  <select class='minutes' name='minutes'>
+                    <option value='0'>00</option>
+                    <option value='15'>15</option>
+                    <option value='30'>30</option>
+                    <option value='45'>45</option>
+                  </select>
+                </fieldset>
+                <fieldset>
+                  <select class='am_pm' name='am_pm'>
+                    <option value='am'>AM</option>
+                    <option value='pm'>PM</option>
+                  </select>
+                </fieldset>
+              </div>
+              <div class='fieldset_block headline'>
+                <fieldset>
+                  <label>Title:</label>
+                  <input class='text name' maxlength='200' name='headline' type='text' value='' />
+                </fieldset>
+              </div>
+              <div class='fieldset_block details'>
+                <fieldset>
+                  <label>Details:</label>
+                  <textarea class='text name' cols='10' name='details' rows='5'></textarea>
+                </fieldset>
+              </div>
+              <div class='buttons'>
+                <button class='save'>Save</button>
+                <button class='cancel'>Cancel</button>
+                <button class='delete'>Delete Alarm</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Alarm wall holds the Flash code. -->
+      <div id='alarm_wall'>
+        <div class='decorative_padding'></div>
+        <div id='alarm_holder'></div>
+      </div>
+    </div>
+  </body>
+</html>

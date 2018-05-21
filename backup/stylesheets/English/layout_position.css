@@ -1,0 +1,114 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline; }
+
+div, span, object, iframe, h1, h2, h3, h4, h5, h6, p,
+pre, a, abbr, acronym, address, code, del, dfn, em, img,
+dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption, tbody, tfoot, thead, tr {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline; }
+
+blockquote, q {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  quotes: "" ""; }
+  blockquote:before, q:before,
+  blockquote:after, q:after {
+    content: ""; }
+
+th, td, caption {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle; }
+
+table {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 100%;
+  font-family: inherit;
+  vertical-align: baseline;
+  border-collapse: separate;
+  border-spacing: 0;
+  vertical-align: middle; }
+
+a img {
+  border: none; }
+
+#container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 960px;
+  overflow: hidden;
+  display: inline-block; }
+  #container {
+    display: block; }
+
+#nav_bar {
+  display: inline;
+  float: left;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 220px; }
+
+#loading {
+  display: inline;
+  float: left;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 700px;
+  padding-left: 240px; }
+
+#content {
+  display: inline;
+  float: left;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 700px; }
+
+form fieldset input.text, form fieldset textarea {
+  width: 600px; }
+
+#nav_bar h4 {
+  margin: 0 0 3px 80px; }
+#nav_bar ul {
+  margin: 0 0 0 80px; }
+#nav_bar #logo {
+  margin: 0 0 0 80px; }
+
+#footer {
+  display: inline;
+  float: left;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 700px;
+  padding-left: 240px;
+  display: none; }

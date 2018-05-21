@@ -1,0 +1,1847 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <title>JSSpec results</title>
+        
+        <!-- ****************** Required Files ************************* -->
+        <link rel="stylesheet" type="text/css" href="../vendor/jsspec/JSSpec.css" />
+        <script type="text/javascript" src="../vendor/jsspec/diff_match_patch.js"></script>
+        <script type="text/javascript" src="../vendor/jsspec/JSSpec.js"></script>
+        <!-- *********************************************************** -->
+        
+        
+        <!-- ****************** start custom libraries ****************** -->
+        <script type="text/javascript" src="../vendor/mootools-1.2.js"></script>
+        <script type="text/javascript" src="../swiss.js"></script>
+        <script type="text/javascript" src="../beach_house.js"></script>
+        <!-- ****************************** end ************************* -->
+        
+        <link rel="stylesheet" type="text/css" href="/javascripts/specs/specs.css" />
+        <script type="text/javascript">
+        // <![CDATA[
+         
+/* ****************************************************** */            
+/* ****** functions/objects used by Various specs ******* */
+/* ****************************************************** */ 
+function do_it_later(){ throw 'This has not been implemented yet.'; }; 
+function empty_garden_bed() {
+        $('garden_bed_1').getChildren().each(function(stem, index){ 
+            window.stem_trash[index] = stem.dispose(); 
+        });     
+};
+
+
+
+function reset_beach_house(){
+    $('beach_house_1_wrapper').set('html', window.original_beach_house );
+};
+
+var Flower = {compare : function(new_stem, old_stem){
+    return old_stem.get('id') == 'stem_2';    
+} };
+
+var GardenBedFlower = {};
+
+var SunFlower = {};
+function reset_sun_flower() {
+    SunFlower = {};    
+};
+
+var MockRequest = {
+    HTML : new Class({
+        initialize : function(options){
+            this.options    = options;
+            this.js_name    = this.js_name || 'MockRequest';
+            this.exec       = this.exec || 'onSuccess';
+            if(this.check_options)
+                this.check_options(options);
+        },
+        send : function(){
+            
+            if(this.exec == 'onFailure' )
+                return this.options.onFailure( {status : this.error_status} );
+            if(this.exec == 'onSuccess' )
+                return this.options.onSuccess( [ $(this.options.url) ] );
+            if(this.exec == 'onException')
+                return this.options.onException({header:'Unknown header.', val:'Unknown val.'});
+                
+            if(this.exec=='Nothing')
+                return;
+            
+            if(!this.exec)
+                throw('No "exec" method name has been set.');
+                
+            throw('"exec" method not recognized: ' + this.exec)
+        }  
+    })
+}; // end MockRequest
+
+var Mock404Request = {
+    HTML : new Class({
+        Extends  : MockRequest.HTML,
+        js_name     : 'Mock404Request',
+        exec        : 'onFailure',
+        error_status : 404
+    })    
+    
+};
+
+var Mock501Request = {
+    HTML : new Class({
+        Extends  : MockRequest.HTML,
+        js_name     : 'Mock501Request',
+        exec        : 'onFailure',
+        error_status : 501
+    })    
+    
+};
+
+var MockExceptionRequest = {
+    HTML : new Class({
+        Extends  : MockRequest.HTML,
+        js_name     : 'MockExceptionRequest',
+        exec        : 'onException'
+    })
+};
+
+var MockDoNothingRequest = {
+    HTML : new Class({
+        Extends  : MockRequest.HTML,
+        js_name     : 'MockDoNothingRequest',
+        exec        : 'Nothing'
+    })    
+};
+
+var MockValidateOptionsRequest = {
+    HTML : new Class({
+        Extends  : MockRequest.HTML,
+        js_name     : 'MockValidateOptionsRequest',
+        check_options : function(options){ 
+                throw('No validate_options method defined.'); 
+        }
+    })    
+    
+};
+
+function newReqClass(options){
+    return {HTML: new Class(options)};    
+};
+function mockReqValidateOptions(correct_options){
+    return new Class({
+        initialize : function(opts){
+            var correct_opts = $H(correct_options);
+            correct_opts.each(function(val, key){
+                 if(opts[key]!= val){
+                    window.request_options_error = key + ' should be ' + val + ', but it is this instead: '+ opts[key];
+                    return;
+                 }
+            });
+        },
+        send : function(){}    
+    });    
+};
+function mockReqDoNothing(){
+    return new Class({
+        initialize : function(opts){},
+        send : function(){}    
+    });    
+};
+function mockReqOnSuccess(ele_to_return){
+    return new Class({
+            initialize : function(opts) { this.onSuccess = opts.onSuccess;},
+            send : function(){ this.onSuccess(new Elements([ ele_to_return ])); }    
+        });    
+    
+};
+function mockReqOnFailure( response ){
+    return new Class({
+            initialize : function(opts) { this.onFailure = opts.onFailure;},
+            send : function(){ this.onFailure( response ) }    
+        });    
+    
+};
+
+function mockReqOnException( header, val ){
+    return new Class({
+            initialize : function(opts) {this.onException = opts.onException },
+            send : function(){ this.onException(header, val) }
+        });
+};
+
+function mockReqSend(func) {
+    return new Class({
+        initialize : function(opts) { this.options = opts },
+        send : func   
+    });
+};
+    
+/* Mock the XMLHTTPRequest thingy. */
+function reset_request(){ 
+    window.Request = MockRequest; 
+    window.request_options_error = false;    
+    SunFlower = {};
+};
+reset_request();
+
+/* ****************************************************** */  
+/* *** end of functions/objects used by Various specs *** */ 
+/* ****************************************************** */ 
+
+ 
+/* ****************************************************** */ 
+/*  Specs for Swiss class. */
+/* ****************************************************** */ 
+describe( 'Swiss.browser.on_dev', {
+    'should be true if these specs are being run on a local machine' : function(){
+        value_of(Swiss.browser.on_dev).should_be(true);    
+    }
+});
+
+describe('Swiss.does', {
+
+    'should return undefined if "SomeObject" does not exist' : function(){
+        value_of(Swiss.does("SomeObject", "methodName")).should_be_undefined();    
+    },
+    'should return undefined if "SomeObject" exists, but not "methodName" ' : function(){
+        window.SomeObject = { };
+        value_of(Swiss.does("SomeObject", "methodName")).should_be_undefined();    
+    },
+    'should return a method reference to "SomeObject"  and "methodName" if it exists (within window scope)' : function(){
+        window.SomeObject = { 'methodName' : function(){} };
+        value_of(Swiss.does("SomeObject", "methodName")).should_be(SomeObject.methodName);  
+    },
+});
+
+describe('Swiss.reportError', {
+    'should raise an exception if it is used on a local machine.' : function(){
+        var exp = null;
+        try { Swiss.reportError("Some Error String")  }
+        catch ( e ) {  exp =e  }
+        value_of( exp ).should_be("Some Error String");
+    }
+});
+
+describe('Swiss.getErrorMsg', {
+    'should return a string ("Unknown error"...) if no arguments are passed to it.' : function(){
+        value_of(Swiss.getErrorMsg()).should_match(/Unknown error/);   
+    },
+    'should return a string ("Unknown error"...) if passed an object with an un-recognized key.' : function(){
+        value_of(Swiss.getErrorMsg({'unknown_key':'unknown_value'})).should_match(/Unknown error/);   
+    },
+    'should convert the passed argument into a string and return it if a non-string and non-object are passed to it.' : function(){
+        value_of(  Swiss.getErrorMsg(5)  ).should_be('5');
+        
+        value_of(  Swiss.getErrorMsg( (new Hash({'key':'val'})) )  ).should_be( ''+(new Hash({'key':'val'}) ) );    
+    },
+    'should return the same string if it is passed a string.' : function(){
+        value_of(Swiss.getErrorMsg('Some error occurred.')).should_be('Some error occurred.');   
+    },
+    'should return a string containing an exception that is passed to it' : function(){
+        value_of(Swiss.getErrorMsg({'exception' : 'Some exception occurred.'})).should_match(/Some exception occurred/);  
+    },
+    'should return a string containing the header and value that is passed to it. (Used in failed mootools Ajax requests.) ' : function(){
+        value_of(Swiss.getErrorMsg({'header' : 'Some header', 'val' : 'Some value.'})).should_match(/Some header/);
+        value_of(Swiss.getErrorMsg({'header' : 'Some header', 'val' : 'Some value.'})).should_match(/Some value/);    
+    },
+    'should return a string containing HTTP error status code if argument contains a "request" object.' : function(){
+        value_of(Swiss.getErrorMsg({'request' : {status:501}})).should_match(/501/);   
+        value_of(Swiss.getErrorMsg({'request' : {status:404}})).should_match(/404/); 
+        value_of(Swiss.getErrorMsg({'request' : {status:'404'}})).should_match(/404/); 
+        value_of(Swiss.getErrorMsg({'request' : {status:'404'}})).should_match(/404/);   
+    }, 
+    'should return a string containing HTTP error status code even if the status code is not of an error:' : function(){
+        value_of(Swiss.getErrorMsg({'request' : {status:'200'}})).should_match(/200/); 
+        value_of(Swiss.getErrorMsg({'request' : {status:'302'}})).should_match(/302/); 
+    },
+    'should return a string when error is a template error' : function(){
+        value_of(Swiss.getErrorMsg({'error' : 'template'})).should_match(/template error/i);    
+    },
+    'should include the given message in the returned string when error is a string.' : function(){
+        value_of(Swiss.getErrorMsg({'error' : 'template', 'msg' : 'Site Preference template'})).should_match(/Site Preference template/);    
+    },
+    'should return a string containing "error in function" if the error is "arguments" and nothing else is specified.' : function(){
+        value_of(Swiss.getErrorMsg({'error' : 'arguments'})).should_match(/error in function/i);    
+    },
+    'should return a string containing the name of the function if the error is "arguments" and the function name is given.' : function(){
+        value_of(Swiss.getErrorMsg({'error' : 'arguments', 'function' : 'SomeClass.somemethod'})).should_match(/error in function/i);    
+        value_of(Swiss.getErrorMsg({'error' : 'arguments', 'function' : 'SomeClass.somemethod'})).should_match(/SomeClass.somemethod/i);    
+    },
+    
+    'should return a string containing the key/value pairs of the "arguments" key in the object passed to it when the error is "arguments".' : function(){
+        value_of(Swiss.getErrorMsg({
+                    'error' : 'arguments', 
+                    'function' : 'SomeClass.SomeMethod', 
+                    'arguments' : {'key1':'arg1', 'key_2' : 'arg2'} 
+                }) ).should_match(/key1\: arg1/i);    
+        value_of(Swiss.getErrorMsg({
+                    'error' : 'arguments', 
+                    'function' : 'SomeClass.SomeMethod', 
+                    'arguments' : {'key1':'arg1', 'key_2' : 'arg2'} 
+                }) ).should_match(/key_2\: arg2/i); 
+    }
+    
+});
+/* **************  end Swiss specs ********************* */
+
+
+/* ***************************************************
+ *  Specs for String custom additions.
+ * *************************************************** */
+describe( 'String.dot_it()', {
+            'should add a dot in front' : function(){ value_of( 'some_class'.dot_it() ).should_be('.some_class') },
+            'should add a dot after'    : function(){ value_of( 'some_class'.dot_it(true) ).should_be('some_class.') }
+            
+});
+
+describe( 'String.to_english()' , {
+                'should take a "an_underscored_name" and give us "no underscored name"' : function(){ value_of('some_class'.to_english() ).should_be('some class') }
+});
+
+describe('String.flat_camel()', { 
+    'should take a "ClassName" and flatten_it' : function(){ value_of( 'SomeClassName'.flat_camel() ).should_be('some_class_name') },
+    'should return the same string if it is already flat' : function(){ value_of('some_class_name'.flat_camel() ).should_be('some_class_name') }
+});
+
+describe('String.TallCamel()',{
+    
+    'should take "some_class_id_string" and give us "SomeClassIdString".' : function(){
+        value_of('some_class_id_string'.TallCamel()).should_be('SomeClassIdString');    
+    },    
+    'should take "SomeClassIdString" and give us back the same value' : function(){
+        value_of('SomeClassIdString'.TallCamel()).should_be('SomeClassIdString');    
+    }
+});
+/* **************  end String custom additions ********************* */
+
+/* ***************************************************
+ *  Specs for Element custom additions.
+ * *************************************************** */
+
+describe('Element Method: getTheBoss', {
+    'should throw an exception containing "CSS selector not defined" if "css_selector" is not defined and this is a local machine' : function(){
+        var err = null;
+        try { $('nursery_1').getTheBoss() }
+        catch ( e ) { err=e };  
+        value_of( err ).should_match(/CSS selector not defined/i);
+    },
+    'should return "null" if no match could be found with a given "css_selector" and no "top_ancestor" specified.' : function(){
+        value_of( $('nursery_1').getTheBoss( '.unknown_class' ) ).should_be(null);    
+        value_of( $('nursery_1').getTheBoss( 'random string' ) ).should_be(null);    
+    },
+    'should return the closest parent that matches "css_selector" if no "top_ancestor" is specified.' : function(){
+        value_of( $('stem_1').getTheBoss('.garden') ).should_be($('garden_1'));    
+    },
+    'should throw an exception containing "Top ancestor not found" if "top_ancestor" was not found and this is a local machine.' : function(){
+        var err = null;
+        try { $('nursery_1').getTheBoss('.garden', 'some_unknow_class') }
+        catch (e) { err = e}
+        value_of(err).should_match(/Top ancestor not found/i);    
+    },
+    'should return top ancestor if element matches the "top_ancestor" selector.' : function(){
+        value_of( $('stem_2').getTheBoss('.stem') ).should_be( $('stem_2') );
+    },
+    'should return the closest element of the top ancestor that matches the "css_selector".' : function(){
+        value_of( $('stem_2').getTheBoss('.garden_bed', '.garden') ).should_be( $('garden_bed_1') ) ;    
+    }
+});
+
+describe('Element Method: getEyeColor' , {
+    'should return the visible background-color of the element even if the background-color is specified as transparent.' : function(){
+        // Make sure at least one parent has a background-color specified.
+        value_of( $('beach_house_1').getStyle('background-color') ).should_match(/\#/); 
+        //  Make sure the target element has a background-color that is not set (=='transparent')
+        value_of($('stem_1').getStyle('background-color')).should_be('transparent');
+        // Now test the method.
+        value_of($('stem_1').getEyeColor()).should_be( $('beach_house_1').getStyle('background-color') );   
+        
+    },
+    'should return the background-color of the element if the background-color has been specified for it.' : function(){
+        value_of( $('beach_house_1').getEyeColor() ).should_be( $('beach_house_1').getStyle('background-color') );    
+    },
+    'should return a default value of "#fff" if it and none of it\'s parent have a background-color specified.' : function(){
+        value_of( $('color_less').getStyle('background-color') ).should_be('transparent');  
+        value_of( $$('body')[0].getStyle('background-color')  ).should_be('transparent');
+        value_of( $('color_less').getParent() ).should_be( $$('body')[0] ); 
+           
+        value_of( $('color_less').getEyeColor() ).should_be( '#fff' );  
+    }
+    
+});
+
+describe('Element Method: flash_it', {
+    'should flash element without any error.' : function(){
+        value_of( $('beach_house_1').flash_it() ).should_be($('beach_house_1'));    
+    },
+    'should return the element.' : function(){
+        value_of( $('beach_house_1').flash_it() ).should_be($('beach_house_1'));     
+    }
+    
+});
+/* **********  end Element custom additions ********** */
+
+/* ***************************************************
+ *  Specs for beach_house.js.
+ * *************************************************** */
+var PoolHouse = new Class({ 
+    /* The Soil class can't be used by itself, so
+     * PoolHouse is used just to test the core functionality of 
+     * Soil.  PoolHouse is just for testing purposes and is not 
+     * used in a production environment.
+     */
+    Extends     : Soil,
+    found_at    : 'pool_house',
+    css_name   : 'pool_house',
+    states : ['error', 'loading']
+});
+
+Element.implement( { 
+    getPoolHouse : createBeachHouseButler('PoolHouse')    
+} );
+
+describe('createBeachHouseButler', {
+    "should return the same stored object when called by a child element." : function(){
+        var pool_house = $('pool_house_1').getPoolHouse();
+        pool_house.chek_id = 'this is a stored pool house.';
+        value_of( $('pool_stem_1').getPoolHouse().chek_id ).should_be(pool_house.chek_id);  
+    }    
+});
+
+describe('PoolHouse (based on Soil)', {
+    after_each : reset_beach_house,
+    
+    'should have js_name automatically set at initialization' : function(){
+        value_of( $('pool_stem_1').getPoolHouse().js_name ).should_be('PoolHouse');    
+    },
+    'should have dot_css automatically set at initialization' : function(){
+        value_of( $('pool_stem_1').getPoolHouse().dot_css ).should_be('.pool_house');  
+    },
+    'should have english_name automatically set at initialization' : function(){
+        value_of( $('pool_stem_1').getPoolHouse().english_name ).should_be('pool house');      
+    },
+    'should have an element attached to it that corresponds to it.' : function(){
+        value_of( $('pool_stem_1').getPoolHouse().$ ).should_be( $('pool_house_1') ); 
+    },
+    'should be stored to its corresponding element' : function(){
+        value_of( $('pool_house_1').retrieve('pool_house') ).should_be( $('pool_stem_1').getPoolHouse() );
+    },
+    'should add a prefixed css class name to the element after using "set_to".' : function(){
+        $('pool_stem_1').getPoolHouse().set_to('loading');
+        value_of( $('pool_house_1').hasClass('pool_house_loading') ).should_be(true);
+    },
+    'should NOT allow a state not defined in the states list to be used.' : function(){
+        var err= null;
+        try { $('pool_stem_1').getPoolHouse().set_to('random_state') }    
+        catch (e) { err = e; }
+        value_of( err ).should_match(/is not allowed as a state for pool house/);
+    },
+    'should remove any class based on its states after calling "reset".' : function(){
+        $('pool_stem_1').getPoolHouse().set_to('loading');
+        $('pool_stem_1').getPoolHouse().reset();
+        value_of( $('pool_house_1').hasClass('pool_house_loading') ).should_be(false); 
+    },
+    'should create and insert a new error block with error message when using "set_to" for displaying and error message.' : function(){
+        value_of( $('pool_stem_1').getPoolHouse().$.getFirst('div.error_msg') ).should_be(null);
+        $('pool_stem_1').getPoolHouse().set_to('error', 'Random error inserted.');
+        value_of( $('pool_stem_1').getPoolHouse().$.getFirst('div.error_msg') ).should_not_be_null( );
+        value_of($('pool_house_1').getFirst('div.error_msg').getElement('div.msg').get('text')).should_match(/Random error inserted./);
+    },
+    'should grab the first error block that is a child.' : function(){
+        value_of( $('pool_stem_1').getPoolHouse().grabError_$() ).should_be( $('pool_house_1').getFirst('div.error_msg') );    
+    }
+        
+}); // end PoolHouse
+
+describe('BeachHouse', {
+    after_each : reset_beach_house,
+    
+    'should return a proper corresponding element when searched from a descendent.' : function(){
+        value_of( $('stem_1').getBeachHouse().$ ).should_be($('beach_house_1'));    
+    },  
+    'should return the element itself when called from a beach_house element.' : function(){
+        value_of( $('beach_house_1').getBeachHouse().$ ).should_be($('beach_house_1'));    
+    },  
+    'should store itself as "beach_house".' : function(){
+        $('beach_house_1').getBeachHouse();
+        value_of( $('beach_house_1').retrieve('beach_house') ).should_be( $('beach_house_1').getBeachHouse() );    
+    }
+}); // end BeachHouse
+
+describe( 'Garden' , {
+    before_each : function(){
+        window.stem_trash = [];
+    },
+    
+    after_each : reset_beach_house,
+    
+    'should return a proper corresponding element when searched from a descendent.' : function(){
+        value_of( $('stem_1').getGarden().$).should_be( $('garden_1') );  
+    }, 
+    'should store itself as "garden".' : function(){
+        $('garden_1').getGarden();
+        value_of( $('garden_1').retrieve('garden') ).should_be( $('stem_1').getGarden() );
+    },
+    'should add "empty_garden" to the beach_house if there are no stems in the garden_bed upon using Garden Method: resize()' : function(){
+        // Prep test.
+        value_of( $('beach_house_1').hasClass('empty_garden') ).should_be(false);
+        
+        // Do test.
+        empty_garden_bed();
+        $('garden_bed_1').getGarden().resize();
+        value_of($('garden_bed_1').getBeachHouse().$.hasClass('empty_garden')).should_be(true);
+        
+    }, 
+    'should add "empty_garden" to the beach_house if there are no stems in the garden_bed when using Garden Method: reset()' : function(){
+        // Prep test.
+        value_of( $('beach_house_1').hasClass('empty_garden')).should_be(false);
+        empty_garden_bed();
+        
+        // Do test.
+        $('garden_bed_1').getGarden().reset();
+        value_of($('garden_bed_1').getBeachHouse().$.hasClass('empty_garden')).should_be(true);
+        
+    },
+    'should remove "empty_garden" if garden_bed is not empty when using Garden Method: resize.' : function(){
+        // Prep test.
+        empty_garden_bed();
+        $('garden_bed_1').getGarden().resize();
+        value_of( $('beach_house_1').hasClass('empty_garden') ).should_be(true);
+        
+        // Do test.
+        reset_beach_house();
+        $('garden_bed_1').getGarden().resize();
+        value_of( $('beach_house_1').hasClass('empty_garden') ).should_be(false);
+        
+    },
+    'should remove "empty_garden" if garden_bed is not empty when using Garden Method: reset.' : function(){
+        // Prep test.
+        empty_garden_bed();
+        $('garden_bed_1').getGarden().reset();
+        value_of( $('beach_house_1').hasClass('empty_garden') ).should_be(true);
+        
+        // Do test.
+        reset_beach_house();
+        $('garden_bed_1').getGarden().reset();
+        value_of($('beach_house_1').hasClass('empty_garden')).should_be(false);
+        
+        
+    },
+    'should be able to get the model of the garden' : function(){
+        $('garden_1').addClass('Flower');
+        value_of( $('garden_1').getGarden().getModel() ).should_be(Flower);
+    },
+    'should add "js_name", "css_name", and "english_name" to the Model.' : function(){
+        // Prep test.
+        window.BlueFlower = {};
+        $('garden_1').removeClass('Flower');
+        $('garden_1').addClass('BlueFlower');
+        
+        // Check model class does not have names set.
+        value_of(BlueFlower.js_name).should_be_undefined();  
+        value_of(BlueFlower.css_name).should_be_undefined();  
+        value_of(BlueFlower.english_name).should_be_undefined();  
+        
+        // Get model and check for names.        
+        value_of($('garden_1').getGarden().getModel().js_name).should_be('BlueFlower');
+        value_of($('garden_1').getGarden().getModel().css_name).should_be('blue_flower');
+        value_of($('garden_1').getGarden().getModel().english_name).should_be('blue flower');
+    },
+    'should give a null model if no model is found.' : function(){
+        $('garden_1').removeClass('Flower');
+        value_of( $('garden_1').getGarden().getModel() ).should_be(null);    
+    },
+    'should throw an exception if this is a local machine and no Javascript object was found for the stem model specified in the garden\'s css classname.' : function(){
+        // Prep test.
+        $('garden_1').removeClass('Flower');
+        $('garden_1').addClass('RandomClass');
+        var err = null;
+        
+        // Do test.
+        try { $('garden_1').getGarden().getModel() }
+        catch (e) {err=e};
+        value_of(err).should_match(/did not define stem model/);
+        value_of(err).should_match(/RandomClass/);
+    },
+    'should return a default model (Garden Method: getDefaultModel()) with predefined names ("js_name", "css_name", "english_name").' : function(){
+        var default_model = {'english_name' : 'unknown model', 'css_name' : 'unknown_model' , 'js_name' : 'UnknownModel'};
+        value_of( $('garden_1').getGarden().getDefaultModel() ).should_be(default_model);    
+    },
+    'should return a default model object if no model is found (using Garden Method: getModel(true) ).' : function(){
+        // Prep test.
+        $('garden_1').removeClass('Flower');
+        
+        // Do test.
+        value_of( $('garden_1').getGarden().getModel(true).js_name ).should_be('UnknownModel');
+        value_of( $('garden_1').getGarden().getModel(true).css_name ).should_be('unknown_model');
+        value_of( $('garden_1').getGarden().getModel(true).english_name ).should_be('unknown model');
+    },
+    'should insert a new stem into the garden_bed when it grabs it.' : function(){
+        // Prep test.
+        empty_garden_bed();
+        $('garden_bed_1').getGarden().reset();
+        value_of( $('garden_bed_1').hasChild($('stem_3')) ).should_be(false);
+        
+        // Do test.
+        $('garden_bed_1').getGarden().grab_$( $('stem_3'));
+        value_of( $('garden_bed_1').hasChild($('stem_3')) ).should_be(true);
+    },
+    'should remove "empty_garden" after grabbing a new stem.' : function(){
+        // Prep test.
+        empty_garden_bed();
+        $('garden_bed_1').getGarden().reset();
+        value_of( $('beach_house_1').hasClass('empty_garden') ).should_be(true);
+        
+        // Do test.
+        $('garden_bed_1').getGarden().grab_$( $('stem_3'));
+        value_of( $('beach_house_1').hasClass('empty_garden') ).should_be(false);
+    },
+    'should flash new stem after grabbing it.' : function(){
+        value_of( $('garden_bed_1').getGarden().grab_$( $('stem_3'), true ) ).should_be( $('stem_3') );
+    },
+    'should insert stem using the comparison function defined in the garden\'s class.' : function(){
+        $('garden_1').addClass('Flower');
+        $('garden_1').getGarden().grab_$($('stem_3'));
+        value_of( $('stem_3').getPrevious() ).should_be( $('stem_1') );
+        value_of( $('stem_3').getNext()     ).should_be( $('stem_2') );
+    },
+    'should insert stem to the top if no comparison function is found.' : function(){
+        $('garden_1').removeClass('Flower');
+        $('garden_1').getGarden().grab_$($('stem_3'));
+        value_of( $('stem_3').getPrevious() ).should_be_null( );
+        value_of( $('stem_3').getNext()     ).should_be($('stem_1'));   
+    }
+} ); // end Garden
+
+describe('Garden Element Method: getGarden', {
+    "should return a stored garden object when called by a child element." : function(){
+        var garden = $('garden_1').getGarden();
+        garden.garden_chek_id = 'this is a stored garden.';
+        value_of( $('stem_1').getGarden().garden_chek_id ).should_be(garden.garden_chek_id);  
+    }    
+});
+
+
+/* *************** GardenBed Specs ********************* */
+describe('GardenBed', {
+    after_each : reset_beach_house,
+    
+    'should have a corresponding element of css class "garden_bed".' : function(){
+        value_of($('stem_1').getGardenBed().$.hasClass('garden_bed')).should_be(true);    
+    },
+    'should store itself in the corresponding element with a key of "garden_bed".' : function(){
+        $('stem_1').getGardenBed();
+        value_of($('garden_bed_1').retrieve('garden_bed').js_name ).should_be( 'GardenBed' );    
+    }    
+});
+describe('GardenBed Element Method: getGardenBed', {
+    after_each : reset_beach_house,
+    
+    'should return a GardenBed object' : function(){
+        
+        value_of($('stem_1').getGardenBed().js_name).should_be('GardenBed');
+    }
+});
+describe('GardenBed Method: is_empty()', {
+    after_each : reset_beach_house,
+    
+    'should return false if garden_bed is not empty.' : function(){
+        value_of($('garden_bed_1').getGardenBed().is_empty()).should_be(false);
+    },
+    'should return true if garden_bed is empty of children elements.' : function(){
+        $('garden_bed_1').getChildren().each(function(stem){ stem.dispose() });    
+        
+        value_of($('garden_bed_1').getGardenBed().is_empty()).should_be(true);
+    },
+    'should return true if all of the garden_bed\'s child elements are marked as "stem_deleted".' : function(){
+        // Prep test.
+        $('garden_bed_1').getChildren().each(function(stem){ stem.addClass('stem_deleted') });  
+        $('garden_bed_1').getChildren().length != 0;
+        
+        // Do test.
+        value_of($('garden_bed_1').getGardenBed().is_empty()).should_be(true);
+        
+    }
+});
+
+describe('GardenBed Method: grab_$()', {
+    after_each : function(){ reset_beach_house();  window.GardenBedFlower={}; },
+    
+    'should insert stem into garden bed element.' : function(){
+        
+        // Prep test. 
+        value_of($('stem_3').getParent()).should_not_be( $('garden_bed') );     
+        $('garden_bed_1').getGardenBed().grab_$($('stem_3'));
+        
+        // Do test.
+        value_of( $('stem_3').getParent() ).should_be($('garden_bed_1'));
+    } ,
+    'should insert a new stem using the comparison function provided by Garden Method: getModel.' : function(){
+        // Prep test.
+        GardenBedFlower = { compare: function(new_stem, old_stem){
+            return old_stem.get('id') > new_stem.get('id');
+        }};
+        $('garden_1').addClass('GardenBedFlower');
+        value_of( $('garden_1').getGarden().getModel().compare ).should_be(GardenBedFlower.compare);
+        
+        // Do test.
+        $('garden_bed_1').getGardenBed().grab_$($('stem_3'));
+        value_of( $('stem_3').getPrevious() ).should_be($('stem_2'));
+        value_of( $('stem_3').getNext()     ).should_be($('stem_4'));
+    },
+    'should insert a new stem to the top if no comparison function was found.' : function(){
+        $('garden_bed_1').getGardenBed().grab_$($('stem_3'));
+        value_of($('stem_3').getPrevious()).should_be(null);
+        value_of($('stem_3').getNext()).should_be($('stem_1'));
+    },
+    'should insert a new stem to the bottom if comparison function kept returning false on each call.' : function(){
+        // Prep test.
+        GardenBedFlower.compare = function(){return false;};
+        $('garden_1').addClass('GardenBedFlower');
+        value_of($('garden_1').getGarden().getModel().compare).should_be(GardenBedFlower.compare);
+        
+        // Do test.
+        $('garden_bed_1').getGardenBed().grab_$($('stem_3'));
+        value_of(  $('garden_bed_1').getLast() ).should_be($('stem_3'));
+        
+    }
+});
+/* *************** end GardenBed Specs ********************* */
+
+/* *************** Stem Specs ********************* */
+describe('Stem', {
+    after_each : reset_beach_house,
+    
+    'should store itself in the element with a key of: stem' : function(){
+        $('leaf_1').getStem();
+        value_of($('stem_1').retrieve('stem').js_name).should_be('Stem');
+    }
+}); 
+describe('Stem Element Method: getStem', {
+    after_each : reset_beach_house,
+    
+    'should return a Stem object.' : function(){
+        value_of($('leaf_1').getStem().js_name).should_be('Stem');
+    }
+}); 
+describe('Stem Method: set_to', {
+    after_each : reset_beach_house,
+    
+    'should allow a states of: loading, editing, cancelled_edit, updating, updated, deleted ' : function(){
+        ['loading', 'editing', 'cancelled_edit', 'updating', 'updated', 'deleted'].each(function(class_name){
+            $('leaf_1').getStem().set_to(class_name);
+            value_of( $('stem_1').hasClass('stem_'+class_name) ).should_be(true);  
+        });
+    },
+    'should remove the following states when using reset(): loading, editing, cancelled_edit, updating, updated, deleted' : function(){
+        ['loading', 'editing', 'cancelled_edit', 'updating', 'updated', 'deleted'].each(function(class_name){
+            $('leaf_1').getStem().set_to(class_name);  
+            $('leaf_1').getStem().reset();
+            value_of( $('stem_1').hasClass('stem_'+class_name) ).should_be(false); 
+        });
+    },
+    'should allow a state of: error' : function(){
+        $('leaf_1').getStem().set_to('error', 'Stem Error Occurred.');
+        value_of( $('stem_1').hasClass('stem_error') ).should_be(true);
+    }, 
+    'should update the error msg when setting an error.' : function(){
+        $('leaf_1').getStem().set_to('error', 'Stem Error Occurred.');
+        value_of( $('stem_1').getFirst('div.error_msg').getFirst('div.msg').get('text') ).should_match(/Stem Error Occurred/);      
+    }
+    
+}); // end Stem
+describe('Stem Method: hasKnife', {
+    after_each : reset_beach_house,
+    
+    'should return false if stem does not have a child with css class ".knife".' : function(){
+        value_of( $('stem_1').getStem().hasKnife() ).should_be(false);
+    },
+    'should return true if stem has a child with css class ".knife".' : function(){
+        $('stem_1').grab($('knife_1'), 'bottom');    
+        value_of( $('stem_1').getStem().hasKnife() ).should_be(true);
+    }
+});
+describe('Stem Method: getKnife', {
+    after_each : function(){ reset_request(), reset_beach_house(); },
+    
+    'should set stem element to a css class of stem_editing if it already has a knife.' : function(){
+        // Make sure request is not called.
+        window.Request = null;
+        
+        // Prep test.
+        $('stem_1').grab($('knife_1'));    
+        $('stem_1').getStem().getKnife();
+        
+        // Do test.
+        value_of( $('stem_1').hasClass('stem_editing') ).should_be(true);
+    },
+    'should set stem element to a css class of stem_loading when it does not have a knife.': function(){
+        window.Request = MockDoNothingRequest;
+        $('stem_1').getStem().getKnife( new Element('a', {'href' : 'nothing' }) );
+        // console.log($('stem_1').getFirst('div.error_msg').get('html'))
+        value_of( $('stem_1').hasClass('stem_loading') ).should_be(true);
+    },
+    'should send a GET Request when retrieving knife element.' : function(){
+        // Prep test.
+        window.Request = newReqClass({
+            Extends          : MockValidateOptionsRequest.HTML,    
+            exec             : 'Nothing',
+            js_name          : 'ValidateGET',
+            check_options    : function(options){
+                    if(options.method == 'get') 
+                        throw('GET method has been set.');
+                    
+                    throw('GET method expected, but got this instead: ' + options.method);
+            }
+        });
+        
+        // Do test.
+        var err = null;
+        try { 
+            $('stem_1').getStem().getKnife( new Element('a', {'href' : 'nothing' }) );  
+        } catch(e) { err = e };
+        
+        value_of( err ).should_match(/GET method has been set/);
+        
+    }, 
+    'should use the HREF attribute of the link button as the "url" of the Request.' : function(){
+        window.Request = newReqClass({
+            Extends:  MockValidateOptionsRequest.HTML,
+            exec : 'Nothing',
+            js_name: 'ValidateURL',
+            check_options : function(options){
+                if(options.url == '/correct/url/')
+                    throw('URL has been set.');
+                throw('URL was not set correctly: ' + options.url);
+            }
+               
+        });    
+        var err = null;
+        try { $('stem_1').getStem().getKnife(new Element('a', {'href' : '/correct/url/'})) }
+        catch(e){ err = e};
+        value_of(err).should_match(/URL has been set/);
+    },
+    'should not evaluate Scripts or Response.' : function(){
+        window.Request = newReqClass({
+            Extends:  MockValidateOptionsRequest.HTML,
+            exec : 'Nothing',
+            js_name: 'ValidateURL',
+            check_options : function(options){
+                if(options.evalScripts == false && options.evalResponse == false)
+                    throw('evalScripts and evalResponse are both correctly set to false.');
+                throw('Incorrect settings. evalScripts: '+options.evalScripts +', evalResponse ' + options.evalResponse);
+            }
+               
+        });    
+        var err = null;
+        try { $('stem_1').getStem().getKnife(new Element('a', {'href' : '/random/url/'})) }
+        catch(e){ err = e};
+        value_of(err).should_match(/evalScripts and evalResponse are both correctly set to false./);  
+    },
+    'should insert knife as a child element to the stem onSuccess.' : function(){
+        // Prep test.
+        window.Request.HTML = new Class({
+            initialize : function(opts) { this.onSuccess = opts.onSuccess;} ,
+            send : function(){ this.onSuccess(new Elements([$('knife_1')])); }
+        });
+        
+        // Do test.
+        value_of( $('knife_1').getParent() ).should_not_be($('stem_1'));
+        $('stem_1').getStem().getKnife( new Element('a', {href : '/some/random/link'}));
+        value_of( $('knife_1').getParent() ).should_be($('stem_1'));
+    },
+    "should display the error message if the returned HTML is an element with a css class of 'error_msg'." : function(){
+        // Prep test.
+        window.Request.HTML = mockReqOnSuccess( $('knife_error_msg_1') );
+        
+        var error_blok = $('stem_1').getStem().grabError_$().getFirst('div.msg');
+        value_of( error_blok.get('text') ).should_not_be($('knife_error_msg_1').get('text'));
+        
+        // Do test.
+        $('stem_1').getStem().getKnife( new Element('a', {href : '/some/random/link'}) );
+        value_of( error_blok.get('text') ).should_be($('knife_error_msg_1').get('text'));
+    },
+    "should display an error message if the returned HTML does not contain a css class name of 'error_msg' or a 'knife'." : function(){
+        // Prep test.
+        window.Request.HTML = mockReqOnSuccess( $('random_knife_msg') );
+        
+        var error_blok = $('stem_1').getStem().grabError_$().getFirst('div.msg');
+        value_of(error_blok.get('text')).should_not_match(/Programmer error. Contact support and tell them to put in a form thingy/);
+        
+        // Do test.
+        $('stem_1').getStem().getKnife( $('get_knife_1') ); 
+        value_of(error_blok.get('text') ).should_match( /Programmer error. Contact support and tell them to put in a form thingy/ );
+    },
+    'should display the stem\'s error message if Request was successful, but the HTML is not an element..' : function(){
+        // Prep test.
+        window.Request.HTML = mockReqOnSuccess( '' );
+        var err_blok = $('stem_1').getStem().grabError_$().getFirst('div.msg');
+        value_of(err_blok.get('text')).should_not_match(/Programmer error. Contact support and tell them to put in a form thingy/);
+        
+        // Do test.
+        $('stem_1').getStem().getKnife( $('get_knife_1') );
+        value_of(err_blok.get('text')).should_match(/Programmer error. Contact support and tell them to put in a form thingy/);
+    },
+    'should display the stem\'s error message if Request was a failure.' : function(){
+        // Prep test.
+        window.Request.HTML = mockReqOnFailure({status : 500 });
+        var err_blok = $('stem_1').getStem().grabError_$().getFirst('div.msg');
+        value_of(err_blok.get('text')).should_not_match(/500/);
+        
+        // Do test.
+        $('stem_1').getStem().getKnife( $('get_knife_1') );
+        value_of(err_blok.get('text')).should_match(/500/);
+    },
+    'should display the stem\'s error message when Request executes the onException function.' : function(){
+        // Prep test.
+        window.Request.HTML = mockReqOnException( 'Mock Exception Header', 'Mock Exception Val' );
+        var err_blok = $('stem_1').getStem().grabError_$().getFirst('div.msg');
+        value_of(err_blok.get('text')).should_not_match(/Mock Exception Header/);
+        
+        // Do test.
+        $('stem_1').getStem().getKnife( $('get_knife_1') );
+        value_of( err_blok.get('text') ).should_match(/Mock Exception Header/);
+    },
+    'should display the stem\'s error message when Request.send() produces an exception.' : function(){
+        // Prep test.
+        window.Request.HTML = mockReqSend( function(){ throw('Send threw exception.') });
+        var err_blok = $('stem_1').getStem().grabError_$().getFirst('div.msg');
+        value_of(err_blok.get('text')).should_not_match(/Send threw exception/);
+        
+        // Do test.
+        $('stem_1').getStem().getKnife( $('get_knife_1') );
+        value_of(err_blok.get('text')).should_match(/Send threw exception/);
+    }
+});
+describe('Stem Method: grabKnife_$', {
+    after_each : reset_beach_house,
+    
+    'should insert the new knife element at the bottom of the stem.': function(){
+        // Prep test.
+        value_of( $('stem_1').getLast() ).should_not_be( $('knife_1') );
+        
+        // Do test.
+        $('stem_1').getStem().grabKnife_$( $('knife_1') );
+        value_of( $('stem_1').getLast() ).should_be( $('knife_1') );
+    },
+    'should set the stem to a css class of editing.' : function(){
+        // Prep test.
+        value_of( $('stem_1').hasClass('stem_editing') ).should_not_be(true);
+        
+        // Do test.
+        $('stem_1').getStem().grabKnife_$( $('knife_1') );
+        value_of( $('stem_1').hasClass('stem_editing') ).should_be(true);
+    },
+    'should return the stem element.' : function(){
+        value_of( $('stem_1').getStem().grabKnife_$( $('knife_1') ) ).should_be($('stem_1'));
+    }
+});
+describe('Stem Method: unstore_$', {
+    before_each : function(){
+        stem_1_$ = $('stem_1');
+        stem_1   = stem_1_$.getStem();
+    },
+    
+    after_each : reset_beach_house,
+    
+    "should set the element's stored 'stem' value to null." : function(){
+        stem_1.unstore_$();
+        value_of( stem_1_$.retrieve('stem') ).should_be(null);
+    },
+    "should set the Stem's object element to 'null'."  : function(){
+        stem_1.unstore_$();
+        value_of( stem_1.$ ).should_be(null);
+    },
+    "should return 'null'." : function(){
+        value_of( stem_1.unstore_$() ).should_be(null);
+    }
+}); // end unstore_$
+describe('Stem Method: replace_$', {
+    before_each : function(){
+        stem_1_$ = $('stem_1');
+        stem_1   = stem_1_$.getStem();
+    },
+    after_each : reset_beach_house,
+    
+    'should call Stem Method: unstore_$.': function(){
+        stem_1.unstore_$ = function(){ throw 'unstore_$ was called' };
+        var err = null;
+        try { stem_1.replace_$($('stem_3')) }
+        catch (e) {err=e}
+        
+        value_of(err).should_match(/unstore_\$ was called/);
+    },
+    
+    'should replace the old element in the DOM with the new element.' : function(){
+        var orig_parent = stem_1_$.getParent();
+        stem_1.replace_$($('stem_3'));
+        value_of( stem_1_$.getParent() ).should_be(null);
+        value_of( $('stem_3').getParent() ).should_be(orig_parent);
+    }, 
+    'should destroy the old element.': function(){
+        var orig_html = stem_1_$.get('html');
+        stem_1.replace_$($('stem_3'));
+        value_of( stem_1_$.get('html') ).should_not_be(orig_html);
+    },
+    'should store the Stem object in the new element.' : function(){
+        value_of($('stem_3').retrieve('stem')).should_be(null);
+        stem_1.replace_$($('stem_3'));
+        value_of($('stem_3').retrieve('stem')).should_be(stem_1);
+    },
+    'should return the element.' : function(){
+        value_of( stem_1.replace_$($('stem_3')) ).should_be($('stem_3'));
+    }
+});
+describe('Stem Method: destroy_$', {
+    before_each : function(){
+        stem_1_$ = $('stem_1');
+        stem_1 = $('stem_1').getStem();
+    },
+    after_each : reset_beach_house,
+    
+    'should replace the old element with the new element if it is passed an undo-delete element.' : function(){
+        var orig_parent = stem_1_$.getParent();
+        stem_1.destroy_$($('undo_delete_blok'));
+        value_of( stem_1_$.getParent() ).should_not_be(orig_parent);
+        value_of( $('undo_delete_blok').getParent() ).should_be(orig_parent);
+    },
+    "should display the stem's error message if the undo element passed to it does not evaluate to an 'undo_delete' element." : function(){
+        // Prep test.
+        value_of(stem_1.grabError_$().get('html')).should_not_match(/Programmer error./);
+        
+        // Do test.
+        stem_1.destroy_$(new Element('div', {'class' : 'random_blok'}));
+        value_of(stem_1.grabError_$().get('html')).should_match(/Programmer error./);
+    },
+    "should call the 'unstore_$()' to remove the Stem object from the element's storage when no element is passed to the method." : function(){
+        stem_1.unstore_$ = function(){ throw('unstore_$ was called') };
+        var err = null;
+        try { stem_1.destroy_$() }
+        catch (e) {err = e;}
+        
+        value_of(err).should_match(/unstore_\$ was called/);
+    },
+    "should destroy the original element if not element is passed to it.." : function(){
+        stem_1_$.destroy = function(){ throw('element method destroy was called') };
+        var err = null;
+        try {stem_1.destroy_$()}
+        catch (e) {err = e;}
+        value_of(err).should_match(/element method destroy was called/);
+    },
+    
+    "should reset the garden after replacing the element with an undo_delete element." : function(){
+        var garden = stem_1_$.getGarden();
+        var err = null;
+        
+        garden.reset = function(){ throw('garden reset method called.')};
+        try { stem_1.destroy_$($('undo_delete_blok')) }
+        catch (e) {err = e; }
+        value_of(err).should_match(/garden reset method called/);
+    },
+    "should reset the garden after destroying the element (when no element is passed to the method)." : function(){
+        var garden = stem_1.$.getGarden();
+        var err = null;
+        
+        garden.reset = function(){ throw('garden reset method called.')};
+        try { stem_1.destroy_$()  }
+        catch (e) {err = e}
+        value_of(err).should_match(/garden reset method called/);
+    },
+    "should return 'null' when an undo_delete element is passed to it." : function(){
+        value_of(stem_1.destroy_$($('undo_delete_blok'))).should_be(null);
+    },
+    "should return 'null' when no element is passed to it." : function(){
+        value_of(stem_1.destroy_$()).should_be(null);
+    }
+});
+
+/* *************** end Stem Specs ********************* */
+
+/* *************** Leaf Specs ********************* */
+describe('Leaf', {
+    after_each : reset_beach_house,
+    
+    'should store itself on the element with a key of "leaf".' : function(){
+        $('get_knife_1').getLeaf();
+        value_of( $('leaf_1').retrieve('leaf').css_name ).should_be('leaf');
+    },
+    "should have a value for 'found_at' of 'stem'." : function(){
+        value_of($('leaf_1').getLeaf().found_at).should_be('stem');    
+    } 
+});
+describe('Leaf Element Method: getLeaf', {
+    after_each : reset_beach_house,
+    
+    "should return a Leaf element." : function(){
+        value_of( $('leaf_1').getLeaf('leaf').css_name ).should_be('leaf');
+    }    
+});
+/* *************** end Leaf Specs ********************* */
+
+/* *************** Knife Specs ********************* */
+describe('Knife', {
+    after_each : reset_beach_house,
+    
+    "should store itself on the element with a key of 'knife'." : function(){
+        $('knife_4').getKnife();
+        value_of( $('knife_4').retrieve('knife').css_name ).should_be( 'knife' );
+    },
+    "should have 'found_at' as 'stem'." : function(){
+        value_of( $('knife_4').getKnife().found_at ).should_be('stem');
+    }   
+});
+describe('Knife Element Method: getKnife', {
+    after_each : reset_beach_house,
+    
+    "should return a Knife object." : function(){
+        value_of( $('knife_4').getKnife().css_name ).should_be('knife');
+    }  
+});
+describe('Knife Property: css_name', {
+    "should be 'knife'" : function(){
+        value_of($('knife_4').getKnife().css_name).should_be('knife');
+    }    
+});
+describe('Knife Property: states', {
+    "should only contain two values: loading, error" : function(){
+        value_of( $('knife_4').getKnife().states.length ).should_be(2);
+        value_of( $('knife_4').getKnife().states.contains('loading')).should_be(true);
+        value_of( $('knife_4').getKnife().states.contains('error')).should_be(true);
+    }
+});
+describe('Knife Method: grabError_$', {
+    "should return the error block of the Stem." : function(){
+        value_of( $('knife_4').getKnife().grabError_$() ).should_be($('stem_4').getStem().grabError_$());
+    }
+});
+describe('Knife Method: postReplace', {
+    after_each : function(){ 
+                    reset_request(); 
+                    reset_beach_house(); 
+                    reset_sun_flower();
+    },
+    
+    "should set the element to 'loading'." : function(){
+        window.Request.HTML = mockReqDoNothing();
+        
+        value_of($('knife_4').hasClass('knife_loading')).should_be(false);
+        $('knife_4').getKnife().postReplace();
+        value_of($('knife_4').hasClass('knife_loading')).should_be(true);
+    },
+    "should send a request with the following options: {method: 'post', evalScripts : false, evalResponse : false }" : function(){
+        window.Request.HTML = mockReqValidateOptions({method: 'post', evalScripts : false, evalResponse : false });
+        $('knife_4').getKnife().postReplace();
+        value_of(window.request_options_error).should_be(false);
+    },
+    "should send a request with the element form's action url." : function(){
+        window.Request.HTML = mockReqValidateOptions({ url : $('knife_4').getElement('form').get('action') });
+        value_of( $('knife_4').getElement('form').get('action').length > 4 ).should_be(true);
+        
+        $('knife_4').getKnife().postReplace();
+        
+        value_of(window.request_options_error).should_be(false); 
+        
+    },
+    "should update the error message if the returned HTML did not contain any elements." : function(){
+        window.Request.HTML = mockReqOnSuccess('');
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_not_match(/Programmer error/);
+        $('knife_4').getKnife().postReplace();
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_match(/Programmer error/);
+        
+    },
+    "should replace the stem if the returned HTML contained elements a new stem." : function(){
+        var update_stem = new Element('div', { 'id' : 'stem_4', 'class' : 'stem', 'text' : 'updated stem 4' });
+        window.Request.HTML = mockReqOnSuccess(update_stem);
+
+        $('knife_4').getKnife().postReplace();
+
+        value_of(update_stem.getParent().hasClass('garden_bed')).should_be(true);
+        value_of($('stem_4').get('text')).should_match(/updated stem 4/);
+    },
+    "should display error message if the returned HTML is an error message." : function(){
+        var error_msg = new Element('div', {'class' : 'error_msg', 'text' : 'error message for stem 4'});
+        window.Request.HTML = mockReqOnSuccess(error_msg);
+        $('knife_4').getKnife().postReplace();
+        value_of($('knife_4').getKnife().grabError_$().get('text')).should_match(error_msg.get('text'));
+    },
+    "should display error message if the returned HTML is of a css class other than 'stem' and 'error_msg'." : function(){
+        var random_blok = new Element('div', {'class' : 'random', 'text' : 'who knose'});
+        window.Request.HTML = mockReqOnSuccess(random_blok);
+        value_of( $('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text') ).should_not_match(/The programmer made a mistake/);
+        $('knife_4').getKnife().postReplace();
+        value_of( $('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text') ).should_match(/The programmer made a mistake/);
+    },
+    "should call Stem model class after processing it if the returned block has a class of 'stem'." : function(){
+        var was_it_called = null;
+        
+        SunFlower.afterReplace = function(){ was_it_called = 'SunFlower.afterReplace was called' };
+        $('garden_1').addClass('SunFlower');
+        
+        var update_stem = new Element('div', { 'id' : 'stem_4', 'class' : 'stem', 'text' : 'updated stem 4' });
+        
+        window.Request.HTML = mockReqOnSuccess(update_stem);
+        $('knife_4').getKnife().postReplace();
+        value_of(was_it_called).should_match(/SunFlower\.afterReplace was called/);
+    },
+    "should send the results of the HTML request back to the Stem model class after processing it if the returned block has a class of 'stem'." : function(){
+        SunFlower.afterReplace = function(html){ this.replaceResults = html };
+        $('garden_1').addClass('SunFlower');
+        
+        var update_stem = new Element('div', { 'id' : 'stem_4', 'class' : 'stem', 'text' : 'updated stem 4' });
+        
+        window.Request.HTML = mockReqOnSuccess(update_stem);
+        
+        $('knife_4').getKnife().postReplace();
+        
+        value_of(SunFlower.replaceResults).should_be([update_stem]);
+    },
+    "should ONLY call the customer handler when the element has a css class name of 'stem'." : function(){
+        SunFlower.afterReplace = function(html){ throw('this should not have been called')};
+        $('garden_1').addClass('SunFlower');
+        
+        // Do test for random block.
+        var random_blok = new Element('div', {'class' : 'random', 'text' : 'random blok' });
+        window.Request.HTML = mockReqOnSuccess(random_blok);
+        $('knife_4').getKnife().postReplace();
+        
+        // Do test for error_msg block.
+        var error_blok = new Element('div', {'class' : 'error_msg', 'text' : 'error_msg blok' });
+        window.Request.HTML = mockReqOnSuccess(error_blok);
+        $('knife_4').getKnife().postReplace();
+
+    },
+    "should display the error message if there was a Request Failure." : function(){
+        window.Request.HTML = mockReqOnFailure({status : 500});
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_not_match(/500/);
+        $('knife_4').getKnife().postReplace();
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_match(/500/);
+        
+    },
+    "should display the error message if there was a Request Exception." : function(){
+        window.Request.HTML = mockReqOnException('Knife Header', 'Knife Val');
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_not_match(/Knife Header/);
+        $('knife_4').getKnife().postReplace();
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_match(/Knife Header/);
+        
+    },
+    "should cache the Request object." : function(){
+        window.Request.HTML = mockReqDoNothing();
+        value_of($type($('knife_4').getKnife().previous_request)).should_be(false);
+        $('knife_4').getKnife().postReplace();
+        value_of($type($('knife_4').getKnife().previous_request)).should_be('object');
+        
+    },
+    "should send the form values in a query string." : function(){
+        var orig_form_qs = $('knife_form_4').toQueryString();
+        var sent_qs = null;
+        
+        window.Request.HTML = mockReqSend(function(qs){ sent_qs = qs});
+        $('knife_4').getKnife().postReplace();
+        value_of(sent_qs).should_be({data : orig_form_qs });
+    },
+    "should display the error message if the 'send' method threw an exception." : function(){
+        window.Request.HTML = mockReqSend(function(qs){ throw('send in bad mood') });
+        $('knife_4').getKnife().postReplace();
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_match(/send in bad mood/);
+    }
+    
+});
+describe('Knife Method: replace_$', {
+    after_each : reset_beach_house,
+    
+    "should replace the entire stem with the new stem." : function(){
+        var new_stem = new Element('div', {'id' : 'new_stem_4', class : 'stem', 'text' : 'new stem 4'});    
+        $('knife_4').getKnife().replace_$(new_stem);
+        value_of($('new_stem_4').getNext()).should_be($('stem_5'));
+    },
+    "should call the Stem object's Method: replace_$" : function(){
+        var stem = $('knife_4').getStem();
+        var new_stem = new Element('div', {'id' : 'new_stem_4', class : 'stem', 'text' : 'new stem 4'});  
+        var meth_was_called = null;
+        var orig_meth = stem.replace_$.bind(stem);
+        stem.replace_$ = function(new_ele){ meth_was_called = 'it was called'; return orig_meth(new_ele)};  
+        $('knife_4').getKnife().replace_$(new_stem);
+        value_of(meth_was_called).should_be('it was called');      
+    },
+    "should return the stem element." : function(){
+        var new_stem = new Element('div', {'id' : 'new_stem_4', class : 'stem', 'text' : 'new stem 4'});  
+        value_of($('knife_4').getKnife().replace_$(new_stem)).should_be(new_stem);
+    }
+});
+describe('Knife Method: postDestroy', {
+    after_each : function(){ 
+                    reset_request(); 
+                    reset_beach_house(); 
+                    reset_sun_flower();
+    },
+    
+    "should set the knife element to 'loading'." : function(){
+        window.Request.HTML = mockReqDoNothing();
+        value_of($('knife_4').hasClass('knife_loading')).should_not_be(true);
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of($('knife_4').hasClass('knife_loading')).should_be(true);
+    },
+    "should send the Request with the following options: method:post, evalScripts:false, evalResponse:false" : function(){
+        window.Request.HTML = mockReqValidateOptions({method : 'post', evalScripts : false, evalResponse : false});
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of(window.request_options_error).should_be(false);
+    },
+    "should send the Request with the option.url set to the form's delete action." : function(){
+        window.Request.HTML = mockReqValidateOptions({ 
+                                    url : $('knife_4').getElement('form').get('action').replace('update','delete')
+                                });
+        
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        
+        value_of(window.request_options_error).should_be(false);
+    },
+    "should display the error message if the return HTML did not contain any elements." : function(){
+        window.Request.HTML = mockReqOnSuccess('');
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of( $('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text') ).should_match(/Empty results for destroying/);
+    },
+    "should remove the element if the returned HTML was a success message." : function(){
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'success_msg', 'text':'Success.'} ));
+        
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update')); 
+        value_of($('stem_4')).should_be(null);
+    },    
+    "should update the element if the returned HTML was an undo-delete box." : function(){
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'id' : 'undo_delete_stem_4', 'class' : 'undo_delete', 'text':'Success.'} ));
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of($('knife_4')).should_be(null);
+        value_of( $('undo_delete_stem_4').getNext() ).should_be($('stem_5'));
+    },
+    "should display an error message if the HTML results was a error message block." : function(){
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'error_msg', 'text':'error in deleting stem 4'}));
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of( $('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text') ).should_be('error in deleting stem 4');
+    },
+    "should display an error message if the HTML results was an unknown block." : function(){
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'random_blok', 'text':'random text'}));
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of( $('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text') ).should_match(/Unknown programmer error./);
+    },
+    "should send the HTML results to the appropriate class if the first element was of class 'success_msg'." : function(){
+        var success_msg = new Element('div', {'class' : 'success_msg', 'text' : 'destroyed stem 4'});
+        var passed_html  = null;
+        window.Request.HTML = mockReqOnSuccess(success_msg);
+        
+        SunFlower.afterDestroy = function(html_results){ passed_html = html_results};
+        $('knife_4').getGarden().$.addClass('SunFlower');
+
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of(passed_html).should_be([success_msg]);
+    },
+    "should send the HTML results to the appropriate class if the first element was of class 'undo_delete'." : function(){
+        var undo_blok = new Element('div', {'class' : 'undo_delete', 'text' : 'undo delete for stem 4'});
+        window.Request.HTML = mockReqOnSuccess(undo_blok);
+        SunFlower.afterDestroy = function(html_results){ SunFlower.passed_results = html_results};
+        $('knife_4').getGarden().$.addClass('SunFlower');
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of(SunFlower.passed_results).should_be([undo_blok]);
+    },
+    "should NOT send the HTML results if the element was of class 'error_msg'." : function(){
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'error_msg', 'text' : 'error in deleting stem 4'}));
+        SunFlower.afterDestroy = function(html_results){ this.html_results = html_results};
+        $('knife_4').getGarden().$.addClass('SunFlower');
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of(SunFlower.html_results).should_be(undefined);
+    },
+    "should NOT send the HTML results if the element was of an unknown class." : function(){
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'random_blok', 'text' : 'random message for stem 4'}));
+        SunFlower.afterDestroy = function(html_results){ this.html_results = html_results};
+        $('knife_4').getGarden().$.addClass('SunFlower');
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of(SunFlower.html_results).should_be(undefined);
+    },
+    "should display an error message if the Request was a Failure." : function(){
+        window.Request.HTML = mockReqOnFailure({status : 500});
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_match(/500/);
+    },
+    "should display an error message if the Request threw an exception." : function(){
+        window.Request.HTML = mockReqOnException('error header for stem 4', 'error val for stem 4');
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_match(/error header for stem 4/);
+    },
+    "should cache the Request for future use." : function(){
+        window.Request.HTML = mockReqDoNothing();
+        var knife = $('knife_4').getKnife();
+        knife.postDestroy($('knife_form_4_button_update'));
+        value_of($type(knife.previous_delete_request)).should_not_be(false);
+    },
+    "should send the Request with the form values as a query string." : function(){
+        var send_results = null;
+        var orig_qs = $('knife_4').getElement('form').toQueryString();
+        
+        window.Request.HTML = mockReqSend(function(opts){ send_results = opts.data });
+        
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of(send_results).should_be(orig_qs);
+    },
+    "should display an error message if Request.HTML.send throws an error." : function(){
+        window.Request.HTML = mockReqSend(function(opts){ throw('send no work') });
+        $('knife_4').getKnife().postDestroy($('knife_form_4_button_update'));
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_match(/send no work/);
+        
+    }
+    
+        
+});
+describe('Knife Method: destroy_$', {
+    after_each : function(){
+        reset_sun_flower(); 
+        reset_beach_house();
+    },
+    
+    "should display an error message if the element passed to it does not have css class 'undo_delete'. " : function(){
+        var unknown = new Element('div', {'id' : 'stem_4', 'class': 'stem', 'text' : 'unknown block'});
+        $('knife_4').getKnife().destroy_$(unknown);
+        value_of($('knife_4').getKnife().grabError_$().getFirst('div.msg').get('text')).should_match(/Programmer error: Undo delete element not properly defined/);
+    },
+    "should NOT replace the stem if the element passed to it is not an 'undo_delete' block." : function(){
+        var unknown = new Element('div', {'id' : 'stem_4', 'class': 'stem', 'text' : 'unknown block'});
+        var garden= $('knife_4').getGarden();
+        $('knife_4').getKnife().destroy_$(unknown);
+        value_of($('knife_4').getGarden()).should_be(garden);
+    },
+    "should replace the stem element if the element passed to it is an 'undo_delete' block." : function(){
+        var undo = new Element('div', {'id' : 'stem_4', 'class': 'undo_delete stem', 'text' : 'undo delete stem 4'});
+        $('knife_4').getKnife().destroy_$(undo);
+        value_of(undo.getParent().hasClass('garden_bed')).should_be(true);
+        value_of($('knife_4')).should_be(null);
+    },
+    "should replace the element by calling stem method 'destroy_$' with an 'undo_delete' element was passed." : function(){
+        var stem = $('knife_4').getStem();
+        stem.destroy_$ = function(undo_delete){ stem.destroy_$_was_called = undo_delete;}
+        
+        var undo = new Element('div', {'id' : 'stem_4', 'class': 'undo_delete stem', 'text' : 'undo delete stem 4'});
+        $('knife_4').getKnife().destroy_$(undo);
+        value_of(stem.destroy_$_was_called).should_be(undo);
+    },
+    "should destroy the element by calling stem method 'destroy_$' if no 'undo_delete' element was passed." : function(){
+        var stem = $('knife_4').getStem();
+        stem.destroy_$ = function(){ stem.destroy_$_was_called = 'was_called';}
+        $('knife_4').getKnife().destroy_$();
+        value_of(stem.destroy_$_was_called).should_be('was_called');
+    },
+    "should pass the element to a custom handler if it is defined and if an 'undo_delete' block was passed." : function(){
+        SunFlower.afterDestroy = function(new_stem){ this.was_called_with = new_stem};
+        var undo_delete = new Element('div', {'id' : 'stem_4', 'class': 'undo_delete stem', 'text' : 'undo delete stem 4'});
+        $('knife_4').getGarden().$.addClass('SunFlower');
+        $('knife_4').getKnife().destroy_$(undo_delete);
+        value_of(SunFlower.was_called_with).should_be(undo_delete);
+    },
+    "should pass the element to a custom handler if it is defined and no 'undo_delete' block was passed." : function(){
+        SunFlower.afterDestroy = function(new_stem){ this.was_called_with = true}; 
+        $('knife_4').getGarden().$.addClass('SunFlower');
+        $('knife_4').getKnife().destroy_$();
+        value_of(SunFlower.was_called_with).should_be(true);
+    },
+    "should return null if no element is passed to it." : function(){
+        value_of( $('knife_4').getKnife().destroy_$()).should_be(null);
+    },
+    "should return null if an 'undo_delete' element is passed to it." : function(){
+        var undo_blok = new Element('div', {'id' : 'stem_4', 'class': 'undo_delete stem', 'text':'undo blok 4'});    
+        value_of( $('knife_4').getKnife().destroy_$(undo_blok)).should_be(null);
+    },
+    "should return null if a non-'undo_delete' element was passed to it." : function(){
+        var unknown = new Element('div', {'id' : 'stem_4', 'class': 'stem', 'text' : 'unknown block'});
+        value_of( $('knife_4').getKnife().destroy_$(unknown)).should_be(null);
+    }
+    
+});
+/* *************** end Knife Specs ********************* */
+
+/* *************** Nursery Specs ********************* */
+describe('Nursery', {
+    "should store itself in the element with a key of 'nursery'." : function(){
+        $('nursery_1').getNursery();
+        value_of($('nursery_1').retrieve('nursery').css_name).should_be('nursery');
+    },
+    "should be 'found_at' 'garden'." : function(){
+        value_of($('nursery_1').getNursery().found_at).should_be('garden');
+    },
+    "should have the states 'loading' and 'error' "  : function(){
+        value_of($('nursery_1').getNursery().states.length).should_be(2);
+        value_of($('nursery_1').getNursery().states.contains('loading')).should_be(true);
+        value_of($('nursery_1').getNursery().states.contains('error')).should_be(true); 
+    }  
+});
+describe('Nursery Element Method: getNursery', {
+    "should return a 'nursery' object." : function(){
+        value_of($('nursery_1').getNursery().css_name).should_be('nursery');
+    }
+});
+describe('Nursery Method: reset', {     
+    after_each : reset_beach_house,
+    "should reset the nursery element." : function(){
+        $('nursery_1').addClass('nursery_loading');
+        $('nursery_1').getNursery().reset();
+        value_of($('nursery_1').hasClass('nursery_loading')).should_be(false);
+    },
+    "should reset the form if a boolean 'true' is passed to it." : function(){
+        
+        var form_resetted = false;
+        $('nursery_1').getElement('form').reset = function(){ form_resetted= true};
+      
+        $('nursery_1').getNursery().reset(true);
+        value_of(form_resetted).should_be(true);
+
+    },
+    "should return the nursery element." : function(){
+        value_of( $('nursery_1').getNursery().reset() ).should_be($('nursery_1'));    
+    }
+});
+
+describe('Nursery Method: grab_$', {
+    after_each : reset_beach_house,
+    
+    "should grab the stem into the garden bed.": function(){
+        $('nursery_1').getNursery().grab_$($('stem_3'));
+        value_of($('stem_3').getGarden()).should_be($('stem_1').getGarden());
+    },
+    "should reset the nursery element." : function(){
+        var css_loading = 'nursery_loading';
+        $('nursery_1').addClass(css_loading);
+        $('nursery_1').getNursery().grab_$($('stem_3'));
+        value_of( $('nursery_1').hasClass(css_loading) ).should_be(false);
+    },
+    "should reset the form element." : function(){
+        var form_was_reset = false;
+        $('nursery_form_1').reset = function(){ form_was_reset = true;};
+        $('nursery_1').getNursery().grab_$($('stem_3'));
+        value_of( form_was_reset ).should_be(true);
+    },
+    "should return the nursery element" : function(){
+        value_of($('nursery_1').getNursery().grab_$($('stem_3'))).should_be($('nursery_1'));
+    } 
+});
+
+describe('Nursery Method: postGrab', {
+    before_each : function(){
+        nursery_1_error_msg = $('nursery_1').getNursery().grabError_$().getFirst('div.msg');
+    },
+    
+    after_each : function(){ 
+        reset_beach_house(); 
+        reset_request(); 
+        window.request_options_valid = true;
+        
+    },
+    
+    "should set the nursery element to a css class of loading." : function(){
+        window.Request.HTML = mockReqDoNothing();
+        $('nursery_1').getNursery().postGrab();
+        value_of($('nursery_1').hasClass('nursery_loading')).should_be(true);
+    },
+    "should send the request with options: method:post, evalScripts:false, evalResponse:false" : function(){
+        window.Request.HTML = mockReqValidateOptions({method : 'post', evalScripts: false, evalResponse : false});
+        $('nursery_1').getNursery().postGrab();
+        value_of(window.request_options_error).should_be(false);
+    },
+    "should send the request to a url from the form's action." : function(){
+        window.Request.HTML = mockReqValidateOptions({url : $('nursery_1').getFirst('form').get('action')});
+        $('nursery_1').getNursery().postGrab();
+        value_of(window.request_options_error).should_be(false);
+    },
+    "should display an error message if the returned HTML is not an element." : function(){
+        window.Request.HTML = mockReqOnSuccess('');
+        $('nursery_1').getNursery().postGrab();
+        value_of( nursery_1_error_msg.get('text') ).should_match(/Programmer error: template is invalid./);
+    },
+    "should display the error message if the returned HTML is neither a 'stem' or an 'error_msg'." : function(){
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'random', 'text' : 'random text'}));    
+        $('nursery_1').getNursery().postGrab();
+        value_of( nursery_1_error_msg.get('text') ).should_match(/Programmer error: template is invalid./);
+    },
+    "should display the error message if the returned HTML is of css class 'error_msg'." : function(){
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'error_msg', 'text' : 'error in creating stem 3' }));
+        $('nursery_1').getNursery().postGrab();
+        value_of( nursery_1_error_msg.get('text') ).should_match(/error in creating stem 3/);
+    },
+    "should grab the new stem into the garden bed if it has a css class name of 'stem'." : function(){
+        window.Request.HTML = mockReqOnSuccess($('stem_3'));    
+        $('nursery_1').getNursery().postGrab();
+        value_of( $('nursery_1').getGardenBed().$.hasChild($('stem_3')) ).should_be(true);
+    },
+    "should call the custom handler if it is defined." : function(){
+        SunFlower.afterGrab = function(html){
+            
+                                    SunFlower.inserted_stem = html[0] 
+                                };
+
+        $('nursery_1').getGarden().$.addClass('SunFlower');
+        
+        window.Request.HTML = mockReqOnSuccess($('stem_3'));   
+        $('nursery_1').getNursery().postGrab();
+        value_of(SunFlower.inserted_stem).should_be($('stem_3'));
+    },
+    "should NOT call the custom handler if it is not a 'stem' element." : function(){
+        SunFlower.inserted_stem = false;
+        SunFlower.afterGrab = function(html){SunFlower.inserted_stem = true };
+        $('nursery_1').getGarden().$.addClass('SunFlower');
+        
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'random', 'text' : 'random text'}));   
+        $('nursery_1').getNursery().postGrab();
+        value_of(SunFlower.inserted_stem).should_be(false);
+    },
+    "should NOT call the custom handler if it is an 'error_msg' element."  : function(){
+        SunFlower.inserted_stem = false;
+        SunFlower.afterGrab = function(html){SunFlower.inserted_stem = true };
+        $('nursery_1').getGarden().$.addClass('SunFlower');
+        
+        window.Request.HTML = mockReqOnSuccess(new Element('div', {'class' : 'error_msg', 'text' : 'error in creating stem 3' }));   
+        $('nursery_1').getNursery().postGrab();
+        value_of(SunFlower.inserted_stem).should_be(false);
+    },
+    "should display an error message if the Request Failed." : function(){
+        window.Request.HTML = mockReqOnFailure({status:500});
+        $('nursery_1').getNursery().postGrab();
+        value_of( nursery_1_error_msg.get('text') ).should_match(/500/);
+    },
+    "should display an error message if the Request resulted in an exception." : function(){
+        window.Request.HTML = mockReqOnException('Nursery header error', 'Nursery header val');
+        $('nursery_1').getNursery().postGrab();
+        value_of( nursery_1_error_msg.get('text') ).should_match(/Nursery header error/);
+    },
+    "should cache the request." : function(){
+        window.Request.HTML = mockReqDoNothing();
+        $('nursery_1').getNursery().postGrab();
+        value_of( $type($('nursery_1').getNursery().previous_request) ).should_be('object');
+    },
+    "should pass the form values as a query string to Request.HTML method 'send' " : function(){
+        var qs = $('nursery_1').getFirst('form').toQueryString();
+        var passed_qs = null;
+        window.Request.HTML = mockReqSend(function(opts){ passed_qs = opts.data });
+        $('nursery_1').getNursery().postGrab();
+        value_of( passed_qs ).should_be(qs);
+    },
+    "should display an error message if Request.HTML.send threw an exception." : function(){
+        window.Request.HTML = mockReqSend(function(opts){throw 'send no like.'});
+        $('nursery_1').getNursery().postGrab();
+        value_of( nursery_1_error_msg.get('text') ).should_match(/send no like./);
+    }
+});
+
+/* *************** end Nursery Specs ********************* */
+
+/* ***************************************************
+ *  Specs for admin_home_page.js.
+ * *************************************************** */
+describe('SitePreg.compare', {
+    'should return false if "new_stem" has an ID larger than "old_stem"' : function(){
+        value_of( SitePref.compare( $('stem_2'), $('stem_1')) ).should_be(false);    
+    },    
+    'should return true if "old_stem" has an ID larger than "new_stem"' : function(){
+        value_of( SitePref.compare( $('stem_1'), $('stem_2')) ).should_be(true);    
+    }
+});
+/* **********  end admin_home_page.js ********** */
+
+
+var current_parent = "beach_house_1"
+var children = ["beach_house_1", "garden_1", "garden_bed_1", ["stem_1", "stem_2", "stem_4", "stem_5"]];
+
+/* ***************************************************
+ *  These specs make sure everything is setup properly.
+ *  for all the other specs.
+ * *************************************************** */     
+describe('Element: color_less', {
+    "should exist" : function(){
+        value_of($type($('color_less'))).should_be('element');
+    }    
+});
+describe('Element: beach_house_1_wrapper', {
+    "should exist" : function(){
+        value_of($type($('beach_house_1_wrapper'))).should_be('element');   
+    },
+    "should have child: beach_house_1" : function(){
+        value_of($('beach_house_1_wrapper').hasChild($('beach_house_1'))).should_be(true);    
+    }
+});
+describe('Element: beach_house_1', {
+    "should have child: garden_1" : function(){
+        value_of($('beach_house_1').hasChild($('garden_1'))).should_be(true);
+    }    
+});
+describe('Element: garden_1', {
+    "should have child: garden_bed_1" : function(){
+        value_of( $('garden_1').hasChild($('garden_bed_1')) ).should_be(true);    
+    }
+});
+
+describe('Element: garden_bed_1', {
+    "should NOT have child: stem_3" : function(){
+        value_of($('garden_bed_1').hasChild($('stem_3'))).should_be(false);
+    },
+    "should have child: stem_1" : function(){
+        value_of($('garden_bed_1').hasChild($('stem_1'))).should_be(true);    
+    },
+    "should have child: stem_2" : function(){
+        value_of($('garden_bed_1').hasChild($('stem_1'))).should_be(true);    
+    },
+    "should have child: stem_4" : function(){
+        value_of($('garden_bed_1').hasChild($('stem_4'))).should_be(true);    
+    },
+    "should have child: stem_5" : function(){
+        value_of($('garden_bed_1').hasChild($('stem_5'))).should_be(true);    
+    }
+});
+
+describe('Element: stem_1', {
+    "should have a child leaf: leaf_1" : function(){
+        value_of( $('stem_1').hasChild($('leaf_1')) ).should_be(true);    
+    }
+});
+    describe('Element: leaf_1', {
+        "should have a child link: get_knife_1" : function(){
+            value_of($('leaf_1').hasChild($('get_knife_1'))).should_be(true);
+        },    
+        "should have a child span with text: Leaf on a stem 1" : function(){
+            value_of($('leaf_1').getFirst('span').get('text')).should_match(/Leaf on a stem 1/);    
+        }
+    });
+describe('Element: stem_2', {
+    "should have a child leaf: leaf_2" : function(){
+        value_of($('stem_2').hasChild($('leaf_2'))).should_be(true);    
+    }    
+});
+    describe('Element: leaf_2', {
+        "should have text: Leaf on a stem 2" : function(){
+            value_of($('stem_2').get('text')).should_match(/Leaf on stem 2/);   
+        }    
+    });
+describe('Element: stem_4', {
+    "should have a child leaf: leaf 4" : function(){
+        value_of($('stem_4').hasChild($('leaf_4'))).should_be(true);
+    },
+    "should have a child knife: knife_4" : function(){
+        value_of($('stem_4').hasChild($('knife_4'))).should_be(true);    
+    }
+});
+    describe("Element: leaf_4", {
+        "should have text: Lead on stem 4" : function(){
+            value_of($('leaf_4').get('text')).should_match(/Leaf on stem 4/);
+        }
+    });
+    describe("Element: knife_4", {
+        "should have a child form: knife_form_4" : function(){
+            value_of($('knife_4').hasChild($('knife_form_4'))).should_be(true);
+        }
+    });
+    
+        describe("Element: knife_form_4",{
+            "should have a child input with name=title" : function(){
+                value_of($('knife_form_4').getFirst('input').get('name')).should_be('title');
+            },
+            "should have a child input with value='Leaf on a stem 4'" : function(){
+                value_of($('knife_form_4').getFirst('input').get('value')).should_be('Leaf on a stem 4');
+            },
+            "should have a button with class 'submit'." : function(){
+                value_of($type($('knife_form_4').getElement('button.submit'))).should_be('element');  
+            }
+        });
+        
+
+        // ]]></script>
+    </head>
+    <body>
+    
+        <div id="color_less"></div>
+        
+        <div id="beach_house_1_wrapper">
+            <div id="beach_house_1" class="beach_house">
+                <div id="garden_1" class="garden">
+                    <div id="garden_bed_1" class="garden_bed ClassName">
+                        <div id="stem_1" class="stem">
+                            <div id="leaf_1" class="leaf">
+                                <a href="/knife" id="get_knife_1">Get Knife</a>
+                                <span>Leaf on a stem 1</span>
+                            </div>
+                        </div>
+                        <div id="stem_2" class="stem">
+                            <div id="leaf_2" class="leaf">Leaf on stem 2</div>
+                        </div>
+                        <div id="stem_4" class="stem">
+                            <div id="leaf_4" class="leaf">Leaf on stem 4</div>
+                            <div id="knife_4" class="knife">
+                                <form id="knife_form_4" method="post" action="/update/leaf">
+                                    <input type="text" name="title" value="Leaf on a stem 4" />
+                                    <div class="buttons">
+                                        <button class="submit" id="knife_form_4_button_update">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div id="stem_5" class="stem">
+                            <div id="leaf_5" class="leaf">Leaf on a stem 5</div>
+                        </div>
+                        
+                    </div>
+                    <div id="nursery_1" class="nursery">
+                        <div class="error_msg">
+                            <h6>Errors:</h6>
+                            <div class="msg">Msg goes here.</div>
+                        </div>
+                        <form id="nursery_form_1" action="/new/stem" method="post" class>
+                            <input type="text" name="title" value="" />
+                            <div class="buttons">
+                                <button class="submit" id="nursery_submit_1">Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div><!-- end .garden -->
+            </div><!-- end .beach_house -->
+            
+            <div class="miscel_wrapper">
+                <div id="stem_3" class="stem">
+                    <div id="leaf_3" class="leaf">Leaf on a stem 3</div>
+                </div>
+                
+                <div id="knife_1" class="knife">
+                    Knife 1 goes here.
+                </div>
+                
+                <div id="knife_error_msg_1" class="error_msg">
+                    * random error 1
+                    * random error 2
+                </div>
+                
+                <div id="random_knife_msg" class="random">Random knife message.</div>
+                
+                <div id="undo_delete_blok" class="undo_delete">
+                    <a href="/undo/delete/some_model">Undo delete.</a>
+                </div>
+                
+            </div>
+            
+        </div>
+
+    
+        <div id="pool_house_1" class="pool_house">
+            <div id="pool_garden_1" class="garden">
+                <div id="pool_garden_bed_1" class="garden_bed">
+                    <div id="pool_stem_1" class="stem">Stem1</div>
+                    <div id="pool_stem_1" class="stem">Stem2</div>
+                </div>
+                <div id="pool_nursery_1" class="nursery">
+                    <div class="error_msg">
+                        <h6>Errors:</h6>
+                        <div class="msg">Msg goes here.</div>
+                    </div>
+                    <form action="/" method="post"></form>
+                </div>
+            </div><!-- end .garden -->
+        </div><!-- end .pool_house -->
+    
+<!-- This code is put here to avoid using onLoad handlers. -->
+<script language="javascript" type="text/javascript">
+// <![CDATA[
+
+var original_beach_house = $('beach_house_1_wrapper').get('html');
+
+
+// ]]></script>
+    </body>
+</html>

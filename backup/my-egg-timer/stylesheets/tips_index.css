@@ -1,0 +1,41 @@
+@import url("default.css");
+
+h1 {
+	border-bottom: 6px double #073D6F;
+	padding: 20px 0 10px 0;
+	font-size: 250%;
+}
+	h1 a:link, h1 a:visited {
+		font-family: serif;
+	}
+
+span.email { color: #F00919; }	
+
+#tips {
+	text-align: left; 
+}
+	#tips div.tip {}
+		#tips h3 {
+			padding: 10px 0 5px 0;
+			font-family: helvetica, arial, sans-serif;
+		}
+		#tips div.tip_body {
+			padding: 0 0 10px 35px;
+			overflow: auto;
+			font: normal 110% helvetica, arial, sans-serif;
+		}
+			#tips div.tip_body img {
+				border: 1px solid #F00919;;
+				padding: 5px;
+			}
+			
+			#tips div.tip_body blockquote {
+				font: italic 90% helvetica, arial, sans-serif;
+				padding: 5px 5px 5px 20px;
+			}
+
+
+#egg_content {
+	width:795px;
+	margin: 0 auto;
+}

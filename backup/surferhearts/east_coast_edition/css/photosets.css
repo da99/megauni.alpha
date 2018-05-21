@@ -1,0 +1,25 @@
+@import url("main.css?timestamp=1178640400");
+@import url("_extra_wide.css?timestamp=1178640400");
+@import url("photoset.css?timestamp=1178640400");
+@import url("_photoset.css?timestamp=1178640400");
+
+#main_column { width: 756px; }
+
+#photoset h3 { background-image: url("../images/text/spotlight_title_long.gif?timestamp=1178640400"); }
+#photoset .body .datetime { display:none; }
+
+
+/** photoset_column_count: 3 **/
+#photosets  h3 {background-position:0 -645px; }
+#photosets .body {padding: 15px 0 5px 30px;}
+#photosets .photoset {
+    border:0px solid red;  
+    float:left; 
+    padding: 0 30px  15px 0;
+    background:transparent url("../images/sprites/mediaset_preview_medium_bg.gif?timestamp=1178640400") no-repeat 12px 12px;
+    }
+#photosets .photoset .medium_preview { float:none; margin:0; padding:0 0 13px 0;}
+#photosets .photoset h4 { font-size:12pt; text-align:left; border:0px solid red; width:210px;}
+#photosets .photoset .info { float:none; }
+#photosets .photoset .info .datetime { display:none; }
+#photosets .photoset .info .permalink {width:auto; text-align:center;}

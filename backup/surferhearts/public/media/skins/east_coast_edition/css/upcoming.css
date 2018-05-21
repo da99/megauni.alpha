@@ -1,0 +1,23 @@
+@import url("main.css?timestamp=1178640400");
+@import url("main.css?timestamp=1178640400");
+
+
+#heart_links .body { padding-left:0; padding-top:0; }
+#heart_links .heart_link { padding-left: 5px; padding-top:2px;}
+#heart_links span.empty_msg {
+    display:block;
+    padding:3px 7px 57px 7px;
+    background:transparent url("../images/sprites/block_bg.gif?timestamp=1178640400") no-repeat bottom right;
+    }
+
+#upcoming_dates ul {
+    margin: 0 0 0 15px;
+    padding:0;
+}
+#upcoming_dates span.empty_msg {
+    display:block;
+    padding: 2px 5px 0 2px;
+}
+/* titles */
+#heart_links h3 { background-position: 0 -795px;}
+#upcoming_dates h3 { background-position: 0 -795px;}

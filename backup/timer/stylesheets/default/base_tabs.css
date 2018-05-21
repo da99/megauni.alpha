@@ -1,0 +1,48 @@
+div.tabs {
+  text-align: right;
+  font-size: 2em;
+  padding: 0 0 0 25px;
+  margin: 0 0 -8px 0;}
+  div.tabs ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0; 
+    overflow: auto; }
+    div.tabs ul li {
+      float: left;
+      display: block; 
+      padding-bottom: 4px;
+      padding-top: 4px;
+      margin: 0 10px 0 0;}
+  div.tabs a:link, div.tabs a:visited {
+    display: block;
+    font-size: 90%;
+    padding: 4px 10px 6px 10px;
+    border: 0 none; }
+  div.tabs a:hover {
+    padding-bottom: 6px;
+    background-color: #ffffcc;
+    border-width: 0;
+    border-color: #a2d3e0;
+    border-style: solid; 
+    color: #F00919;}
+  div.tabs li.selected {
+    padding-top: 2px;}
+  div.tabs li.selected a {
+    padding-bottom: 4px;
+    color: #fff;
+    text-decoration: none;
+    background-color: #f00919;
+    border: 4px solid #f00919;
+    }
+
+div.tabs_body {
+  padding: 10px 15px 8px 15px;
+  margin-bottom: 15px;
+  background-color: #ffffcc;
+  border: 4px solid #fff;
+  border-color: #f00919;  }
+  div.tabs_body div.tab_body {
+    display: none; }
+    div.tabs_body div.tab_body.selected {
+      display: block; }

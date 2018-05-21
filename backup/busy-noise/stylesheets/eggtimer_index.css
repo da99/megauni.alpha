@@ -1,0 +1,442 @@
+a:link, a:visited {
+  color: #F00919;
+  padding: 0 2px 4px 2px;
+  font: bold 14px !sans_serif; }
+
+a:hover, a:active {
+  color: #fff;
+  background: #F00919; }
+
+html, body, div, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, p, blockquote, pre, form, fieldset, table, th, td {
+  margin: 0;
+  padding: 0; }
+
+#busy_body {
+  text-align: center;
+  background-color: #a2d3e0;
+  background-image: url("/busy-noise/images/logo_bg.gif");
+  background-repeat: repeat-x; }
+
+#content {
+  margin: 0 auto;
+  text-align: left;
+  width: 790px;
+  background-image: url("/busy-noise/images/spotlights.gif");
+  background-repeat: no-repeat;
+  background-position: 0 51px; }
+#bad_msie {
+  background: #ff9;
+  text-align: center;
+  padding: 10px;
+  font-family: helvetica, arial, sans-serif;
+  margin-bottom: 0px;
+}
+#current_time {
+  overflow: hidden;
+  width: 263px;
+  height: 70px;
+  position: absolute;
+  text-align: center;
+  background-image: url("/busy-noise/images/current_time_bg.gif");
+  background-repeat: no-repeat;
+  background-position: top right; }
+  #current_time #big_date {
+    padding-top: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-family: helvetica, arial, sans-serif;
+    font-weight: bold; }
+  #current_time #big_time {
+    color: #fff;
+    font-size: 24px;
+    font-family: helvetica, arial, sans-serif;
+    font-weight: bold; }
+    #current_time #big_time #big_seconds {
+      color: #ffbe2c;
+      font-style: italic;
+      font-size: 16px; }
+
+h1 {
+  height: 91px;
+  width: 100%;
+  overflow: hidden;
+  text-indent: -200px;
+  /* background-image: url("/busy-noise/images/logo.gif"); */
+  /* background-repeat: no-repeat; */
+  /* background-position: 567px 0; */
+  font-size: 10px;
+  font-family: sans-serif; }
+
+h2 {
+  display: none; }
+
+form {
+  font-size: 16px; }
+  form div.fieldset_block fieldset.days {
+    display: none; }
+  form div.fieldset_block fieldset {
+    border-width: 0; }
+  form div.fieldset_block label {
+    text-align: left;
+    display: block;
+    color: #f00919;
+    font-size: 120%;
+    font-weight: bold;
+    font-style: italic; }
+  form div.fieldset_block input, form div.fieldset_block textarea {
+    font-size: 28px;
+    font-weight: bold;
+    font-family: courier, serif;
+    font-style: normal; }
+  form div.fieldset_block select,
+  form div.fieldset_block select option {
+    font-size: 28px;
+    font-weight: bold;
+    font-style: normal; }
+  form div.headline input {
+    width: 650px; }
+  form div.details textarea {
+    width: 650px; }
+  form div.time_units_block div.title {
+    color: #f00919;
+    font-size: 120%;
+    font-weight: bold;
+    font-style: italic; }
+  form div.time_units_block input {
+    width: 70px;
+    text-align: right; }
+  form div.time_units_block fieldset {
+    display: inline;
+    padding: 0 20px 0 0; }
+  form div.time_units_block label {
+    display: inline;
+    color: #073d6f; }
+  form div.buttons button {
+    color: #073d6f;
+    font-size: 120%;
+    font-weight: bold; }
+
+#add_stuff {
+  visibility: hidden;
+  font-family: helvetica, arial, sans-serif;
+  padding: 10px 0 0px 0; }
+  #add_stuff ul.binder {
+    width: 780px;
+    overflow: auto;
+    list-style-type: none; }
+    #add_stuff ul.binder li {
+      display: inline;
+      width: 140px;
+      overflow: hidden;
+      text-align: center;
+      float: left; }
+    #add_stuff ul.binder li.instructions {
+      margin-left: 150px; }
+    #add_stuff ul.binder li.create_countdown {
+      width: 160px; }
+    #add_stuff ul.binder li.create_alarm {
+      width: 120px; }
+    #add_stuff ul.binder li.create_note {
+      width: 120px; }
+    #add_stuff ul.binder li.selected_link a:link, #add_stuff ul.binder li.selected_link a:hover, #add_stuff ul.binder li.selected_link a:visited {
+      color: #f00919;
+      cursor: default;
+      text-decoration: none;
+      background-color: #f4fafc; }
+    #add_stuff ul.binder a:link, #add_stuff ul.binder a:visited {
+      padding: 5px 0 5px 0;
+      font-weight: bold;
+      font-size: 16px;
+      display: block;
+      margin: 0 5px; }
+    #add_stuff ul.binder a:hover {
+      color: #fff;
+      background-color: #f00919; }
+  #add_stuff #folders div.island {
+    display: none;
+    padding: 15px 10px 20px 20px;
+    background-color: #f4fafc; }
+  #add_stuff #folders div.selected_folder {
+    display: block; }
+  #add_stuff #folders div.intro {
+    margin: 0 0 10px 0;
+    padding: 5px 10px;
+    border-width: 1px 0;
+    border-style: dashed;
+    border-color: #073d6f; }
+  #add_stuff #folders #instructions {
+    background-image: url("/busy-noise/images/instruction_arrows.gif");
+    background-repeat: no-repeat;
+    background-position: 360px 10px; }
+    #add_stuff #folders #instructions ol {
+      margin: 0;
+      padding: 0;
+      list-style-type: none; }
+      #add_stuff #folders #instructions ol li {
+        margin: 0;
+        padding: 20px 0 10px 50px;
+        font-size: 22px;
+        font-weight: bold;
+        background-image: url("/busy-noise/images/instruction_numbers.gif");
+        background-repeat: no-repeat; }
+        #add_stuff #folders #instructions ol li div.title {
+          color: #f00919; }
+        #add_stuff #folders #instructions ol li div.body {
+          color: #073d6f;
+          font-size: 80%;
+          width: 600px; }
+      #add_stuff #folders #instructions ol li.step_1 {
+        margin-right: 400px;
+        background-position: 0 24px;
+        padding-bottom: 0; }
+      #add_stuff #folders #instructions ol li.step_2 {
+        background-position: 0 -97px;
+        padding-top: 20px; }
+        #add_stuff #folders #instructions ol li.step_2 a.stop_buzzer {
+          display: none; }
+      #add_stuff #folders #instructions ol li.step_3 {
+        background-position: 0 -250px;
+        padding-top: 20px; }
+    #add_stuff #folders #instructions div.about {
+      padding-top: 10px;
+      border-width: 1px 0 0 0;
+      border-style: dashed;
+      border-color: #073d6f; }
+      #add_stuff #folders #instructions div.about p {
+        padding-bottom: 10px; }
+      #add_stuff #folders #instructions div.about p.advertisement {
+        padding: 10px;
+        width: 400px;
+        background-color: #ffff88; }
+  #add_stuff #folders #instructions.testing_buzzer ol li.step_2 a.test_buzzer {
+    display: none; }
+  #add_stuff #folders #instructions.testing_buzzer ol li.step_2 a.stop_buzzer {
+    display: inline; }
+
+#work {
+  visibility: hidden;
+  text-align: center; }
+  #work div.egg, #work div.edit_egg {
+    overflow: auto;
+    text-align: left;
+    width: 700px;
+    margin: 0 auto 10px auto;
+    padding-bottom: 10px;
+    font-family: helvetica, arial, sans-serif;
+    background-color: #D3ECF2;
+    background-image: url("/busy-noise/images/blue_sky_bg.jpg");
+    background-repeat: repeat-x; }
+    #work div.egg a:link, #work div.egg a:visited,     #work div.edit_egg a:link, #work div.edit_egg a:visited {
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: bold; }
+    #work div.egg div.undo,     #work div.edit_egg div.undo {
+      display: none; }
+    #work div.egg div.buttons,     #work div.edit_egg div.buttons {
+      overflow: auto;
+      padding-left: 10px; }
+      #work div.egg div.buttons a:link, #work div.egg div.buttons a:visited,       #work div.edit_egg div.buttons a:link, #work div.edit_egg div.buttons a:visited {
+        float: left;
+        display: block;
+        margin-right: 10px; }
+    #work div.egg div.status,     #work div.edit_egg div.status {
+      overflow: auto;
+      float: left; }
+      #work div.egg div.status div.time_status,       #work div.edit_egg div.status div.time_status {
+        float: left;
+        padding: 5px 20px 5px 10px; }
+        #work div.egg div.status div.time_status span,         #work div.edit_egg div.status div.time_status span {
+          padding: 0 5px 0 0;
+          font-size: 15px;
+          font-family: helvetica, arial, sans-serif;
+          font-weight: bold; }
+        #work div.egg div.status div.time_status span.number,         #work div.edit_egg div.status div.time_status span.number {
+          padding: 0;
+          font-size: 40px; }
+      #work div.egg div.status div.buzzer_option,       #work div.edit_egg div.status div.buzzer_option {
+        float: left;
+        clear: both;
+        text-transform: uppercase;
+        padding: 0 15px 3px 5px;
+        font-size: 12px;
+        font-weight: bold;
+        font-family: helvetica, arial, sans-serif; }
+      #work div.egg div.status div.selected_buzzer,       #work div.edit_egg div.status div.selected_buzzer {
+        padding-left: 33px;
+        background-image: url("/busy-noise/images/music_note.gif");
+        background-repeat: no-repeat;
+        background-position: 8px 0; }
+      #work div.egg div.status div.time_status_in_words,       #work div.edit_egg div.status div.time_status_in_words {
+        float: left;
+        clear: both;
+        text-align: center;
+        color: #f00919;
+        padding-left: 50px;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 80%; }
+    #work div.egg div.summary,     #work div.edit_egg div.summary {
+      float: left; }
+      #work div.egg div.summary h4,       #work div.edit_egg div.summary h4 {
+        font-size: 30px; }
+      #work div.egg div.summary div.setting,       #work div.edit_egg div.summary div.setting {
+        text-transform: uppercase;
+        font-style: italic;
+        font-size: 12px; }
+      #work div.egg div.summary div.visible_show_body,       #work div.edit_egg div.summary div.visible_show_body {
+        text-align: right; }
+      #work div.egg div.summary div.body,       #work div.edit_egg div.summary div.body {
+        padding: 0 0 10px 0;
+        font-size: 110%; }
+      #work div.egg div.summary div.details,       #work div.edit_egg div.summary div.details {
+        padding-top: 10px;
+        font-size: 20px;
+        font-weight: bold; }
+  #work div.ready_to_start div.buttons a.pause, #work div.ready_to_start div.buttons a.ready_to_start {
+    display: none; }
+  #work div.ready_to_start div.status {
+    display: none; }
+  #work div.ready_to_start div.summary {
+    padding-left: 13px; }
+    #work div.ready_to_start div.summary h4 {
+      color: #073d6f; }
+  #work div.at_play {
+    color: #fff;
+    background-color: #f00919;
+    background-image: url("/busy-noise/images/humble_red_bg.gif");
+    background-repeat: repeat-x; }
+    #work div.at_play a:link, #work div.at_play a:visited {
+      color: #fff; }
+    #work div.at_play a:hover, #work div.at_play a:active {
+      color: #f00919;
+      background-color: #fff; }
+    #work div.at_play div.buttons a.play, #work div.at_play div.buttons a.edit, #work div.at_play div.buttons a.ready_to_start {
+      display: none; }
+    #work div.at_play div.status div.time_status_in_words {
+      display: none; }
+    #work div.at_play div.summary div.setting {
+      color: #000; }
+    #work div.at_play div.summary div.body {
+      color: #ffc;
+      font-weight: bold; }
+  #work div.paused div.buttons a.pause {
+    display: none; }
+  #work div.paused div.status div.time_status {
+    color: #073d6f; }
+  #work div.paused div.status div.buzzer_option {
+    display: none; }
+  #work div.paused div.status div.time_status_in_words {
+    display: block; }
+  #work div.paused div.summary h4 {
+    color: #073d6f; }
+  #work div.x_marked div.buttons a.pause, #work div.x_marked div.buttons a.ready_to_start, #work div.x_marked div.buttons a.x_mark {
+    display: none; }
+  #work div.x_marked div.status {
+    width: 72px;
+    height: 70px;
+    background-image: url("/busy-noise/images/xmark.gif");
+    background-repeat: no-repeat;
+    background-position: 15px 10px; }
+    #work div.x_marked div.status div.time_status, #work div.x_marked div.status div.buzzer_option, #work div.x_marked div.status div.time_status_in_words {
+      display: none; }
+  #work div.x_marked div.summary h4 {
+    text-decoration: line-through;
+    color: #073d6f; }
+  #work div.check_marked div.buttons a:link.pause, #work div.check_marked div.buttons a:visited.pause,
+  #work div.check_marked div.buttons a:link.ready_to_start, #work div.check_marked div.buttons a:visited.ready_to_start,
+  #work div.check_marked div.buttons a:link.check_mark, #work div.check_marked div.buttons a:visited.check_mark {
+    display: none; }
+  #work div.check_marked div.status {
+    width: 72px;
+    height: 70px;
+    background-image: url("/busy-noise/images/checkmark.gif");
+    background-repeat: no-repeat;
+    background-position: 15px 10px; }
+    #work div.check_marked div.status div.time_status, #work div.check_marked div.status div.buzzer_option, #work div.check_marked div.status div.time_status_in_words {
+      display: none; }
+  #work div.check_marked div.summary h4 {
+    text-decoration: line-through;
+    color: #073d6f; }
+  #work div.no_details div.summary div.details_control_panel, #work div.no_details div.summary div.details {
+    display: none; }
+  #work div.show_details div.summary div.details_control_panel a.show {
+    display: none; }
+  #work div.show_details div.details {
+    display: block; }
+  #work div.hide_details div.summary div.details_control_panel a.hide {
+    display: none; }
+  #work div.hide_details div.details {
+    display: none; }
+  #work div.edit {
+    display: none; }
+  #work div.deleted {
+    padding: 0; }
+    #work div.deleted div.undo {
+      display: block;
+      text-align: center;
+      padding: 20px 10px;
+      border-width: 3px;
+      border-style: dashed;
+      border-color: #f00919; }
+      #work div.deleted div.undo span.short_headline {
+        color: #073d6f;
+        font-weight: bold;
+        font-size: 120%;
+        font-style: italic; }
+    #work div.deleted div.control_panel, #work div.deleted div.status, #work div.deleted div.summary {
+      display: none; }
+  #work div.egg_template_note div.control_panel div.buttons a.ready_to_start {
+    display: inline; }
+  #work div.ready_to_start div.control_panel div.buttons a.ready_to_start {
+    display: none; }
+  #work div.times_up div.buttons a.pause, #work div.times_up div.buttons a.ready_to_start {
+    display: none; }
+  #work div.times_up div.status div.time_status {
+    color: #f00919; }
+  #work div.times_up div.status div.time_status span.number {
+    font-size: 35px; }
+  #work div.times_up div.status div.time_status_in_words, #work div.times_up div.status div.buzzer_option {
+    display: none; }
+  #work div.times_up div.summary h4 {
+    color: #073d6f; }
+  #work div.edit_egg {
+    margin-bottom: 15px;
+    font-size: 120%;
+    font-style: italic; }
+    #work div.edit_egg div.short_headline {
+      color: #f00919;
+      margin: 5px 10px 0 10px;
+      padding-left: 10px;
+      border-width: 0 0 2px 0;
+      border-color: #073d6f;
+      border-style: dashed;
+      font-size: 120%;
+      font-weight: bold; }
+      #work div.edit_egg div.short_headline span.short_headline {
+        color: #073d6f;
+        font-style: normal; }
+    #work div.edit_egg div.land {
+      padding: 10px 10px 10px 20px; }
+      #work div.edit_egg div.land div.time_units_block {
+        text-align: center; }
+        #work div.edit_egg div.land div.time_units_block div.title {
+          text-align: left; }
+      #work div.edit_egg div.land div.buttons {
+        padding-left: 0;
+        text-align: center; }
+        #work div.edit_egg div.land div.buttons button.save, #work div.edit_egg div.land div.buttons button.cancel {
+          margin-right: 25px; }
+
+#dom_templates {
+  display: none; }
+
+#alarm_wall #alarm_holder {
+  visibility: hidden; }
+  
+  
+#the_closing {
+  text-align: center;
+  padding: 15px 0;
+  background: #ff9;
+  font-family: sans-serif;
+}  

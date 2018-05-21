@@ -1,0 +1,229 @@
+/* keep the LVHA order, as decribed by */
+/* www.positioniseverything.net_articles_common.html */
+a:link, a:visited {
+    color: #F00919;
+    font-family: helvetica, arial, sans-serif;
+    font-weight: bold;
+    padding: 1px 1px 2px 1px;
+}
+
+a:hover, a:active {
+    color: #fff;
+    background: #F00919;
+    
+}
+
+
+html, body, div, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, 
+p, blockquote, pre, form, fieldset, table, th, td { 
+  margin: 0; padding: 0; 
+}
+
+#loading {
+  font-size: 2em; 
+  padding: 20px 10px 10px 10px; 
+  text-transform: lowercase; 
+  font-weight: bold; }
+  #loading img { margin: 0 10px 0 0;}
+
+#content { display: none; }
+
+#busy_body {
+  padding: 0;
+  margin: 0;
+  background: #A2D3E0 url("images/body_bg.gif?v1") no-repeat top center;
+  text-align: center;
+  font-size: 62.5%;
+}
+
+#busy_container {
+   width: 800px;
+   margin: 0 auto;
+   text-align: left;
+}
+
+#nav_menu {
+  background: transparent url("images/nav_logo.gif?v4") no-repeat top right;
+  padding-bottom: 18px;
+}
+  #nav_menu ul {
+    height: 34px;
+    text-align: right;
+    list-style-type: none;
+  }
+  #nav_menu ul li {
+    background: transparent url("images/nav_logo.gif?v3") no-repeat top right;
+    height: 32px;
+    display: block;
+  }
+  #nav_menu ul li a {
+    display: block;
+    height: 30px;
+    width: 150px;
+    float: right;
+    text-indent: -400px;
+    text-align: left;
+    overflow: hidden;
+  }
+  #nav_menu ul li a:hover {
+    background-color: transparent;
+  }
+
+h1 { 
+  font-size: xx-small;
+  text-indent: 40px;
+  overflow: hidden;
+  display: none;
+}
+
+h2 { 
+  font-size: xx-small;
+  text-indent: 40px;
+  overflow: hidden;
+  display: none;
+}
+
+
+div.content_block {
+  background: #073D6F;
+  background: #DAEDF3;
+  padding: 8px 15px 20px 15px;
+  margin-bottom: 10px;
+}
+  div.content_block h4 {
+    padding: 0 0 5px 0;
+    margin: 0;
+    color: #FF477C;
+    color: #FF2869;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 18px;
+  
+  }
+
+  div.content_block div.content {
+    font: bold 160% helvetica, arial, sans-serif;
+    color: #ffc;
+    color: #073D6F;
+  }
+  div.content_block div.content p { padding-bottom: 10px; }
+  
+  div.content_block div.content ul { 
+    margin: 0;
+    padding: 0 0 0 25px;
+  }
+#flash_players {
+  margin-top: 10px;
+  overflow: auto;
+  background: #073D6F;
+}
+
+  
+  #flash_players div.player {
+    
+    padding: 8px 0 10px 0;
+  }
+
+  #flash_players #about_busy_office { width: 360px; padding-top: 10px; padding-left: 20px; }
+  #flash_players #about_busy_office ul { list-style-type: none;  padding: 0 0 0 10px; margin: 0;  }
+  #flash_players #about_busy_office ul li { padding: 5px 0 0 0; font-size: 12px;  }
+  #flash_players div.player p {
+    padding-bottom: 10px;
+  }
+
+  #flash_players #ipo_here_we_go,
+  #flash_players #lecture {
+    width: 270px;
+  }
+     #flash_players #ipo_here_we_go h4,
+     #flash_players #ipo_here_we_go div.content,
+     #flash_players #lecture h4,
+     #flash_players #lecture div.content {
+       margin-left: 10px;
+     }
+
+  #flash_players div.player {
+    background-color: transparent; 
+  }
+
+  #flash_players div.player h4  {
+   padding: 0 10px 5px 10px;
+  }
+  #flash_players div.player div.content {
+   padding: 0 10px;
+   color: #ffc;
+   
+  }
+
+#suggestions {
+  display: none;
+  background-color: #ff9;
+  color: #073D6F;
+  margin: 10px 0;
+  padding: 7px 15px 8px 8px;
+  text-align: center;
+  font-weight: bold;
+  font-family: helvetica, arial, sans-serif;
+  font-size: 190%;
+}
+  #suggestions p span{
+    color: #F00919;
+  }
+
+  #ads {
+    margin-top: 100px;
+    text-align: center;
+  }
+	  #ads h3 {
+	    font: bold 250%  georgia;
+	    text-transform: lowercase;
+	    color: #F00919;
+	    
+	  }
+
+	  #ads div.content_block { 
+	     margin: 0; 
+	     padding: 7px 0 0 0; 
+	     text-align: center;  
+	     background-color: transparent;
+	     font-size: 130%;
+	     font-family: helvetica, sans-serif;
+	  } 
+  
+
+
+  #email_subscribe {}
+    #email_subscribe p input { 
+      font: bold 130% courier;
+      width: 450px;
+    }
+    
+    #email_subscribe p.messenger_name {
+      font-size: 70%;
+      padding-top: 10px;
+    }
+
+#credits {
+   float: right;
+   width: 796px;
+   background: #B0C460;
+   margin-top: 30px;
+   padding-top: 20px;
+   font-family: helvetica, arial, sans-serif;
+   font-size: 110%;
+}
+  #credits ul {
+    background: #FFBE2C;
+    margin: 0;
+    padding: 10px 10px 15px 10px;
+  }
+
+  #credits ul li {
+    list-style-type: none;
+    padding: 0 5px 5px 0;
+  }
+
+#busy_body {
+	padding-top: 100px;
+	font-size: medium;
+	background-image: none;
+}

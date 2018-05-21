@@ -1,0 +1,599 @@
+/*    */
+/* keep the LVHA order, as decribed by */
+/* www.positioniseverything.net_articles_common.html */
+a:link, a:visited {
+    color: #F00919;
+    font-family: helvetica, arial, sans-serif;
+    font-weight: bold;
+    padding: 1px 1px 2px 1px;
+}
+
+a:hover, a:active {
+    color: #fff;
+    background: #F00919;
+    
+}
+
+
+html, body, div, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, 
+p, blockquote, pre, form, fieldset, table, th, td { 
+  margin: 0; padding: 0; 
+}
+
+body {
+  background: #A2D3E0 url("images/body_bg.jpg?07.15.05") repeat-x 0 8px;
+}
+
+div.column {
+  padding: 10px 0 0 0;
+}
+  div.column h3 {
+    text-transform: lowercase;
+    color: #f00919;
+    font: bold 110% helvetica, arial, sans-serif;
+    padding: 0;
+    border: 4px double #ff0919;
+    border-width: 4px 0;
+  }
+
+div.system_message {
+  background: #ff9;
+  padding: 0;
+  margin: 0 0 10px 0;
+  text-align: left;
+}
+
+    div.system_message h3 {
+            color: #F00919;
+            padding: 0 10px;
+            text-transform: uppercase;
+            font: bold 80% helvetica, arial, sans-serif;
+            background: transparent;
+    }
+
+    div.system_message p {
+            padding: 0 10px;
+            font: bold 75% helvetica, sans-serif;
+    }
+      div.system_message p span {
+            color: #F00919;
+      }      
+      div.system_message ul {
+            padding: 0 30px 5px 30px;
+      }
+              div.system_message ul li {
+                    font: bold 75% helvetica, sans-serif;
+              }
+
+#egg_content {
+  text-align: center;
+}
+
+
+/*************************************************************************************/
+  #add_stuff {
+    margin: 0;
+    width: 260px;
+    float: left;
+    background: #ff9;
+    text-align: left;
+    padding-top: 0;
+  }
+	#add_stuff h3 { 
+		
+	}
+      #add_stuff.minimized {
+        overflow: hidden;
+        width: 19px;
+      }
+			#add_stuff.minimized div.island {
+				margin: 0;
+			}
+      #add_stuff div.resize_column {
+        text-align: right;
+        padding-right: 5px;
+		padding-bottom: 15px;
+      }
+          #add_stuff div.resize_column a {
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 0;
+          }
+          #add_stuff div.resize_column a.expand {
+            display: none;
+            
+          }
+          #add_stuff.minimized div.resize_column a.expand {
+            display: block;
+            padding: 5px 0 110px 0;
+            font-size: 13px;
+          }
+          #add_stuff.minimized div.resize_column {
+            padding: 0;
+          }
+          #add_stuff.minimized div.resize_column a.minimize,
+          #add_stuff.minimized #tips,
+          #add_stuff.minimized h3,
+          #add_stuff.minimized div.island {
+            display: none;
+          }
+          #system_update {
+            background: #E8F4F7;
+            border: 1px solid #073D6F;
+            padding: 5px;
+            margin: 5px 5px 10px 5px;
+          }
+          #add_stuff h3 {
+            text-indent: 5px;
+            border-top: 4px double #f00919;
+          }
+
+	#add_stuff form {
+	
+	}
+
+		#add_stuff form div.submitted_msg {
+			display: none;
+		}
+		
+		#add_stuff form.submitted div.submitted_msg {
+			display: block;
+			background-color: #ffc;
+			font-weight: bold;
+			color: #073D6F;
+			padding: 5px;
+			margin: 7px 0 0 0;
+			border: 2px dashed #FF477C;
+		}
+     
+     #add_stuff div.island {
+	  padding: 15px 0 0 0;
+	  font-family: helvetica, arial, sans-serif;
+	  margin: 0 auto;
+	  text-align: left;
+	  width: 250px;
+     }
+     
+		 #add_stuff div.island h4 {
+		    background: #E8F4F7;
+		    border: 1px solid #073D6F;
+		    border-width: 1px 1px 0 1px;
+		    margin: 0 0 0 15px;
+		    padding: 1px 10px 2px 5px;
+		    font: bold 90% helvetica, arial, sans-serif;
+		    display: inline;
+		  }
+		  
+		 #add_stuff div.island div.land {
+		    background: #E8F4F7;
+		    border: 1px solid #073D6F;
+		    padding: 5px 0 5px 4px;
+		 }
+			/*** rules to handle expand and minimizing of blocks ***/
+			#add_stuff div.island div.exposable {
+				display: none;
+			}
+				#add_stuff div.island div.nudity_control a:link,
+				#add_stuff div.island div.nudity_control a:visited
+				{
+					font-size: 75%;
+					text-transform: uppercase;
+					padding-left: 5px;
+					padding-right: 5px;
+				}
+
+				#add_stuff div.island div.nudity_control a.cover_up {
+					display: none;
+				}
+			
+			#add_stuff div.island div.exposed div.exposable {
+				display: block;
+			}
+			#add_stuff div.island div.exposed div.nudity_control {
+				text-align: right;
+			}
+				#add_stuff div.island div.exposed div.nudity_control a.expose {
+					display: none;
+				}
+				#add_stuff div.island div.exposed div.nudity_control a.cover_up {
+					display: inline;
+				}
+			/***************************************************/
+			
+		 #add_stuff div.island form {}
+		 
+		 #add_stuff div.island form div.buttons {
+		   padding: 8px 0;
+		 }
+			 
+			 #add_stuff div.island form div.buttons button {
+			   font: bold 90% helvetica, arial, sans-serif;
+			 }
+		 
+		 #add_stuff div.island form label,
+		 #add_stuff div.island div.title {
+		   font: normal 90% helvetica, arial, sans-serif;
+		   color: #073D6F;
+		   
+		 }
+		 
+		 #add_stuff div.island form div.time_units_block  {
+		   overflow: auto;
+		 }
+		 #add_stuff div.island form div.time_units_block fieldset {
+		   border-width: 0 0 3px 0;
+		   padding: 5px 0;
+		   width: 108px;
+		   float: left;
+		   
+		 }
+		 #add_stuff div.island form div.time_units_block fieldset input {
+		   font: normal 140% courier, serif ;
+		   width: 50px;
+		 }
+		 #add_stuff div.island form div.time_units_block fieldset label {
+		   text-transform: lowercase;
+		   
+		 }
+
+		 #add_stuff div.island form div.title_or_details { 
+		   padding: 8px 0 0 0;
+		   margin: 0;
+		 }
+		    #add_stuff div.island form div.title_or_details fieldset {
+		      border-width: 0;
+			  margin: 0;
+			  padding: 0;
+			  text-align: left;
+		    }
+		    #add_stuff div.island form div.title_or_details textarea {
+		      width: 220px;
+		      font: normal 100% courier, serif;
+			  margin: 0;
+		    }
+			#add_stuff div.island #form_note div.title_or_details textarea {
+				height: 300px;
+				font-size: 100%;
+				margin: 0;
+			}
+
+    #add_stuff #create_alarm {
+      
+    }
+      #add_stuff #create_alarm form div.time_units_block fieldset {
+        width: 60px;
+      }
+      #add_stuff #create_alarm form div.time_units_block select {
+        font: normal 140%  serif;
+      }
+/*************************************************************************************/
+
+
+#current_time {
+  background: #073D6F;
+  border-bottom: 8px solid #FF477C; 
+  text-align: center;
+  padding: 10px 0 15px 0;
+  
+}
+
+  #current_time h3 { 
+    color: #fff;
+    font: bold 90% helvetica, sans-serif;
+    text-transform: uppercase;
+  }
+  
+  #big_time {
+    color: #FF477C;
+    font: bold 300% helvetica, sans-serif;
+  }
+	  #big_seconds {
+	    font-size: 80%;
+	  }
+  #big_date {
+    color: #ffc;
+    font: bold 120% helvetica, sans-serif;
+  }
+
+  
+#all_my_stuff {
+
+  text-align: center;
+  overflow: auto;
+  visibility: hidden;
+  
+}
+
+ 
+    #intro {
+      padding: 5px 0 8px 0;
+      width: 530px;
+      margin: 10px auto 0 auto;
+    }
+
+      #intro div.full_features {
+            display: none;
+            padding: 10px 0 0 0;
+      }
+
+  #my_work {
+    display: none;
+    width: 530px;
+    overflow: auto;
+    text-align: left;
+    margin: 0 auto;
+  }
+  	#my_work h3 {
+		
+  	}
+    #my_work #my_tasks { 
+      overflow: auto;
+    }
+    #my_work.empty {
+      display: none;
+    }
+  
+    #my_work div.island {
+      background: #E8F4F7;
+      overflow: auto;
+      padding: 0 5px 10px 5px;
+      margin: 10px 0 ;
+    }
+    
+      #my_work div.undo_block {
+        display: none;
+        padding: 5px 5px 0px 5px;
+        text-align: center;
+      }
+      
+      #my_work div.control_panel { 
+         float: right;
+         width: 250px;  
+		 text-align: right;
+      }
+      
+      #my_work div.summary {
+         padding-bottom: 10px;
+         text-align: left;
+      }
+      
+      #my_work div.island h4 {
+       font: bold 150% helvetica, arial, sans-serif;
+      }
+      
+      #my_work div.setting {
+       font: bold 80% helvetica, arial, sans-serif;
+       padding: 2px 0 0 0;
+	   text-transform: uppercase;
+      }
+      
+      #my_work div.time_status_in_words {
+        color: #F00919;
+        font: bold 110% helvetica, sans-serif; 
+      }
+      
+      #my_work div.time_status {
+        
+      }
+         #my_work div.time_status span {
+           font: normal 100% helvetica, sans-serif;
+         }
+         
+         #my_work div.time_status span.number {
+           font: bold 250% helvetica, sans-serif;
+         }
+      #my_work div.this_is_a_note {
+      	font: bold 110% helvetica, sans-serif;
+      	padding-left: 10px;
+      	color: #F00919;
+      }
+	  
+
+
+      /*** all buttons ***/
+      #my_work div.buttons  {
+        padding: 0 0 2px 0;
+		font-size: 12px;
+      }      
+        #my_work div.island div.buttons a:link,
+		#my_work div.island div.buttons a:visited { 
+          display: none;
+          margin-left: 5px;
+		  padding: 0 2px 2px 2px;
+		  text-transform: uppercase;
+		  font-family: helvetica, verdana, arial, sans-serif;
+        }
+        
+        #my_work div.island div.buzzer_option {
+        	display: none;
+        }
+       
+       
+       
+      /*** islands in different states ***/  
+
+      
+      #my_work div.at_peace {
+         border-bottom: 4px dashed #000;
+         border-width: 0;
+		 background: #C0E0E9 url("images/at_peace_bg.jpg?01.19.19") repeat-x 0 0;
+      } 
+         #my_work div.at_peace h4 {
+           color: #073D6F;
+         }
+         
+         #my_work div.at_peace div.summary {
+         	
+         }
+         #my_work div.at_peace div.setting {
+           color: #FF477C;
+		   color: #F00919;
+         }
+         #my_work div.at_peace div.time_status,
+         #my_work div.at_peace div.time_status_in_words {
+           display: none;
+         }
+         #my_work div.at_peace div.buttons a.play,
+         #my_work div.at_peace div.buttons a.mark_as_done,
+         #my_work div.at_peace div.buttons a.edit { 
+         	display: inline; 
+         }         
+         
+      #my_work div.playing {
+        background: #F00919;
+        color: #fff;
+      }
+		#my_work div.playing div.buttons a:link,
+		#my_work div.playing div.buttons a:visited {
+			color: #fff;
+		}
+		#my_work div.playing div.buttons a:hover{
+			background: #ff9;
+			color: #F00919;
+		}
+		
+      	 #my_work div.playing div.buzzer_option { 	
+      	 	display: inline;  
+      	 	font: bold 90% helvetica, arial, sans-serif;	
+      	 }
+      	 #my_work div.playing div.buzzer_selected {
+      	 	background: transparent url("images/bell_icon.gif?01.19.19") no-repeat 0 0;
+			padding-left: 40px;
+      	 }
+         #my_work div.playing div.time_status_in_words { display: none; }
+         
+         #my_work div.playing div.buttons a.pause,
+         #my_work div.playing div.buttons a.mark_as_done { 
+         	display: inline; 
+         }
+         
+      #my_work div.times_up {
+        background: #F00919;
+        color: #fff;
+      }
+         #my_work div.times_up div.time_status_in_words { display: none; }
+         #my_work div.times_up div.time_status { color: #ff9; }
+         #my_work div.times_up div.buttons a.mark_as_done { 
+         	display: inline; 
+         }
+		 
+		#my_work div.times_up div.buttons a:link,
+		#my_work div.times_up div.buttons a:visited {
+			color: #fff;
+		}
+		#my_work div.times_up div.buttons a:hover{
+			background: #ff9;
+			color: #F00919;
+		}
+		 
+         
+      #my_work div.done {
+		background: #C0E0E9 url("images/at_peace_bg.jpg?01.19.19") repeat-x 0 0;
+      }
+      
+         #my_work div.done h4 {
+           color: #073D6F;
+		   background: transparent url("images/task_checkmark.gif?01.19.19") no-repeat 4px 0;
+		   min-height: 75px;
+		   height: auto;
+		   padding-left: 54px;
+		   text-decoration: line-through;
+         }
+         #my_work div.done div.setting {
+           color: #FF477C;
+		   color: #F00919;
+         }
+      
+      	 #my_work div.done div.time_status_in_words {
+      	 	
+      	 	display: none;
+      	 }
+      	 #my_work div.done div.buttons {
+      	 	
+      	 	text-align: right;
+      	 }
+      	 
+         #my_work div.done div.buttons a.reset,
+         #my_work div.done div.buttons a.edit { 
+         	display: inline; 
+         }
+         
+         #my_work div.done div.time_status {
+           display: none;
+         }
+         
+         #my_work div.done div.this_is_a_note {
+         	display: none;
+         }
+      
+      #my_work div.paused {
+        background: #FFFF71 url("images/paused_bg.jpg?01.19.19") repeat-x 0 0;
+      }
+         #my_work div.paused div.setting {
+			color: #F00919;
+		 }
+         #my_work div.paused div.buttons a.play,
+         #my_work div.paused div.buttons a.mark_as_done { 
+         	display: inline; 
+         }
+
+      #my_work div.deleted {
+      	background: #ff9;
+      }
+      	#my_work div.deleted div.undo_block {
+      		display: block;
+      	}
+      	#my_work div.deleted div.control_panel,
+      	#my_work div.deleted div.summary {
+      		display: none;
+      	}
+
+#add_stuff #tips {
+	margin: 0 auto;
+	padding-bottom: 20px;
+	text-align: center;
+	font: normal 80% serif;
+}
+	#add_stuff #tips div.land {
+		margin: 0;
+	}
+#add_stuff #new_version {
+	margin-top: 0;
+	padding-bottom: 10px;
+	padding-top: 0;
+}
+	#add_stuff #new_version div.land {
+		margin: 0;
+	}
+		#tips #product_suggestions h3 {
+			background: #E8F4F7;
+			color: #000;
+			font-size: 80%;
+			border: 1px solid #073D6F;
+			border-width: 1px 1px 0 1px;
+			padding-bottom: 0;
+			padding-top: 5px;
+		}
+		#tips #product_suggestions div.island {
+			background: #E8F4F7;
+			border: 1px solid #073D6F;
+			border-width: 0 1px 1px 1px;
+			padding: 0 0 0 5px;
+			font-size: 80%;
+			width: auto;
+		}
+	
+	
+#dom_templates { display: none; }
+
+#alarm_wall { /* also use this to cache images */
+	width: 50px;
+	height: 10px;
+	overflow: hidden;
+	float: right;
+	background: transparent url("images/task_checkmark.gif?07.15.05") no-repeat  100px 100px;
+}
+	#alarm_wall div.decorative_padding { /** pushes the player out of view. **/
+		height: 20px;
+		width: 40px;
+	}

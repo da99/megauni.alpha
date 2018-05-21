@@ -1,0 +1,45 @@
+/******************************** Heart Links Block **********************************/
+.heart_links .heart_link h4 { font-size: large; font-family:serif; }
+.heart_links .body { background-image:none; padding-bottom:0; padding-right:0;  }
+.heart_links .heart_link  { 
+    padding-bottom:10px; 
+    padding-right:5px;
+    background: transparent url("../images/sprites/block_bg.gif?timestamp=1178640400") no-repeat bottom right; 
+}
+.heart_links .heart_link div {text-align:right;}
+.heart_links .heart_link .text {text-align:left;}
+.heart_links .heart_link .img_center {text-align:center;}
+.heart_links .heart_link .datetime  {padding-top:5px;}
+
+/** Clearing float fix from: http://www.positioniseverything.net/easyclearing.html **/
+.heart_link:after {
+    content: "."; 
+    display: block; 
+    height: 0; 
+    clear: both; 
+    visibility: hidden;
+}
+
+.heart_link {display: inline-block;}
+
+/* Hides from IE-mac \*/
+* html .heart_link {height: 1%;}
+.heart_link {display: block;}
+/* End hide from IE-mac */
+/********************************* end clearing float fix *****************************/
+/** Clearing float fix from: http://www.positioniseverything.net/easyclearing.html **/
+#main_column .heart_link .text:after {
+    content: "."; 
+    display: block; 
+    height: 0; 
+    clear: both; 
+    visibility: hidden;
+}
+
+#main_column .heart_link .text {display: inline-block;}
+
+/* Hides from IE-mac \*/
+* html #main_column .heart_link .text {height: 1%;}
+#main_column .heart_link .text {display: block;}
+/* End hide from IE-mac */
+/********************************* end clearing float fix *****************************/
