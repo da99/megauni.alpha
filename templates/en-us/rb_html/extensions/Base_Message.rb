@@ -166,7 +166,7 @@ module Ruby_To_Html::Base_Message
     if ask.css_class?
       div_attrs[:class] = get.css_class
     end
-    add_javascript_file '/js/vendor/jquery-1.4.2.min.js'
+    add_javascript_file '/js/vendor/jquery.min.js'
     add_javascript_file '/js/pages/Megauni_Base.js'
     
     config = form_config

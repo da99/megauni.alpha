@@ -334,7 +334,7 @@ class Base_View < Mustache
 
   def default_javascripts
     [ {
-      :src=>'/js/vendor/jquery-1.4.2.min.js' 
+      :src=>'/js/vendor/jquery.min.js' 
     },
       {:src=>"/js/pages/#{base_filename}.js"}]
   end
